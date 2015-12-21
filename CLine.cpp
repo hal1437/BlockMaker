@@ -1,5 +1,7 @@
 #include "CLine.h"
 
+#include <iostream>
+
 bool CLine::Create(Relative<Pos> pos, int index){
     if(0 <= index && index < 2){
         this->pos[index] = pos;

@@ -5,7 +5,7 @@
 //相対値
 template<class Base,class Diff = Base>
 class Relative{
-protected:
+public:
     Base* ref=nullptr;
     Relative<Base,Diff>* ref_same=nullptr;
     Diff diff;
@@ -51,8 +51,9 @@ public:
     }
     //ふつうのコピー
     Relative<Base,Diff> operator=(const Relative<Base,Diff>& rhs){
-        setRelative(rhs.ref);
-        setDifferent(rhs.diff);
+        this->ref = rhs.ref;
+        this->ref_same = rhs.ref_same;
+        this->diff = rhs.diff;
         return (*this);
     }
     Relative(){

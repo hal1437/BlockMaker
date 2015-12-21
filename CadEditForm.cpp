@@ -22,11 +22,10 @@ void CadEditForm::paintEvent(QPaintEvent * event){
 }
 
 void CadEditForm::mouseMoveEvent   (QMouseEvent* event){
-    Pos local_pos = Pos(event->pos().x(),event->pos().y());
-    CObject::mouse_over = local_pos;
+    CObject::mouse_over = Pos(event->pos().x(),event->pos().y());
+    CObject* answer = Selecting();
     repaint();
-    CObject::select_obj = Selecting();
-    emit MovedMouse();
+    emit MovedMouse(event,answer);
 }
 
 CadEditForm::CadEditForm(QWidget *parent) :

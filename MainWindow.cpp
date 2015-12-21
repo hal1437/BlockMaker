@@ -7,7 +7,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     setMouseTracking(true);
-    connect(ui->CadEdit,SIGNAL(MovedMouse()),this,SLOT(MovedMouse()));
+    connect(ui->CadEdit,SIGNAL(MovedMouse(QMouseEvent*,CObject*)),this,SLOT(MovedMouse(QMouseEvent*,CObject*)));
     connect(ui->actionCtrlZ,SIGNAL(triggered()),this,SLOT(CtrlZ()));
     ConnectSignals();
 }
@@ -23,6 +23,11 @@ void MainWindow::mousePressEvent  (QMouseEvent* event){
     if(select  != nullptr)local_pos = select->GetPoint();
 
     release_flag=false;
+
+    //編集
+    if(state == Edit){
+        move_flag = true;
+    }
 
     //点の追加
     if(state == Dot){
@@ -42,14 +47,15 @@ void MainWindow::mousePressEvent  (QMouseEvent* event){
             log.push_back(make_obj);
         }
         //端点に点を作成
-        if(selecting == nullptr){
-            CObject* new_point = new CPoint();
+        if(CObject::select_obj == nullptr){
+            CPoint* new_point = new CPoint();
             new_point->Make(Pos(local_pos.x,local_pos.y));
             ui->CadEdit->AddObject(new_point);
             log.push_back(new_point);
+            make_obj->Make(*new_point,creating_count);
+        }else{
+            make_obj->Make(*dynamic_cast<CPoint*>(CObject::select_obj),creating_count);
         }
-
-        make_obj->Make(Pos(local_pos.x,local_pos.y),creating_count);
         creating_count++;
         creating_count %= 2;
     }
@@ -58,6 +64,13 @@ void MainWindow::mousePressEvent  (QMouseEvent* event){
 
 void MainWindow::mouseReleaseEvent(QMouseEvent* event){
     Pos local_pos = CObject::mouse_over;
+
+
+    //編集
+    if(state == Edit){
+        move_flag = false;
+    }
+
     if(state == Line && release_flag==true){
         if(creating_count == 0){
             ui->CadEdit->AddObject(make_obj);
@@ -65,13 +78,15 @@ void MainWindow::mouseReleaseEvent(QMouseEvent* event){
         }
 
         //端点に点を作成
-        if (selecting == nullptr){
-            CObject* new_point = new CPoint();
+        if(CObject::select_obj == nullptr){
+            CPoint* new_point = new CPoint();
             new_point->Make(Pos(local_pos.x,local_pos.y));
             ui->CadEdit->AddObject(new_point);
             log.push_back(new_point);
+            make_obj->Make(*new_point,creating_count);
+        }else{
+            make_obj->Make(*dynamic_cast<CPoint*>(CObject::select_obj),creating_count);
         }
-        make_obj->Make(Pos(local_pos.x,local_pos.y),creating_count);
         creating_count++;
         creating_count %= 2;
     }
@@ -85,7 +100,14 @@ void MainWindow::CtrlZ(){
     }
 }
 
-void MainWindow::MovedMouse(){
+void MainWindow::MovedMouse(QMouseEvent *event, CObject *under_object){
+    if(!(event->buttons() & Qt::LeftButton) || !move_flag){
+        CObject::select_obj = under_object;
+    }
+    //編集
+    if(move_flag == true){
+        dynamic_cast<CPoint*>(CObject::select_obj)->setDifferent(CObject::mouse_over);
+    }
     release_flag=true;
     repaint();
 }

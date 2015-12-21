@@ -34,11 +34,12 @@ private:
     CObject* selecting = nullptr;
     int creating_count=0;
     bool release_flag=false;
+    bool move_flag=false;
     QVector<CObject*> log;
 
 public slots:
     void CtrlZ();
-    void MovedMouse();
+    void MovedMouse(QMouseEvent* event,CObject* under_object);
     void ConnectSignals();
     void DisconnectSignals();
     void ClearButton();

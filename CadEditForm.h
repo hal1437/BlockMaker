@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QDebug>
 #include <QMouseEvent>
+#include <iostream>
 #include "CObject.h"
 
 namespace Ui {
@@ -31,7 +32,7 @@ private:
     Ui::CadEditForm *ui;
 
 signals:
-    void MovedMouse();
+    void MovedMouse(QMouseEvent *event, CObject *under_object);
 
 public slots:
     CObject* Selecting();

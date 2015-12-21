@@ -28,6 +28,7 @@ public:
     //生成関数
     bool Make(Pos& pos,int index=0);
     bool Make(Pos&& pos, int index=0);
+    bool Make(Relative<Pos>& pos, int index=0);
 
     //コンストラクタ
     CObject();
