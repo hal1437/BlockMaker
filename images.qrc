@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/ToolImages">
+        <file>Arc.png</file>
+        <file>Dot.png</file>
+        <file>Line.png</file>
+    </qresource>
+</RCC>
