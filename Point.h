@@ -1,6 +1,9 @@
 #ifndef POINT_H
 #define POINT_H
 #include <cmath>
+#include <QPoint>
+#include <iostream>
+
 
 //座標
 template<class T>
@@ -14,8 +17,29 @@ public:
     Point():x(0),y(0){}
     Point(const T& X,const T& Y):x(X),y(Y){}
 
+    //直線と点の最近点を求める
+    static current LineNearPoint(cr_current pos1,cr_current pos2,cr_current hand){
+        //内積で一発
+        return pos1 + (pos2-pos1).GetNormalize() * (pos2-pos1).GetNormalize().Dot(hand-pos1);
+    }
+
+    //円と点の最近点を求める
+    static current CircleNearPoint(cr_current center,double r,cr_current hand){
+        //当然centerとhandの線分上にある
+        return (hand-center).GetNormalize() * r;
+    }
+
+    double Length()const{
+        return std::sqrt(x*x+y*y);
+    }
     double Length(cr_current rhs)const{
         return std::sqrt(std::pow(x - rhs.x,2)+std::pow(y - rhs.y,2));
+    }
+    double Dot(cr_current rhs)const{
+        return x * rhs.x + y * rhs.y;
+    }
+    current GetNormalize()const{
+        return current(x/Length(),y/Length());
     }
 
     current operator-()const{return Point(-x,-y);}
@@ -29,6 +53,12 @@ public:
     template<class V> current operator*(V rhs){x *= rhs;y *= rhs;return (*this);}
     template<class V> current operator/(V rhs){x /= rhs;y /= rhs;return (*this);}
 };
+
+template<class T>
+std::ostream& operator<<(std::ostream& ost,Point<T> pos){
+    ost << "(" << pos.x << "," << pos.y << ")";
+    return ost;
+}
 
 typedef Point<double> Pos;
 

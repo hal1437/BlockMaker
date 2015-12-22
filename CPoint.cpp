@@ -6,7 +6,7 @@ bool CPoint::Create(Relative<Pos> pos,int){
     return true;
 }
 
-Pos CPoint::GetPoint()const{
+Pos CPoint::GetNear(const Pos&)const{
     return this->getRelative();
 }
 
@@ -33,6 +33,12 @@ bool CPoint::Selecting(){
 bool CPoint::isLocked(){
     return (this->ref != nullptr);
 }
+
+bool CPoint::Move(const Pos& diff){
+    this->setDifferent(this->getDifference()+diff);
+}
+
+
 
 CPoint::CPoint()
 {

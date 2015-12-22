@@ -14,10 +14,11 @@ protected:
     bool Create(Relative<Pos> pos,int index);
 
 public:
-    Pos GetPoint()const;
+    virtual Pos GetNear(const Pos&)const;
     virtual bool Draw(QPainter& painter)const;
     virtual bool Selecting();
     virtual bool isLocked();
+    virtual bool Move(const Pos& diff);
 
     CPoint();
     ~CPoint();

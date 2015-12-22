@@ -31,6 +31,9 @@ public:
     Base* getReference()const{
         return ref;
     }
+    Relative<Base,Diff>* getReferenceSame()const{
+        return ref_same;
+    }
     Diff getDifference()const{
         return diff;
     }

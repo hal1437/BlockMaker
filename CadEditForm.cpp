@@ -43,7 +43,9 @@ CadEditForm::~CadEditForm()
 
 CObject* CadEditForm::Selecting(){
     for(CObject* obj:objects){
-        if(obj->Selecting())return obj;
+        if(obj->Selecting()){
+            return obj;
+        }
     }
     return nullptr;
 }
