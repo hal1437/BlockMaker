@@ -72,6 +72,7 @@ void MainWindow::mousePressEvent  (QMouseEvent* event){
 
 void MainWindow::mouseReleaseEvent(QMouseEvent* event){
     Pos local_pos = CObject::mouse_over;
+    if(CObject::select_obj != nullptr)local_pos = CObject::select_obj->GetNear(local_pos);
 
 
     //編集

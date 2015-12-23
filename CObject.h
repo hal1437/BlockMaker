@@ -34,6 +34,8 @@ public:
     //隣接点
     virtual Pos GetNear(const Pos& hand)const=0;
 
+    void SetSelecting(bool f);
+
 
     //生成関数
     bool Make(Pos& pos,int index=0);

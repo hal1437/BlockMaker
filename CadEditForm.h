@@ -6,6 +6,8 @@
 #include <QMouseEvent>
 #include <iostream>
 #include "CObject.h"
+#include "CPoint.h"
+#include "CLine.h"
 
 namespace Ui {
 class CadEditForm;

@@ -4,6 +4,9 @@ CObject* CObject::select_obj;
 Pos CObject::mouse_over;
 
 
+void CObject::SetSelecting(bool f){
+    this->selecting = f;
+}
 
 bool CObject::Make(Pos& pos,int index){
     Relative<Pos> r;
