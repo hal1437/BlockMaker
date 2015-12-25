@@ -16,19 +16,31 @@
   <widget class="QWidget" name="centralWidget">
    <layout class="QHBoxLayout" name="horizontalLayout">
     <item>
-     <widget class="CadEditForm" name="CadEdit" native="true">
+     <widget class="QGroupBox" name="groupBox">
       <property name="minimumSize">
        <size>
-        <width>400</width>
-        <height>300</height>
+        <width>100</width>
+        <height>0</height>
        </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>100</width>
+        <height>16777215</height>
+       </size>
+      </property>
+      <property name="title">
+       <string>幾何拘束</string>
       </property>
      </widget>
     </item>
     <item>
-     <widget class="QGroupBox" name="groupBox">
-      <property name="title">
-       <string>なんか</string>
+     <widget class="CadEditForm" name="CadEdit" native="true">
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>0</height>
+       </size>
       </property>
      </widget>
     </item>

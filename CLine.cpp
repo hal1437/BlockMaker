@@ -21,8 +21,9 @@ Pos CLine::GetNear(const Pos& hand)const{
 }
 
 bool CLine::Draw(QPainter& painter)const{
-    if(this->selecting)painter.setPen(QPen(Qt::red , DRAWING_LINE_SIZE));
-    else               painter.setPen(QPen(Qt::blue, DRAWING_LINE_SIZE));
+    if     (this == CObject::selected )painter.setPen(QPen(Qt::cyan, DRAWING_LINE_SIZE));
+    else if(this == CObject::selecting)painter.setPen(QPen(Qt::red , DRAWING_LINE_SIZE));
+    else                               painter.setPen(QPen(Qt::blue, DRAWING_LINE_SIZE));
     if(is_Creating){
         painter.drawLine(QPointF(pos[0].getRelative().x,pos[0].getRelative().y),
                          QPointF(this->mouse_over.x,this->mouse_over.y));
@@ -44,10 +45,8 @@ bool CLine::Selecting(){
                               (pos[1].getRelative().x < mouse_over.x && mouse_over.x < pos[0].getRelative().x) ||
                               (pos[0].getRelative().y < mouse_over.y && mouse_over.y < pos[1].getRelative().y) ||
                               (pos[1].getRelative().y < mouse_over.y && mouse_over.y < pos[0].getRelative().y))){
-        selecting=true;
         return true;
     }else{
-        selecting=false;
         return false;
     }
 }
@@ -59,6 +58,14 @@ bool CLine::Move(const Pos& diff){
     for(int i = 0;i<2;i++){
         pos[i].getReferenceSame()->diff += diff;
     }
+    return true;
+}
+
+int CLine::GetJointNum()const{
+    return 2;
+}
+Pos CLine::GetJointPos(int index)const{
+    return pos[index]();
 }
 
 

@@ -52,6 +52,18 @@ public:
     current& operator-=(cr_current rhs){x -= rhs.x;y -= rhs.y;return (*this);}
     template<class V> current operator*(V rhs){x *= rhs;y *= rhs;return (*this);}
     template<class V> current operator/(V rhs){x /= rhs;y /= rhs;return (*this);}
+
+    bool operator==(cr_current rhs)const{
+        return (this->x == rhs.x && this->y == rhs.y);
+    }
+    bool operator!=(cr_current rhs)const{
+        return !(*this == rhs.x);
+    }
+    bool operator<(cr_current rhs)const{
+        if(this->x == rhs.x){
+            return (this->y == rhs.y);
+        }else return (this->x == rhs.x);
+    }
 };
 
 template<class T>

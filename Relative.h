@@ -27,6 +27,7 @@ public:
         if     (ref == nullptr && ref_same == nullptr)return diff;
         else if(ref == nullptr && ref_same != nullptr)return ref_same->getRelative() + diff;
         else if(ref != nullptr && ref_same == nullptr)return *ref + diff;
+        else return Base();
     }
     Base* getReference()const{
         return ref;

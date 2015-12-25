@@ -19,6 +19,9 @@ public:
     virtual bool Selecting();
     virtual bool isLocked();
     virtual bool Move(const Pos& diff);
+    virtual int GetJointNum()const;
+    virtual Pos GetJointPos(int index)const;
+
 
     CPoint();
     ~CPoint();

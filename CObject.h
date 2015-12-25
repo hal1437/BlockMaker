@@ -9,11 +9,11 @@
 class CObject
 {
 public:
-    static CObject* select_obj;
+    static CObject* selecting;
+    static CObject* selected;
     static Pos mouse_over;
 protected:
     bool is_Creating;
-    bool selecting = false;
 
     virtual bool Create(Relative<Pos> pos,int index)=0;
 public:
@@ -31,11 +31,12 @@ public:
     virtual bool isLocked()=0;
     //移動関数
     virtual bool Move(const Pos& diff)=0;
-    //隣接点
+    //近接点
     virtual Pos GetNear(const Pos& hand)const=0;
 
-    void SetSelecting(bool f);
-
+    //座標取得
+    virtual int GetJointNum()const=0;
+    virtual Pos GetJointPos(int index)const=0;
 
     //生成関数
     bool Make(Pos& pos,int index=0);

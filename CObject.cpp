@@ -1,12 +1,10 @@
 #include "CObject.h"
 
-CObject* CObject::select_obj;
+CObject* CObject::selecting;
+CObject* CObject::selected;
 Pos CObject::mouse_over;
 
 
-void CObject::SetSelecting(bool f){
-    this->selecting = f;
-}
 
 bool CObject::Make(Pos& pos,int index){
     Relative<Pos> r;

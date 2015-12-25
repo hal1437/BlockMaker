@@ -5,21 +5,53 @@ void CadEditForm::AddObject(CObject* obj){
     objects.push_back(obj);
 
     //CPoint→CLineの順で
-    std::sort(objects.begin(),objects.end(),[](const CObject* lhs,const CObject* rhs){
+    std::sort(objects.begin(),objects.end(),[](const CObject* lhs,const CObject* ){
         if(lhs->is<CPoint>())return true;
         else return false;
     });
 }
 void CadEditForm::RemoveObject(CObject* obj){
-    auto it = std::find(objects.begin(),objects.end(),obj);
-    if(it != objects.end()){
+
+    //点ならば含むObjectを全て削除する。
+    if(obj->is<CPoint>()){
+        for(QVector<CObject*>::Iterator it = objects.begin();it != objects.end();it++){
+            for(int i=0;i < (*it)->GetJointNum();i++){
+                if((*it)->GetJointPos(i) == dynamic_cast<CPoint*>(obj)->getRelative() && (*it) != obj){
+                    *it = nullptr;
+                    break;
+                }
+            }
+        }
+    }else{
+        //点以外ならば端点の被参照数を確認して1なら消す
+
+        //点を抽出
+        QMap<Pos,int> map;//位置,個数
+        for(QVector<CObject*>::Iterator it = objects.begin();it != objects.end();it++){
+            if((*it)->is<CPoint>()){
+                map[(*it)->GetJointPos(0)]++;//増える
+            }
+        }
+        for(int i=0;i<obj->GetJointNum();i++){
+            map.insert(obj->GetJointPos(i),1);
+        }
+    }
+
+    //objを消す
+    QVector<CObject*>::Iterator it = std::find(objects.begin(),objects.end(),obj);
+    if(it != objects.end())objects.erase(it);
+
+    //nullptrを消す
+    it = std::find(objects.begin(),objects.end(),nullptr);
+    while(it != objects.end()){
         delete *it;
         objects.erase(it);
+        it = std::find(objects.begin(),objects.end(),nullptr);
     }
     repaint();
 }
 
-void CadEditForm::paintEvent(QPaintEvent * event){
+void CadEditForm::paintEvent(QPaintEvent*){
     QPainter paint(this);
     paint.fillRect(0,0,this->width(),this->height(),Qt::white);
     for(int i=0;i<this->objects.size();i++){
@@ -51,8 +83,7 @@ CObject* CadEditForm::Selecting(){
     bool selected = false;
     CObject* select_obj = nullptr;
     for(CObject* obj:objects){
-        if (selected)obj->SetSelecting(false);
-        else{
+        if (!selected){
             if(obj->Selecting()){
                 selected=true;
                 select_obj = obj;

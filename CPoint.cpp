@@ -11,7 +11,8 @@ Pos CPoint::GetNear(const Pos&)const{
 }
 
 bool CPoint::Draw(QPainter& painter)const{
-    if(CObject::selecting)painter.setPen(QPen(Qt::red, 2));
+    if     (this == CObject::selected )painter.setPen(QPen(Qt::cyan, 2));
+    else if(this == CObject::selecting)painter.setPen(QPen(Qt::red , 2));
     else painter.setPen(QPen(Qt::blue, 2));
     Pos p = this->getRelative();
     painter.drawArc(p.x-DRAWING_CIRCLE_SIZE,
@@ -21,13 +22,7 @@ bool CPoint::Draw(QPainter& painter)const{
     return true;
 }
 bool CPoint::Selecting(){
-    if((*this)().Length(mouse_over) < COLLISION_SIZE){
-        selecting=true;
-        return true;
-    }else{
-        selecting=false;
-        return false;
-    }
+    return ((*this)().Length(mouse_over) < COLLISION_SIZE);
 }
 
 bool CPoint::isLocked(){
@@ -36,6 +31,15 @@ bool CPoint::isLocked(){
 
 bool CPoint::Move(const Pos& diff){
     this->setDifferent(this->getDifference()+diff);
+    return true;
+}
+
+int CPoint::GetJointNum()const{
+    return 1;
+}
+Pos CPoint::GetJointPos(int index)const{
+    if(index == 0) return (*this)();
+    else return Pos();
 }
 
 

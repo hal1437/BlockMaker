@@ -17,9 +17,9 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::mousePressEvent  (QMouseEvent* event){
+void MainWindow::mousePressEvent  (QMouseEvent* ){
     Pos local_pos = CObject::mouse_over;
-    if(CObject::select_obj != nullptr)local_pos = CObject::select_obj->GetNear(local_pos);
+    if(CObject::selecting != nullptr)local_pos = CObject::selecting->GetNear(local_pos);
 
     release_flag=false;
 
@@ -46,17 +46,17 @@ void MainWindow::mousePressEvent  (QMouseEvent* event){
             log.push_back(make_obj);
         }
 
-        if(CObject::select_obj == nullptr){
+        if(CObject::selecting == nullptr){
             //端点に点を作成
             CPoint* new_point = new CPoint();
             new_point->Make(Pos(local_pos.x,local_pos.y));
             ui->CadEdit->AddObject(new_point);
             log.push_back(new_point);
             make_obj->Make(*new_point,creating_count);
-        }else if(CObject::select_obj->is<CPoint>()){
+        }else if(CObject::selecting->is<CPoint>()){
             //点と結合
-            make_obj->Make(*dynamic_cast<CPoint*>(CObject::select_obj),creating_count);
-        }else if(CObject::select_obj->is<CLine>()){
+            make_obj->Make(*dynamic_cast<CPoint*>(CObject::selecting),creating_count);
+        }else if(CObject::selecting->is<CLine>()){
             //点を線上に追加
             CPoint* new_point = new CPoint();
             new_point->Make(Pos(local_pos.x,local_pos.y));
@@ -70,14 +70,16 @@ void MainWindow::mousePressEvent  (QMouseEvent* event){
     repaint();
 }
 
-void MainWindow::mouseReleaseEvent(QMouseEvent* event){
+void MainWindow::mouseReleaseEvent(QMouseEvent* ){
     Pos local_pos = CObject::mouse_over;
-    if(CObject::select_obj != nullptr)local_pos = CObject::select_obj->GetNear(local_pos);
+    if(CObject::selecting != nullptr)local_pos = CObject::selecting->GetNear(local_pos);
 
 
     //編集
     if(state == Edit){
         move_flag = false;
+        if(CObject::selected == CObject::selecting)CObject::selected = nullptr;
+        else CObject::selected = CObject::selecting;
     }
 
     if(state == Line && release_flag==true){
@@ -87,17 +89,17 @@ void MainWindow::mouseReleaseEvent(QMouseEvent* event){
         }
 
         //端点に点を作成
-        if(CObject::select_obj == nullptr){
+        if(CObject::selecting == nullptr){
             //端点に点を作成
             CPoint* new_point = new CPoint();
             new_point->Make(Pos(local_pos.x,local_pos.y));
             ui->CadEdit->AddObject(new_point);
             log.push_back(new_point);
             make_obj->Make(*new_point,creating_count);
-        }else if(CObject::select_obj->is<CPoint>()){
+        }else if(CObject::selecting->is<CPoint>()){
             //点と結合
-            make_obj->Make(*dynamic_cast<CPoint*>(CObject::select_obj),creating_count);
-        }else if(CObject::select_obj->is<CLine>()){
+            make_obj->Make(*dynamic_cast<CPoint*>(CObject::selecting),creating_count);
+        }else if(CObject::selecting->is<CLine>()){
             //点を線上に追加
             CPoint* new_point = new CPoint();
             new_point->Make(Pos(local_pos.x,local_pos.y));
@@ -121,11 +123,11 @@ void MainWindow::CtrlZ(){
 void MainWindow::MovedMouse(QMouseEvent *event, CObject *under_object){
     static Pos past;
     if(!(event->buttons() & Qt::LeftButton) || !move_flag){
-        CObject::select_obj = under_object;
+        CObject::selecting = under_object;
     }
     //編集
     if(move_flag == true){
-        if(CObject::select_obj!=nullptr)CObject::select_obj->Move(CObject::mouse_over-past);
+        if(CObject::selecting!=nullptr)CObject::selecting->Move(CObject::mouse_over-past);
     }
     past = CObject::mouse_over;
     release_flag=true;
