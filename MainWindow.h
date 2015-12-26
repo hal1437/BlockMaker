@@ -26,15 +26,21 @@ public:
 protected:
     void mousePressEvent  (QMouseEvent* event);
     void mouseReleaseEvent(QMouseEvent* event);
+    void wheelEvent(QWheelEvent * e);
+    void keyPressEvent(QKeyEvent* event);
+    void keyReleaseEvent(QKeyEvent* event);
 
 private:
     Ui::MainWindow *ui;
     CEnum state = Edit;
     CObject* make_obj = nullptr;
     int creating_count=0;
-    bool release_flag=false;
-    bool move_flag=false;
+    bool release_flag = false;
+    bool move_flag    = false;
     QVector<CObject*> log;
+
+    bool shift_pressed = false;
+    bool ctrl_pressed  = false;
 
 public slots:
     void CtrlZ();

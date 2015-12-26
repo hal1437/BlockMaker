@@ -1,7 +1,7 @@
 #include "CObject.h"
 
 CObject* CObject::selecting;
-CObject* CObject::selected;
+std::vector<CObject*> CObject::selected;
 Pos CObject::mouse_over;
 
 

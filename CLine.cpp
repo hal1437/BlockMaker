@@ -21,7 +21,7 @@ Pos CLine::GetNear(const Pos& hand)const{
 }
 
 bool CLine::Draw(QPainter& painter)const{
-    if     (this == CObject::selected )painter.setPen(QPen(Qt::cyan, DRAWING_LINE_SIZE));
+    if     (exist(CObject::selected,this))painter.setPen(QPen(Qt::cyan, DRAWING_LINE_SIZE));
     else if(this == CObject::selecting)painter.setPen(QPen(Qt::red , DRAWING_LINE_SIZE));
     else                               painter.setPen(QPen(Qt::blue, DRAWING_LINE_SIZE));
     if(is_Creating){

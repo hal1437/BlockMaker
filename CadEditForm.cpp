@@ -50,13 +50,24 @@ void CadEditForm::RemoveObject(CObject* obj){
     }
     repaint();
 }
+double CadEditForm::GetScale()const{
+    return scale;
+}
+Pos    CadEditForm::GetTransform()const{
+    return transform;
+}
+
 
 void CadEditForm::paintEvent(QPaintEvent*){
     QPainter paint(this);
+    paint.save();
     paint.fillRect(0,0,this->width(),this->height(),Qt::white);
+    if(scale == 0) paint.scale(0.00001f,0.00001f);
+    else paint.scale(scale,scale);
     for(int i=0;i<this->objects.size();i++){
         objects[i]->Draw(paint);
     }
+    paint.restore();
 }
 
 void CadEditForm::mouseMoveEvent   (QMouseEvent* event){
@@ -91,4 +102,14 @@ CObject* CadEditForm::Selecting(){
         }
     }
     return select_obj;
+}
+
+void CadEditForm::SetScale(double scale){
+    this->scale = scale;
+    repaint();
+}
+
+void CadEditForm::SetTransform(Pos trans){
+    this->transform = trans;
+    repaint();
 }

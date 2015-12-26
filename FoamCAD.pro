@@ -17,7 +17,8 @@ SOURCES += main.cpp\
     CObject.cpp \
     CPoint.cpp \
     CLine.cpp \
-    CadEditForm.cpp
+    CadEditForm.cpp \
+    SmartDimension.cpp
 
 HEADERS  += MainWindow.h \
     CObject.h \
@@ -25,7 +26,9 @@ HEADERS  += MainWindow.h \
     Relative.h \
     Point.h \
     CLine.h \
-    CadEditForm.h
+    CadEditForm.h \
+    Utils.h \
+    SmartDimension.h
 
 FORMS    += MainWindow.ui \
     CadEditForm.ui

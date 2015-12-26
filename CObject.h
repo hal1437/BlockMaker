@@ -1,6 +1,7 @@
 #ifndef COBJECT_H
 #define COBJECT_H
 #include <QPainter>
+#include "Utils.h"
 #include "Point.h"
 #include "Relative.h"
 
@@ -10,7 +11,7 @@ class CObject
 {
 public:
     static CObject* selecting;
-    static CObject* selected;
+    static std::vector<CObject*> selected;
     static Pos mouse_over;
 protected:
     bool is_Creating;

@@ -18,10 +18,14 @@ class CadEditForm : public QWidget
     Q_OBJECT
 private:
     QVector<CObject*> objects;
+    double scale = 1.0f;
+    Pos transform = Pos(0,0);
 public:
 
     void AddObject(CObject* obj);
     void RemoveObject(CObject* obj);
+    double GetScale()const;
+    Pos    GetTransform()const;
 
     void paintEvent(QPaintEvent * event);    //描画イベントハンドラ
     void mouseMoveEvent   (QMouseEvent* event);     //マウス移動
@@ -38,6 +42,8 @@ signals:
 
 public slots:
     CObject* Selecting();
+    void SetScale(double scale);
+    void SetTransform(Pos trans);
 
 };
 

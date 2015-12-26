@@ -9,6 +9,7 @@ MainWindow::MainWindow(QWidget *parent) :
     setMouseTracking(true);
     connect(ui->CadEdit,SIGNAL(MovedMouse(QMouseEvent*,CObject*)),this,SLOT(MovedMouse(QMouseEvent*,CObject*)));
     connect(ui->actionCtrlZ,SIGNAL(triggered()),this,SLOT(CtrlZ()));
+    connect(ui->SizeRateSpinBox,SIGNAL(valueChanged(double)),ui->CadEdit,SLOT(SetScale(double)));
     ConnectSignals();
 }
 
@@ -17,11 +18,15 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::mousePressEvent  (QMouseEvent* ){
+void MainWindow::mousePressEvent  (QMouseEvent* event){
     Pos local_pos = CObject::mouse_over;
     if(CObject::selecting != nullptr)local_pos = CObject::selecting->GetNear(local_pos);
 
     release_flag=false;
+
+
+    //並行移動
+    //if(event->buttons() == )
 
     //編集
     if(state == Edit){
@@ -78,8 +83,9 @@ void MainWindow::mouseReleaseEvent(QMouseEvent* ){
     //編集
     if(state == Edit){
         move_flag = false;
-        if(CObject::selected == CObject::selecting)CObject::selected = nullptr;
-        else CObject::selected = CObject::selecting;
+        if(!shift_pressed)CObject::selected.clear();
+        if(exist(CObject::selected,CObject::selecting))erase(CObject::selected,CObject::selecting);
+        else CObject::selected.push_back(CObject::selecting);
     }
 
     if(state == Line && release_flag==true){
@@ -112,6 +118,25 @@ void MainWindow::mouseReleaseEvent(QMouseEvent* ){
     }
     repaint();
 }
+void MainWindow::wheelEvent(QWheelEvent * e){
+    if(ctrl_pressed){
+        double value = ui->CadEdit->GetScale() + (e->angleDelta().y() / 256.0f);
+        ui->SizeRateSpinBox->setValue(value);
+        ui->CadEdit->SetScale(value);
+
+    }
+}
+
+void MainWindow::keyPressEvent(QKeyEvent* event){
+    shift_pressed = event->modifiers() & Qt::ShiftModifier;
+    ctrl_pressed  = event->modifiers() & Qt::ControlModifier;
+}
+void MainWindow::keyReleaseEvent(QKeyEvent* event){
+    shift_pressed = event->modifiers() & Qt::ShiftModifier;
+    ctrl_pressed  = event->modifiers() & Qt::ControlModifier;
+}
+
+
 void MainWindow::CtrlZ(){
     if(!log.empty()){
         ui->CadEdit->RemoveObject(log.back());
@@ -123,6 +148,7 @@ void MainWindow::CtrlZ(){
 void MainWindow::MovedMouse(QMouseEvent *event, CObject *under_object){
     static Pos past;
     if(!(event->buttons() & Qt::LeftButton) || !move_flag){
+
         CObject::selecting = under_object;
     }
     //編集
