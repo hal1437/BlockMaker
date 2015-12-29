@@ -7,9 +7,10 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     setMouseTracking(true);
-    connect(ui->CadEdit,SIGNAL(MovedMouse(QMouseEvent*,CObject*)),this,SLOT(MovedMouse(QMouseEvent*,CObject*)));
-    connect(ui->actionCtrlZ,SIGNAL(triggered()),this,SLOT(CtrlZ()));
-    connect(ui->SizeRateSpinBox,SIGNAL(valueChanged(double)),ui->CadEdit,SLOT(SetScale(double)));
+    connect(ui->CadEdit        ,SIGNAL(MovedMouse(QMouseEvent*,CObject*)),this       ,SLOT(MovedMouse(QMouseEvent*,CObject*)));
+    connect(ui->actionCtrlZ    ,SIGNAL(triggered())                      ,this       ,SLOT(CtrlZ()));
+    connect(ui->SizeRateSpinBox,SIGNAL(valueChanged(double))             ,ui->CadEdit,SLOT(SetScale(double)));
+    connect(ui->ToolDimension  ,SIGNAL(triggered())                      ,ui->CadEdit,SLOT(MakeSmartDimension()));
     ConnectSignals();
 }
 
@@ -222,3 +223,5 @@ void MainWindow::ToggledArc (bool checked){
     }
     ConnectSignals();
 }
+
+

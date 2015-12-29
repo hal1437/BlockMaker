@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QMouseEvent>
+#include "SmartDimensionDialog.h"
 #include "CPoint.h"
 #include "CLine.h"
 

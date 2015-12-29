@@ -3,5 +3,6 @@
         <file>Arc.png</file>
         <file>Dot.png</file>
         <file>Line.png</file>
+        <file>Dimension.png</file>
     </qresource>
 </RCC>

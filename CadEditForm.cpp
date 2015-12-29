@@ -64,9 +64,11 @@ void CadEditForm::paintEvent(QPaintEvent*){
     paint.fillRect(0,0,this->width(),this->height(),Qt::white);
     if(scale == 0) paint.scale(0.00001f,0.00001f);
     else paint.scale(scale,scale);
-    for(int i=0;i<this->objects.size();i++){
-        objects[i]->Draw(paint);
-    }
+
+    for(CObject*        obj:objects)   obj->Draw(paint);
+
+    paint.setPen(QPen(Qt::blue, 1));
+    for(SmartDimension* dim:dimensions)dim->Draw(paint);
     paint.restore();
 }
 
@@ -112,4 +114,26 @@ void CadEditForm::SetScale(double scale){
 void CadEditForm::SetTransform(Pos trans){
     this->transform = trans;
     repaint();
+}
+
+
+
+void CadEditForm::MakeSmartDimension(){
+    if(CObject::selected.size()==2){
+
+        //スマート寸法生成
+        SmartDimensionDialog* diag = new SmartDimensionDialog(this);
+        if(diag->exec()){
+            double value = diag->GetValue();
+            SmartDimension* dim = new SmartDimension();
+
+            //有効寸法であれば
+            if(dim->SetTarget(CObject::selected[0],CObject::selected[1])){
+                dim->SetValue(value);
+                this->dimensions.push_back(dim);
+            }else{
+                delete dim;
+            }
+        }
+    }
 }

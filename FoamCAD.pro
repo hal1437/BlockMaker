@@ -18,7 +18,9 @@ SOURCES += main.cpp\
     CPoint.cpp \
     CLine.cpp \
     CadEditForm.cpp \
-    SmartDimension.cpp
+    SmartDimension.cpp \
+    CArc.cpp \
+    SmartDimensionDialog.cpp
 
 HEADERS  += MainWindow.h \
     CObject.h \
@@ -28,10 +30,13 @@ HEADERS  += MainWindow.h \
     CLine.h \
     CadEditForm.h \
     Utils.h \
-    SmartDimension.h
+    SmartDimension.h \
+    CArc.h \
+    SmartDimensionDialog.h
 
 FORMS    += MainWindow.ui \
-    CadEditForm.ui
+    CadEditForm.ui \
+    SmartDimensionDialog.ui
 
 RESOURCES += \
     images.qrc

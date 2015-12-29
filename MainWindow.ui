@@ -137,7 +137,6 @@
     <property name="title">
      <string>ファイル</string>
     </property>
-    <addaction name="actionNannla"/>
    </widget>
    <addaction name="menu"/>
   </widget>
@@ -158,6 +157,8 @@
    <addaction name="ToolDot"/>
    <addaction name="ToolLine"/>
    <addaction name="ToolArc"/>
+   <addaction name="separator"/>
+   <addaction name="ToolDimension"/>
    <addaction name="actionCtrlZ"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
@@ -172,6 +173,9 @@
    <property name="text">
     <string>Dot</string>
    </property>
+   <property name="shortcut">
+    <string>P</string>
+   </property>
   </action>
   <action name="ToolLine">
    <property name="checkable">
@@ -183,6 +187,9 @@
    </property>
    <property name="text">
     <string>Line</string>
+   </property>
+   <property name="shortcut">
+    <string>L</string>
    </property>
   </action>
   <action name="ToolArc">
@@ -196,6 +203,9 @@
    <property name="text">
     <string>Arc</string>
    </property>
+   <property name="shortcut">
+    <string>A</string>
+   </property>
   </action>
   <action name="actionCtrlZ">
    <property name="text">
@@ -205,9 +215,16 @@
     <string>Ctrl+Z</string>
    </property>
   </action>
-  <action name="actionNannla">
+  <action name="ToolDimension">
+   <property name="icon">
+    <iconset resource="images.qrc">
+     <normaloff>:/ToolImages/Dimension.png</normaloff>:/ToolImages/Dimension.png</iconset>
+   </property>
    <property name="text">
-    <string>none</string>
+    <string>Dimension</string>
+   </property>
+   <property name="shortcut">
+    <string>D</string>
    </property>
   </action>
  </widget>

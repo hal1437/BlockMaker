@@ -8,6 +8,8 @@
 #include "CObject.h"
 #include "CPoint.h"
 #include "CLine.h"
+#include "SmartDimension.h"
+#include "SmartDimensionDialog.h"
 
 namespace Ui {
 class CadEditForm;
@@ -17,7 +19,8 @@ class CadEditForm : public QWidget
 {
     Q_OBJECT
 private:
-    QVector<CObject*> objects;
+    QVector<CObject*> objects;           //物体
+    QVector<SmartDimension*> dimensions; //寸法
     double scale = 1.0f;
     Pos transform = Pos(0,0);
 public:
@@ -27,8 +30,8 @@ public:
     double GetScale()const;
     Pos    GetTransform()const;
 
-    void paintEvent(QPaintEvent * event);    //描画イベントハンドラ
-    void mouseMoveEvent   (QMouseEvent* event);     //マウス移動
+    void paintEvent    (QPaintEvent* event); //描画イベントハンドラ
+    void mouseMoveEvent(QMouseEvent* event); //マウス移動
 
 
     explicit CadEditForm(QWidget *parent = 0);
@@ -44,6 +47,7 @@ public slots:
     CObject* Selecting();
     void SetScale(double scale);
     void SetTransform(Pos trans);
+    void MakeSmartDimension();
 
 };
 

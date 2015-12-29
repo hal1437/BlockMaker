@@ -5,7 +5,6 @@
 #include "Point.h"
 #include "Relative.h"
 
-
 //CADオブジェクト
 class CObject
 {
