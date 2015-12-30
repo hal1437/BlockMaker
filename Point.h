@@ -20,13 +20,13 @@ public:
     //直線と点の最近点を求める
     static current LineNearPoint(cr_current pos1,cr_current pos2,cr_current hand){
         //内積で一発
-        return pos1 + (pos2-pos1).GetNormalize() * (pos2-pos1).GetNormalize().Dot(hand-pos1);
+        return (pos1 + (pos2-pos1).GetNormalize() * (pos2-pos1).GetNormalize().Dot(hand-pos1));
     }
 
     //円と点の最近点を求める
     static current CircleNearPoint(cr_current center,double r,cr_current hand){
         //当然centerとhandの線分上にある
-        return (hand-center).GetNormalize() * r;
+        return (hand-center).GetNormalize() * r + center;
     }
     //方向比較
     static bool DirComp(cr_current lhs,cr_current rhs){

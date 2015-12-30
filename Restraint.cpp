@@ -1,7 +1,7 @@
 #include "Restraint.h"
 
-
 Pos LineRestraint::GetNearPoint(const Pos& pos)const{
+    //std::cerr << center << "," << center+dir << "," << pos <<  std::endl;
     return Pos::LineNearPoint(center,center+dir,pos);
 }
 Pos ArcRestraint::GetNearPoint(const Pos& pos)const{

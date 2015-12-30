@@ -41,6 +41,7 @@ public:
     double GetValue()const;
 
     bool SetTarget(CObject* obj1,CObject* obj2);
+    CObject* GetTarget(int index)const;
     Restraint* MakeRestraint();
 
     bool Draw(QPainter& painter)const;

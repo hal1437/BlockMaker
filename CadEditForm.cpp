@@ -10,8 +10,6 @@ void CadEditForm::AddObject(CObject* obj){
         else return false;
     });
 
-    //拘束関係に追加
-
 }
 void CadEditForm::RemoveObject(CObject* obj){
 
@@ -73,6 +71,7 @@ void CadEditForm::paintEvent(QPaintEvent*){
     paint.setPen(QPen(Qt::blue, 1));
     for(SmartDimension* dim:dimensions)dim->Draw(paint);
     paint.restore();
+
 }
 
 void CadEditForm::mouseMoveEvent   (QMouseEvent* event){
@@ -139,12 +138,23 @@ void CadEditForm::MakeSmartDimension(){
             }
         }
     }
+    RefreshRestraints();
 }
 
 
 void CadEditForm::RefreshRestraints(){
+    restraints.clear();
+    for(SmartDimension* dim:dimensions){
+        if(restraints.find(dim->GetTarget(1)) != restraints.end()){
+            restraints[dim->GetTarget(1)] = *restraints[dim->GetTarget(1)] & *dim->MakeRestraint();
+        }else{
+            restraints[dim->GetTarget(1)] = dim->MakeRestraint();
+        }
+    }
     //拘束関係更新
     for(QMap<CObject*,Restraint*>::iterator rest = restraints.begin();rest != restraints.end();rest++){
-        rest.key()->Move(rest.value()->GetNearPoint(rest.key()->GetJointPos(0)) - rest.key()->GetJointPos(0));
+        Pos p1 = rest.key()->GetJointPos(0);
+        Pos diff =  p1-rest.value()->GetNearPoint(p1);
+        rest.key()->Move(-diff);
     }
 }
