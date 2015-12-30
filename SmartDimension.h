@@ -3,21 +3,24 @@
 
 #include <vector>
 #include <QMessageBox>
+#include <algorithm>
 #include "CObject.h"
 #include "CPoint.h"
 #include "CLine.h"
 #include "CArc.h"
+#include "Restraint.h"
 
 
 class SmartDimension
 {
 public:
     enum DimensionType{
-        none,       //無効
-        distance1,  //1線距離
-        distance2,  //2点距離
-        angle,      //角度
-        radius,     //半径
+        none,         //無効
+        length,       //1線距離
+        distance,     //2点距離
+        distanceLine, //点距離
+        angle,        //角度
+        radius,       //半径
     };
 
 private:
@@ -38,6 +41,7 @@ public:
     double GetValue()const;
 
     bool SetTarget(CObject* obj1,CObject* obj2);
+    Restraint* MakeRestraint();
 
     bool Draw(QPainter& painter)const;
 

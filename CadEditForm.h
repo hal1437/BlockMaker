@@ -10,6 +10,7 @@
 #include "CLine.h"
 #include "SmartDimension.h"
 #include "SmartDimensionDialog.h"
+#include "Restraint.h"
 
 namespace Ui {
 class CadEditForm;
@@ -19,8 +20,9 @@ class CadEditForm : public QWidget
 {
     Q_OBJECT
 private:
-    QVector<CObject*> objects;           //物体
-    QVector<SmartDimension*> dimensions; //寸法
+    QVector<CObject*>         objects; //物体
+    QVector<SmartDimension*>  dimensions; //寸法
+    QMap<CObject*,Restraint*> restraints; //拘束
     double scale = 1.0f;
     Pos transform = Pos(0,0);
 public:
@@ -48,6 +50,7 @@ public slots:
     void SetScale(double scale);
     void SetTransform(Pos trans);
     void MakeSmartDimension();
+    void RefreshRestraints();
 
 };
 

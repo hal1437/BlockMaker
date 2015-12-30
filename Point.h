@@ -28,6 +28,10 @@ public:
         //当然centerとhandの線分上にある
         return (hand-center).GetNormalize() * r;
     }
+    //方向比較
+    static bool DirComp(cr_current lhs,cr_current rhs){
+        return (lhs.GetNormalize() == rhs.GetNormalize() || lhs.GetNormalize() == -rhs.GetNormalize());
+    }
 
     double Length()const{
         return std::sqrt(x*x+y*y);
@@ -41,6 +45,7 @@ public:
     current GetNormalize()const{
         return current(x/Length(),y/Length());
     }
+
 
     current operator-()const{return Point(-x,-y);}
     current operator+(cr_current rhs)const{return Point(x + rhs.x,y + rhs.y);}

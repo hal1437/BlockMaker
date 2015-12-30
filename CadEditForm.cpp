@@ -9,6 +9,9 @@ void CadEditForm::AddObject(CObject* obj){
         if(lhs->is<CPoint>())return true;
         else return false;
     });
+
+    //拘束関係に追加
+
 }
 void CadEditForm::RemoveObject(CObject* obj){
 
@@ -135,5 +138,13 @@ void CadEditForm::MakeSmartDimension(){
                 delete dim;
             }
         }
+    }
+}
+
+
+void CadEditForm::RefreshRestraints(){
+    //拘束関係更新
+    for(QMap<CObject*,Restraint*>::iterator rest = restraints.begin();rest != restraints.end();rest++){
+        rest.key()->Move(rest.value()->GetNearPoint(rest.key()->GetJointPos(0)) - rest.key()->GetJointPos(0));
     }
 }

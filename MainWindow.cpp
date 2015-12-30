@@ -87,6 +87,7 @@ void MainWindow::mouseReleaseEvent(QMouseEvent* ){
         if(!shift_pressed)CObject::selected.clear();
         if(exist(CObject::selected,CObject::selecting))erase(CObject::selected,CObject::selecting);
         else CObject::selected.push_back(CObject::selecting);
+        ui->ToolDimension->setEnabled(CObject::selected.size() == 2);
     }
 
     if(state == Line && release_flag==true){
@@ -158,6 +159,8 @@ void MainWindow::MovedMouse(QMouseEvent *event, CObject *under_object){
     }
     past = CObject::mouse_over;
     release_flag=true;
+
+    ui->CadEdit->RefreshRestraints();
     repaint();
 }
 
