@@ -66,12 +66,13 @@ void CadEditForm::paintEvent(QPaintEvent*){
     if(scale == 0) paint.scale(0.00001f,0.00001f);
     else paint.scale(scale,scale);
 
-    for(CObject*        obj:objects)   obj->Draw(paint);
+    for(CObject*        obj:objects){
+        if(obj->Refresh())obj->Draw(paint);
+    }
 
     paint.setPen(QPen(Qt::blue, 1));
     for(SmartDimension* dim:dimensions)dim->Draw(paint);
     paint.restore();
-
 }
 
 void CadEditForm::mouseMoveEvent   (QMouseEvent* event){

@@ -4,7 +4,7 @@
 
 bool CLine::Create(Relative<Pos> pos, int index){
     if(0 <= index && index < 2){
-        this->pos[index] = pos;
+        this->pos[index]=pos;
         if(index==1){
             this->is_Creating = false;
             return true;
@@ -56,7 +56,8 @@ bool CLine::isLocked(){
 }
 bool CLine::Move(const Pos& diff){
     for(int i = 0;i<2;i++){
-        pos[i].getReferenceSame()->diff += diff;
+        if(pos[i].getReference() != nullptr)pos[i].getReference()->diff += diff;
+        else pos[i].diff += diff;
     }
     return true;
 }

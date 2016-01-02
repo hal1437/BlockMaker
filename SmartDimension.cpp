@@ -52,7 +52,6 @@ CObject* SmartDimension::GetTarget(int index)const{
 
 
 bool SmartDimension::Draw(QPainter& painter)const{
-    const double PI = 3.141592;
     //描画
     if (this->type == none)return true;
     if (this->type == distance){

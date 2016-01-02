@@ -23,6 +23,8 @@ public:
         return (dynamic_cast<const T*>(this) != nullptr);
     }
 
+    //更新関数
+    virtual bool Refresh(){return true;}
     //描画関数
     virtual bool Draw(QPainter& painter)const = 0;
     //選択関数

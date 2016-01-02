@@ -3,6 +3,7 @@
 
 #include <iterator>
 #include <algorithm>
+#define PI 3.1415926535897932384626433832795
 
 template<class T>
 bool exist(std::iterator<std::forward_iterator_tag,T> begin ,std::iterator<std::forward_iterator_tag,T> end,const T& value){
@@ -21,6 +22,12 @@ void erase(C array,const V& value){
         array.erase(it);
         it = std::find(std::begin(array),std::end(array),value);
     }
+}
+
+template<class T,class U = T>
+T Mod(T lhs,const U& rhs){
+    while(lhs > rhs)lhs -= rhs;
+    return lhs;
 }
 
 #endif // UTILS
