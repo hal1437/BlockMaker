@@ -18,6 +18,8 @@ protected:
     virtual bool Create(Relative<Pos> pos,int index);
 public:
 
+    double GetRound()const;
+    Pos    GetCenter()const;
     virtual bool Refresh();
     virtual Pos GetNear(const Pos& hand)const;
     virtual bool Draw(QPainter& painter)const;

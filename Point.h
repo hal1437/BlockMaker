@@ -16,6 +16,7 @@ public:
 public:
     Point():x(0),y(0){}
     Point(const T& X,const T& Y):x(X),y(Y){}
+    Point(const QPoint& p):x(p.x()),y(p.y()){}
 
     //直線と点の最近点を求める
     static current LineNearPoint(cr_current pos1,cr_current pos2,cr_current hand){
@@ -31,6 +32,15 @@ public:
     //方向比較
     static bool DirComp(cr_current lhs,cr_current rhs){
         return (lhs.GetNormalize() == rhs.GetNormalize() || lhs.GetNormalize() == -rhs.GetNormalize());
+    }
+
+    //直線以上
+    static bool MoreThan(cr_current pos1,cr_current pos2,cr_current hand){
+        //y=ax+b
+        //b=y-ax
+        const T a = (pos2.y - pos1.y)/(pos2.x - pos1.x);
+        const T b = pos1.y - a*pos1.x;
+        return ((hand.x * a + b) <= hand.y);
     }
 
     double Length()const{

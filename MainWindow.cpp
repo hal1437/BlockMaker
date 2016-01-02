@@ -119,7 +119,7 @@ void MainWindow::mouseReleaseEvent(QMouseEvent* ){
         if(!shift_pressed)CObject::selected.clear();
         if(exist(CObject::selected,CObject::selecting))erase(CObject::selected,CObject::selecting);
         else if(CObject::selecting != nullptr)CObject::selected.push_back(CObject::selecting);
-        ui->ToolDimension->setEnabled(CObject::selected.size() == 2);
+        ui->ToolDimension->setEnabled(CObject::selected.size() != 0);
     }
 
     if(state == Line && release_flag==true){

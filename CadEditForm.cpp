@@ -71,7 +71,9 @@ void CadEditForm::paintEvent(QPaintEvent*){
     }
 
     paint.setPen(QPen(Qt::blue, 1));
-    for(SmartDimension* dim:dimensions)dim->Draw(paint);
+    for(SmartDimension* dim:dimensions){
+        dim->Draw(paint);
+    }
     paint.restore();
 }
 
@@ -122,7 +124,7 @@ void CadEditForm::SetTransform(Pos trans){
 
 
 void CadEditForm::MakeSmartDimension(){
-    if(CObject::selected.size()==2){
+    if(CObject::selected.size()!=0){
 
         //スマート寸法生成
         SmartDimensionDialog* diag = new SmartDimensionDialog(this);
@@ -131,7 +133,12 @@ void CadEditForm::MakeSmartDimension(){
             SmartDimension* dim = new SmartDimension();
 
             //有効寸法であれば
-            if(dim->SetTarget(CObject::selected[0],CObject::selected[1])){
+            CObject* sel[2];
+            sel[0] = CObject::selected[0];
+            if(CObject::selected.size()==1)sel[1] = nullptr;
+            else sel[1] = CObject::selected[1];
+
+            if(dim->SetTarget(sel[0],sel[1])){
                 dim->SetValue(value);
                 this->dimensions.push_back(dim);
             }else{
@@ -154,8 +161,10 @@ void CadEditForm::RefreshRestraints(){
     }
     //拘束関係更新
     for(QMap<CObject*,Restraint*>::iterator rest = restraints.begin();rest != restraints.end();rest++){
-        Pos p1 = rest.key()->GetJointPos(0);
-        Pos diff =  p1-rest.value()->GetNearPoint(p1);
-        rest.key()->Move(-diff);
+        if(rest.key()!=nullptr){
+            Pos p1 = rest.key()->GetJointPos(0);
+            Pos diff =  p1-rest.value()->GetNearPoint(p1);
+            rest.key()->Move(-diff);
+        }
     }
 }

@@ -19,12 +19,11 @@ void SmartDimension::DrawArrow(QPainter& painter,const Pos& pos,const Pos& rote,
 
 SmartDimension::DimensionType SmartDimension::GetDimensionType(CObject* obj1, CObject* obj2){
     if     (obj1->is<CLine >() && obj2 == nullptr   )return SmartDimension::length;
+    else if(obj1->is<CArc  >() && obj2 == nullptr   )return SmartDimension::radius;
     else if(obj1->is<CPoint>() && obj2->is<CPoint>())return SmartDimension::distance;
     else if(obj1->is<CLine >() && obj2->is<CPoint>())return SmartDimension::distanceLine;
     else if(obj1->is<CPoint>() && obj2->is<CLine >())return SmartDimension::distanceLine;
     else if(obj1->is<CLine >() && obj2->is<CLine >())return SmartDimension::angle;
-    else if(obj1->is<CArc  >() && obj2->is<CPoint>())return SmartDimension::radius;
-    else if(obj1->is<CPoint>() && obj2->is<CArc  >())return SmartDimension::radius;
     else return SmartDimension::none;
 }
 
@@ -42,7 +41,7 @@ bool SmartDimension::SetTarget(CObject* obj1,CObject* obj2){
     target[0] = obj1;
     target[1] = obj2;
 
-    if(!target[0]->is<CLine>() && target[1]->is<CLine>())std::swap(target[0],target[1]);
+    if(!target[0]->is<CLine>() && target[1]!=nullptr || target[1]->is<CLine>())std::swap(target[0],target[1]);
     return !(this->type == SmartDimension::none);
 }
 
@@ -120,6 +119,36 @@ bool SmartDimension::Draw(QPainter& painter)const{
         trans.rotate(std::atan2(d_pos[0].y - d_pos[1].y,d_pos[0].x - d_pos[1].x)*180/PI + bit * 180);
         painter.setTransform(trans);
         painter.drawText(0,0,QString::number(value));
+        painter.restore();
+        return true;
+    }
+    if (this->type == radius){
+        //矢印
+        CArc* arc = dynamic_cast<CArc*>(target[0]);
+        Pos pos[2] = {arc->GetJointPos(0),arc->GetJointPos(1)};
+        Pos center = arc->GetCenter();
+
+        double angle = std::acos((pos[0]-center).GetNormalize().Dot(pos[1]-center) / arc->GetRound())*180/PI/2;
+        if( Pos::MoreThan(pos[0],center,pos[1]) && pos[0].x < center.x)angle = 180 - angle;
+        if(!Pos::MoreThan(pos[0],center,pos[1]) && pos[0].x > center.x)angle = 180 - angle;
+        std::cerr << angle;
+        Pos dir(QPoint(pos[0].x-center.x,pos[0].y-center.y)*QTransform().rotate(angle));
+        Pos dir_p = dir + dir.GetNormalize()*50;
+
+        painter.drawLine(center.x,center.y,(center+dir_p).x,(center+dir_p).y);
+        DrawArrow(painter,(center+dir),-dir,3.0);
+
+        //寸法の文字
+        painter.save();
+        QTransform trans;
+        QString str = QString("R")+QString::number(value);
+        QFontMetrics fm = painter.fontMetrics();
+        int bit = (dir.x) > 0 ? 0 : 1;
+        trans = QTransform::fromTranslate((center+dir).x,(center+dir).y);
+        trans.rotate(std::atan2(dir.y,dir.x)*180/PI + bit * 180);
+        painter.setTransform(trans);
+        if(bit)painter.drawText(-(fm.width(str)+10),-2,str);
+        else   painter.drawText(10,-2,str);
         painter.restore();
         return true;
     }

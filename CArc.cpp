@@ -38,6 +38,12 @@ bool CArc::Create(Relative<Pos> pos, int index){
     return false;
 }
 
+double CArc::GetRound()const{
+    return round;
+}
+Pos    CArc::GetCenter()const{
+    return center();
+}
 Pos CArc::GetNear(const Pos& hand)const{
     return Pos::CircleNearPoint(center(),round,hand);
 }
@@ -107,7 +113,8 @@ int CArc::GetJointNum()const{
     return 2;
 }
 Pos CArc::GetJointPos(int index)const{
-    return pos[index]();
+    if(index == -1)return center();
+    else return pos[index]();
 }
 
 
