@@ -89,7 +89,8 @@ bool CArc::Selecting(){
     if(angle1 > angle2)std::swap(angle1,angle2);
 
     d = dir3.Length();
-    if((std::abs(d-round) < COLLISION_SIZE) &&
+    if(d < COLLISION_SIZE ||
+       (std::abs(d-round) < COLLISION_SIZE) &&
        (Pos::Angle(dir2,dir3) < Pos::Angle(dir2,dir1))){
         return true;
     }else{
