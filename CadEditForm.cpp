@@ -9,8 +9,10 @@ void CadEditForm::AddObject(CObject* obj){
         if(lhs->is<CPoint>())return true;
         else return false;
     });
-
 }
+
+
+
 void CadEditForm::RemoveObject(CObject* obj){
 
     //点ならば含むObjectを全て削除する。
@@ -77,6 +79,7 @@ void CadEditForm::paintEvent(QPaintEvent*){
     paint.restore();
 }
 
+
 void CadEditForm::mouseMoveEvent   (QMouseEvent* event){
     CObject::mouse_over = Pos(event->pos().x(),event->pos().y());
     CObject* answer = Selecting();
@@ -121,11 +124,8 @@ void CadEditForm::SetTransform(Pos trans){
     repaint();
 }
 
-
-
 void CadEditForm::MakeSmartDimension(){
     if(CObject::selected.size()!=0){
-
         //スマート寸法生成
         SmartDimensionDialog* diag = new SmartDimensionDialog(this);
         if(diag->exec()){

@@ -78,19 +78,13 @@ bool CArc::Draw(QPainter& painter)const{
 }
 bool CArc::Selecting(){
     //円と点の距離のアルゴリズム
-    float d;
 
     Pos dir1 = pos[0]() - center();
     Pos dir2 = pos[1]() - center();
     Pos dir3 = CObject::mouse_over - center();
-    double angle1  = std::atan2(-dir1.y,dir1.x) * 180 / PI;
-    double angle2  = std::atan2(-dir2.y,dir2.x) * 180 / PI;
-    double angle_m = std::atan2(-dir3.y,dir3.x) * 180 / PI;
-    if(angle1 > angle2)std::swap(angle1,angle2);
 
-    d = dir3.Length();
-    if(d < COLLISION_SIZE ||
-       (std::abs(d-round) < COLLISION_SIZE) &&
+    float d = dir3.Length();
+    if((d < COLLISION_SIZE || (std::abs(d-round) < COLLISION_SIZE)) &&
        (Pos::Angle(dir2,dir3) < Pos::Angle(dir2,dir1))){
         return true;
     }else{

@@ -16,10 +16,20 @@ bool CPoint::Draw(QPainter& painter)const{
     else if(this == CObject::selecting)painter.setPen(QPen(Qt::red , 2));
     else painter.setPen(QPen(Qt::blue, 2));
     Pos p = this->getRelative();
-    painter.drawArc(p.x-DRAWING_CIRCLE_SIZE,
-                    p.y-DRAWING_CIRCLE_SIZE,
-                    2*DRAWING_CIRCLE_SIZE,
-                    2*DRAWING_CIRCLE_SIZE,0,360*16);
+    if(control_point){
+        //四角
+        QLine ps[4] = {QLine(p.x-DRAWING_CIRCLE_SIZE,p.y-DRAWING_CIRCLE_SIZE,p.x+DRAWING_CIRCLE_SIZE,p.y-DRAWING_CIRCLE_SIZE),
+                       QLine(p.x+DRAWING_CIRCLE_SIZE,p.y-DRAWING_CIRCLE_SIZE,p.x+DRAWING_CIRCLE_SIZE,p.y+DRAWING_CIRCLE_SIZE),
+                       QLine(p.x+DRAWING_CIRCLE_SIZE,p.y+DRAWING_CIRCLE_SIZE,p.x-DRAWING_CIRCLE_SIZE,p.y+DRAWING_CIRCLE_SIZE),
+                       QLine(p.x-DRAWING_CIRCLE_SIZE,p.y+DRAWING_CIRCLE_SIZE,p.x-DRAWING_CIRCLE_SIZE,p.y-DRAWING_CIRCLE_SIZE)};
+        painter.drawLines(ps,4);
+    }else{
+        //まる
+        painter.drawArc(p.x-DRAWING_CIRCLE_SIZE,
+                        p.y-DRAWING_CIRCLE_SIZE,
+                        2*DRAWING_CIRCLE_SIZE,
+                        2*DRAWING_CIRCLE_SIZE,0,360*16);
+    }
     return true;
 }
 bool CPoint::Selecting(){
@@ -41,6 +51,20 @@ int CPoint::GetJointNum()const{
 Pos CPoint::GetJointPos(int index)const{
     if(index == 0) return (*this)();
     else return Pos();
+}
+
+bool CPoint::isSelectable()const{
+    return this->selectable;
+}
+bool CPoint::isControlPoint()const{
+    return this->control_point;
+}
+
+bool CPoint::Selectable(bool f){
+    selectable = f;
+}
+bool CPoint::ControlPoint(bool f){
+    control_point = f;
 }
 
 

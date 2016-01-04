@@ -11,6 +11,9 @@ private:
     const static int COLLISION_SIZE = 8;
 
 protected:
+    bool selectable = true;
+    bool control_point = false;
+protected:
     bool Create(Relative<Pos> pos,int index);
 
 public:
@@ -22,6 +25,11 @@ public:
     virtual int GetJointNum()const;
     virtual Pos GetJointPos(int index)const;
 
+    virtual bool isSelectable()const;
+    virtual bool isControlPoint()const;
+
+    virtual bool Selectable(bool f);
+    virtual bool ControlPoint(bool f);
 
     CPoint();
     ~CPoint();

@@ -9,6 +9,8 @@ MainWindow::MainWindow(QWidget *parent) :
     setMouseTracking(true);
     connect(ui->CadEdit        ,SIGNAL(MovedMouse(QMouseEvent*,CObject*)),this       ,SLOT(MovedMouse(QMouseEvent*,CObject*)));
     connect(ui->actionCtrlZ    ,SIGNAL(triggered())                      ,this       ,SLOT(CtrlZ()));
+    connect(ui->actionDelete   ,SIGNAL(triggered())                      ,this       ,SLOT(Delete()));
+    connect(ui->actionEsc      ,SIGNAL(triggered())                      ,this       ,SLOT(Escape()));
     connect(ui->SizeRateSpinBox,SIGNAL(valueChanged(double))             ,ui->CadEdit,SLOT(SetScale(double)));
     connect(ui->ToolDimension  ,SIGNAL(triggered())                      ,ui->CadEdit,SLOT(MakeSmartDimension()));
     ConnectSignals();
@@ -19,138 +21,16 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::mousePressEvent  (QMouseEvent* event){
-    Pos local_pos = CObject::mouse_over;
-    if(CObject::selecting != nullptr)local_pos = CObject::selecting->GetNear(local_pos);
-
+void MainWindow::mousePressEvent  (QMouseEvent*){
     release_flag=false;
-
-
-    //並行移動
-    //if(event->buttons() == )
-
-    //編集
-    if(state == Edit){
-        move_flag = true;
-    }
-
-    //点の追加
-    if(state == Dot){
-        make_obj = new CPoint();
-        make_obj->Make(Pos(local_pos.x,local_pos.y));
-        ui->CadEdit->AddObject(make_obj);
-        log.push_back(make_obj);
-    }
-    //線の追加
-    if(state == Line){
-        //新規作成
-        if(creating_count == 0){
-            make_obj = new CLine();
-            ui->CadEdit->AddObject(make_obj);
-
-            make_obj->Make(CObject::mouse_over,creating_count);
-            log.push_back(make_obj);
-        }
-
-        if(CObject::selecting == nullptr){
-            //端点に点を作成
-            CPoint* new_point = new CPoint();
-            new_point->Make(Pos(local_pos.x,local_pos.y));
-            ui->CadEdit->AddObject(new_point);
-            log.push_back(new_point);
-            make_obj->Make(*new_point,creating_count);
-        }else if(CObject::selecting->is<CPoint>()){
-            //点と結合
-            make_obj->Make(*dynamic_cast<CPoint*>(CObject::selecting),creating_count);
-        }else if(CObject::selecting->is<CLine>()){
-            //点を線上に追加
-            CPoint* new_point = new CPoint();
-            new_point->Make(Pos(local_pos.x,local_pos.y));
-            ui->CadEdit->AddObject(new_point);
-            log.push_back(new_point);
-            make_obj->Make(*new_point,creating_count);
-        }
-        creating_count++;
-        creating_count %= 2;
-    }
-    //円弧の追加
-    if(state == Arc){
-        //新規作成
-        if(creating_count == 0){
-            make_obj = new CArc();
-            ui->CadEdit->AddObject(make_obj);
-
-            make_obj->Make(CObject::mouse_over,creating_count);
-            log.push_back(make_obj);
-        }
-
-        if(CObject::selecting == nullptr){
-            //端点に点を作成
-            CPoint* new_point = new CPoint();
-            new_point->Make(Pos(local_pos.x,local_pos.y));
-            ui->CadEdit->AddObject(new_point);
-            log.push_back(new_point);
-            make_obj->Make(*new_point,creating_count);
-        }else if(CObject::selecting->is<CPoint>()){
-            //点と結合
-            make_obj->Make(*dynamic_cast<CPoint*>(CObject::selecting),creating_count);
-        }else if(CObject::selecting->is<CLine>()){
-            //点を線上に追加
-            CPoint* new_point = new CPoint();
-            new_point->Make(Pos(local_pos.x,local_pos.y));
-            ui->CadEdit->AddObject(new_point);
-            log.push_back(new_point);
-            make_obj->Make(*new_point,creating_count);
-        }
-        creating_count++;
-        creating_count %= 2;
-    }
-    repaint();
+    move_flag = true;
+    MakeObject();
 }
 
-void MainWindow::mouseReleaseEvent(QMouseEvent* ){
-    Pos local_pos = CObject::mouse_over;
-    if(CObject::selecting != nullptr)local_pos = CObject::selecting->GetNear(local_pos);
-
-
+void MainWindow::mouseReleaseEvent(QMouseEvent*){
     //編集
-    if(state == Edit){
-        move_flag = false;
-        if(!shift_pressed)CObject::selected.clear();
-        if(exist(CObject::selected,CObject::selecting))erase(CObject::selected,CObject::selecting);
-        else if(CObject::selecting != nullptr)CObject::selected.push_back(CObject::selecting);
-        ui->ToolDimension->setEnabled(CObject::selected.size() != 0);
-    }
-
-    if(state == Line && release_flag==true){
-        if(creating_count == 0){
-            ui->CadEdit->AddObject(make_obj);
-            log.push_back(make_obj);
-        }
-
-        //端点に点を作成
-        if(CObject::selecting == nullptr){
-            //端点に点を作成
-            CPoint* new_point = new CPoint();
-            new_point->Make(Pos(local_pos.x,local_pos.y));
-            ui->CadEdit->AddObject(new_point);
-            log.push_back(new_point);
-            make_obj->Make(*new_point,creating_count);
-        }else if(CObject::selecting->is<CPoint>()){
-            //点と結合
-            make_obj->Make(*dynamic_cast<CPoint*>(CObject::selecting),creating_count);
-        }else if(CObject::selecting->is<CLine>()){
-            //点を線上に追加
-            CPoint* new_point = new CPoint();
-            new_point->Make(Pos(local_pos.x,local_pos.y));
-            ui->CadEdit->AddObject(new_point);
-            log.push_back(new_point);
-            make_obj->Make(*new_point,creating_count);
-        }
-        creating_count++;
-        creating_count %= 2;
-    }
-    repaint();
+    move_flag = false;
+    if(release_flag==true)MakeObject();
 }
 void MainWindow::wheelEvent(QWheelEvent * e){
     if(ctrl_pressed){
@@ -170,12 +50,19 @@ void MainWindow::keyReleaseEvent(QKeyEvent* event){
     ctrl_pressed  = event->modifiers() & Qt::ControlModifier;
 }
 
-
 void MainWindow::CtrlZ(){
     if(!log.empty()){
         ui->CadEdit->RemoveObject(log.back());
         log.erase(log.end()-1);
         creating_count=0;
+    }
+}
+void MainWindow::Delete(){
+    ui->CadEdit->RemoveObject(CObject::selecting);
+}
+void MainWindow::Escape(){
+    if(!make_obj->Make(Pos(),-1)){
+        ui->CadEdit->RemoveObject(make_obj);
     }
 }
 
@@ -257,6 +144,71 @@ void MainWindow::ToggledArc (bool checked){
         state = Edit;
     }
     ConnectSignals();
+}
+
+void MainWindow::MakeObject(){
+
+    Pos local_pos = CObject::mouse_over;
+    if(CObject::selecting != nullptr)local_pos = CObject::selecting->GetNear(local_pos);
+
+    release_flag=false;
+
+    //並行移動
+    //if(event->buttons() == )
+
+    //編集
+    if(state == Edit){
+        if(!shift_pressed)CObject::selected.clear();
+        if(exist(CObject::selected,CObject::selecting))erase(CObject::selected,CObject::selecting);
+        else if(CObject::selecting != nullptr)CObject::selected.push_back(CObject::selecting);
+        ui->ToolDimension->setEnabled(CObject::selected.size() == 2);
+    }else if(state == Dot){
+        //点の追加
+        make_obj = new CPoint();
+        make_obj->Make(Pos(local_pos.x,local_pos.y));
+        ui->CadEdit->AddObject(make_obj);
+        log.push_back(make_obj);
+    }else{
+        //新規作成
+        if(creating_count == 0){
+            if(state == Line)make_obj = new CLine();
+            else if(state == Arc )make_obj = new CArc();
+            ui->CadEdit->AddObject(make_obj);
+
+            make_obj->Make(CObject::mouse_over,creating_count);
+            log.push_back(make_obj);
+        }
+
+        MakeJoint(make_obj);
+        creating_count++;
+        creating_count %= 2;
+    }
+    repaint();
+}
+
+void MainWindow::MakeJoint(CObject* obj){
+    Pos local_pos = CObject::mouse_over;
+    if(CObject::selecting != nullptr)local_pos = CObject::selecting->GetNear(local_pos);
+
+    //端点に点を作成
+    if(CObject::selecting == nullptr){
+        //端点に点を作成
+        CPoint* new_point = new CPoint();
+        new_point->Make(Pos(local_pos.x,local_pos.y));
+        ui->CadEdit->AddObject(new_point);
+        log.push_back(new_point);
+        obj->Make(*new_point,creating_count);
+    }else if(CObject::selecting->is<CPoint>()){
+        //点と結合
+        obj->Make(*dynamic_cast<CPoint*>(CObject::selecting),creating_count);
+    }else if(CObject::selecting->is<CLine>()){
+        //点を線上に追加
+        CPoint* new_point = new CPoint();
+        new_point->Make(Pos(local_pos.x,local_pos.y));
+        ui->CadEdit->AddObject(new_point);
+        log.push_back(new_point);
+        obj->Make(*new_point,creating_count);
+    }
 }
 
 

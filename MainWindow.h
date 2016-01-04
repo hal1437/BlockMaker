@@ -45,6 +45,8 @@ private:
 
 public slots:
     void CtrlZ();
+    void Delete();
+    void Escape();
     void MovedMouse(QMouseEvent* event,CObject* under_object);
     void ConnectSignals();
     void DisconnectSignals();
@@ -52,6 +54,9 @@ public slots:
     void ToggledDot (bool checked);
     void ToggledLine(bool checked);
     void ToggledArc (bool checked);
+
+    void MakeObject();
+    void MakeJoint(CObject *obj);
 
 };
 
