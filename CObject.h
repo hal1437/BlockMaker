@@ -31,6 +31,7 @@ public:
     virtual bool Selecting() = 0;
     //固定関数
     virtual bool isLocked()=0;
+    virtual bool isCreateing()const;
     //移動関数
     virtual bool Move(const Pos& diff)=0;
     //近接点

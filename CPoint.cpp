@@ -3,6 +3,7 @@
 bool CPoint::Create(Relative<Pos> pos,int){
     this->diff = pos.getDifference();
     this->ref = pos.getReference();
+    this->is_Creating = false;
     return true;
 }
 

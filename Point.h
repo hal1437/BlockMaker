@@ -3,6 +3,7 @@
 #include <cmath>
 #include <QPoint>
 #include <iostream>
+#include "Utils.h"
 
 
 //座標
@@ -32,6 +33,19 @@ public:
     //方向比較
     static bool DirComp(cr_current lhs,cr_current rhs){
         return (lhs.GetNormalize() == rhs.GetNormalize() || lhs.GetNormalize() == -rhs.GetNormalize());
+    }
+    //角度比較
+    static double Angle(cr_current base,cr_current dir){
+        current a = base.GetNormalize();
+        current b = dir.GetNormalize();
+        if((MoreThan(current(),a,b))){
+            if(a.x > 0)return 360 - std::acos(a.x*b.x + a.y*b.y) * 180 / PI;
+            else return std::acos(a.x*b.x + a.y*b.y) * 180 / PI;
+        }
+        else {
+            if(a.x < 0)return 360 - std::acos(a.x*b.x + a.y*b.y) * 180 / PI;
+            else return std::acos(a.x*b.x + a.y*b.y) * 180 / PI;
+        }
     }
 
     //直線以上

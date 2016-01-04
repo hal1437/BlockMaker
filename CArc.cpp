@@ -90,11 +90,12 @@ bool CArc::Selecting(){
 
     d = dir3.Length();
     if((std::abs(d-round) < COLLISION_SIZE) &&
-       (angle1 <= angle_m && angle_m <= angle2)){
+       (Pos::Angle(dir2,dir3) < Pos::Angle(dir2,dir1))){
         return true;
     }else{
         return false;
     }
+    return false;
 }
 
 bool CArc::isLocked(){
