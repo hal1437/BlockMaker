@@ -7,7 +7,6 @@
 class CArc : public CObject
 {
 private:
-    const static int DRAWING_LINE_SIZE = 3;
     const static int COLLISION_SIZE = 10;
 
 protected:

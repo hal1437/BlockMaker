@@ -49,9 +49,6 @@ Pos CArc::GetNear(const Pos& hand)const{
 }
 
 bool CArc::Draw(QPainter& painter)const{
-    if     (exist(CObject::selected,this))painter.setPen(QPen(Qt::cyan, DRAWING_LINE_SIZE));
-    else if(this == CObject::selecting)painter.setPen(QPen(Qt::red , DRAWING_LINE_SIZE));
-    else                               painter.setPen(QPen(Qt::blue, DRAWING_LINE_SIZE));
     Pos end_point;
     if(is_Creating){
         end_point = this->mouse_over;

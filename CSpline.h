@@ -5,18 +5,33 @@
 #include "CPoint.h"
 #include <memory>
 
+#define MaxSplineSize 100
+class Spline {
+public:
+    int num=0;
+    double a[MaxSplineSize+1], b[MaxSplineSize+1], c[MaxSplineSize+1], d[MaxSplineSize+1];
+public:
+    Spline(){}
+    void init(std::vector<double> sp);
+    double culc(double t)const;
+};
+
 //CAD上の点
 class CSpline : public CObject
 {
 private:
-    const static int DRAWING_LINE_SIZE = 3;
-    const static int COLLISION_SIZE = 10;
+    const static int DIVISION = 10;//分解数
+    const static int DRAWING_LINE_SIZE = 3;//線の太さ
+    const static int COLLISION_SIZE = 10;//あたり判定の大きさ
 protected:
     std::vector<Relative<Pos>> pos;
+    Spline xs;
+    Spline ys;
 
     virtual bool Create(Relative<Pos> pos,int index);
 public:
 
+    virtual bool Refresh();
     virtual Pos GetNear(const Pos& hand)const;
     virtual bool Draw(QPainter& painter)const;
     virtual bool Selecting();
@@ -29,6 +44,5 @@ public:
     CSpline();
     ~CSpline();
 };
-
 
 #endif // CSPLINE_H

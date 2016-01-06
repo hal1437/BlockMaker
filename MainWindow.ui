@@ -248,6 +248,9 @@
    <property name="text">
     <string>Esc</string>
    </property>
+   <property name="shortcut">
+    <string>Esc</string>
+   </property>
   </action>
   <action name="ToolSpline">
    <property name="checkable">

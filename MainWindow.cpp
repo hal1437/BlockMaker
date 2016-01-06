@@ -37,7 +37,6 @@ void MainWindow::wheelEvent(QWheelEvent * e){
         double value = ui->CadEdit->GetScale() + (e->angleDelta().y() / 256.0f);
         ui->SizeRateSpinBox->setValue(value);
         ui->CadEdit->SetScale(value);
-
     }
 }
 
@@ -61,15 +60,16 @@ void MainWindow::Delete(){
     ui->CadEdit->RemoveObject(CObject::selecting);
 }
 void MainWindow::Escape(){
-    if(!make_obj->Make(Pos(),-1)){
+    if(make_obj != nullptr && !make_obj->Make(Pos(),-1)){
         ui->CadEdit->RemoveObject(make_obj);
     }
+    creating_count=0;
+    ClearButton();
 }
 
 void MainWindow::MovedMouse(QMouseEvent *event, CObject *under_object){
     static Pos past;
     if(!(event->buttons() & Qt::LeftButton) || !move_flag){
-
         CObject::selecting = under_object;
     }
     //編集
@@ -132,35 +132,34 @@ void MainWindow::MakeObject(){
     release_flag=false;
 
     //並行移動
-    //if(event->buttons() == )
 
     //編集
     if(state == Edit){
+        //シフト状態
         if(!shift_pressed)CObject::selected.clear();
+
+        //トグル化
         if(exist(CObject::selected,CObject::selecting))erase(CObject::selected,CObject::selecting);
         else if(CObject::selecting != nullptr)CObject::selected.push_back(CObject::selecting);
-        ui->ToolDimension->setEnabled(CObject::selected.size() == 2);
-    }else if(state == Dot){
-        //点の追加
-        make_obj = new CPoint();
-        make_obj->Make(Pos(local_pos.x,local_pos.y));
-        ui->CadEdit->AddObject(make_obj);
-        log.push_back(make_obj);
+
+        //スマート寸法は2つから
+        ui->ToolDimension->setEnabled(CObject::selected.size() >= 2);
     }else{
-        //新規作成
+        //新規オブジェクト
         if(creating_count == 0){
-            if     (state == Line  )make_obj = new CLine();
+            if     (state == Dot   )make_obj = new CPoint();
+            else if(state == Line  )make_obj = new CLine();
             else if(state == Arc   )make_obj = new CArc();
             else if(state == Spline)make_obj = new CSpline();
             ui->CadEdit->AddObject(make_obj);
-
-            make_obj->Make(CObject::mouse_over,creating_count);
             log.push_back(make_obj);
         }
-
+        //作成
         if(MakeJoint(make_obj)){
             creating_count = 0;
-        }else creating_count++;
+        }else {
+            creating_count++;
+        }
     }
     repaint();
 }
@@ -178,14 +177,17 @@ bool MainWindow::MakeJoint(CObject* obj){
         log.push_back(new_point);
         return obj->Make(*new_point,creating_count);
     }else if(CObject::selecting->is<CPoint>()){
-        //点と結合
+        //点をマージ
         return obj->Make(*dynamic_cast<CPoint*>(CObject::selecting),creating_count);
     }else if(CObject::selecting->is<CLine>()){
-        //点を線上に追加
+        //点をオブジェクト上に追加
         CPoint* new_point = new CPoint();
         new_point->Make(Pos(local_pos.x,local_pos.y));
         ui->CadEdit->AddObject(new_point);
         log.push_back(new_point);
+
+        //一致の幾何拘束を付与
+
         return  obj->Make(*new_point,creating_count);
     }
 }

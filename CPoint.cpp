@@ -12,9 +12,6 @@ Pos CPoint::GetNear(const Pos&)const{
 }
 
 bool CPoint::Draw(QPainter& painter)const{
-    if     (exist(CObject::selected,this))painter.setPen(QPen(Qt::cyan, 2));
-    else if(this == CObject::selecting)painter.setPen(QPen(Qt::red , 2));
-    else painter.setPen(QPen(Qt::blue, 2));
     Pos p = this->getRelative();
     if(control_point){
         //四角

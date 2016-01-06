@@ -68,12 +68,16 @@ void CadEditForm::paintEvent(QPaintEvent*){
     if(scale == 0) paint.scale(0.00001f,0.00001f);
     else paint.scale(scale,scale);
 
-    for(CObject*        obj:objects){
+    for(CObject* obj:objects){
+        if     (exist(CObject::selected,obj))paint.setPen(QPen(Qt::cyan, CObject::DRAWING_LINE_SIZE));
+        else if(obj == CObject::selecting)   paint.setPen(QPen(Qt::red , CObject::DRAWING_LINE_SIZE));
+        else                                 paint.setPen(QPen(Qt::blue, CObject::DRAWING_LINE_SIZE));
         if(obj->Refresh())obj->Draw(paint);
     }
 
     paint.setPen(QPen(Qt::blue, 1));
     for(SmartDimension* dim:dimensions){
+
         dim->Draw(paint);
     }
     paint.restore();
@@ -106,7 +110,7 @@ CObject* CadEditForm::Selecting(){
     for(CObject* obj:objects){
         if (!selected){
             if(obj->Selecting() && !obj->isCreateing()){
-                selected=true;
+                selected = true;
                 select_obj = obj;
             }
         }
