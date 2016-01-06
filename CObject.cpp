@@ -19,14 +19,12 @@ bool CObject::Make(Pos& pos,int index){
 bool CObject::Make(Pos&& pos, int index){
     Relative<Pos> r;
     r = std::move(pos);
-    Create(r,index);
-    return true;
+    return Create(r,index);
 }
 bool CObject::Make(Relative<Pos>& pos, int index){
     Relative<Pos> r;
     r.setReference(&pos);
-    Create(r,index);
-    return true;
+    return Create(r,index);
 }
 
 CObject::CObject()

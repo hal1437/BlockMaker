@@ -1,17 +1,18 @@
-#ifndef CLINE_H
-#define CLINE_H
+#ifndef CSPLINE_H
+#define CSPLINE_H
+
 #include "CObject.h"
 #include "CPoint.h"
 #include <memory>
 
 //CAD上の点
-class CLine : public CObject
+class CSpline : public CObject
 {
 private:
     const static int DRAWING_LINE_SIZE = 3;
-    const static int COLLISION_SIZE = 5;
+    const static int COLLISION_SIZE = 10;
 protected:
-    Relative<Pos> pos[2];
+    std::vector<Relative<Pos>> pos;
 
     virtual bool Create(Relative<Pos> pos,int index);
 public:
@@ -25,9 +26,9 @@ public:
     virtual Pos GetJointPos(int index)const;
 
 
-    CLine();
-    ~CLine();
+    CSpline();
+    ~CSpline();
 };
 
 
-#endif // CLINE_H
+#endif // CSPLINE_H

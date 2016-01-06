@@ -160,6 +160,7 @@
    <addaction name="ToolDot"/>
    <addaction name="ToolLine"/>
    <addaction name="ToolArc"/>
+   <addaction name="ToolSpline"/>
    <addaction name="separator"/>
    <addaction name="ToolDimension"/>
    <addaction name="actionCtrlZ"/>
@@ -246,6 +247,21 @@
   <action name="actionEsc">
    <property name="text">
     <string>Esc</string>
+   </property>
+  </action>
+  <action name="ToolSpline">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="images.qrc">
+     <normaloff>:/ToolImages/Spline.png</normaloff>:/ToolImages/Spline.png</iconset>
+   </property>
+   <property name="text">
+    <string>Spline</string>
+   </property>
+   <property name="toolTip">
+    <string>Spline</string>
    </property>
   </action>
  </widget>

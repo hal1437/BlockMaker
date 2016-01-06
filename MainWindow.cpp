@@ -86,65 +86,43 @@ void MainWindow::MovedMouse(QMouseEvent *event, CObject *under_object){
 
 
 void MainWindow::ConnectSignals(){
-    connect(ui->ToolDot ,SIGNAL(toggled(bool)),this,SLOT(ToggledDot(bool)));
-    connect(ui->ToolArc ,SIGNAL(toggled(bool)),this,SLOT(ToggledArc(bool)));
-    connect(ui->ToolLine,SIGNAL(toggled(bool)),this,SLOT(ToggledLine(bool)));
+    connect(ui->ToolDot   ,SIGNAL(toggled(bool)),this,SLOT(ToggledDot(bool)));
+    connect(ui->ToolArc   ,SIGNAL(toggled(bool)),this,SLOT(ToggledArc(bool)));
+    connect(ui->ToolLine  ,SIGNAL(toggled(bool)),this,SLOT(ToggledLine(bool)));
+    connect(ui->ToolSpline,SIGNAL(toggled(bool)),this,SLOT(ToggledSpline(bool)));
 }
 
 void MainWindow::DisconnectSignals(){
-    disconnect(ui->ToolDot ,SIGNAL(toggled(bool)),this,SLOT(ToggledDot(bool)));
-    disconnect(ui->ToolArc ,SIGNAL(toggled(bool)),this,SLOT(ToggledArc(bool)));
-    disconnect(ui->ToolLine,SIGNAL(toggled(bool)),this,SLOT(ToggledLine(bool)));
+    disconnect(ui->ToolDot   ,SIGNAL(toggled(bool)),this,SLOT(ToggledDot(bool)));
+    disconnect(ui->ToolArc   ,SIGNAL(toggled(bool)),this,SLOT(ToggledArc(bool)));
+    disconnect(ui->ToolLine  ,SIGNAL(toggled(bool)),this,SLOT(ToggledLine(bool)));
+    disconnect(ui->ToolSpline,SIGNAL(toggled(bool)),this,SLOT(ToggledSpline(bool)));
 }
 
 void MainWindow::ClearButton(){
-    if(ui->ToolDot ->isChecked())ui->ToolDot->setChecked(false);
-    if(ui->ToolLine->isChecked())ui->ToolLine->setChecked(false);
-    if(ui->ToolArc ->isChecked())ui->ToolArc ->setChecked(false);
+    if(ui->ToolDot   ->isChecked())ui->ToolDot   ->setChecked(false);
+    if(ui->ToolLine  ->isChecked())ui->ToolLine  ->setChecked(false);
+    if(ui->ToolArc   ->isChecked())ui->ToolArc   ->setChecked(false);
+    if(ui->ToolSpline->isChecked())ui->ToolSpline->setChecked(false);
 }
 
-void MainWindow::ToggledDot (bool checked){
+#define ToggledToolDefinition(TYPE)             \
+void MainWindow::Toggled##TYPE (bool checked){  \
+    if(TYPE != Edit)DisconnectSignals();        \
+    if(checked){                                \
+        ClearButton();                          \
+        state = TYPE;                           \
+        ui->Tool##TYPE->setChecked(true);       \
+    }else{                                      \
+        state = Edit;                           \
+    }                                           \
+    ConnectSignals();                           \
+}                                               \
 
-    DisconnectSignals();
-    if(checked){
-        ClearButton();
-        //選択された
-        state = Dot;
-        ui->ToolDot->setChecked(true);
-    }else{
-        //解除された
-        state = Edit;
-    }
-    ConnectSignals();
-}
-
-void MainWindow::ToggledLine(bool checked){
-    DisconnectSignals();
-    ClearButton();
-    if(checked){
-        //選択された
-        state = Line;
-        ui->ToolLine->setChecked(true);
-    }else{
-        //解除された
-        state = Edit;
-    }
-    ConnectSignals();
-}
-
-void MainWindow::ToggledArc (bool checked){
-    DisconnectSignals();
-    ClearButton();
-    if(checked){
-        //選択された
-        state = Arc;
-        ui->ToolArc->setChecked(true);
-    }else{
-        //解除された
-        state = Edit;
-    }
-    ConnectSignals();
-}
+ToggledToolDefinition(Dot)
+ToggledToolDefinition(Line)
+ToggledToolDefinition(Arc)
+ToggledToolDefinition(Spline)
 
 void MainWindow::MakeObject(){
 
@@ -171,22 +149,23 @@ void MainWindow::MakeObject(){
     }else{
         //新規作成
         if(creating_count == 0){
-            if(state == Line)make_obj = new CLine();
-            else if(state == Arc )make_obj = new CArc();
+            if     (state == Line  )make_obj = new CLine();
+            else if(state == Arc   )make_obj = new CArc();
+            else if(state == Spline)make_obj = new CSpline();
             ui->CadEdit->AddObject(make_obj);
 
             make_obj->Make(CObject::mouse_over,creating_count);
             log.push_back(make_obj);
         }
 
-        MakeJoint(make_obj);
-        creating_count++;
-        creating_count %= 2;
+        if(MakeJoint(make_obj)){
+            creating_count = 0;
+        }else creating_count++;
     }
     repaint();
 }
 
-void MainWindow::MakeJoint(CObject* obj){
+bool MainWindow::MakeJoint(CObject* obj){
     Pos local_pos = CObject::mouse_over;
     if(CObject::selecting != nullptr)local_pos = CObject::selecting->GetNear(local_pos);
 
@@ -197,17 +176,17 @@ void MainWindow::MakeJoint(CObject* obj){
         new_point->Make(Pos(local_pos.x,local_pos.y));
         ui->CadEdit->AddObject(new_point);
         log.push_back(new_point);
-        obj->Make(*new_point,creating_count);
+        return obj->Make(*new_point,creating_count);
     }else if(CObject::selecting->is<CPoint>()){
         //点と結合
-        obj->Make(*dynamic_cast<CPoint*>(CObject::selecting),creating_count);
+        return obj->Make(*dynamic_cast<CPoint*>(CObject::selecting),creating_count);
     }else if(CObject::selecting->is<CLine>()){
         //点を線上に追加
         CPoint* new_point = new CPoint();
         new_point->Make(Pos(local_pos.x,local_pos.y));
         ui->CadEdit->AddObject(new_point);
         log.push_back(new_point);
-        obj->Make(*new_point,creating_count);
+        return  obj->Make(*new_point,creating_count);
     }
 }
 

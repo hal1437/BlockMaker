@@ -21,7 +21,8 @@ SOURCES += main.cpp\
     SmartDimension.cpp \
     CArc.cpp \
     SmartDimensionDialog.cpp \
-    Restraint.cpp
+    Restraint.cpp \
+    CSpline.cpp
 
 HEADERS  += MainWindow.h \
     CObject.h \
@@ -34,7 +35,8 @@ HEADERS  += MainWindow.h \
     SmartDimension.h \
     CArc.h \
     SmartDimensionDialog.h \
-    Restraint.h
+    Restraint.h \
+    CSpline.h
 
 FORMS    += MainWindow.ui \
     CadEditForm.ui \

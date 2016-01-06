@@ -4,5 +4,6 @@
         <file>Dot.png</file>
         <file>Line.png</file>
         <file>Dimension.png</file>
+        <file>Spline.png</file>
     </qresource>
 </RCC>

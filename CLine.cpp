@@ -35,12 +35,13 @@ bool CLine::Draw(QPainter& painter)const{
 }
 bool CLine::Selecting(){
     //直線と点の距離のアルゴリズム
-    float d,d_;
+    float d;
     Pos v1,v2;
     v1 = pos[1].getRelative() - pos[0].getRelative();
     v2 = mouse_over           - pos[0].getRelative();
-    d_ = (v1.x*v2.x + v1.y*v2.y) / (std::sqrt(std::pow(v2.x,2)+std::pow(v2.y,2))*std::sqrt(std::pow(v1.x,2)+std::pow(v1.y,2)));
-    d  = std::sqrt(1-d_*d_) * std::sqrt(std::pow(v1.x,2)+std::pow(v1.y,2));
+    Pos near = Pos::LineNearPoint(Pos(),v1,v2);
+    d = (near - v2).Length();
+
     if(d < COLLISION_SIZE && ((pos[0].getRelative().x < mouse_over.x && mouse_over.x < pos[1].getRelative().x) ||
                               (pos[1].getRelative().x < mouse_over.x && mouse_over.x < pos[0].getRelative().x) ||
                               (pos[0].getRelative().y < mouse_over.y && mouse_over.y < pos[1].getRelative().y) ||

@@ -6,6 +6,7 @@
 #include "SmartDimensionDialog.h"
 #include "CPoint.h"
 #include "CLine.h"
+#include "CSpline.h"
 
 namespace Ui {
 class MainWindow;
@@ -16,6 +17,7 @@ enum CEnum{
     Dot,
     Line,
     Arc,
+    Spline,
 };
 
 class MainWindow : public QMainWindow
@@ -51,12 +53,13 @@ public slots:
     void ConnectSignals();
     void DisconnectSignals();
     void ClearButton();
-    void ToggledDot (bool checked);
-    void ToggledLine(bool checked);
-    void ToggledArc (bool checked);
+    void ToggledDot   (bool checked);
+    void ToggledLine  (bool checked);
+    void ToggledArc   (bool checked);
+    void ToggledSpline(bool checked);
 
     void MakeObject();
-    void MakeJoint(CObject *obj);
+    bool MakeJoint(CObject *obj);
 
 };
 
