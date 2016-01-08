@@ -1,9 +1,7 @@
 #include "CPoint.h"
 
-bool CPoint::Create(Relative<Pos> pos,int){
-    this->diff = pos.getDifference();
-    this->ref = pos.getReference();
-    this->is_Creating = false;
+bool CPoint::Create(CPoint* pos,int){
+    (*this) = *pos;
     return true;
 }
 
@@ -30,15 +28,15 @@ bool CPoint::Draw(QPainter& painter)const{
     return true;
 }
 bool CPoint::Selecting(){
-    return ((*this)().Length(mouse_over) < COLLISION_SIZE);
+    return ((*this)().Length(CPoint::mouse_over) < COLLISION_SIZE);
 }
 
 bool CPoint::isLocked(){
     return (this->ref != nullptr);
 }
 
-bool CPoint::Move(const Pos& diff){
-    this->setDifferent(this->getDifference()+diff);
+bool CPoint::Move(const Pos& pos){
+    diff = this->getRelative() + pos;
     return true;
 }
 
@@ -49,7 +47,13 @@ Pos CPoint::GetJointPos(int index)const{
     if(index == 0) return (*this)();
     else return Pos();
 }
+CPoint* CPoint::GetJoint(int index){
+    return this;
+}
 
+bool CPoint::isCreateing()const{
+    return false;
+}
 bool CPoint::isSelectable()const{
     return this->selectable;
 }
@@ -66,8 +70,16 @@ bool CPoint::ControlPoint(bool f){
 
 
 
-CPoint::CPoint()
-{
+CPoint::CPoint(){
+}
+
+CPoint::CPoint(const Pos &pos):
+    Relative<Pos>(pos){
+
+}
+
+CPoint::CPoint(double x,double y):
+    Relative<Pos>(Pos(x,y)){
 
 }
 

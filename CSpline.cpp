@@ -67,16 +67,16 @@ CSpline::~CSpline()
 bool CSpline::Refresh(){
     std::vector<double> x,y;
     for(int i=0;i<this->pos.size();i++){
-        x.push_back(this->pos[i]().x);
-        y.push_back(this->pos[i]().y);
+        x.push_back(GetJointPos(i).x);
+        y.push_back(GetJointPos(i).y);
     }
     xs.init(x);
     ys.init(y);
     return true;
 }
-bool CSpline::Create(Relative<Pos> pos, int index){
+bool CSpline::Create(CPoint* pos, int index){
     if(0 <= index){
-        this->is_Creating = true;
+        is_Creating = true;
         this->pos.push_back(pos);
         Refresh();
         return false;
@@ -95,7 +95,7 @@ bool CSpline::Draw(QPainter& painter)const{
         double t, m;
         m = (double)(pos.size()-1);
 
-        path.moveTo(pos[0]().x,pos[0]().y);
+        path.moveTo(GetJointPos(0).x,GetJointPos(0).y);
         const double dt = 1.0/DIVISION;
         for(t=0; t<=m; t += dt){
             if(t + dt > m)t=m;
@@ -124,7 +124,7 @@ bool CSpline::isLocked(){
 }
 bool CSpline::Move(const Pos& diff){
     for(int i=0;i<pos.size();i++){
-        pos[i].getReference()->diff += diff;
+        pos[i]->Move(diff);
     }
     return true;
 }
@@ -133,9 +133,9 @@ int CSpline::GetJointNum()const{
     return this->pos.size();
 }
 Pos CSpline::GetJointPos(int index)const{
-    return pos[index]();
+    return pos[index]->getRelative();
 }
-CPoint *CSpline::GetJoint(int index)const{
+CPoint* CSpline::GetJoint(int index){
     return pos[index];
 }
 

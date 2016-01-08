@@ -1,11 +1,12 @@
 #include "CArc.h"
 
 bool CArc::Refresh(){
-    QPoint c;
     if (is_Creating){
         center->setDifferent((GetJointPos(0) - CObject::mouse_over) / 2 + CObject::mouse_over);
         round = (GetJointPos(0) - GetCenter()).Length();
     }else{
+        center->setDifferent((GetJointPos(0) - GetJointPos(1)) / 2 + GetJointPos(1));
+        round = (GetJointPos(0) - GetCenter()).Length();
         for(int i=0;i<2;i++){
             if(std::abs(round - (GetJointPos(i)-GetCenter()).Length()) > 0.001){
                 round = (GetJointPos(i)-GetCenter()).Length();
@@ -15,17 +16,17 @@ bool CArc::Refresh(){
 
         //点を円形修正
         for(int i=0;i<2;i++){
-            if(this->pos[i]->getReference()!=nullptr){
-                pos[i]->getReference()->diff = Pos::CircleNearPoint(GetCenter(),round,this->GetJointPos(i));
-            }
+            //if(this->pos[i]->getReference()!=nullptr){
+            pos[i]->Move(Pos::CircleNearPoint(GetCenter(),round,GetJointPos(i))-GetJointPos(i));
+            //}
         }
     }
 
     return true;
 }
-bool CArc::Create(Relative<Pos> pos, int index){
+bool CArc::Create(CPoint* pos, int index){
     if(0 <= index && index < 2){
-        this->pos[index]->setReference(pos.getReference());
+        this->pos[index] = pos;
         if(index==1){
             this->is_Creating = false;
             Refresh();
@@ -42,7 +43,7 @@ double CArc::GetRound()const{
     return round;
 }
 Pos    CArc::GetCenter()const{
-    return GetCenter();
+    return this->center->getRelative();
 }
 Pos CArc::GetNear(const Pos& hand)const{
     return Pos::CircleNearPoint(GetCenter(),round,hand);
@@ -95,10 +96,9 @@ bool CArc::isLocked(){
 }
 bool CArc::Move(const Pos& diff){
     for(int i = 0;i<2;i++){
-        pos[i]->getReference()->diff += diff;
+        pos[i]->Move(diff);
     }
-    center->diff += diff;
-    //Refresh();
+    center->Move(diff);
     return true;
 }
 
@@ -107,20 +107,21 @@ int CArc::GetJointNum()const{
 }
 Pos CArc::GetJointPos(int index)const{
     if(index == -1)return GetCenter();
+    else if(index == 1 && isCreateing())return CObject::mouse_over;
     else return pos[index]->getRelative();
 }
-CPoint* CArc::GetJoint(int index)const{
+CPoint* CArc::GetJoint(int index){
     if(index == -1)return center;
     else return pos[index];
 }
 
 CArc::CArc()
 {
-
+    this->center = new CPoint();
 }
 
 CArc::~CArc()
 {
-
+    delete center;
 }
 

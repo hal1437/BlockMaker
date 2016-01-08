@@ -14,7 +14,7 @@ protected:
     CPoint* center;
     double round=0;//半径
 
-    virtual bool Create(Relative<Pos> pos,int index);
+    virtual bool Create(CPoint * pos,int index);
 public:
 
     double GetRound()const;
@@ -27,7 +27,7 @@ public:
     virtual bool Move(const Pos& diff);
     virtual int GetJointNum()const;
     virtual Pos GetJointPos(int index)const;
-    virtual CPoint* GetJoint(int index)const;
+    virtual CPoint* GetJoint(int index);
 
 
     CArc();

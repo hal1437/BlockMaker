@@ -12,7 +12,7 @@ private:
 protected:
     CPoint* pos[2];
 
-    virtual bool Create(Relative<Pos> pos,int index);
+    virtual bool Create(CPoint * pos,int index);
 public:
 
     virtual Pos GetNear(const Pos& hand)const;
@@ -22,7 +22,7 @@ public:
     virtual bool Move(const Pos& diff);
     virtual int GetJointNum()const;
     virtual Pos GetJointPos(int index)const;
-    virtual CPoint* GetJoint(int index)const;
+    virtual CPoint* GetJoint(int index);
 
 
     CLine();

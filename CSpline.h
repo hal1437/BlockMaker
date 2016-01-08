@@ -24,11 +24,11 @@ private:
     const static int DRAWING_LINE_SIZE = 3;//線の太さ
     const static int COLLISION_SIZE = 6;//あたり判定の大きさ
 protected:
-    std::vector<Relative<Pos>> pos;
+    std::vector<CPoint*> pos;
     Spline xs;
     Spline ys;
 
-    virtual bool Create(Relative<Pos> pos,int index);
+    virtual bool Create(CPoint* pos, int index);
 public:
 
     virtual bool Refresh();
@@ -39,7 +39,7 @@ public:
     virtual bool Move(const Pos& diff);
     virtual int GetJointNum()const;
     virtual Pos GetJointPos(int index)const;
-    virtual CPoint* GetJoint(int index)const;
+    virtual CPoint* GetJoint(int index);
 
 
 

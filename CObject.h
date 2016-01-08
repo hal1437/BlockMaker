@@ -19,7 +19,7 @@ public:
 protected:
     bool is_Creating;
 
-    virtual bool Create(Relative<Pos> pos,int index)=0;
+    virtual bool Create(CPoint* pos,int index)=0;
 public:
 
     template<class T>
@@ -44,12 +44,10 @@ public:
     //座標取得
     virtual int GetJointNum()const=0;
     virtual Pos GetJointPos(int index)const=0;
-    virtual CPoint* GetJoint(int index)const;
+    virtual CPoint* GetJoint(int index)=0;
 
     //生成関数
-    bool Make(Pos& pos,int index=0);
-    bool Make(Pos&& pos, int index=0);
-    bool Make(Relative<Pos>& pos, int index=0);
+    bool Make(CPoint *pos, int index=0);
 
     //コンストラクタ
     CObject();

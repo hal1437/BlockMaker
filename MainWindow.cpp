@@ -60,7 +60,7 @@ void MainWindow::Delete(){
     ui->CadEdit->RemoveObject(CObject::selecting);
 }
 void MainWindow::Escape(){
-    if(make_obj != nullptr && !make_obj->Make(Pos(),-1)){
+    if(make_obj != nullptr && !make_obj->Make(nullptr,-1)){
         ui->CadEdit->RemoveObject(make_obj);
     }
     creating_count=0;
@@ -100,7 +100,7 @@ void MainWindow::DisconnectSignals(){
 }
 
 void MainWindow::ClearButton(){
-    if(make_obj != nullptr && make_obj->isCreateing())make_obj->Make(Pos(),-1);
+    if(make_obj != nullptr && make_obj->isCreateing())make_obj->Make(nullptr,-1);
     if(ui->ToolDot   ->isChecked())ui->ToolDot   ->setChecked(false);
     if(ui->ToolLine  ->isChecked())ui->ToolLine  ->setChecked(false);
     if(ui->ToolArc   ->isChecked())ui->ToolArc   ->setChecked(false);
@@ -116,7 +116,7 @@ void MainWindow::Toggled##TYPE (bool checked){  \
         ui->Tool##TYPE->setChecked(true);       \
     }else{                                      \
         if(make_obj != nullptr && make_obj->isCreateing()){\
-            make_obj->Make(Pos(),-1);           \
+            make_obj->Make(nullptr,-1);           \
             creating_count=0;                   \
         }                                       \
         make_obj = nullptr;                     \
@@ -177,24 +177,23 @@ bool MainWindow::MakeJoint(CObject* obj){
     //端点に点を作成
     if(CObject::selecting == nullptr){
         //端点に点を作成
-        CPoint* new_point = new CPoint();
-        new_point->Make(Pos(local_pos.x,local_pos.y));
+        CPoint* new_point = new CPoint(CObject::mouse_over);
+        new_point->Make(new_point);
         ui->CadEdit->AddObject(new_point);
         log.push_back(new_point);
-        return obj->Make(*new_point,creating_count);
+        return obj->Make(new_point,creating_count);
     }else if(CObject::selecting->is<CPoint>()){
         //点をマージ
-        return obj->Make(*dynamic_cast<CPoint*>(CObject::selecting),creating_count);
-    }else if(CObject::selecting->is<CLine>()){
+        return obj->Make(dynamic_cast<CPoint*>(CObject::selecting),creating_count);
+    }else{
         //点をオブジェクト上に追加
-        CPoint* new_point = new CPoint();
-        new_point->Make(Pos(local_pos.x,local_pos.y));
+        CPoint* new_point = new CPoint(CObject::selecting->GetNear(CObject::mouse_over));
+        new_point->Make(new_point);
         ui->CadEdit->AddObject(new_point);
         log.push_back(new_point);
 
         //一致の幾何拘束を付与
-
-        return  obj->Make(*new_point,creating_count);
+        return  obj->Make(new_point,creating_count);
     }
 }
 

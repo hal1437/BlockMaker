@@ -2,9 +2,9 @@
 
 #include <iostream>
 
-bool CLine::Create(Relative<Pos> pos, int index){
+bool CLine::Create(CPoint *pos, int index){
     if(0 <= index && index < 2){
-        this->pos[index]->setReference(pos.getReference());
+        this->pos[index] = pos;
         if(index==1){
             this->is_Creating = false;
             return true;
@@ -64,9 +64,10 @@ int CLine::GetJointNum()const{
     return 2;
 }
 Pos CLine::GetJointPos(int index)const{
+    if(index == 1 && isCreateing())return CObject::mouse_over;
     return pos[index]->getRelative();
 }
-CPoint* CLine::GetJoint(int index)const{
+CPoint* CLine::GetJoint(int index){
     return pos[index];
 }
 
