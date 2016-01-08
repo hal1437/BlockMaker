@@ -1,6 +1,21 @@
 #include "SmartDimension.h"
 
 
+
+void SmartDimension::DrawString(QPainter& painter,const Pos& pos,const QString& str,double angle)const{
+    painter.save();
+    QTransform trans;
+    int bit = (90 <= angle && angle < 270) ? 1 : 0;
+    trans = QTransform::fromTranslate(pos.x,pos.y);
+    QFontMetrics fm = painter.fontMetrics();
+
+    trans.rotate(angle + 180*bit);
+    painter.setTransform(trans);
+    qDebug() << angle;
+    painter.drawText(-fm.width(str)*bit,-2,str);
+    painter.restore();
+}
+
 void SmartDimension::DrawArrow(QPainter& painter,const Pos& pos,const Pos& rote,double angle,double length)const{
 
     //基準ベクトル作成
@@ -53,6 +68,25 @@ CObject* SmartDimension::GetTarget(int index)const{
 bool SmartDimension::Draw(QPainter& painter)const{
     //描画
     if (this->type == none)return true;
+    if (this->type == length){
+        //矢印
+        Pos diff_base((target[0]->GetJointPos(0)-target[0]->GetJointPos(1)).GetNormalize());
+        QPointF diff_(QPointF(diff_base.x,diff_base.y)*QTransform().rotate(90));
+        Pos diff = Pos(diff_.x(),diff_.y());
+        Pos p0 = target[0]->GetJointPos(0);
+        Pos p1 = target[0]->GetJointPos(1);
+        Pos t0 = target[0]->GetJointPos(0)+diff*15;
+        Pos t1 = target[0]->GetJointPos(1)+diff*15;
+
+        painter.drawLine(t0.x,t0.y,t1.x,t1.y);
+        painter.drawLine((p0+diff*20).x,(p0+diff*20).y,p0.x,p0.y);
+        painter.drawLine((p1+diff*20).x,(p1+diff*20).y,p1.x,p1.y);
+        this->DrawArrow(painter,t0,(t0-t1).GetNormalize(),3.0);
+        this->DrawArrow(painter,t1,(t1-t0).GetNormalize(),3.0);
+        this->DrawString(painter,(t1+t0)/2.0,QString::number(value),Pos::Angle(p1-p0,Pos(1,0)));
+        //寸法の文字
+        return true;
+    }
     if (this->type == distance){
         //矢印
         Pos t0 = target[0]->GetJointPos(0);
@@ -61,16 +95,9 @@ bool SmartDimension::Draw(QPainter& painter)const{
         painter.drawLine(t0.x,t0.y,t1.x,t1.y);
         this->DrawArrow(painter,t0,(t0-t1).GetNormalize(),3.0);
         this->DrawArrow(painter,t1,(t1-t0).GetNormalize(),3.0);
+        this->DrawString(painter,(t1+t0)/2.0,QString::number(value),Pos::Angle(t1-t0,Pos(1,0)));
 
         //寸法の文字
-        painter.save();
-        QTransform trans;
-        int bit = (t0.x - t1.x) > 0 ? 0 : 1;
-        trans = QTransform::fromTranslate(((t0+t1)/2).x,((t0+t1)/2).y);
-        trans.rotate(std::atan2(t0.y - t1.y,t0.x - t1.x)*180/PI + bit * 180);
-        painter.setTransform(trans);
-        painter.drawText(0,0,QString::number(value));
-        painter.restore();
         return true;
     }
     if (this->type == distanceLine){
@@ -83,10 +110,10 @@ bool SmartDimension::Draw(QPainter& painter)const{
         d_pos[1] = d_pos[1] + target[0]->GetJointPos(0);
 
         painter.drawLine(d_pos[0].x,d_pos[0].y,d_pos[1].x,d_pos[1].y);
-        //painter.drawLine(d_pos[1].x,d_pos[1].y,target[0]->GetJointPos(1).x,target[0]->GetJointPos(1).y);
-        //painter.drawLine(d_pos[1].x,d_pos[1].y,target[1]->GetJointPos(1).x,target[1]->GetJointPos(1).y);
         this->DrawArrow(painter,d_pos[0],(d_pos[0]-d_pos[1]).GetNormalize(),3.0);
         this->DrawArrow(painter,d_pos[1],(d_pos[1]-d_pos[0]).GetNormalize(),3.0);
+        this->DrawArrow(painter,d_pos[1],(d_pos[1]-d_pos[0]).GetNormalize(),3.0);
+        this->DrawString(painter,(d_pos[0]+d_pos[1])/2,QString::number(value),Pos::Angle(d_pos[0]-d_pos[1],Pos(1,0)));
 
         //線からはみ出たら補助線を引く
         if(d_pos[1].y < std::min(lines[0].y,lines[1].y) ||  std::max(lines[0].y,lines[1].y) < d_pos[1].y){
@@ -94,32 +121,6 @@ bool SmartDimension::Draw(QPainter& painter)const{
             near = std::max(lines[0],lines[1],[&](Pos l,Pos r){return ((l-d_pos[1]).Length() < (r-d_pos[1]).Length());});
             painter.drawLine(near.x,near.y,d_pos[1].x,d_pos[1].y);
         }
-
-        /*
-        //拘束補助線
-        Pos dot;
-        Pos t0_0 = target[0]->GetJointPos(0);
-        Pos t0_1 = target[0]->GetJointPos(1);
-        Pos t1   = target[1]->GetJointPos(0);
-        dot = (t0_1 - t0_0).GetNormalize();
-        dot = dot * dot.GetNormalize().Dot(t1-t0_0);
-        dot = dot + t0_0;
-        Pos c = (dot - (dot-t1).GetNormalize() * value);
-        Pos r = t0_1-t0_0;
-        painter.drawArc(c.x-10,c.y-10,20,20,0,360*16);
-        painter.drawLine((c+r).x,(c+r).y,c.x,c.y);
-        painter.drawLine((c-r).x,(c-r).y,c.x,c.y);
-        */
-
-        //寸法の文字
-        painter.save();
-        QTransform trans;
-        int bit = (d_pos[0].x - d_pos[1].x) > 0 ? 0 : 1;
-        trans = QTransform::fromTranslate(((d_pos[0]+d_pos[1])/2).x,((d_pos[0]+d_pos[1])/2).y);
-        trans.rotate(std::atan2(d_pos[0].y - d_pos[1].y,d_pos[0].x - d_pos[1].x)*180/PI + bit * 180);
-        painter.setTransform(trans);
-        painter.drawText(0,0,QString::number(value));
-        painter.restore();
         return true;
     }
     if (this->type == radius){
@@ -131,7 +132,6 @@ bool SmartDimension::Draw(QPainter& painter)const{
         double angle = std::acos((pos[0]-center).GetNormalize().Dot(pos[1]-center) / arc->GetRound())*180/PI/2;
         if( Pos::MoreThan(pos[0],center,pos[1]) && pos[0].x < center.x)angle = 180 - angle;
         if(!Pos::MoreThan(pos[0],center,pos[1]) && pos[0].x > center.x)angle = 180 - angle;
-        std::cerr << angle;
         Pos dir(QPoint(pos[0].x-center.x,pos[0].y-center.y)*QTransform().rotate(angle));
         Pos dir_p = dir + dir.GetNormalize()*50;
 
@@ -139,46 +139,28 @@ bool SmartDimension::Draw(QPainter& painter)const{
         DrawArrow(painter,(center+dir),-dir,3.0);
 
         //寸法の文字
-        painter.save();
-        QTransform trans;
-        QString str = QString("R")+QString::number(value);
-        QFontMetrics fm = painter.fontMetrics();
-        int bit = (dir.x) > 0 ? 0 : 1;
-        trans = QTransform::fromTranslate((center+dir).x,(center+dir).y);
-        trans.rotate(std::atan2(dir.y,dir.x)*180/PI + bit * 180);
-        painter.setTransform(trans);
-        if(bit)painter.drawText(-(fm.width(str)+10),-2,str);
-        else   painter.drawText(10,-2,str);
-        painter.restore();
+        DrawString(painter,(center+dir+dir.GetNormalize()*20),QString("R")+QString::number(value),Pos::Angle(dir,Pos(1,0)));
         return true;
     }
 
     return false;
 }
 
-Restraint* SmartDimension::MakeRestraint(){
-    Restraint* answer;
+std::vector<Restraint*> SmartDimension::MakeRestraint(){
+    std::vector<Restraint*> answer;
 
     //点と直線
     if(type == SmartDimension::distanceLine){
-        Pos dot;
-        Pos t0_0 = target[0]->GetJointPos(0);
-        Pos t0_1 = target[0]->GetJointPos(1);
-        Pos t1   = target[1]->GetJointPos(0);
-        dot = (t0_1 - t0_0).GetNormalize();
-        dot = dot * dot.GetNormalize().Dot(t1-t0_0);
-        dot = dot + t0_0;
-
-        answer = new LineRestraint((dot - (dot-t1).GetNormalize() * value),t0_1-t0_0);
+        answer.push_back(new ConcurrentRestraint({target[0],target[1]},value));
     }
     //点と点
     if(type == SmartDimension::distance){
-
-        Pos t0 = target[0]->GetJointPos(0);
-        Pos t1 = target[1]->GetJointPos(0);
-        answer = new ArcRestraint(t0,(t1-t0).GetNormalize()*value);
+        answer.push_back(new MatchRestraint({target[0],target[1]},value));
     }
-    //if(type == SmartDimension::)
+    //線だけ
+    if(type == SmartDimension::length){
+        answer.push_back(new MatchRestraint({target[0]->GetJoint(0),target[0]->GetJoint(1)},value));
+    }
     return answer;
 }
 

@@ -22,7 +22,7 @@ class CadEditForm : public QWidget
 private:
     QVector<CObject*>         objects; //物体
     QVector<SmartDimension*>  dimensions; //寸法
-    QMap<CObject*,Restraint*> restraints; //拘束
+    QVector<Restraint*>       restraints; //拘束
     double scale = 1.0f;
     Pos transform = Pos(0,0);
 public:

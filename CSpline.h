@@ -22,7 +22,7 @@ class CSpline : public CObject
 private:
     const static int DIVISION = 10;//分解数
     const static int DRAWING_LINE_SIZE = 3;//線の太さ
-    const static int COLLISION_SIZE = 10;//あたり判定の大きさ
+    const static int COLLISION_SIZE = 6;//あたり判定の大きさ
 protected:
     std::vector<Relative<Pos>> pos;
     Spline xs;
@@ -39,6 +39,8 @@ public:
     virtual bool Move(const Pos& diff);
     virtual int GetJointNum()const;
     virtual Pos GetJointPos(int index)const;
+    virtual CPoint* GetJoint(int index)const;
+
 
 
     CSpline();

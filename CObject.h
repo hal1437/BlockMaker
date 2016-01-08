@@ -1,9 +1,12 @@
 #ifndef COBJECT_H
 #define COBJECT_H
 #include <QPainter>
+#include <QDebug>
 #include "Utils.h"
 #include "Point.h"
 #include "Relative.h"
+
+class CPoint;
 
 //CADオブジェクト
 class CObject
@@ -41,6 +44,7 @@ public:
     //座標取得
     virtual int GetJointNum()const=0;
     virtual Pos GetJointPos(int index)const=0;
+    virtual CPoint* GetJoint(int index)const;
 
     //生成関数
     bool Make(Pos& pos,int index=0);

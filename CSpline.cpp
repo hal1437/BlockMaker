@@ -75,12 +75,13 @@ bool CSpline::Refresh(){
     return true;
 }
 bool CSpline::Create(Relative<Pos> pos, int index){
-    this->is_Creating = true;
     if(0 <= index){
+        this->is_Creating = true;
         this->pos.push_back(pos);
         Refresh();
         return false;
     }
+    this->is_Creating = false;
     return true;
 }
 
@@ -133,6 +134,9 @@ int CSpline::GetJointNum()const{
 }
 Pos CSpline::GetJointPos(int index)const{
     return pos[index]();
+}
+CPoint *CSpline::GetJoint(int index)const{
+    return pos[index];
 }
 
 

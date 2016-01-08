@@ -3,53 +3,71 @@
 #include <algorithm>
 #include <vector>
 #include "Point.h"
+#include "CObject.h"
+#include "CLine.h"
+#include "CArc.h"
+#include "CSpline.h"
+
+
+enum RestrainType{
+    VERTICAL   ,//垂直拘束 c:[-.]
+    HORIZONTAL ,//水平拘束 c:[-.]
+    MATCH      ,//一致拘束 c:[p.-]
+    CONCURRENT ,//並行拘束 c:[l,l]
+    ANGLE      ,//角度拘束 c:[l,l]
+    TANGENT    ,//正接拘束 c:[l]
+    Fix        ,//固定拘束 c:[]
+    Paradox    ,//矛盾拘束 c:[]
+};
 
 //拘束
 struct Restraint{
-    Pos center; //位置
-    Pos dir;    //方向
+    std::vector<CObject*> nodes;//拘束対象
+    double value;      //値
+    RestrainType type; //タイプ
 
-    //最寄りの拘束点を取得
-    virtual Pos GetNearPoint(const Pos& pos)const = 0;
+    //最寄りの点に補完
+    virtual bool Complete() = 0;
 
     //いつもの
     template<class T>
-    bool is()const {
+    bool is()const{
         return (dynamic_cast<const T*>(this) != nullptr);
     }
 
     Restraint(){}
-    Restraint(const Pos& Center,const Pos& Dir):center(Center),dir(Dir){}
+    Restraint(std::vector<CObject*> Nodes,
+              double Value):
+        nodes(Nodes),
+        value(Value){}
+
     virtual ~Restraint(){}
 };
 
 #define RESTRAINT_MAKE_DEF(CLASS_NAME)                      \
 struct CLASS_NAME : public Restraint{                       \
                                                             \
-    virtual Pos GetNearPoint(const Pos& pos)const;          \
+    bool Complete();                                        \
                                                             \
     CLASS_NAME(){}                                          \
-    CLASS_NAME(const Pos& c,const Pos& d):Restraint(c,d){}  \
+    CLASS_NAME(std::vector<CObject*> Nodes,                 \
+              double Value):                                \
+        Restraint(Nodes,Value){}                            \
     virtual ~CLASS_NAME(){};                                \
 };                                                          \
 
-RESTRAINT_MAKE_DEF(LineRestraint     ) //線形拘束
-RESTRAINT_MAKE_DEF(ArcRestraint      ) //円弧拘束
-RESTRAINT_MAKE_DEF(FixRestraint      ) //固定拘束
-RESTRAINT_MAKE_DEF(ParadoxRestraint  ) //矛盾拘束
+//RESTRAINT_MAKE_DEF(VerticalRestraint  ) //垂直拘束 c:[l] s:[]
+//RESTRAINT_MAKE_DEF(HorizontalRestraint) //水平拘束 c:[l] s:[]
+RESTRAINT_MAKE_DEF(MatchRestraint     ) //一致拘束 c:[p] s:[-]
+RESTRAINT_MAKE_DEF(ConcurrentRestraint) //並行拘束 c:[l,l] s:[]
+//RESTRAINT_MAKE_DEF(TangentRestraint   ) //正接拘束 c:[l] s:[a]
+//RESTRAINT_MAKE_DEF(ArcRestraint       ) //円弧拘束 c:[p] s:[a]
+RESTRAINT_MAKE_DEF(FixRestraint       ) //固定拘束 c:[]  s:[]
+RESTRAINT_MAKE_DEF(ParadoxRestraint   ) //矛盾拘束 c:[]  s:[]
 
-//合成拘束
-struct CompositRestraint : public Restraint{
-    std::vector<const Restraint*> ref;//参照先
 
-    virtual Pos GetNearPoint(const Pos& pos)const;
-    CompositRestraint(){}
-    CompositRestraint(const Pos& c,const Pos& d):Restraint(c,d){}
-    virtual ~CompositRestraint(){}
-};
 
 //演算子定義
-CompositRestraint operator|(const Restraint& lhs  ,const Restraint& rhs); //or演算
 Restraint*        operator&(const Restraint& lhs  ,const Restraint& rhs); //and演算
 
 #endif // RESTRAINT_H

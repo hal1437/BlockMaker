@@ -100,6 +100,7 @@ void MainWindow::DisconnectSignals(){
 }
 
 void MainWindow::ClearButton(){
+    if(make_obj != nullptr && make_obj->isCreateing())make_obj->Make(Pos(),-1);
     if(ui->ToolDot   ->isChecked())ui->ToolDot   ->setChecked(false);
     if(ui->ToolLine  ->isChecked())ui->ToolLine  ->setChecked(false);
     if(ui->ToolArc   ->isChecked())ui->ToolArc   ->setChecked(false);
@@ -114,6 +115,11 @@ void MainWindow::Toggled##TYPE (bool checked){  \
         state = TYPE;                           \
         ui->Tool##TYPE->setChecked(true);       \
     }else{                                      \
+        if(make_obj != nullptr && make_obj->isCreateing()){\
+            make_obj->Make(Pos(),-1);           \
+            creating_count=0;                   \
+        }                                       \
+        make_obj = nullptr;                     \
         state = Edit;                           \
     }                                           \
     ConnectSignals();                           \
@@ -142,8 +148,8 @@ void MainWindow::MakeObject(){
         if(exist(CObject::selected,CObject::selecting))erase(CObject::selected,CObject::selecting);
         else if(CObject::selecting != nullptr)CObject::selected.push_back(CObject::selecting);
 
-        //スマート寸法は2つから
-        ui->ToolDimension->setEnabled(CObject::selected.size() >= 2);
+        //スマート寸法は1つから
+        ui->ToolDimension->setEnabled(CObject::selected.size() >= 1);
     }else{
         //新規オブジェクト
         if(creating_count == 0){

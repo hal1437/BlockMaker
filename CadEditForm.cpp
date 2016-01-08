@@ -157,10 +157,26 @@ void CadEditForm::MakeSmartDimension(){
 void CadEditForm::RefreshRestraints(){
     restraints.clear();
     for(SmartDimension* dim:dimensions){
-        if(restraints.find(dim->GetTarget(1)) != restraints.end()){
-            restraints[dim->GetTarget(1)] = *restraints[dim->GetTarget(1)] & *dim->MakeRestraint();
+
+        std::vector<Restraint*> rs = dim->MakeRestraint();
+        for(Restraint* r : rs){
+            restraints.push_back(r);
+        }
+    }
+    for(Restraint* rest:restraints){
+        rest->Complete();
+    }
+    /*
+    for(SmartDimension* dim:dimensions){
+        std::vector<Restraint*> rs = dim->MakeRestraint();
+        if(!exist(restraints,dim->GetTarget(1))){
+            for(Restraint* r : rs){
+                restraints[dim->GetTarget(1)] = *restraints[dim->GetTarget(1)] & *r;
+            }
         }else{
-            restraints[dim->GetTarget(1)] = dim->MakeRestraint();
+            for(Restraint* r : rs){
+                restraints[dim->GetTarget(1)] = r;
+            }
         }
     }
     //拘束関係更新
@@ -170,5 +186,5 @@ void CadEditForm::RefreshRestraints(){
             Pos diff =  p1-rest.value()->GetNearPoint(p1);
             rest.key()->Move(-diff);
         }
-    }
+    }*/
 }

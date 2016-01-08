@@ -10,8 +10,8 @@ private:
     const static int COLLISION_SIZE = 10;
 
 protected:
-    Relative<Pos> pos[2];
-    Relative<Pos> center;
+    CPoint* pos[2];
+    CPoint* center;
     double round=0;//半径
 
     virtual bool Create(Relative<Pos> pos,int index);
@@ -27,6 +27,7 @@ public:
     virtual bool Move(const Pos& diff);
     virtual int GetJointNum()const;
     virtual Pos GetJointPos(int index)const;
+    virtual CPoint* GetJoint(int index)const;
 
 
     CArc();

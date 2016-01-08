@@ -31,7 +31,8 @@ private:
 
 private:
 
-    void DrawArrow(QPainter& painter,const Pos& pos,const Pos& rote,double angle,double length = 15)const;
+    void DrawString(QPainter& painter,const Pos& pos,const QString& str,double angle)const;
+    void DrawArrow (QPainter& painter,const Pos& pos,const Pos& rote,double angle,double length = 15)const;
 
 public:
 
@@ -42,7 +43,7 @@ public:
 
     bool SetTarget(CObject* obj1,CObject* obj2);
     CObject* GetTarget(int index)const;
-    Restraint* MakeRestraint();
+    std::vector<Restraint *> MakeRestraint();
 
     bool Draw(QPainter& painter)const;
 

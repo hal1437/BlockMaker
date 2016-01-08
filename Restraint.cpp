@@ -1,64 +1,41 @@
 #include "Restraint.h"
 
-Pos LineRestraint::GetNearPoint(const Pos& pos)const{
-    //std::cerr << center << "," << center+dir << "," << pos <<  std::endl;
-    return Pos::LineNearPoint(center,center+dir,pos);
-}
-Pos ArcRestraint::GetNearPoint(const Pos& pos)const{
-    return Pos::CircleNearPoint(center,dir.Length(),pos);
-}
-Pos FixRestraint::GetNearPoint(const Pos&)const{
-    return center;
-}
-Pos ParadoxRestraint::GetNearPoint(const Pos&)const{
-    return Pos();
-}
-Pos CompositRestraint::GetNearPoint(const Pos& pos)const{
-    return (*std::min_element(ref.begin(),ref.end(),[&](const Restraint* lhs,const Restraint* rhs){
-        return ((lhs->GetNearPoint(pos)-pos).Length() < (rhs->GetNearPoint(pos)-pos).Length());
-    }))->GetNearPoint(pos);
-}
+bool MatchRestraint::Complete(){
 
-CompositRestraint operator|(const Restraint& lhs  ,const Restraint& rhs){
-    CompositRestraint answer;
-    answer.ref.push_back(&lhs);
-    answer.ref.push_back(&rhs);
-    return answer;
-}
-Restraint* operator&(const Restraint& l,const Restraint& r){
-    Restraint* rest = nullptr;
-    const Restraint* lhs = &l;
-    const Restraint* rhs = &r;
-    const double MIN_LIM  = 0.1; //誤差
-
-    //固定が存在
-    if(!lhs->is<FixRestraint>() && rhs->is<FixRestraint>())std::swap(lhs,rhs);
-    if(lhs->is<FixRestraint>()){
-        //両固定
-        if(rhs->is<FixRestraint>()){
-            if(lhs->center == rhs->center)rest = new FixRestraint(lhs->center,lhs->dir);
-        }
-        //他、とにかく線上に乗っていればおk
-        if(rhs->is<LineRestraint>()){
-            if(std::abs((rhs->GetNearPoint(lhs->center) - lhs->GetNearPoint(Pos())).Length()) < MIN_LIM)rest = new FixRestraint(lhs->center,lhs->dir);
-        }
-    }
-    //線
-    if(!lhs->is<LineRestraint>() && rhs->is<LineRestraint>())std::swap(lhs,rhs);
-    if(lhs->is<LineRestraint>()){
-        //両線
-        if(rhs->is<FixRestraint>()){
-            if(lhs->center == rhs->center)rest = new FixRestraint(lhs->center,lhs->dir);
-            //二直線の交点のアルゴリズム
-            //else
-        }
-        //他、とにかく線上に乗っていればおk
-        if(rhs->is<LineRestraint>()){
-            if(std::abs((rhs->GetNearPoint(lhs->center) - lhs->GetNearPoint(Pos())).Length()) < MIN_LIM)rest = new FixRestraint(lhs->center,lhs->dir);
-        }
+    //選択中を優先的に
+    if(exist(this->nodes,CObject::selecting)){
+        std::swap(*nodes.begin(),*std::find(nodes.begin(),nodes.end(),CObject::selecting));
     }
 
-    if(rest==nullptr)rest = new ParadoxRestraint();
-    return rest;
+    for(int i=0;i<nodes.size();i++){
+        CObject* ptr = nodes[i];
+        Pos near = nodes[i]->GetNear(ptr->GetJointPos(0));
+        ptr->Move((near-ptr->GetJointPos(0)).GetNormalize() * value - ptr->GetJointPos(0));
+    }
+    return true;
+}
+bool ConcurrentRestraint::Complete(){
+
+    if(exist(this->nodes,CObject::selecting)){
+        std::swap(*nodes.begin(),*std::find(nodes.begin(),nodes.end(),CObject::selecting));
+    }else{
+        std::swap(*nodes.begin(),*std::find(nodes.begin(),nodes.end(),[](CObject* obj){return obj->is<CLine>();}));
+    }
+    Relative<Pos> line_pos[2] = {nodes[0]->GetJointPos(0),nodes[0]->GetJointPos(1)};
+
+    Pos base = (line_pos[1]()-line_pos[0]());
+    QPointF diff_ = QPointF(base.x,base.y)*QTransform().rotate(90);
+    Pos diff = Pos(diff_.x(),diff_.y()).GetNormalize();
+    //全てを並行に
+    for(int i=1;i<nodes.size();i++){
+        if(nodes[i]->is<CLine>()){
+            Pos line2_near1 = Pos::LineNearPoint(line_pos[0]()+diff*value,line_pos[1]()+diff*value,nodes[i]->GetJointPos(0)());
+            Pos line2_near2 = Pos::LineNearPoint(line_pos[0]()+diff*value,line_pos[1]()+diff*value,nodes[i]->GetJointPos(1)());
+
+            line2_pos[0] = line2_near1;
+            line2_pos[1] = line2_near2;
+        }
+    }
+    return true;
 }
 

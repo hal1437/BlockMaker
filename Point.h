@@ -3,6 +3,7 @@
 #include <cmath>
 #include <QPoint>
 #include <iostream>
+#include <limits>
 #include "Utils.h"
 
 
@@ -38,7 +39,10 @@ public:
     static double Angle(cr_current base,cr_current dir){
         current a = base.GetNormalize();
         current b = dir.GetNormalize();
-        if((MoreThan(current(),a,b))){
+        if(a.Dot(b) == 0){
+            return !MoreThan(current(),b,a)*180+90;
+        }
+        if(MoreThan(current(),a,b)){
             if(a.x > 0)return 360 - std::acos(a.x*b.x + a.y*b.y) * 180 / PI;
             else return std::acos(a.x*b.x + a.y*b.y) * 180 / PI;
         }
@@ -79,8 +83,8 @@ public:
 
     current& operator+=(cr_current rhs){x += rhs.x;y += rhs.y;return (*this);}
     current& operator-=(cr_current rhs){x -= rhs.x;y -= rhs.y;return (*this);}
-    template<class V> current operator*(V rhs){x *= rhs;y *= rhs;return (*this);}
-    template<class V> current operator/(V rhs){x /= rhs;y /= rhs;return (*this);}
+    template<class V> current operator*=(V rhs){x *= rhs;y *= rhs;return (*this);}
+    template<class V> current operator/=(V rhs){x /= rhs;y /= rhs;return (*this);}
 
     bool operator==(cr_current rhs)const{
         return (this->x == rhs.x && this->y == rhs.y);
@@ -100,6 +104,21 @@ std::ostream& operator<<(std::ostream& ost,Point<T> pos){
     ost << "(" << pos.x << "," << pos.y << ")";
     return ost;
 }
+
+namespace std {
+    template<class T>
+    class numeric_limits<Point<T>> {
+    public:
+
+        static Point<T> max(){
+            return Point<T>(std::numeric_limits<T>::max(),std::numeric_limits<T>::max());
+        }
+        static Point<T> lowest(){
+            return Point<T>(std::numeric_limits<T>::lowest(),std::numeric_limits<T>::lowest());
+        }
+    };
+}
+
 
 typedef Point<double> Pos;
 

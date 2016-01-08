@@ -10,7 +10,7 @@ class CLine : public CObject
 private:
     const static int COLLISION_SIZE = 5;
 protected:
-    Relative<Pos> pos[2];
+    CPoint* pos[2];
 
     virtual bool Create(Relative<Pos> pos,int index);
 public:
@@ -22,6 +22,7 @@ public:
     virtual bool Move(const Pos& diff);
     virtual int GetJointNum()const;
     virtual Pos GetJointPos(int index)const;
+    virtual CPoint* GetJoint(int index)const;
 
 
     CLine();
