@@ -5,8 +5,6 @@ bool CArc::Refresh(){
         center->setDifferent((GetJointPos(0) - CObject::mouse_over) / 2 + CObject::mouse_over);
         round = (GetJointPos(0) - GetCenter()).Length();
     }else{
-        center->setDifferent((GetJointPos(0) - GetJointPos(1)) / 2 + GetJointPos(1));
-        round = (GetJointPos(0) - GetCenter()).Length();
         for(int i=0;i<2;i++){
             if(std::abs(round - (GetJointPos(i)-GetCenter()).Length()) > 0.001){
                 round = (GetJointPos(i)-GetCenter()).Length();
@@ -30,6 +28,9 @@ bool CArc::Create(CPoint* pos, int index){
         if(index==1){
             this->is_Creating = false;
             Refresh();
+            center->setDifferent((GetJointPos(0) - GetJointPos(1)) / 2 + GetJointPos(1));
+            round = (GetJointPos(0) - GetCenter()).Length();
+
             return true;
         }else{
             this->is_Creating = true;
@@ -56,8 +57,6 @@ bool CArc::Draw(QPainter& painter)const{
     }else{
         end_point = GetJointPos(1);
     }
-
-    painter.drawArc(GetCenter().x-3,GetCenter().y-3,6,6,0,360*16);
 
     Pos dir1 = end_point-GetCenter();
     Pos dir2 = GetJointPos(0)-GetCenter();

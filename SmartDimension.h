@@ -21,6 +21,7 @@ public:
         distanceLine, //点距離
         angle,        //角度
         radius,       //半径
+        concurrent,   //並行
     };
 
 private:

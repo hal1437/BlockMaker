@@ -11,7 +11,6 @@ void SmartDimension::DrawString(QPainter& painter,const Pos& pos,const QString& 
 
     trans.rotate(angle + 180*bit);
     painter.setTransform(trans);
-    qDebug() << angle;
     painter.drawText(-fm.width(str)*bit,-2,str);
     painter.restore();
 }
@@ -38,7 +37,7 @@ SmartDimension::DimensionType SmartDimension::GetDimensionType(CObject* obj1, CO
     else if(obj1->is<CPoint>() && obj2->is<CPoint>())return SmartDimension::distance;
     else if(obj1->is<CLine >() && obj2->is<CPoint>())return SmartDimension::distanceLine;
     else if(obj1->is<CPoint>() && obj2->is<CLine >())return SmartDimension::distanceLine;
-    else if(obj1->is<CLine >() && obj2->is<CLine >())return SmartDimension::angle;
+    else if(obj1->is<CLine >() && obj2->is<CLine >())return SmartDimension::concurrent;
     else return SmartDimension::none;
 }
 
@@ -151,7 +150,7 @@ std::vector<Restraint*> SmartDimension::MakeRestraint(){
 
     //点と直線
     if(type == SmartDimension::distanceLine){
-        answer.push_back(new ConcurrentRestraint({target[0],target[1]},value));
+        answer.push_back(new MatchRestraint({target[0],target[1]},value));
     }
     //点と点
     if(type == SmartDimension::distance){
@@ -160,6 +159,21 @@ std::vector<Restraint*> SmartDimension::MakeRestraint(){
     //線だけ
     if(type == SmartDimension::length){
         answer.push_back(new MatchRestraint({target[0]->GetJoint(0),target[0]->GetJoint(1)},value));
+    }
+    //線だけ
+    if(type == SmartDimension::length){
+        answer.push_back(new MatchRestraint({target[0]->GetJoint(0),target[0]->GetJoint(1)},value));
+    }
+    //円弧
+    if(type == SmartDimension::radius){
+        answer.push_back(new MatchRestraint({target[0]->GetJoint(-1),
+                                             target[0]->GetJoint(0),
+                                             target[0]->GetJoint(1)},value));
+    }
+    //並行
+    if(type == SmartDimension::concurrent){
+        answer.push_back(new MatchRestraint({target[0],target[1]->GetJoint(0)},value));
+        answer.push_back(new MatchRestraint({target[0],target[1]->GetJoint(1)},value));
     }
     return answer;
 }

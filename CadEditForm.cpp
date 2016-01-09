@@ -68,6 +68,10 @@ void CadEditForm::paintEvent(QPaintEvent*){
     if(scale == 0) paint.scale(0.00001f,0.00001f);
     else paint.scale(scale,scale);
 
+    paint.setPen(QPen(Qt::blue, 1));
+    for(SmartDimension* dim:dimensions){
+        dim->Draw(paint);
+    }
     for(CObject* obj:objects){
         if     (exist(CObject::selected,obj))paint.setPen(QPen(Qt::cyan, CObject::DRAWING_LINE_SIZE));
         else if(obj == CObject::selecting)   paint.setPen(QPen(Qt::red , CObject::DRAWING_LINE_SIZE));
@@ -75,11 +79,6 @@ void CadEditForm::paintEvent(QPaintEvent*){
         if(obj->Refresh())obj->Draw(paint);
     }
 
-    paint.setPen(QPen(Qt::blue, 1));
-    for(SmartDimension* dim:dimensions){
-
-        dim->Draw(paint);
-    }
     paint.restore();
 }
 
@@ -148,6 +147,14 @@ void CadEditForm::MakeSmartDimension(){
             }else{
                 delete dim;
             }
+            restraints.clear();
+            for(SmartDimension* dim:dimensions){
+
+                std::vector<Restraint*> rs = dim->MakeRestraint();
+                for(Restraint* r : rs){
+                    restraints.push_back(r);
+                }
+            }
         }
     }
     RefreshRestraints();
@@ -155,36 +162,7 @@ void CadEditForm::MakeSmartDimension(){
 
 
 void CadEditForm::RefreshRestraints(){
-    restraints.clear();
-    for(SmartDimension* dim:dimensions){
-
-        std::vector<Restraint*> rs = dim->MakeRestraint();
-        for(Restraint* r : rs){
-            restraints.push_back(r);
-        }
-    }
     for(Restraint* rest:restraints){
         rest->Complete();
     }
-    /*
-    for(SmartDimension* dim:dimensions){
-        std::vector<Restraint*> rs = dim->MakeRestraint();
-        if(!exist(restraints,dim->GetTarget(1))){
-            for(Restraint* r : rs){
-                restraints[dim->GetTarget(1)] = *restraints[dim->GetTarget(1)] & *r;
-            }
-        }else{
-            for(Restraint* r : rs){
-                restraints[dim->GetTarget(1)] = r;
-            }
-        }
-    }
-    //拘束関係更新
-    for(QMap<CObject*,Restraint*>::iterator rest = restraints.begin();rest != restraints.end();rest++){
-        if(rest.key()!=nullptr){
-            Pos p1 = rest.key()->GetJointPos(0);
-            Pos diff =  p1-rest.value()->GetNearPoint(p1);
-            rest.key()->Move(-diff);
-        }
-    }*/
 }

@@ -162,11 +162,18 @@ void MainWindow::MakeObject(){
         }
         //作成
         if(MakeJoint(make_obj)){
+            if(make_obj->is<CArc>()){
+                CPoint* new_point = dynamic_cast<CArc*>(make_obj)->GetJoint(-1);
+                new_point->Make(new_point);
+                ui->CadEdit->AddObject(new_point);
+                log.push_back(new_point);
+            }
             creating_count = 0;
         }else {
             creating_count++;
         }
     }
+    ui->CadEdit->RefreshRestraints();
     repaint();
 }
 
@@ -193,6 +200,7 @@ bool MainWindow::MakeJoint(CObject* obj){
         log.push_back(new_point);
 
         //一致の幾何拘束を付与
+
         return  obj->Make(new_point,creating_count);
     }
 }

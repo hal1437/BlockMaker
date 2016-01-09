@@ -2,15 +2,18 @@
 
 bool MatchRestraint::Complete(){
 
-    //選択中を優先的に
-    if(exist(this->nodes,CObject::selecting)){
-        std::swap(*nodes.begin(),*std::find(nodes.begin(),nodes.end(),CObject::selecting));
-    }
+    std::sort(nodes.begin(),nodes.end(),[](CObject* lhs,CObject* rhs){
+        return lhs->GetJointNum() > rhs->GetJointNum();
+    });
 
-    for(int i=0;i<nodes.size();i++){
+    for(int i=1;i<nodes.size();i++){
         CObject* ptr = nodes[i];
-        Pos near = nodes[i]->GetNear(ptr->GetJointPos(0));
-        ptr->Move((near-ptr->GetJointPos(0)).GetNormalize() * value - ptr->GetJointPos(0));
+        Pos near = nodes[0]->GetNear(ptr->GetJointPos(0));
+        Pos current_pos = ptr->GetJointPos(0);
+        Pos next_pos = (current_pos - near).GetNormalize() * value + near;
+        if(!(current_pos == near)){
+            ptr->Move(next_pos - current_pos);
+        }
     }
     return true;
 }
