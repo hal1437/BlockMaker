@@ -142,6 +142,53 @@ bool SmartDimension::Draw(QPainter& painter)const{
         return true;
     }
 
+    if (this->type == concurrent){
+        //矢印
+        CLine* line1 = dynamic_cast<CLine*>(target[0]);
+        CLine* line2 = dynamic_cast<CLine*>(target[1]);
+        Pos line1_pos[2] = {line1->GetJointPos(0),line1->GetJointPos(1)};
+        Pos line2_pos[2] = {line2->GetJointPos(0),line2->GetJointPos(1)};
+
+        std::sort(line1_pos,line1_pos+2);
+        std::sort(line2_pos,line2_pos+2);
+
+        Pos line1_base = (line1_pos[1] - line1_pos[0]).GetNormalize();
+        Pos line2_base = (line2_pos[1] - line2_pos[0]).GetNormalize();
+
+        Pos line1_c = (line1_pos[1] + line1_pos[0])/2;
+        Pos line2_c = (line2_pos[1] + line2_pos[0])/2;
+
+        Pos line_center = (line1_c + line2_c)/2;
+        Pos line1_cc = line1_base * line1_base.Dot(line_center-line1_pos[0]) + line1_pos[0];
+        Pos line2_cc = line2_base * line2_base.Dot(line_center-line2_pos[0]) + line2_pos[0];
+        Pos dir      = (line1_cc - line2_cc).GetNormalize();
+
+
+        //補助線
+
+        if((line1_cc - line1_pos[0]).Length() > (line1_pos[1] - line1_pos[0]).Length() ||
+           (line1_cc - line1_pos[1]).Length() > (line1_pos[0] - line1_pos[1]).Length()){
+            Pos near = std::min(line1_pos[0],line1_pos[1],[&](Pos lhs,Pos rhs){return ((line1_cc - lhs).Length()<(line1_cc - rhs).Length());});
+            Pos ap = line1_cc + (line1_cc - near).GetNormalize()*10;
+            painter.drawLine(near.x,near.y,ap.x,ap.y);
+        }
+
+        if((line2_cc - line2_pos[0]).Length() > (line2_pos[1] - line2_pos[0]).Length() ||
+           (line2_cc - line2_pos[1]).Length() > (line2_pos[0] - line2_pos[1]).Length()){
+            Pos near = std::min(line2_pos[0],line2_pos[1],[&](Pos lhs,Pos rhs){return ((line2_cc - lhs).Length()<(line2_cc - rhs).Length());});
+            Pos ap = line2_cc + (line2_cc - near).GetNormalize()*10;
+            painter.drawLine(near.x,near.y,ap.x,ap.y);
+        }
+
+
+        painter.drawLine(line1_cc.x,line1_cc.y,line2_cc.x,line2_cc.y);
+        DrawArrow(painter,line1_cc, dir,3.0);
+        DrawArrow(painter,line2_cc,-dir,3.0);
+        //寸法の文字
+        DrawString(painter,line_center,QString::number(value),Pos::Angle(dir,Pos(1,0)));
+        return true;
+    }
+
     return false;
 }
 
@@ -155,10 +202,6 @@ std::vector<Restraint*> SmartDimension::MakeRestraint(){
     //点と点
     if(type == SmartDimension::distance){
         answer.push_back(new MatchRestraint({target[0],target[1]},value));
-    }
-    //線だけ
-    if(type == SmartDimension::length){
-        answer.push_back(new MatchRestraint({target[0]->GetJoint(0),target[0]->GetJoint(1)},value));
     }
     //線だけ
     if(type == SmartDimension::length){
