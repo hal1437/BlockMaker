@@ -90,11 +90,20 @@ void CadEditForm::paintEvent(QPaintEvent*){
     for(SmartDimension* dim:dimensions){
         dim->Draw(paint);
     }
+    //普通の
+    paint.setPen(QPen(Qt::blue, CObject::DRAWING_LINE_SIZE));
     for(CObject* obj:objects){
-        if     (exist(CObject::selected,obj))paint.setPen(QPen(Qt::cyan, CObject::DRAWING_LINE_SIZE));
-        else if(obj == CObject::selecting)   paint.setPen(QPen(Qt::red , CObject::DRAWING_LINE_SIZE));
-        else                                 paint.setPen(QPen(Qt::blue, CObject::DRAWING_LINE_SIZE));
         if(obj->Refresh())obj->Draw(paint);
+    }
+    //選択された
+    paint.setPen(QPen(Qt::cyan, CObject::DRAWING_LINE_SIZE));
+    for(CObject* obj:CObject::selected){
+        if(obj->Refresh())obj->Draw(paint);
+    }
+    //洗濯中
+    paint.setPen(QPen(Qt::red , CObject::DRAWING_LINE_SIZE));
+    if(CObject::selecting!=nullptr){
+        if(CObject::selecting->Refresh())CObject::selecting->Draw(paint);
     }
 
     paint.restore();

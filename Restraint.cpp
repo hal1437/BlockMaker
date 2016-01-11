@@ -102,14 +102,36 @@ bool MatchRestraint::Complete(){
     return true;
 }
 bool ConcurrentRestraint::Complete(){
-
+    /*
     if(exist(this->nodes,CObject::selecting)){
         std::swap(*nodes.begin(),*std::find(nodes.begin(),nodes.end(),CObject::selecting));
     }else{
         std::swap(*nodes.begin(),*std::find_if(nodes.begin(),nodes.end(),[](CObject* obj){return obj->is<CLine>();}));
     }
+    */
+
+    Pos base_line[2] = {nodes[0]->GetJointPos(0),nodes[0]->GetJointPos(1)};
+    //全てを並行に
+    for(int i=1;i<nodes.size();i++){
+        if(nodes[i]->is<CLine>()){
+            Pos line_near1 = Pos::LineNearPoint(base_line[0],base_line[1],nodes[i]->GetJointPos(0));
+            Pos line_near2 = Pos::LineNearPoint(base_line[0],base_line[1],nodes[i]->GetJointPos(1));
+
+            double length = (line_near1 - nodes[i]->GetJointPos(0)).Length();
+            nodes[i]->GetJoint(0)->setDifferent(line_near1 + (nodes[i]->GetJointPos(0) - line_near1).GetNormalize()*length);
+            if(Pos::MoreThan(base_line[0],base_line[1],nodes[i]->GetJointPos(0)) == Pos::MoreThan(base_line[0],base_line[1],nodes[i]->GetJointPos(1))){
+                nodes[i]->GetJoint(1)->setDifferent(line_near2 + (nodes[i]->GetJointPos(1) - line_near2).GetNormalize()*length);
+            }else{
+                nodes[i]->GetJoint(1)->setDifferent(line_near2 - (nodes[i]->GetJointPos(1) - line_near2).GetNormalize()*length);
+            }
+        }
+    }
+
+    //間違って垂直のやつを作ってしまった
+    /*
     Relative<Pos> line_pos[2] = {nodes[0]->GetJointPos(0),nodes[0]->GetJointPos(1)};
 
+    value = (nodes[1]->GetJointPos(0)-nodes[0]->GetJointPos(0)).Length();
     Pos base = (line_pos[1]()-line_pos[0]());
     QPointF diff_ = QPointF(base.x,base.y)*QTransform().rotate(90);
     Pos diff = Pos(diff_.x(),diff_.y()).GetNormalize();
@@ -122,7 +144,7 @@ bool ConcurrentRestraint::Complete(){
             nodes[i]->GetJoint(0)->setDifferent(line_near1);
             nodes[i]->GetJoint(0)->setDifferent(line_near2);
         }
-    }
+    }*/
     return true;
 }
 
