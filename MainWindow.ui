@@ -40,6 +40,23 @@
         <property name="title">
          <string>幾何拘束</string>
         </property>
+        <layout class="QVBoxLayout" name="verticalLayout_2">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QListWidget" name="RestraintList"/>
+         </item>
+        </layout>
        </widget>
       </item>
       <item>
@@ -160,6 +177,7 @@
    <addaction name="ToolDot"/>
    <addaction name="ToolLine"/>
    <addaction name="ToolArc"/>
+   <addaction name="ToolRect"/>
    <addaction name="ToolSpline"/>
    <addaction name="separator"/>
    <addaction name="ToolDimension"/>
@@ -265,6 +283,18 @@
    </property>
    <property name="toolTip">
     <string>Spline</string>
+   </property>
+  </action>
+  <action name="ToolRect">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="images.qrc">
+     <normaloff>:/ToolImages/Rect.png</normaloff>:/ToolImages/Rect.png</iconset>
+   </property>
+   <property name="text">
+    <string>Rect</string>
    </property>
   </action>
  </widget>

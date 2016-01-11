@@ -209,7 +209,7 @@ std::vector<Restraint*> SmartDimension::MakeRestraint(){
     }
     //円弧
     if(type == SmartDimension::radius){
-        answer.push_back(new MatchRestraint({target[0]->GetJoint(-1),
+        answer.push_back(new MatchRestraint({target[0]->GetJoint(2),
                                              target[0]->GetJoint(0),
                                              target[0]->GetJoint(1)},value));
     }

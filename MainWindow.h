@@ -6,6 +6,7 @@
 #include "SmartDimensionDialog.h"
 #include "CPoint.h"
 #include "CLine.h"
+#include "CRect.h"
 #include "CSpline.h"
 
 namespace Ui {
@@ -17,6 +18,7 @@ enum CEnum{
     Dot,
     Line,
     Arc,
+    Rect,
     Spline,
 };
 
@@ -53,11 +55,14 @@ public slots:
     void ConnectSignals();
     void DisconnectSignals();
     void ClearButton();
+    void RefreshRestraintList();
     void ToggledDot   (bool checked);
     void ToggledLine  (bool checked);
     void ToggledArc   (bool checked);
+    void ToggledRect  (bool checked);
     void ToggledSpline(bool checked);
 
+    void MakeRestraint(QString text);
     void MakeObject();
     bool MakeJoint(CObject *obj);
 

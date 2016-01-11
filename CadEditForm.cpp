@@ -12,9 +12,7 @@ void CadEditForm::AddObject(CObject* obj){
 }
 
 
-
 void CadEditForm::RemoveObject(CObject* obj){
-
     //点ならば含むObjectを全て削除する。
     if(obj->is<CPoint>()){
         for(QVector<CObject*>::Iterator it = objects.begin();it != objects.end();it++){
@@ -53,6 +51,26 @@ void CadEditForm::RemoveObject(CObject* obj){
     }
     repaint();
 }
+
+void CadEditForm::CompleteObject(CObject* make_obj){
+    for(int i=0;i<make_obj->GetJointNum();i++){
+        bool is_known_pos=false;
+        //すでに点がなければ
+        for(CObject* obj : objects){
+            if(obj->is<CPoint>() && (*dynamic_cast<CPoint*>(obj))() == make_obj->GetJointPos(i)){
+                is_known_pos=true;
+                break;
+            }
+        }
+        //追加
+        if(!is_known_pos){
+            CPoint* new_point = make_obj->GetJoint(i);
+            new_point->Make(new_point);
+            AddObject(new_point);
+        }
+    }
+}
+
 double CadEditForm::GetScale()const{
     return scale;
 }
@@ -160,9 +178,34 @@ void CadEditForm::MakeSmartDimension(){
     RefreshRestraints();
 }
 
+void CadEditForm::MakeRestraint(RestraintType type){
+    Restraint* rest;
+    /*
+    RestraintType
+            EQUAL      ,//等しい値
+            VERTICAL   ,//垂直拘束 c:[-.]
+            HORIZONTAL ,//水平拘束 c:[-.]
+            MATCH      ,//一致拘束 c:[p.-]
+            CONCURRENT ,//並行拘束 c:[l,l]
+            ANGLE      ,//角度拘束 c:[l,l]
+            TANGENT    ,//正接拘束 c:[l]
+            FIX        ,//固定拘束 c:[]
+            Paradox    ,//矛盾拘束 c:[]
+            */
+    if(type == EQUAL)     rest = new EqualRestraint({CObject::selected[0],CObject::selected[1]});
+    if(type == VERTICAL)  rest = new VerticalRestraint({CObject::selected[0]});
+    if(type == HORIZONTAL)rest = new HorizontalRestraint({CObject::selected[0]});
+    if(type == MATCH)     rest = new MatchRestraint({CObject::selected[0],CObject::selected[1]});
+    if(type == CONCURRENT)rest = new ConcurrentRestraint({CObject::selected[0],CObject::selected[1]});
+    //if(type == TANGENT)   rest = new TangentRestraint(CObject::selected[0],CObject::selected[1]);
+
+
+    restraints.push_back(rest);
+    RefreshRestraints();
+}
 
 void CadEditForm::RefreshRestraints(){
     for(Restraint* rest:restraints){
-        rest->Complete();
+        if(rest!=nullptr)rest->Complete();
     }
 }

@@ -14,6 +14,7 @@ class CObject
 public:
     const static int DRAWING_LINE_SIZE=3;
     static CObject* selecting;
+    static std::vector<CObject*> all_objects;
     static std::vector<CObject*> selected;
     static Pos mouse_over;
 protected:
@@ -40,6 +41,8 @@ public:
     virtual bool Move(const Pos& diff)=0;
     //近接点
     virtual Pos GetNear(const Pos& hand)const=0;
+    //子オブジェクト取得
+    virtual std::vector<CObject*> GetChild(){return std::vector<CObject*>();}
 
     //座標取得
     virtual int GetJointNum()const=0;

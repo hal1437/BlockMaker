@@ -14,9 +14,7 @@ bool CArc::Refresh(){
 
         //点を円形修正
         for(int i=0;i<2;i++){
-            //if(this->pos[i]->getReference()!=nullptr){
             pos[i]->Move(Pos::CircleNearPoint(GetCenter(),round,GetJointPos(i))-GetJointPos(i));
-            //}
         }
     }
 
@@ -102,7 +100,7 @@ bool CArc::Move(const Pos& diff){
 }
 
 int CArc::GetJointNum()const{
-    return 2;
+    return 3;
 }
 Pos CArc::GetJointPos(int index)const{
     if(index == -1)return GetCenter();
@@ -110,7 +108,7 @@ Pos CArc::GetJointPos(int index)const{
     else return pos[index]->getRelative();
 }
 CPoint* CArc::GetJoint(int index){
-    if(index == -1)return center;
+    if(index == 2)return center;
     else return pos[index];
 }
 

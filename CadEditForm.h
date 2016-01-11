@@ -29,6 +29,7 @@ public:
 
     void AddObject(CObject* obj);
     void RemoveObject(CObject* obj);
+    void CompleteObject(CObject* make_obj);//非端点を追加
     double GetScale()const;
     Pos    GetTransform()const;
 
@@ -49,6 +50,7 @@ public slots:
     CObject* Selecting();
     void SetScale(double scale);
     void SetTransform(Pos trans);
+    void MakeRestraint(RestraintType type);
     void MakeSmartDimension();
     void RefreshRestraints();
 

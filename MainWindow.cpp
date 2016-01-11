@@ -11,6 +11,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionCtrlZ    ,SIGNAL(triggered())                      ,this       ,SLOT(CtrlZ()));
     connect(ui->actionDelete   ,SIGNAL(triggered())                      ,this       ,SLOT(Delete()));
     connect(ui->actionEsc      ,SIGNAL(triggered())                      ,this       ,SLOT(Escape()));
+    connect(ui->RestraintList  ,SIGNAL(currentTextChanged(QString))      ,this       ,SLOT(MakeRestraint(QString)));
     connect(ui->SizeRateSpinBox,SIGNAL(valueChanged(double))             ,ui->CadEdit,SLOT(SetScale(double)));
     connect(ui->ToolDimension  ,SIGNAL(triggered())                      ,ui->CadEdit,SLOT(MakeSmartDimension()));
     ConnectSignals();
@@ -25,6 +26,7 @@ void MainWindow::mousePressEvent  (QMouseEvent*){
     release_flag=false;
     move_flag = true;
     MakeObject();
+    RefreshRestraintList();
 }
 
 void MainWindow::mouseReleaseEvent(QMouseEvent*){
@@ -89,6 +91,7 @@ void MainWindow::ConnectSignals(){
     connect(ui->ToolDot   ,SIGNAL(toggled(bool)),this,SLOT(ToggledDot(bool)));
     connect(ui->ToolArc   ,SIGNAL(toggled(bool)),this,SLOT(ToggledArc(bool)));
     connect(ui->ToolLine  ,SIGNAL(toggled(bool)),this,SLOT(ToggledLine(bool)));
+    connect(ui->ToolRect  ,SIGNAL(toggled(bool)),this,SLOT(ToggledRect(bool)));
     connect(ui->ToolSpline,SIGNAL(toggled(bool)),this,SLOT(ToggledSpline(bool)));
 }
 
@@ -96,6 +99,7 @@ void MainWindow::DisconnectSignals(){
     disconnect(ui->ToolDot   ,SIGNAL(toggled(bool)),this,SLOT(ToggledDot(bool)));
     disconnect(ui->ToolArc   ,SIGNAL(toggled(bool)),this,SLOT(ToggledArc(bool)));
     disconnect(ui->ToolLine  ,SIGNAL(toggled(bool)),this,SLOT(ToggledLine(bool)));
+    disconnect(ui->ToolRect  ,SIGNAL(toggled(bool)),this,SLOT(ToggledRect(bool)));
     disconnect(ui->ToolSpline,SIGNAL(toggled(bool)),this,SLOT(ToggledSpline(bool)));
 }
 
@@ -104,7 +108,25 @@ void MainWindow::ClearButton(){
     if(ui->ToolDot   ->isChecked())ui->ToolDot   ->setChecked(false);
     if(ui->ToolLine  ->isChecked())ui->ToolLine  ->setChecked(false);
     if(ui->ToolArc   ->isChecked())ui->ToolArc   ->setChecked(false);
+    if(ui->ToolRect  ->isChecked())ui->ToolRect  ->setChecked(false);
     if(ui->ToolSpline->isChecked())ui->ToolSpline->setChecked(false);
+}
+void MainWindow::RefreshRestraintList(){
+    ui->RestraintList->clear();
+    std::vector<RestraintType> able = Restraint::Restraintable(CObject::selected);
+    for(RestraintType r:able){
+        std::pair<std::string,std::string> p;
+        if(r == MATCH     )p = std::make_pair("一致",":/Restraint/MatchRestraint.png");
+        if(r == EQUAL     )p = std::make_pair("等値",":/Restraint/EqualRestraint.png");
+        if(r == CONCURRENT)p = std::make_pair("並行",":/Restraint/ConcurrentRestraint.png");
+        if(r == VERTICAL  )p = std::make_pair("垂直",":/Restraint/VerticalRestraint.png");
+        if(r == HORIZONTAL)p = std::make_pair("水平",":/Restraint/HorizontalRestraint.png");
+        if(r == TANGENT   )p = std::make_pair("正接",":/Restraint/TangentRestraint.png");
+        if(r == FIX       )p = std::make_pair("固定",":/Restraint/FixRestraint.png");
+        if(r == MARGE     )p = std::make_pair("マージ",":/Restraint/Marge.png");
+        ui->RestraintList->addItem(new QListWidgetItem(p.first.c_str()));
+        ui->RestraintList->item(ui->RestraintList->count()-1)->setIcon(QIcon(p.second.c_str()));
+    }
 }
 
 #define ToggledToolDefinition(TYPE)             \
@@ -128,7 +150,25 @@ void MainWindow::Toggled##TYPE (bool checked){  \
 ToggledToolDefinition(Dot)
 ToggledToolDefinition(Line)
 ToggledToolDefinition(Arc)
+ToggledToolDefinition(Rect)
 ToggledToolDefinition(Spline)
+
+
+void MainWindow::MakeRestraint(QString text){
+    //qDebug() << text;
+    RestraintType type = Paradox;
+    if(text == "一致")type = MATCH;
+    if(text == "並行")type = CONCURRENT;
+    if(text == "垂直")type = VERTICAL;
+    if(text == "水平")type = HORIZONTAL;
+    if(text == "正接")type = TANGENT;
+    if(text == "固定")type = FIX;
+    if(type != Paradox)ui->CadEdit->MakeRestraint(type);
+
+    if(text == "マージ"){
+
+    }
+}
 
 void MainWindow::MakeObject(){
 
@@ -156,18 +196,21 @@ void MainWindow::MakeObject(){
             if     (state == Dot   )make_obj = new CPoint();
             else if(state == Line  )make_obj = new CLine();
             else if(state == Arc   )make_obj = new CArc();
+            else if(state == Rect  )make_obj = new CRect();
             else if(state == Spline)make_obj = new CSpline();
             ui->CadEdit->AddObject(make_obj);
             log.push_back(make_obj);
         }
         //作成
         if(MakeJoint(make_obj)){
-            if(make_obj->is<CArc>()){
-                CPoint* new_point = dynamic_cast<CArc*>(make_obj)->GetJoint(-1);
-                new_point->Make(new_point);
-                ui->CadEdit->AddObject(new_point);
-                log.push_back(new_point);
-            }
+
+            //未構築点を追加
+            ui->CadEdit->CompleteObject(make_obj);
+
+            //子オブジェクトを追加
+            std::vector<CObject*> cc = make_obj->GetChild();
+            for(CObject* c:cc)ui->CadEdit->AddObject(c);
+
             creating_count = 0;
         }else {
             creating_count++;
