@@ -121,6 +121,13 @@
         </layout>
        </widget>
       </item>
+      <item>
+       <widget class="QPushButton" name="pushButton">
+        <property name="text">
+         <string>出力</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </item>
     <item>
@@ -179,6 +186,8 @@
    <addaction name="ToolArc"/>
    <addaction name="ToolRect"/>
    <addaction name="ToolSpline"/>
+   <addaction name="separator"/>
+   <addaction name="ToolBlocks"/>
    <addaction name="separator"/>
    <addaction name="ToolDimension"/>
    <addaction name="actionCtrlZ"/>
@@ -297,6 +306,15 @@
     <string>Rect</string>
    </property>
   </action>
+  <action name="ToolBlocks">
+   <property name="icon">
+    <iconset resource="images.qrc">
+     <normaloff>:/ToolImages/Blocks.png</normaloff>:/ToolImages/Blocks.png</iconset>
+   </property>
+   <property name="text">
+    <string>Blocks</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
@@ -310,5 +328,25 @@
  <resources>
   <include location="images.qrc"/>
  </resources>
- <connections/>
+ <connections>
+  <connection>
+   <sender>pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>Export()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>101</x>
+     <y>396</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>123</x>
+     <y>429</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>Export()</slot>
+ </slots>
 </ui>

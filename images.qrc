@@ -6,6 +6,7 @@
         <file>Dimension.png</file>
         <file>Spline.png</file>
         <file>Rect.png</file>
+        <file>Blocks.png</file>
     </qresource>
     <qresource prefix="/Restraint">
         <file>ConcurrentRestraint.png</file>
@@ -17,4 +18,5 @@
         <file>VerticalRestraint.png</file>
         <file>Marge.png</file>
     </qresource>
+    <qresource prefix="/Others"/>
 </RCC>

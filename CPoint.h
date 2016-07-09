@@ -20,7 +20,6 @@ public:
     virtual Pos GetNear(const Pos&)const;
     virtual bool Draw(QPainter& painter)const;
     virtual bool Selecting();
-    virtual bool isLocked();
     virtual bool Move(const Pos& pos);
     virtual int GetJointNum()const;
     virtual Pos GetJointPos(int index)const;

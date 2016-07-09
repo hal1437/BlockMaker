@@ -5,6 +5,7 @@
 #include <QDebug>
 #include <QMouseEvent>
 #include <iostream>
+#include <random>
 #include "CObject.h"
 #include "CPoint.h"
 #include "CLine.h"
@@ -20,18 +21,18 @@ class CadEditForm : public QWidget
 {
     Q_OBJECT
 private:
-    QVector<CObject*>         objects; //物体
+    QVector<CObject*>         objects;    //物体
     QVector<SmartDimension*>  dimensions; //寸法
     QVector<Restraint*>       restraints; //拘束
     double scale = 1.0f;
     Pos transform = Pos(0,0);
 public:
 
-    void AddObject(CObject* obj);
-    void RemoveObject(CObject* obj);
-    void CompleteObject(CObject* make_obj);//非端点を追加
-    double GetScale()const;
-    Pos    GetTransform()const;
+    void AddObject(CObject* obj);           //物体追加
+    void RemoveObject(CObject* obj);        //物体削除
+    void CompleteObject(CObject* make_obj); //非端点を追加
+    double GetScale()const;     //スケール
+    Pos    GetTransform()const; //平行移動
 
     void paintEvent    (QPaintEvent* event); //描画イベントハンドラ
     void mouseMoveEvent(QMouseEvent* event); //マウス移動
@@ -47,12 +48,12 @@ signals:
     void MovedMouse(QMouseEvent *event, CObject *under_object);
 
 public slots:
-    CObject* Selecting();
-    void SetScale(double scale);
-    void SetTransform(Pos trans);
-    void MakeRestraint(RestraintType type);
-    void MakeSmartDimension();
-    void RefreshRestraints();
+    CObject* getSelecting();      //選択中オブジェクト取得
+    void SetScale(double scale);  //スケールセット
+    void SetTransform(Pos trans); //並行移動セット
+    void MakeRestraint(RestraintType type); //拘束作成
+    void MakeSmartDimension();    //寸法設定
+    void RefreshRestraints();     //拘束更新
 
 };
 

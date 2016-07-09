@@ -89,6 +89,13 @@ Pos CSpline::GetNear(const Pos& hand)const{
     return Pos();
 }
 
+void CSpline::Lock(bool lock){
+    for(int i =0;i<this->pos.size();i++){
+        pos[i]->Lock(lock);
+    }
+    this->is_Locking = lock;
+}
+
 bool CSpline::Draw(QPainter& painter)const{
     if(pos.size() > 1){
         QPainterPath path;
@@ -119,9 +126,6 @@ bool CSpline::Selecting(){
     return false;
 }
 
-bool CSpline::isLocked(){
-    return false;
-}
 bool CSpline::Move(const Pos& diff){
     for(int i=0;i<pos.size();i++){
         pos[i]->Move(diff);

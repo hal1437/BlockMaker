@@ -23,7 +23,10 @@ SOURCES += main.cpp\
     SmartDimensionDialog.cpp \
     Restraint.cpp \
     CSpline.cpp \
-    CRect.cpp
+    CRect.cpp \
+    ExportDialog.cpp \
+    CBlocks.cpp \
+    CBoxDefineDialog.cpp
 
 HEADERS  += MainWindow.h \
     CObject.h \
@@ -38,11 +41,16 @@ HEADERS  += MainWindow.h \
     SmartDimensionDialog.h \
     Restraint.h \
     CSpline.h \
-    CRect.h
+    CRect.h \
+    ExportDialog.h \
+    CBlocks.h \
+    CBoxDefineDialog.h
 
 FORMS    += MainWindow.ui \
     CadEditForm.ui \
-    SmartDimensionDialog.ui
+    SmartDimensionDialog.ui \
+    ExportDialog.ui \
+    CBoxDefineDialog.ui
 
 RESOURCES += \
     images.qrc

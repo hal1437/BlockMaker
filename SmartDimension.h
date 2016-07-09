@@ -25,10 +25,11 @@ public:
     };
 
 private:
-    DimensionType type;
-    double value = 1.0;
-    CObject* target[2];
-
+    DimensionType type;  //高速タイプ
+    double value = 1.0;  //測定値
+    CObject* target[2];  //対象
+    bool X_type = false; //X軸成分
+    bool Y_type = false; //Y軸成分
 
 private:
 

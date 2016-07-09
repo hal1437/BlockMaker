@@ -14,7 +14,9 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->RestraintList  ,SIGNAL(currentTextChanged(QString))      ,this       ,SLOT(MakeRestraint(QString)));
     connect(ui->SizeRateSpinBox,SIGNAL(valueChanged(double))             ,ui->CadEdit,SLOT(SetScale(double)));
     connect(ui->ToolDimension  ,SIGNAL(triggered())                      ,ui->CadEdit,SLOT(MakeSmartDimension()));
+    connect(ui->ToolBlocks     ,SIGNAL(triggered())                      ,this       ,SLOT(MakeBlock()));
     ConnectSignals();
+    ui->ToolBlocks->setEnabled(false);
 }
 
 MainWindow::~MainWindow()
@@ -24,7 +26,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::mousePressEvent  (QMouseEvent*){
     release_flag=false;
-    move_flag = true;
+    if(state==Edit)move_flag = true;
     MakeObject();
     RefreshRestraintList();
 }
@@ -76,7 +78,13 @@ void MainWindow::MovedMouse(QMouseEvent *event, CObject *under_object){
     }
     //編集
     if(move_flag == true){
-        if(CObject::selecting!=nullptr)CObject::selecting->Move(CObject::mouse_over-past);
+        if(CObject::selecting!=nullptr && !CObject::selecting->isLocked()){
+            CObject::selecting->Move(CObject::mouse_over-past);
+        }
+    }
+
+    if(CBlocks::Creatable(CObject::selected)){
+        ui->ToolBlocks->setEnabled(true);
     }
     past = CObject::mouse_over;
     release_flag=true;
@@ -153,6 +161,11 @@ ToggledToolDefinition(Arc)
 ToggledToolDefinition(Rect)
 ToggledToolDefinition(Spline)
 
+void MainWindow::Export(){
+    ExportDialog* diag = new ExportDialog(this);
+    diag->SetBlocks(blocks);
+    diag->exec();
+}
 
 void MainWindow::MakeRestraint(QString text){
     //qDebug() << text;
@@ -166,7 +179,7 @@ void MainWindow::MakeRestraint(QString text){
     if(type != Paradox)ui->CadEdit->MakeRestraint(type);
 
     if(text == "マージ"){
-
+    //    ui->CadEdit->
     }
 }
 
@@ -243,9 +256,16 @@ bool MainWindow::MakeJoint(CObject* obj){
         log.push_back(new_point);
 
         //一致の幾何拘束を付与
-
         return  obj->Make(new_point,creating_count);
     }
 }
-
+bool MainWindow::MakeBlock(){
+    CBoxDefineDialog* diag = new CBoxDefineDialog();
+    if(diag->exec()){
+        CBlocks block = diag->ExportCBlocks();
+        block.SetNode(CObject::selected);
+        this->blocks.push_back(block);
+        CObject::selected.clear();
+    }
+}
 

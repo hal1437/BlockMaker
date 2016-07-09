@@ -25,18 +25,18 @@ bool CPoint::Draw(QPainter& painter)const{
                         2*DRAWING_CIRCLE_SIZE,
                         2*DRAWING_CIRCLE_SIZE,0,360*16);
     }
+    if(this->isLocked()){
+        painter.drawImage(p.x+10,p.y-10,QImage(":/Restraint/FixRestraint.png"));
+    }
     return true;
 }
 bool CPoint::Selecting(){
     return ((*this)().Length(CPoint::mouse_over) < COLLISION_SIZE);
 }
 
-bool CPoint::isLocked(){
-    return (this->ref != nullptr);
-}
 
 bool CPoint::Move(const Pos& pos){
-    diff = this->getRelative() + pos;
+    if(!isLocked())diff = this->getRelative() + pos;
     return true;
 }
 
@@ -47,7 +47,7 @@ Pos CPoint::GetJointPos(int index)const{
     if(index == 0) return (*this)();
     else return Pos();
 }
-CPoint* CPoint::GetJoint(int index){
+CPoint* CPoint::GetJoint(int){
     return this;
 }
 

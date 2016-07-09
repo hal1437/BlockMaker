@@ -8,6 +8,9 @@
 #include "CLine.h"
 #include "CRect.h"
 #include "CSpline.h"
+#include "CBlocks.h"
+#include "CBoxDefineDialog.h"
+#include "ExportDialog.h"
 
 namespace Ui {
 class MainWindow;
@@ -44,6 +47,8 @@ private:
     bool move_flag    = false;
     QVector<CObject*> log;
 
+    std::vector<CBlocks> blocks;
+
     bool shift_pressed = false;
     bool ctrl_pressed  = false;
 
@@ -61,10 +66,12 @@ public slots:
     void ToggledArc   (bool checked);
     void ToggledRect  (bool checked);
     void ToggledSpline(bool checked);
+    void Export();
 
     void MakeRestraint(QString text);
     void MakeObject();
     bool MakeJoint(CObject *obj);
+    bool MakeBlock();
 
 };
 

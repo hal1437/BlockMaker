@@ -94,8 +94,8 @@ public:
     }
     bool operator<(cr_current rhs)const{
         if(this->x == rhs.x){
-            return (this->y == rhs.y);
-        }else return (this->x == rhs.x);
+            return (this->y < rhs.y);
+        }else return (this->x < rhs.x);
     }
 };
 

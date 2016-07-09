@@ -1,0 +1,59 @@
+#ifndef CBLOCKS_H
+#define CBLOCKS_H
+
+#include <vector>
+#include "CObject.h"
+#include "CLine.h"
+#include "CArc.h"
+#include "CSpline.h"
+
+//面の方向
+enum BoundaryDir{
+    Top,
+    Right,
+    Left,
+    Bottom,
+    Front,
+    Back,
+};
+
+//面の種類
+enum BoundaryType{
+    Empty,
+    Patch,
+    Wall,
+    SymmetryPlane,
+    Cyclic,
+    CyclicAMI,
+    Wedge,
+};
+//格子点間隔の種類
+enum GradingType{
+    SimpleGrading,
+    EdgeGrading,
+};
+
+class CBlocks{
+private:
+    std::vector<CObject*> lines;
+public:
+    BoundaryType boundery[6];
+    QString name[6];
+    std::vector<int> vertices[6];
+
+    GradingType grading;
+    std::vector<double> grading_args;
+public:
+
+    static bool Creatable(std::vector<CObject*> values);
+
+    void SetNode(std::vector<CObject*> lines);
+
+    Pos GetPos(int index)const;
+
+    CBlocks();
+    CBlocks(std::vector<CObject*> lines);
+    ~CBlocks();
+};
+
+#endif // CBLOCKS_H

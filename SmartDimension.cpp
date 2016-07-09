@@ -55,7 +55,9 @@ bool SmartDimension::SetTarget(CObject* obj1,CObject* obj2){
     target[0] = obj1;
     target[1] = obj2;
 
-    if(!target[0]->is<CLine>() && target[1]!=nullptr || target[1]->is<CLine>())std::swap(target[0],target[1]);
+    if(target[1]!=nullptr){
+        if(!target[0]->is<CLine>()  || target[1]->is<CLine>())std::swap(target[0],target[1]);
+    }
     return !(this->type == SmartDimension::none);
 }
 

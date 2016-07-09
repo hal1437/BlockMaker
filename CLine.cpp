@@ -22,16 +22,23 @@ Pos CLine::GetNear(const Pos& hand)const{
 
 bool CLine::Draw(QPainter& painter)const{
     if(is_Creating){
+        //製作中
         painter.drawLine(QPointF(GetJointPos(0).x,GetJointPos(0).y),
                          QPointF(this->mouse_over.x,this->mouse_over.y));
     }else{
+        //制作済み
         painter.drawLine(QPointF(GetJointPos(0).x,GetJointPos(0).y),
                          QPointF(GetJointPos(1).x,GetJointPos(1).y));
+        //ロック
+        if(this->isLocked()){
+            Pos p = (GetJointPos(0) - GetJointPos(1))/2 + GetJointPos(1);
+            painter.drawImage(p.x+10,p.y-10,QImage(":/Restraint/FixRestraint.png"));
+        }
     }
     return true;
 }
 bool CLine::Selecting(){
-    //直線と点の距離のアルゴリズム
+    //直線と点の距離のアルゴリズムによって選択を決定
     float d;
     Pos v1,v2;
     v1 = GetJointPos(1) - GetJointPos(0);
@@ -49,16 +56,23 @@ bool CLine::Selecting(){
     }
 }
 
-bool CLine::isLocked(){
-    return false;
+void CLine::Lock(bool lock){
+    //それぞれロック
+    pos[0]->Lock(lock);
+    pos[1]->Lock(lock);
+    this->is_Locking = lock;
 }
+
 bool CLine::Move(const Pos& diff){
     for(int i = 0;i<2;i++){
-        if(pos[i]->getReference() != nullptr)pos[i]->getReference()->diff += diff;
-        else pos[i]->diff += diff;
+        if(!pos[i]->isLocked()){
+            if(pos[i]->getReference() != nullptr)pos[i]->getReference()->diff += diff;
+            else pos[i]->diff += diff;
+        }
     }
     return true;
 }
+
 
 int CLine::GetJointNum()const{
     return 2;

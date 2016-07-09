@@ -21,9 +21,9 @@ public:
     Pos    GetCenter()const;
     virtual bool Refresh();
     virtual Pos GetNear(const Pos& hand)const;
+    virtual void Lock(bool lock);
     virtual bool Draw(QPainter& painter)const;
     virtual bool Selecting();
-    virtual bool isLocked();
     virtual bool Move(const Pos& diff);
     virtual int GetJointNum()const;
     virtual Pos GetJointPos(int index)const;

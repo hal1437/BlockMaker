@@ -47,6 +47,13 @@ Pos    CArc::GetCenter()const{
 Pos CArc::GetNear(const Pos& hand)const{
     return Pos::CircleNearPoint(GetCenter(),round,hand);
 }
+void CArc::Lock(bool lock){
+    //それぞれロック
+    pos[0]->Lock(lock);
+    pos[1]->Lock(lock);
+    center->Lock(lock);
+    this->is_Locking = lock;
+}
 
 bool CArc::Draw(QPainter& painter)const{
     Pos end_point;
@@ -88,9 +95,6 @@ bool CArc::Selecting(){
     return false;
 }
 
-bool CArc::isLocked(){
-    return false;
-}
 bool CArc::Move(const Pos& diff){
     for(int i = 0;i<2;i++){
         pos[i]->Move(diff);

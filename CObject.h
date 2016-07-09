@@ -18,7 +18,8 @@ public:
     static std::vector<CObject*> selected;
     static Pos mouse_over;
 protected:
-    bool is_Creating;
+    bool is_Creating = false;
+    bool is_Locking  = false;
 
     virtual bool Create(CPoint* pos,int index)=0;
 public:
@@ -34,8 +35,9 @@ public:
     virtual bool Draw(QPainter& painter)const = 0;
     //選択関数
     virtual bool Selecting() = 0;
+    virtual void Lock(bool lock){is_Locking=lock;}
     //固定関数
-    virtual bool isLocked()=0;
+    virtual bool isLocked()const{return is_Locking;}
     virtual bool isCreateing()const;
     //移動関数
     virtual bool Move(const Pos& diff)=0;

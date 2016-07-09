@@ -13,8 +13,8 @@ bool CRect::Create(CPoint *hand, int index){
             pos[1] = new CPoint();
             pos[2] = new CPoint();
             pos[3] = hand;
-            if(GetJointPos(0).x < GetJointPos(3).x && GetJointPos(0).y < GetJointPos(3).y ||
-               GetJointPos(0).x > GetJointPos(3).x && GetJointPos(0).y > GetJointPos(3).y ){
+            if((GetJointPos(0).x < GetJointPos(3).x && GetJointPos(0).y < GetJointPos(3).y )||
+               (GetJointPos(0).x > GetJointPos(3).x && GetJointPos(0).y > GetJointPos(3).y )){
                 pos[1]->setDifferent(Pos(std::min(GetJointPos(0).x,GetJointPos(3).x),std::max(GetJointPos(0).y,GetJointPos(3).y)));
                 pos[2]->setDifferent(Pos(std::max(GetJointPos(0).x,GetJointPos(3).x),std::min(GetJointPos(0).y,GetJointPos(3).y)));
             }else{
@@ -42,6 +42,12 @@ bool CRect::Create(CPoint *hand, int index){
 Pos CRect::GetNear(const Pos& hand)const{
     return Pos::LineNearPoint(GetJointPos(0),GetJointPos(1),hand);
 }
+void CRect::Lock(bool lock){
+    for(int i =0;i<4;i++){
+        this->lines[i]->Lock(lock);
+    }
+    this->is_Locking = lock;
+}
 
 bool CRect::Draw(QPainter& painter)const{
     if(is_Creating){
@@ -50,22 +56,13 @@ bool CRect::Draw(QPainter& painter)const{
                          std::max((*pos[0])().x,CPoint::mouse_over.x)-std::min((*pos[0])().x,CPoint::mouse_over.x),
                          std::max((*pos[0])().y,CPoint::mouse_over.y)-std::min((*pos[0])().y,CPoint::mouse_over.y));
     }
-    /*else{
-        for(int i=0;i<4;i++){
-            pos[i]->Draw(painter);
-            lines[i]->Draw(painter);
-        }
-    }*/
     return true;
 }
 bool CRect::Selecting(){
     return false;
 }
 
-bool CRect::isLocked(){
-    return false;
-}
-bool CRect::Move(const Pos& diff){
+bool CRect::Move(const Pos&){
     return true;
 }
 

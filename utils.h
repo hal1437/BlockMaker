@@ -3,6 +3,7 @@
 
 #include <iterator>
 #include <algorithm>
+#include <QStringList>
 #define PI 3.1415926535897932384626433832795
 
 template<class T>
@@ -29,6 +30,7 @@ T Mod(T lhs,const U& rhs){
     while(lhs > rhs)lhs -= rhs;
     return lhs;
 }
+
 
 #endif // UTILS
 
