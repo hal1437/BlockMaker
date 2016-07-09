@@ -13,6 +13,8 @@ void CadEditForm::AddObject(CObject* obj){
 
 
 void CadEditForm::RemoveObject(CObject* obj){
+    if(obj == nullptr)return;
+
     //点ならば含むObjectを全て削除する。
     if(obj->is<CPoint>()){
         for(QVector<CObject*>::Iterator it = objects.begin();it != objects.end();it++){
@@ -23,7 +25,8 @@ void CadEditForm::RemoveObject(CObject* obj){
                 }
             }
         }
-    }else{
+    }/*
+    else{
         //点以外ならば端点の被参照数を確認して1なら消す
 
         //点を抽出
@@ -36,7 +39,7 @@ void CadEditForm::RemoveObject(CObject* obj){
         for(int i=0;i<obj->GetJointNum();i++){
             map.insert(obj->GetJointPos(i),1);
         }
-    }
+    }*/
 
     //objを消す
     QVector<CObject*>::Iterator it = std::find(objects.begin(),objects.end(),obj);

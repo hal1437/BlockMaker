@@ -61,7 +61,11 @@ void MainWindow::CtrlZ(){
     }
 }
 void MainWindow::Delete(){
-    ui->CadEdit->RemoveObject(CObject::selecting);
+    for(int i =0;i<CObject::selected.size();i++){
+        ui->CadEdit->RemoveObject(CObject::selected[i]);
+    }
+    CObject::selected.clear();
+    repaint();
 }
 void MainWindow::Escape(){
     if(make_obj != nullptr && !make_obj->Make(nullptr,-1)){
