@@ -44,6 +44,7 @@ public:
     double GetValue()const;
 
     bool SetTarget(CObject* obj1,CObject* obj2);
+    bool SetXYType(bool x,bool y);
     CObject* GetTarget(int index)const;
     std::vector<Restraint *> MakeRestraint();
 

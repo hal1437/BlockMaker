@@ -163,33 +163,54 @@ void CadEditForm::MakeSmartDimension(){
         //XY軸成分指定
         if(CObject::selected.size()==2 && CObject::selected[0]->is<CPoint>() && CObject::selected[1]->is<CPoint>()){
             diag->UseRadioLayout(true);
+            if(diag->exec()){
+                double value = diag->GetValue();
+                SmartDimension* dim = new SmartDimension();
+                dim->SetXYType(diag->GetCurrentRadio()==2,diag->GetCurrentRadio()==1);
+                if(dim->SetTarget(CObject::selected[0],CObject::selected[1])){
+                    dim->SetValue(value);
+                    this->dimensions.push_back(dim);
+                }else{
+                    delete dim;
+                }
+                for(SmartDimension* dim:dimensions){
+                    Restraint* rs ;
+                    if(diag->GetCurrentRadio()==0)rs = new MatchRestraint();
+                    if(diag->GetCurrentRadio()==1)rs = new MatchHRestraint();
+                    if(diag->GetCurrentRadio()==2)rs = new MatchVRestraint();
+                    rs->value = value;
+                    rs->nodes.push_back(CObject::selected[0]);
+                    rs->nodes.push_back(CObject::selected[1]);
+                    restraints.push_back(rs);
+                }
+
+            }
         }else{
             diag->UseRadioLayout(false);
-        }
-
-        if(diag->exec()){
-            double value = diag->GetValue();
-            SmartDimension* dim = new SmartDimension();
+            if(diag->exec()){
+                double value = diag->GetValue();
+                SmartDimension* dim = new SmartDimension();
 
 
-            //有効寸法であれば
-            CObject* sel[2];
-            sel[0] = CObject::selected[0];
-            if(CObject::selected.size()==1)sel[1] = nullptr;
-            else sel[1] = CObject::selected[1];
+                //有効寸法であれば
+                CObject* sel[2];
+                sel[0] = CObject::selected[0];
+                if(CObject::selected.size()==1)sel[1] = nullptr;
+                else sel[1] = CObject::selected[1];
 
-            if(dim->SetTarget(sel[0],sel[1])){
-                dim->SetValue(value);
-                this->dimensions.push_back(dim);
-            }else{
-                delete dim;
-            }
-            //restraints.clear();
-            for(SmartDimension* dim:dimensions){
+                if(dim->SetTarget(sel[0],sel[1])){
+                    dim->SetValue(value);
+                    this->dimensions.push_back(dim);
+                }else{
+                    delete dim;
+                }
+                //restraints.clear();
+                for(SmartDimension* dim:dimensions){
 
-                std::vector<Restraint*> rs = dim->MakeRestraint();
-                for(Restraint* r : rs){
-                    restraints.push_back(r);
+                    std::vector<Restraint*> rs = dim->MakeRestraint();
+                    for(Restraint* r : rs){
+                        restraints.push_back(r);
+                    }
                 }
             }
         }
@@ -226,7 +247,6 @@ void CadEditForm::MakeRestraint(RestraintType type){
 }
 
 void CadEditForm::RefreshRestraints(){
-
     if(objects.size()!=0){
         auto old = CObject::selected;
         CObject::selected.clear();

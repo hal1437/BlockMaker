@@ -159,7 +159,11 @@ bool MatchHRestraint::Complete(){
 
     Pos near = nodes[0]->GetNear(nodes[1]->GetJointPos(0));
     Pos current_pos = nodes[1]->GetJointPos(0);
-    Pos next_pos = Pos(current_pos.x,  near.y + value);
+    Pos rot = (current_pos-near);
+    rot.x = 0;
+    rot = rot.GetNormalize();
+
+    Pos next_pos = Pos(current_pos.x,  near.y + rot.y*value);
     if(!(current_pos == near)){
         nodes[1]->Move(next_pos - current_pos);
     }
@@ -172,7 +176,12 @@ bool MatchVRestraint::Complete(){
 
     Pos near = nodes[0]->GetNear(nodes[1]->GetJointPos(0));
     Pos current_pos = nodes[1]->GetJointPos(0);
-    Pos next_pos = Pos(current_pos.x+value , near.y);
+    Pos rot = (current_pos-near);
+    rot.y = 0;
+    rot = rot.GetNormalize();
+    Pos next_pos = Pos(near.x + rot.x*value , current_pos.y);
+
+
     if(!(current_pos == near)){
         nodes[1]->Move(next_pos - current_pos);
     }

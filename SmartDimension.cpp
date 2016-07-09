@@ -61,6 +61,11 @@ bool SmartDimension::SetTarget(CObject* obj1,CObject* obj2){
     }
     return !(this->type == SmartDimension::none);
 }
+bool SmartDimension::SetXYType(bool x,bool y){
+    this->X_type = x;
+    this->Y_type = y;
+}
+
 
 CObject* SmartDimension::GetTarget(int index)const{
     return this->target[index];
@@ -93,28 +98,28 @@ bool SmartDimension::Draw(QPainter& painter)const{
         //矢印
         Pos t0 = target[0]->GetJointPos(0);
         Pos t1 = target[1]->GetJointPos(0);
-
+        float flow = 20;
         if(this->X_type == true){
             //X軸拘束
             if(t0.y > t1.y)std::swap(t0,t1);
 
-            painter.drawLine(t0.x,t0.y    ,t0.x,t0.y - 10);
-            painter.drawLine(t1.x,t1.y    ,t1.x,t0.y - 10);
-            painter.drawLine(t0.x,t0.y - 5,t1.x,t0.y - 5);
-            this->DrawArrow (painter,Pos(t0.x,t0.y-5)+Pos(0,-5),Pos((t0-t1).x,0).GetNormalize(),3.0);
-            this->DrawArrow (painter,Pos(t1.x,t0.y-5)+Pos(0,-5),Pos((t1-t0).x,0).GetNormalize(),3.0);
-            this->DrawString(painter,Pos((t0.x-t1.x)/2+t1.x,t0.y-5),QString::number(value),0);
+            painter.drawLine(t0.x,t0.y         ,t0.x,t0.y - flow);
+            painter.drawLine(t1.x,t1.y         ,t1.x,t0.y - flow);
+            painter.drawLine(t0.x,t0.y - flow/2,t1.x,t0.y - flow/2);
+            this->DrawArrow (painter,Pos(t0.x,t0.y)+Pos(0,-flow/2),Pos((t0-t1).x,0).GetNormalize(),3.0);
+            this->DrawArrow (painter,Pos(t1.x,t0.y)+Pos(0,-flow/2),Pos((t1-t0).x,0).GetNormalize(),3.0);
+            this->DrawString(painter,Pos((t0.x-t1.x)/2+t1.x,t0.y-flow/2),QString::number(value),0);
 
         }else if(this->Y_type == true){
             //Y軸拘束
             if(t0.x > t1.x)std::swap(t0,t1);
 
-            painter.drawLine(t0.x    ,t0.y,t0.x - 10,t0.y);
-            painter.drawLine(t1.x    ,t1.y,t0.x - 10,t0.y);
-            painter.drawLine(t0.x - 5,t0.y,t0.x - 5 ,t0.y);
-            this->DrawArrow(painter,t0+Pos(-5,0),Pos(0,(t0-t1).y).GetNormalize(),3.0);
-            this->DrawArrow(painter,t1+Pos(-5,0),Pos(0,(t1-t0).y).GetNormalize(),3.0);
-            this->DrawString(painter,(t1+t0)/2.0,QString::number(value),Pos::Angle(Pos(1,0),Pos(0,1)));
+            painter.drawLine(t0.x         ,t0.y,t0.x - flow   ,t0.y);
+            painter.drawLine(t1.x         ,t1.y,t0.x - flow   ,t1.y);
+            painter.drawLine(t0.x - flow/2,t0.y,t0.x - flow/2 ,t1.y);
+            this->DrawArrow(painter,Pos(t0.x,t0.y)+Pos(-flow/2,0),Pos(0,(t0-t1).y).GetNormalize(),3.0);
+            this->DrawArrow(painter,Pos(t0.x,t1.y)+Pos(-flow/2,0),Pos(0,(t1-t0).y).GetNormalize(),3.0);
+            this->DrawString(painter,Pos(t0.x-flow/2,(t0.y-t1.y)/2+t1.y),QString::number(value),Pos::Angle(Pos(0,1),Pos(1,0)));
 
         }else{
             //直線拘束
