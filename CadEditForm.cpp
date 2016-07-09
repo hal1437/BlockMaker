@@ -159,9 +159,18 @@ void CadEditForm::MakeSmartDimension(){
     if(CObject::selected.size()!=0){
         //スマート寸法生成
         SmartDimensionDialog* diag = new SmartDimensionDialog(this);
+
+        //XY軸成分指定
+        if(CObject::selected.size()==2 && CObject::selected[0]->is<CPoint>() && CObject::selected[1]->is<CPoint>()){
+            diag->UseRadioLayout(true);
+        }else{
+            diag->UseRadioLayout(false);
+        }
+
         if(diag->exec()){
             double value = diag->GetValue();
             SmartDimension* dim = new SmartDimension();
+
 
             //有効寸法であれば
             CObject* sel[2];

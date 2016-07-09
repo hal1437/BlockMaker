@@ -56,6 +56,7 @@ bool SmartDimension::SetTarget(CObject* obj1,CObject* obj2){
     target[1] = obj2;
 
     if(target[1]!=nullptr){
+        //CLineはできるだけ0番に入れる
         if(!target[0]->is<CLine>()  || target[1]->is<CLine>())std::swap(target[0],target[1]);
     }
     return !(this->type == SmartDimension::none);
@@ -93,11 +94,35 @@ bool SmartDimension::Draw(QPainter& painter)const{
         Pos t0 = target[0]->GetJointPos(0);
         Pos t1 = target[1]->GetJointPos(0);
 
-        painter.drawLine(t0.x,t0.y,t1.x,t1.y);
-        this->DrawArrow(painter,t0,(t0-t1).GetNormalize(),3.0);
-        this->DrawArrow(painter,t1,(t1-t0).GetNormalize(),3.0);
-        this->DrawString(painter,(t1+t0)/2.0,QString::number(value),Pos::Angle(t1-t0,Pos(1,0)));
+        if(this->X_type == true){
+            //X軸拘束
+            if(t0.y > t1.y)std::swap(t0,t1);
 
+            painter.drawLine(t0.x,t0.y    ,t0.x,t0.y - 10);
+            painter.drawLine(t1.x,t1.y    ,t1.x,t0.y - 10);
+            painter.drawLine(t0.x,t0.y - 5,t1.x,t0.y - 5);
+            this->DrawArrow (painter,Pos(t0.x,t0.y-5)+Pos(0,-5),Pos((t0-t1).x,0).GetNormalize(),3.0);
+            this->DrawArrow (painter,Pos(t1.x,t0.y-5)+Pos(0,-5),Pos((t1-t0).x,0).GetNormalize(),3.0);
+            this->DrawString(painter,Pos((t0.x-t1.x)/2+t1.x,t0.y-5),QString::number(value),0);
+
+        }else if(this->Y_type == true){
+            //Y軸拘束
+            if(t0.x > t1.x)std::swap(t0,t1);
+
+            painter.drawLine(t0.x    ,t0.y,t0.x - 10,t0.y);
+            painter.drawLine(t1.x    ,t1.y,t0.x - 10,t0.y);
+            painter.drawLine(t0.x - 5,t0.y,t0.x - 5 ,t0.y);
+            this->DrawArrow(painter,t0+Pos(-5,0),Pos(0,(t0-t1).y).GetNormalize(),3.0);
+            this->DrawArrow(painter,t1+Pos(-5,0),Pos(0,(t1-t0).y).GetNormalize(),3.0);
+            this->DrawString(painter,(t1+t0)/2.0,QString::number(value),Pos::Angle(Pos(1,0),Pos(0,1)));
+
+        }else{
+            //直線拘束
+            painter.drawLine(t0.x,t0.y,t1.x,t1.y);
+            this->DrawArrow(painter,t0,(t0-t1).GetNormalize(),3.0);
+            this->DrawArrow(painter,t1,(t1-t0).GetNormalize(),3.0);
+            this->DrawString(painter,(t1+t0)/2.0,QString::number(value),Pos::Angle(t1-t0,Pos(1,0)));
+        }
         //寸法の文字
         return true;
     }
@@ -203,7 +228,14 @@ std::vector<Restraint*> SmartDimension::MakeRestraint(){
     }
     //点と点
     if(type == SmartDimension::distance){
-        answer.push_back(new MatchRestraint({target[0],target[1]},value));
+        if(this->X_type){
+            answer.push_back(new MatchHRestraint({target[0],target[1]},value));
+        }else if(this->X_type){
+            answer.push_back(new MatchVRestraint({target[0],target[1]},value));
+        }else{
+            answer.push_back(new MatchRestraint({target[0],target[1]},value));
+        }
+
     }
     //線だけ
     if(type == SmartDimension::length){

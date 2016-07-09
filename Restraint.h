@@ -14,6 +14,8 @@ enum RestraintType{
     VERTICAL   ,//垂直拘束 c:[-.]
     HORIZONTAL ,//水平拘束 c:[-.]
     MATCH      ,//一致拘束 c:[p.-]
+    MATCH_H    ,//水平一致拘束 c:[p.-]
+    MATCH_V    ,//水平一致拘束 c:[p.-]
     CONCURRENT ,//並行拘束 c:[l,l]
     CROSS      ,
     ANGLE      ,//角度拘束 c:[l,l]
@@ -49,27 +51,29 @@ struct Restraint{
     virtual ~Restraint(){}
 };
 
-#define RESTRAINT_MAKE_DEF(CLASS_NAME)                      \
+#define RESTRAINT_MAKE_DEF(CLASS_NAME ,TYPE_VAL)            \
 struct CLASS_NAME : public Restraint{                       \
                                                             \
     bool Complete();                                        \
                                                             \
-    CLASS_NAME();                                           \
+    CLASS_NAME(){type = VERTICAL;};                         \
     CLASS_NAME(std::vector<CObject*> Nodes,                 \
-              double Value=0):                                \
+              double Value=0):                              \
         Restraint(Nodes,Value){CLASS_NAME();};              \
     virtual ~CLASS_NAME(){};                                \
 };                                                          \
 
-RESTRAINT_MAKE_DEF(EqualRestraint     ) //等値
-RESTRAINT_MAKE_DEF(VerticalRestraint  ) //垂直拘束 c:[l] s:[]
-RESTRAINT_MAKE_DEF(HorizontalRestraint) //水平拘束 c:[l] s:[]
-RESTRAINT_MAKE_DEF(MatchRestraint     ) //一致拘束 c:[p] s:[-]
-RESTRAINT_MAKE_DEF(ConcurrentRestraint) //並行拘束 c:[l,l] s:[]
-RESTRAINT_MAKE_DEF(CrossRestraint       ) //拘束 c:[]  s:[]
-//RESTRAINT_MAKE_DEF(TangentRestraint   ) //正接拘束 c:[l] s:[a]
-RESTRAINT_MAKE_DEF(FixRestraint       ) //固定拘束 c:[]  s:[]
-RESTRAINT_MAKE_DEF(ParadoxRestraint   ) //矛盾拘束 c:[]  s:[]
+RESTRAINT_MAKE_DEF(EqualRestraint     ,EQUAL) //等値
+RESTRAINT_MAKE_DEF(VerticalRestraint  ,VERTICAL) //垂直拘束 c:[l] s:[]
+RESTRAINT_MAKE_DEF(HorizontalRestraint,HORIZONTAL) //水平拘束 c:[l] s:[]
+RESTRAINT_MAKE_DEF(MatchRestraint     ,MACH) //一致拘束 c:[p] s:[-]
+RESTRAINT_MAKE_DEF(MatchHRestraint    ,MATCH_H) //一致拘束 c:[p] s:[-]
+RESTRAINT_MAKE_DEF(MatchVRestraint    ,MATCH_V) //一致拘束 c:[p] s:[-]
+RESTRAINT_MAKE_DEF(ConcurrentRestraint,CONCURRENT) //並行拘束 c:[l,l] s:[]
+RESTRAINT_MAKE_DEF(CrossRestraint     ,CONCURRENT) //拘束 c:[]  s:[]
+//RESTRAINT_MAKE_DEF(TangentRestraint  ) //正接拘束 c:[l] s:[a]
+RESTRAINT_MAKE_DEF(FixRestraint       ,FIX) //固定拘束 c:[]  s:[]
+RESTRAINT_MAKE_DEF(ParadoxRestraint   ,PARADOX) //矛盾拘束 c:[]  s:[]
 
 
 

@@ -25,27 +25,6 @@ std::vector<RestraintType> Restraint::Restraintable(const std::vector<CObject *>
 }
 
 
-EqualRestraint::EqualRestraint(){
-    type = EQUAL;
-}
-VerticalRestraint::VerticalRestraint(){
-    type = VERTICAL;
-}
-HorizontalRestraint::HorizontalRestraint(){
-    type = HORIZONTAL;
-}
-FixRestraint::FixRestraint(){
-    type = FIX;
-}
-MatchRestraint::MatchRestraint(){
-    type = MATCH;
-}
-ConcurrentRestraint::ConcurrentRestraint(){
-    type = CONCURRENT;
-}
-CrossRestraint::CrossRestraint(){
-    type = CONCURRENT;
-}
 bool EqualRestraint::Complete(){
 
     std::sort(nodes.begin(),nodes.end(),[](CObject* lhs,CObject* rhs){
@@ -173,6 +152,34 @@ bool MatchRestraint::Complete(){
     }
     return true;
 }
+bool MatchHRestraint::Complete(){
+    if(nodes[0]->isLocked() && nodes[1]->isLocked())return false;
+    if(nodes[1]->isLocked() || exist(CObject::selected,nodes[1]))std::swap(nodes[0],nodes[1]);
+    //0へ1を近づける(CPoint,CPoint)
+
+    Pos near = nodes[0]->GetNear(nodes[1]->GetJointPos(0));
+    Pos current_pos = nodes[1]->GetJointPos(0);
+    Pos next_pos = Pos(current_pos.x,  near.y + value);
+    if(!(current_pos == near)){
+        nodes[1]->Move(next_pos - current_pos);
+    }
+    return true;
+}
+bool MatchVRestraint::Complete(){
+    if(nodes[0]->isLocked() && nodes[1]->isLocked())return false;
+    if(nodes[1]->isLocked() || exist(CObject::selected,nodes[1]))std::swap(nodes[0],nodes[1]);
+    //0へ1を近づける(CPoint,CPoint)
+
+    Pos near = nodes[0]->GetNear(nodes[1]->GetJointPos(0));
+    Pos current_pos = nodes[1]->GetJointPos(0);
+    Pos next_pos = Pos(current_pos.x+value , near.y);
+    if(!(current_pos == near)){
+        nodes[1]->Move(next_pos - current_pos);
+    }
+    return true;
+}
+
+
 bool FixRestraint::Complete(){
     for(int i=0;i<nodes.size();i++){
         for(int j=0;j<nodes[i]->GetJointNum();j++){

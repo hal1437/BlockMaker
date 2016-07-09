@@ -19,6 +19,10 @@ public:
     double GetValue()const;
     void   SetValue(double value);
 
+    //ラジオの入出力(0:Liner,1:X,2:Y)
+    void UseRadioLayout(bool enable);
+    int GetCurrentRadio()const;
+
     explicit SmartDimensionDialog(QWidget *parent = 0);
     ~SmartDimensionDialog();
 

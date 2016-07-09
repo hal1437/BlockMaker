@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QMouseEvent>
+#include <QListWidget>
 #include "SmartDimensionDialog.h"
 #include "CPoint.h"
 #include "CLine.h"
@@ -68,7 +69,7 @@ public slots:
     void ToggledSpline(bool checked);
     void Export();
 
-    void MakeRestraint(QString text);
+    void MakeRestraint(QListWidgetItem*);
     void MakeObject();
     bool MakeJoint(CObject *obj);
     bool MakeBlock();

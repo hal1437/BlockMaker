@@ -11,7 +11,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionCtrlZ    ,SIGNAL(triggered())                      ,this       ,SLOT(CtrlZ()));
     connect(ui->actionDelete   ,SIGNAL(triggered())                      ,this       ,SLOT(Delete()));
     connect(ui->actionEsc      ,SIGNAL(triggered())                      ,this       ,SLOT(Escape()));
-    connect(ui->RestraintList  ,SIGNAL(currentTextChanged(QString))      ,this       ,SLOT(MakeRestraint(QString)));
+    connect(ui->RestraintList  ,SIGNAL(itemClicked(QListWidgetItem*))    ,this       ,SLOT(MakeRestraint(QListWidgetItem*)));
     connect(ui->SizeRateSpinBox,SIGNAL(valueChanged(double))             ,ui->CadEdit,SLOT(SetScale(double)));
     connect(ui->ToolDimension  ,SIGNAL(triggered())                      ,ui->CadEdit,SLOT(MakeSmartDimension()));
     connect(ui->ToolBlocks     ,SIGNAL(triggered())                      ,this       ,SLOT(MakeBlock()));
@@ -167,18 +167,18 @@ void MainWindow::Export(){
     diag->exec();
 }
 
-void MainWindow::MakeRestraint(QString text){
+void MainWindow::MakeRestraint(QListWidgetItem *){
     //qDebug() << text;
     RestraintType type = Paradox;
-    if(text == "一致")type = MATCH;
-    if(text == "並行")type = CONCURRENT;
-    if(text == "垂直")type = VERTICAL;
-    if(text == "水平")type = HORIZONTAL;
-    if(text == "正接")type = TANGENT;
-    if(text == "固定")type = FIX;
+    if(ui->RestraintList->currentItem()->text() == "一致")type = MATCH;
+    if(ui->RestraintList->currentItem()->text() == "並行")type = CONCURRENT;
+    if(ui->RestraintList->currentItem()->text() == "垂直")type = VERTICAL;
+    if(ui->RestraintList->currentItem()->text() == "水平")type = HORIZONTAL;
+    if(ui->RestraintList->currentItem()->text() == "正接")type = TANGENT;
+    if(ui->RestraintList->currentItem()->text() == "固定")type = FIX;
     if(type != Paradox)ui->CadEdit->MakeRestraint(type);
 
-    if(text == "マージ"){
+    if(ui->RestraintList->currentItem()->text() == "マージ"){
     //    ui->CadEdit->
     }
 }
