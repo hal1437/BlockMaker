@@ -251,13 +251,13 @@ void CadEditForm::MakeRestraint(RestraintType type){
 
 void CadEditForm::RefreshRestraints(){
     if(objects.size()!=0){
-        auto old = CObject::selected;
-        CObject::selected.clear();
-        std::random_device rd;
+        //auto old = CObject::selected;
+        //CObject::selected.clear();
+        //std::random_device rd;
         for(int i=0;i<objects.size()*2;i++){
-            int obj_index = rd() % objects.size();
-            int joint_index = rd() % objects[obj_index]->GetJointNum();
-            CObject::selected.push_back(this->objects[obj_index]->GetJoint(joint_index));
+            //int obj_index = rd() % objects.size();
+            //int joint_index = rd() % objects[obj_index]->GetJointNum();
+            //CObject::selected.push_back(this->objects[obj_index]->GetJoint(joint_index));
 
             for(Restraint* rest:restraints){
                 if(rest!=nullptr && rest->nodes.size()!=0){
@@ -266,9 +266,9 @@ void CadEditForm::RefreshRestraints(){
                    }
                 }
             }
-            CObject::selected.clear();
+            //CObject::selected.clear();
         }
-        CObject::selected = old;
+        //CObject::selected = old;
     }
     /*
     for(int i=0;i<10;i++){

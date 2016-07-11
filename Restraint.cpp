@@ -138,16 +138,33 @@ bool HorizontalRestraint::Complete(){
 }
 bool MatchRestraint::Complete(){
     if(nodes[0]->isLocked() && nodes[1]->isLocked())return false;
-    if(nodes[1]->isLocked() || exist(CObject::selected,nodes[1]))std::swap(nodes[0],nodes[1]);
+    std::vector<CObject*> cc = CObject::selected;
+    if(nodes[1]->isLocked() ||
+       exist(CObject::selected,nodes[1])){
+        std::swap(nodes[0],nodes[1]);
+    }
 
+    //0へ1を近づける
 
     for(int i=1;i<nodes.size();i++){
-        CObject* ptr = nodes[i];
-        Pos near = nodes[0]->GetNear(ptr->GetJointPos(0));
-        Pos current_pos = ptr->GetJointPos(0);
-        Pos next_pos = (current_pos - near).GetNormalize() * value + near;
-        if(!(current_pos == near)){
-            ptr->Move(next_pos - current_pos);
+        Pos pp,near;
+        CObject *pos,*line;
+
+        //点を移動
+        if(!nodes[0]->is<CPoint>()){
+            pos  = nodes[i];
+            line = nodes[0];
+            pp   = pos ->GetJointPos(0);
+            near = line->GetNear(pos->GetJointPos(0));
+            pos->Move((near-pp)-(near-pp).GetNormalize()*value);
+        }
+        //線を移動
+        if(!nodes[i]->is<CPoint>()){
+            pos  = nodes[0];
+            line = nodes[i];
+            pp   = pos ->GetJointPos(0);
+            near = line->GetNear(pos->GetJointPos(0));
+            line->Move((pp-near)-(pp-near).GetNormalize()*value);
         }
     }
     return true;
