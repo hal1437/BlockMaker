@@ -61,7 +61,7 @@ public slots:
     void ConnectSignals();
     void DisconnectSignals();
     void ClearButton();
-    void RefreshRestraintList();
+    void RefreshUI();
     void ToggledDot   (bool checked);
     void ToggledLine  (bool checked);
     void ToggledArc   (bool checked);
@@ -74,6 +74,7 @@ public slots:
     bool MakeJoint(CObject *obj);
     bool MakeBlock();
 
+    void ReciveObjectListChanged(QModelIndex);
 };
 
 #endif // MAINWINDOW_H

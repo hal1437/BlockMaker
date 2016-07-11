@@ -4,11 +4,14 @@
 #include <QWidget>
 #include <QDebug>
 #include <QMouseEvent>
+#include <QListWidget>
+#include <QListWidgetItem>
 #include <iostream>
 #include <random>
 #include "CObject.h"
 #include "CPoint.h"
 #include "CLine.h"
+#include "CRect.h"
 #include "SmartDimension.h"
 #include "SmartDimensionDialog.h"
 #include "Restraint.h"
@@ -54,6 +57,8 @@ public slots:
     void MakeRestraint(RestraintType type); //拘束作成
     void MakeSmartDimension();    //寸法設定
     void RefreshRestraints();     //拘束更新
+    void ApplyObjectList(QListWidget *list );
+    void DrawObjectList (QListWidget *list);// オブジェクトリスト描画
 
 };
 
