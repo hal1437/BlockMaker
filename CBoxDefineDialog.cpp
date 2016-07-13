@@ -3,9 +3,12 @@
 #include <QMessageBox>
 
 
+void CBoxDefineDialog::paintEvent    (QPaintEvent* event){
+    QPainter paint(this->ui->Viewer);
+
+}
 
 //面の情報を取得
-
 BoundaryType CBoxDefineDialog::GetBoundaryType(BoundaryDir dir)const{
     QMap <QString,BoundaryType> map;
     map = {{"patch (パッチ)",Patch},
@@ -72,7 +75,6 @@ bool CBoxDefineDialog::isFormatError()const{
 
     return failed;
 }
-
 
 //出力
 CBlocks CBoxDefineDialog::ExportCBlocks()const{

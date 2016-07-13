@@ -23,6 +23,7 @@ public:
     virtual int GetJointNum()const;
     virtual Pos GetJointPos(int index)const;
     virtual CPoint* GetJoint(int index);
+    virtual std::vector<CObject*> GetChild();
 
 
     CLine();

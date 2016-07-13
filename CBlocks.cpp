@@ -5,15 +5,14 @@ bool CBlocks::Creatable(std::vector<CObject*> values){
     if(std::count_if(values.begin(),values.end(),[](CObject* p){return !p->is<CPoint>();}) == 4){
         //カウント
         for(CObject* p:values){
-            map[p->GetJointPos(0)]++;
-            if(p->is<CLine>()){
-                map[p->GetJointPos(1)]++;
-            }else if(p->is<CSpline>()){
-                map[p->GetJointPos(p->GetJointNum()-1)]++;
+            for(int i=0;i<p->GetJointNum();i++){
+                map[p->GetJointPos(i)]++;
             }
         }
         //合計が2であれば
-        return std::all_of(map.begin(),map.end(),[](std::pair<Pos,int> v){return v.second == 2;});
+        return std::all_of(map.begin(),map.end(),[](std::pair<Pos,int> v){
+            return v.second == 2;
+        });
     }
     return false;
 }

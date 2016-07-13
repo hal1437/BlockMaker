@@ -2,8 +2,9 @@
 #include "ui_CadEditForm.h"
 
 void CadEditForm::AddObject(CObject* obj){
-    objects.push_back(obj);
-
+    if(!exist(objects,obj)){
+        objects.push_back(obj);
+    }
     //CPoint→CLineの順で
     std::sort(objects.begin(),objects.end(),[](const CObject* lhs,const CObject* ){
         if(lhs->is<CPoint>())return true;
@@ -69,7 +70,6 @@ void CadEditForm::CompleteObject(CObject* make_obj){
         if(!is_known_pos){
             CPoint* new_point = make_obj->GetJoint(i);
             new_point->Make(new_point);
-            AddObject(new_point);
         }
     }
 }
@@ -285,6 +285,7 @@ void CadEditForm::ApplyObjectList(QListWidget* list){
                 if(this->objects[j]->is<CPoint >() && item->text()=="CPoint" )count++;
                 if(this->objects[j]->is<CLine  >() && item->text()=="CLine"  )count++;
                 if(this->objects[j]->is<CRect  >() && item->text()=="CRect"  )count++;
+                if(this->objects[j]->is<CArc   >() && item->text()=="CArc"  )count++;
                 if(this->objects[j]->is<CSpline>() && item->text()=="CSpline")count++;
             }
             CObject::selected.push_back(this->objects[j-1]);
@@ -295,9 +296,10 @@ void CadEditForm::DrawObjectList(QListWidget* list){
     list->clear();
     for(CObject* ptr: this->objects){
         std::pair<std::string,std::string> p;
-        if(ptr->is<CPoint>() )p = std::make_pair("CPoint" ,":/ToolImages/Dot.png");
-        if(ptr->is<CLine>()  )p = std::make_pair("CLine"  ,":/ToolImages/Line.png");
-        if(ptr->is<CRect>()  )p = std::make_pair("CRect"  ,":/ToolImages/Rect.png");
+        if(ptr->is<CPoint> ())p = std::make_pair("CPoint" ,":/ToolImages/Dot.png");
+        if(ptr->is<CLine>  ())p = std::make_pair("CLine"  ,":/ToolImages/Line.png");
+        if(ptr->is<CRect>  ())p = std::make_pair("CRect"  ,":/ToolImages/Rect.png");
+        if(ptr->is<CArc>   ())p = std::make_pair("CArc"   ,":/ToolImages/Arc.png");
         if(ptr->is<CSpline>())p = std::make_pair("CSpline",":/ToolImages/Spline.png");
         list->addItem(new QListWidgetItem(p.first.c_str()));
         list->item(list->count()-1)->setIcon(QIcon(p.second.c_str()));

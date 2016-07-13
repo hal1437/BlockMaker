@@ -89,9 +89,8 @@ void MainWindow::MovedMouse(QMouseEvent *event, CObject *under_object){
         }
     }
 
-    if(CBlocks::Creatable(CObject::selected)){
-        ui->ToolBlocks->setEnabled(true);
-    }
+    ui->ToolBlocks->setEnabled(CBlocks::Creatable(CObject::selected));
+
     past = CObject::mouse_over;
     release_flag=true;
 
@@ -228,14 +227,13 @@ void MainWindow::MakeObject(){
             //未構築点を追加
             ui->CadEdit->CompleteObject(make_obj);
 
-            //子オブジェクトを追加
-            std::vector<CObject*> cc = make_obj->GetChild();
-            for(CObject* c:cc)ui->CadEdit->AddObject(c);
-
             creating_count = 0;
         }else {
             creating_count++;
         }
+        //子オブジェクトを追加
+        std::vector<CObject*> cc = make_obj->GetChild();
+        for(CObject* c:cc)ui->CadEdit->AddObject(c);
     }
     ui->CadEdit->RefreshRestraints();
     RefreshUI();
@@ -250,7 +248,6 @@ bool MainWindow::MakeJoint(CObject* obj){
         //端点に点を作成
         CPoint* new_point = new CPoint(CObject::mouse_over);
         new_point->Make(new_point);
-        ui->CadEdit->AddObject(new_point);
         log.push_back(new_point);
         return obj->Make(new_point,creating_count);
     }else if(CObject::selecting->is<CPoint>()){
@@ -260,7 +257,6 @@ bool MainWindow::MakeJoint(CObject* obj){
         //点をオブジェクト上に追加
         CPoint* new_point = new CPoint(CObject::selecting->GetNear(CObject::mouse_over));
         new_point->Make(new_point);
-        ui->CadEdit->AddObject(new_point);
         log.push_back(new_point);
 
         //一致の幾何拘束を付与

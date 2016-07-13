@@ -78,10 +78,14 @@ CPoint* CRect::GetJoint(int index){
 }
 std::vector<CObject*> CRect::GetChild(){
     std::vector<CObject*> answer;
-    for(int i=0;i<4;i++)answer.push_back(lines[i]);
+    if(this->isCreateing())return answer;
+    for(int i=0;i<4;i++){
+        answer.push_back(lines[i]);
+        std::vector<CObject*> children = lines[i]->GetChild();
+        for(CObject* child :children)answer.push_back(child);
+    }
     return answer;
 }
-
 
 CRect::CRect()
 {

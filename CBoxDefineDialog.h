@@ -12,16 +12,17 @@ class CBoxDefineDialog;
 class CBoxDefineDialog : public QDialog
 {
     Q_OBJECT
+protected:
+    void paintEvent    (QPaintEvent* event); //描画イベントハンドラ
 public:
 
     //面の情報を取得
-    QString GetBoundaryName(BoundaryDir)const;
-    BoundaryType GetBoundaryType(BoundaryDir)const;
-    QString GetBoundaryArgs(BoundaryDir)const;
-    QString GetVertices(BoundaryDir)const;
-
-    GradingType GetGradigngType()const;
-    QString GetGradigngArgs()const;
+    QString      GetBoundaryName(BoundaryDir dir)const;
+    BoundaryType GetBoundaryType(BoundaryDir dir)const;
+    QString      GetBoundaryArgs(BoundaryDir dir)const;
+    QString      GetVertices    (BoundaryDir dir)const;
+    GradingType  GetGradigngType()const;
+    QString      GetGradigngArgs()const;
 
     //エラー判定
     bool isFormatError()const;

@@ -84,6 +84,13 @@ Pos CLine::GetJointPos(int index)const{
 CPoint* CLine::GetJoint(int index){
     return pos[index];
 }
+std::vector<CObject*> CLine::GetChild(){
+    std::vector<CObject*> ans;
+    if(this->isCreateing())return ans;
+    ans.push_back(pos[0]);
+    ans.push_back(pos[1]);
+    return ans;
+}
 
 
 

@@ -143,4 +143,11 @@ CPoint* CSpline::GetJoint(int index){
     return pos[index];
 }
 
+std::vector<CObject*> CSpline::GetChild(){
+    std::vector<CObject*> ans;
+    ans.resize(pos.size());
+    std::copy(pos.begin(),pos.end(),ans.begin());
+    return ans;
+}
+
 

@@ -104,7 +104,7 @@ bool CArc::Move(const Pos& diff){
 }
 
 int CArc::GetJointNum()const{
-    return 3;
+    return 2;
 }
 Pos CArc::GetJointPos(int index)const{
     if(index == -1)return GetCenter();
@@ -114,6 +114,14 @@ Pos CArc::GetJointPos(int index)const{
 CPoint* CArc::GetJoint(int index){
     if(index == 2)return center;
     else return pos[index];
+}
+std::vector<CObject*> CArc::GetChild(){
+    std::vector<CObject*>ans;
+    if(this->isCreateing())return ans;
+    ans.push_back(pos[0]);
+    ans.push_back(pos[1]);
+    ans.push_back(center);
+    return ans;
 }
 
 CArc::CArc()
