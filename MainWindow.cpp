@@ -126,6 +126,7 @@ void MainWindow::ClearButton(){
 }
 void MainWindow::RefreshUI(){
     ui->RestraintList->clear();
+    ui->CBoxList->clear();
     std::vector<RestraintType> able = Restraint::Restraintable(CObject::selected);
     for(RestraintType r:able){
         std::pair<std::string,std::string> p;
@@ -141,6 +142,12 @@ void MainWindow::RefreshUI(){
         ui->RestraintList->item(ui->RestraintList->count()-1)->setIcon(QIcon(p.second.c_str()));
     }
     this->ui->CadEdit->DrawObjectList(this->ui->ObjectList);
+
+    //CBox描画
+    for(int i=0;i<this->blocks.size();i++){
+        this->ui->CBoxList->addItem(new QListWidgetItem("CBox"));
+        this->ui->CBoxList->item(i)->setIcon(QIcon(":/ToolImages/Blocks.png"));
+    }
     repaint();
 }
 
@@ -267,10 +274,11 @@ bool MainWindow::MakeBlock(){
     CBoxDefineDialog* diag = new CBoxDefineDialog();
     if(diag->exec()){
         CBlocks block = diag->ExportCBlocks();
-        block.SetNode(CObject::selected);
+        block.SetNodeAll(CObject::selected);
         this->blocks.push_back(block);
         CObject::selected.clear();
     }
+    RefreshUI();
 }
 
 void MainWindow::ReciveObjectListChanged(QModelIndex){

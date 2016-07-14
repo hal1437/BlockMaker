@@ -70,7 +70,7 @@ bool CBoxDefineDialog::isFormatError()const{
     //引数の数があっているかな判定
     bool failed=false;
 
-    int args_num = (GetGradigngType() == SimpleGrading) ? 3 : 12;
+    int args_num = (GetGradigngType() == SimpleGrading) ? 2 : 11;
     if(GetGradigngArgs().split(' ').size() == args_num)failed = true;
 
     return failed;

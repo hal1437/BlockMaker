@@ -33,6 +33,7 @@ enum GradingType{
     EdgeGrading,
 };
 
+
 class CBlocks{
 private:
     std::vector<CObject*> lines;
@@ -45,11 +46,16 @@ public:
     std::vector<double> grading_args;
 public:
 
+    //BOX定義可能か
     static bool Creatable(std::vector<CObject*> values);
 
-    void SetNode(std::vector<CObject*> lines);
+       //矛盾平面
+    bool isParadox()const;
 
-    Pos GetPos(int index)const;
+    //ノード
+    void SetNodeAll(std::vector<CObject*> lines);
+    void     SetNode(int index,CObject* line);
+    CObject* GetNode(int index)const;
 
     CBlocks();
     CBlocks(std::vector<CObject*> lines);
