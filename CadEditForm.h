@@ -12,6 +12,8 @@
 #include "CPoint.h"
 #include "CLine.h"
 #include "CRect.h"
+#include "CBlocks.h"
+#include "CBoxDefineDialog.h"
 #include "SmartDimension.h"
 #include "SmartDimensionDialog.h"
 #include "Restraint.h"
@@ -27,6 +29,8 @@ private:
     QVector<CObject*>         objects;    //物体
     QVector<SmartDimension*>  dimensions; //寸法
     QVector<Restraint*>       restraints; //拘束
+    QVector<CBlocks>          blocks;     //物体
+
     double scale = 1.0f;
     Pos transform = Pos(0,0);
 public:
@@ -55,10 +59,11 @@ public slots:
     void SetScale(double scale);  //スケールセット
     void SetTransform(Pos trans); //並行移動セット
     void MakeRestraint(RestraintType type); //拘束作成
-    void MakeSmartDimension();    //寸法設定
-    void RefreshRestraints();     //拘束更新
-    void ApplyObjectList(QListWidget *list );
-    void DrawObjectList (QListWidget *list);// オブジェクトリスト描画
+    void MakeSmartDimension();              //寸法設定
+    bool MakeBlock();                       //物体生成
+    void RefreshRestraints();               //拘束更新
+    void ApplyObjectList(QListWidget *list);
+    void DrawObjectList (QListWidget *list); //オブジェクトリスト描画
 
 };
 

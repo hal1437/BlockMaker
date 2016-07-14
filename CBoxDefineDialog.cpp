@@ -4,7 +4,7 @@
 
 
 void CBoxDefineDialog::paintEvent    (QPaintEvent* event){
-    QPainter paint(this->ui->Viewer);
+//    QPainter paint(this->ui->Viewer);
 
 }
 
@@ -28,6 +28,7 @@ BoundaryType CBoxDefineDialog::GetBoundaryType(BoundaryDir dir)const{
     return map[index];
 }
 QString CBoxDefineDialog::GetBoundaryArgs(BoundaryDir dir)const{
+    /*
     if     (dir == Top   )return (ui->TopVerticesEdit->text()    == "")? "TopBoundary"    :  ui->TopVerticesEdit->text();
     else if(dir == Right )return (ui->RightVerticesEdit->text()  == "")? "RightBoundary"  :  ui->RightVerticesEdit->text();
     else if(dir == Left  )return (ui->LeftVerticesEdit->text()   == "")? "LeftBoundary"   :  ui->LeftVerticesEdit->text();
@@ -35,6 +36,7 @@ QString CBoxDefineDialog::GetBoundaryArgs(BoundaryDir dir)const{
     else if(dir == Front )return (ui->FrontVerticesEdit->text()  == "")? "FrontBoundary"  :  ui->FrontVerticesEdit->text();
     else if(dir == Back  )return (ui->BackVerticesEdit->text()   == "")? "BackBoundary"   :  ui->BackVerticesEdit->text();
     else return "";
+    */
 }
 QString CBoxDefineDialog::GetBoundaryName(BoundaryDir dir)const{
     if     (dir == Top   )return ui->TopNameEdit   ->text();
@@ -46,13 +48,13 @@ QString CBoxDefineDialog::GetBoundaryName(BoundaryDir dir)const{
     else return "";
 }
 QString CBoxDefineDialog::GetVertices(BoundaryDir dir)const{
-    if     (dir == Top   )return ui->TopVerticesEdit->text();
+    /*if     (dir == Top   )return ui->TopVerticesEdit->text();
     else if(dir == Right )return ui->RightVerticesEdit->text();
     else if(dir == Left  )return ui->LeftVerticesEdit->text();
     else if(dir == Bottom)return ui->BottomVerticesEdit->text();
     else if(dir == Front )return ui->FrontVerticesEdit->text();
     else if(dir == Back  )return ui->BackVerticesEdit->text();
-    else return "";
+    else return "";*/
 }
 
 GradingType CBoxDefineDialog::GetGradigngType()const{
@@ -83,9 +85,9 @@ CBlocks CBoxDefineDialog::ExportCBlocks()const{
         BoundaryDir dir = static_cast<BoundaryDir>(i);
         blocks.boundery[i] = this->GetBoundaryType(dir);
         blocks.name[i]     = this->GetBoundaryName(dir);
-        QStringList list   = this->GetVertices(dir).split(' ');
+        QStringList list ;//  = this->GetVertices(dir).split(' ');
         for(int j=0;j<list.size();j++){
-            blocks.vertices[j].push_back(list[j].toDouble());
+            //blocks.vertices[j].push_back(list[j].toDouble());
         }
 
     }
@@ -102,12 +104,6 @@ CBoxDefineDialog::CBoxDefineDialog(QWidget *parent) :
     ui(new Ui::CBoxDefineDialog)
 {
     ui->setupUi(this);
-    ui->TopVerticesEdit   ->setText("0 1 4 5");
-    ui->RightVerticesEdit ->setText("1 2 5 6");
-    ui->BottomVerticesEdit->setText("2 3 6 7");
-    ui->LeftVerticesEdit  ->setText("3 0 7 4");
-    ui->FrontVerticesEdit ->setText("0 1 2 3");
-    ui->BackVerticesEdit  ->setText("4 5 6 7");
     ui->GradingEdit       ->setText("1 1 1");
 }
 

@@ -2,6 +2,7 @@
 #define CBLOCKS_H
 
 #include <vector>
+#include <QPainter>
 #include "CObject.h"
 #include "CLine.h"
 #include "CArc.h"
@@ -40,7 +41,6 @@ private:
 public:
     BoundaryType boundery[6];
     QString name[6];
-    std::vector<int> vertices[6];
 
     GradingType grading;
     std::vector<double> grading_args;
@@ -52,10 +52,14 @@ public:
        //矛盾平面
     bool isParadox()const;
 
+    void Draw(QPainter& painter)const;
+
     //ノード
     void SetNodeAll(std::vector<CObject*> lines);
     void     SetNode(int index,CObject* line);
     CObject* GetNode(int index)const;
+    std::vector<Pos> GetVerticesPos()const;
+
 
     CBlocks();
     CBlocks(std::vector<CObject*> lines);

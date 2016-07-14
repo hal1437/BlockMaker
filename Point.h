@@ -90,7 +90,7 @@ public:
         return (this->x == rhs.x && this->y == rhs.y);
     }
     bool operator!=(cr_current rhs)const{
-        return !(*this == rhs.x);
+        return !(*this == rhs);
     }
     bool operator<(cr_current rhs)const{
         if(this->x == rhs.x){

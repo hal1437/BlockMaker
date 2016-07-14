@@ -48,7 +48,6 @@ private:
     bool move_flag    = false;
     QVector<CObject*> log;
 
-    std::vector<CBlocks> blocks;
 
     bool shift_pressed = false;
     bool ctrl_pressed  = false;
@@ -72,7 +71,6 @@ public slots:
     void MakeRestraint(QListWidgetItem*);
     void MakeObject();
     bool MakeJoint(CObject *obj);
-    bool MakeBlock();
 
     void ReciveObjectListChanged(QModelIndex);
 };

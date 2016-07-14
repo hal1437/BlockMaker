@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>859</width>
-    <height>421</height>
+    <height>360</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -28,20 +28,6 @@
         <string>Bottom</string>
        </property>
        <layout class="QGridLayout" name="gridLayout_6">
-        <item row="0" column="0">
-         <widget class="QLabel" name="BottomNameLabel">
-          <property name="text">
-           <string>Name</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1" colspan="2">
-         <widget class="QLineEdit" name="BottomNameEdit">
-          <property name="placeholderText">
-           <string>Bottom</string>
-          </property>
-         </widget>
-        </item>
         <item row="1" column="0" colspan="2">
          <widget class="QLabel" name="BottomTypeLabel">
           <property name="text">
@@ -88,15 +74,19 @@
           </item>
          </widget>
         </item>
-        <item row="2" column="0" colspan="2">
-         <widget class="QLabel" name="BottomVerticesLabel">
+        <item row="0" column="0">
+         <widget class="QLabel" name="BottomNameLabel">
           <property name="text">
-           <string>vertices</string>
+           <string>Name</string>
           </property>
          </widget>
         </item>
-        <item row="2" column="2">
-         <widget class="QLineEdit" name="BottomVerticesEdit"/>
+        <item row="0" column="1" colspan="2">
+         <widget class="QLineEdit" name="BottomNameEdit">
+          <property name="placeholderText">
+           <string>Bottom</string>
+          </property>
+         </widget>
         </item>
        </layout>
       </widget>
@@ -127,20 +117,6 @@
          <widget class="QLabel" name="FrontNameLabel">
           <property name="text">
            <string>Name</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1" colspan="2">
-         <widget class="QLineEdit" name="FrontNameEdit">
-          <property name="placeholderText">
-           <string>Front</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0" colspan="2">
-         <widget class="QLabel" name="FrontTypeLabel">
-          <property name="text">
-           <string>Type</string>
           </property>
          </widget>
         </item>
@@ -183,15 +159,19 @@
           </item>
          </widget>
         </item>
-        <item row="2" column="0" colspan="2">
-         <widget class="QLabel" name="FrontVerticesLabel">
-          <property name="text">
-           <string>vertices</string>
+        <item row="0" column="1" colspan="2">
+         <widget class="QLineEdit" name="FrontNameEdit">
+          <property name="placeholderText">
+           <string>Front</string>
           </property>
          </widget>
         </item>
-        <item row="2" column="2">
-         <widget class="QLineEdit" name="FrontVerticesEdit"/>
+        <item row="1" column="0" colspan="2">
+         <widget class="QLabel" name="FrontTypeLabel">
+          <property name="text">
+           <string>Type</string>
+          </property>
+         </widget>
         </item>
        </layout>
       </widget>
@@ -219,13 +199,6 @@
          <widget class="QLineEdit" name="LeftNameEdit">
           <property name="placeholderText">
            <string>Left</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0" colspan="2">
-         <widget class="QLabel" name="LeftTypeLabel">
-          <property name="text">
-           <string>Type</string>
           </property>
          </widget>
         </item>
@@ -268,15 +241,12 @@
           </item>
          </widget>
         </item>
-        <item row="2" column="0" colspan="2">
-         <widget class="QLabel" name="LeftVerticesLabel">
+        <item row="1" column="0" colspan="2">
+         <widget class="QLabel" name="LeftTypeLabel">
           <property name="text">
-           <string>vertices</string>
+           <string>Type</string>
           </property>
          </widget>
-        </item>
-        <item row="2" column="2">
-         <widget class="QLineEdit" name="LeftVerticesEdit"/>
         </item>
        </layout>
       </widget>
@@ -331,27 +301,6 @@
         <string>Right</string>
        </property>
        <layout class="QGridLayout" name="gridLayout_4">
-        <item row="0" column="0">
-         <widget class="QLabel" name="RightNameLabel">
-          <property name="text">
-           <string>Name</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1" colspan="2">
-         <widget class="QLineEdit" name="RightNameEdit">
-          <property name="placeholderText">
-           <string>Right</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0" colspan="2">
-         <widget class="QLabel" name="RightTypeLabel">
-          <property name="text">
-           <string>Type</string>
-          </property>
-         </widget>
-        </item>
         <item row="1" column="2">
          <widget class="QComboBox" name="RightTypecombo">
           <item>
@@ -391,15 +340,26 @@
           </item>
          </widget>
         </item>
-        <item row="2" column="0" colspan="2">
-         <widget class="QLabel" name="RightVerticesLabel">
-          <property name="text">
-           <string>vertices</string>
+        <item row="0" column="1" colspan="2">
+         <widget class="QLineEdit" name="RightNameEdit">
+          <property name="placeholderText">
+           <string>Right</string>
           </property>
          </widget>
         </item>
-        <item row="2" column="2">
-         <widget class="QLineEdit" name="RightVerticesEdit"/>
+        <item row="0" column="0">
+         <widget class="QLabel" name="RightNameLabel">
+          <property name="text">
+           <string>Name</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0" colspan="2">
+         <widget class="QLabel" name="RightTypeLabel">
+          <property name="text">
+           <string>Type</string>
+          </property>
+         </widget>
         </item>
        </layout>
       </widget>
@@ -416,20 +376,6 @@
         <string>Back</string>
        </property>
        <layout class="QGridLayout" name="gridLayout_3">
-        <item row="0" column="0">
-         <widget class="QLabel" name="BackNameLabel">
-          <property name="text">
-           <string>Name</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1" colspan="2">
-         <widget class="QLineEdit" name="BackNameEdit">
-          <property name="placeholderText">
-           <string>Back</string>
-          </property>
-         </widget>
-        </item>
         <item row="1" column="0" colspan="2">
          <widget class="QLabel" name="BackTypeLabel">
           <property name="text">
@@ -476,15 +422,19 @@
           </item>
          </widget>
         </item>
-        <item row="2" column="0" colspan="2">
-         <widget class="QLabel" name="BackVerticesLabel">
+        <item row="0" column="0">
+         <widget class="QLabel" name="BackNameLabel">
           <property name="text">
-           <string>vertices</string>
+           <string>Name</string>
           </property>
          </widget>
         </item>
-        <item row="2" column="2">
-         <widget class="QLineEdit" name="BackVerticesEdit"/>
+        <item row="0" column="1" colspan="2">
+         <widget class="QLineEdit" name="BackNameEdit">
+          <property name="placeholderText">
+           <string>Back</string>
+          </property>
+         </widget>
         </item>
        </layout>
       </widget>
@@ -560,16 +510,6 @@
            </property>
           </item>
          </widget>
-        </item>
-        <item row="2" column="0" colspan="2">
-         <widget class="QLabel" name="TopVerticesLabel">
-          <property name="text">
-           <string>vertices</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="2">
-         <widget class="QLineEdit" name="TopVerticesEdit"/>
         </item>
        </layout>
       </widget>

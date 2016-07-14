@@ -14,7 +14,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->RestraintList  ,SIGNAL(itemClicked(QListWidgetItem*))    ,this       ,SLOT(MakeRestraint(QListWidgetItem*)));
     connect(ui->SizeRateSpinBox,SIGNAL(valueChanged(double))             ,ui->CadEdit,SLOT(SetScale(double)));
     connect(ui->ToolDimension  ,SIGNAL(triggered())                      ,ui->CadEdit,SLOT(MakeSmartDimension()));
-    connect(ui->ToolBlocks     ,SIGNAL(triggered())                      ,this       ,SLOT(MakeBlock()));
+    connect(ui->ToolBlocks     ,SIGNAL(triggered())                      ,ui->CadEdit,SLOT(MakeBlock()));
     connect(ui->ObjectList     ,SIGNAL(clicked(QModelIndex))             ,this,SLOT(ReciveObjectListChanged(QModelIndex)));
     ConnectSignals();
     ui->ToolBlocks->setEnabled(false);
@@ -53,6 +53,7 @@ void MainWindow::keyReleaseEvent(QKeyEvent* event){
     shift_pressed = event->modifiers() & Qt::ShiftModifier;
     ctrl_pressed  = event->modifiers() & Qt::ControlModifier;
 }
+
 
 void MainWindow::CtrlZ(){
     if(!log.empty()){
@@ -143,11 +144,6 @@ void MainWindow::RefreshUI(){
     }
     this->ui->CadEdit->DrawObjectList(this->ui->ObjectList);
 
-    //CBox描画
-    for(int i=0;i<this->blocks.size();i++){
-        this->ui->CBoxList->addItem(new QListWidgetItem("CBox"));
-        this->ui->CBoxList->item(i)->setIcon(QIcon(":/ToolImages/Blocks.png"));
-    }
     repaint();
 }
 
@@ -177,7 +173,7 @@ ToggledToolDefinition(Spline)
 
 void MainWindow::Export(){
     ExportDialog* diag = new ExportDialog(this);
-    diag->SetBlocks(blocks);
+    //diag->SetBlocks(blocks);
     diag->exec();
 }
 
@@ -270,17 +266,6 @@ bool MainWindow::MakeJoint(CObject* obj){
         return  obj->Make(new_point,creating_count);
     }
 }
-bool MainWindow::MakeBlock(){
-    CBoxDefineDialog* diag = new CBoxDefineDialog();
-    if(diag->exec()){
-        CBlocks block = diag->ExportCBlocks();
-        block.SetNodeAll(CObject::selected);
-        this->blocks.push_back(block);
-        CObject::selected.clear();
-    }
-    RefreshUI();
-}
-
 void MainWindow::ReciveObjectListChanged(QModelIndex){
     this->ui->CadEdit->ApplyObjectList(this->ui->ObjectList);
 

@@ -109,7 +109,13 @@ void CadEditForm::paintEvent(QPaintEvent*){
     if(CObject::selecting!=nullptr){
         if(CObject::selecting->Refresh())CObject::selecting->Draw(paint);
     }
-
+    //CBox描画
+    paint.setPen(QPen(Qt::red , CObject::DRAWING_LINE_SIZE));
+    for(int i=0;i<this->blocks.size();i++){
+        //this->ui->CBoxList->addItem(new QListWidgetItem("CBox"));
+        //this->ui->CBoxList->item(i)->setIcon(QIcon(":/ToolImages/Blocks.png"));
+        this->blocks[i].Draw(paint);
+    }
     paint.restore();
 }
 
@@ -248,6 +254,16 @@ void CadEditForm::MakeRestraint(RestraintType type){
         RefreshRestraints();
     }
 }
+bool CadEditForm::MakeBlock(){
+    CBoxDefineDialog* diag = new CBoxDefineDialog();
+    if(diag->exec()){
+        CBlocks block = diag->ExportCBlocks();
+        block.SetNodeAll(CObject::selected);
+        this->blocks.push_back(block);
+        CObject::selected.clear();
+    }
+}
+
 
 void CadEditForm::RefreshRestraints(){
     if(objects.size()!=0){
