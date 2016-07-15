@@ -37,32 +37,29 @@ enum GradingType{
 
 class CBlocks{
 private:
-    std::vector<CObject*> lines;
+    QVector<CObject*> lines;
 public:
     BoundaryType boundery[6];
     QString name[6];
 
     GradingType grading;
-    std::vector<double> grading_args;
+    QVector<double> grading_args;
 public:
 
-    //BOX定義可能か
-    static bool Creatable(std::vector<CObject*> values);
+    static bool Creatable(QVector<CObject*> values);//BOX定義可能か
+    bool isParadox()const;//矛盾確認
 
-       //矛盾平面
-    bool isParadox()const;
-
+    //描画
     void Draw(QPainter& painter)const;
 
-    //ノード
-    void SetNodeAll(std::vector<CObject*> lines);
-    void     SetNode(int index,CObject* line);
+    void SetNodeAll(QVector<CObject*> lines);
+    void SetNode(int index,CObject* line);
     CObject* GetNode(int index)const;
-    std::vector<Pos> GetVerticesPos()const;
+    QVector<Pos> GetVerticesPos()const;
 
 
     CBlocks();
-    CBlocks(std::vector<CObject*> lines);
+    CBlocks(QVector<CObject*> lines);
     ~CBlocks();
 };
 

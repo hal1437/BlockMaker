@@ -2,6 +2,8 @@
 #define CBOXDEFINEDIALOG_H
 
 #include <QDialog>
+#include <QComboBox>
+#include <QLineEdit>
 #include "CBlocks.h"
 
 namespace Ui {
@@ -14,21 +16,32 @@ class CBoxDefineDialog : public QDialog
     Q_OBJECT
 protected:
     void paintEvent    (QPaintEvent* event); //描画イベントハンドラ
+    QComboBox*   ConvertDirToCombo      (BoundaryDir  dir)const;
+    QLineEdit*   ConvertDirToNameEdit   (BoundaryDir  dir)const;
+    QString      ConvertBoundaryToString(BoundaryType dir)const;
+    BoundaryType ConvertStringToBoundary(QString      str)const;
+    QString      ConvertGradingToString (GradingType  dir)const;
+    GradingType  ConvertStringToGrading (QString      str)const;
+
 public:
 
-    //面の情報を取得
+    //UI操作
     QString      GetBoundaryName(BoundaryDir dir)const;
     BoundaryType GetBoundaryType(BoundaryDir dir)const;
-    QString      GetBoundaryArgs(BoundaryDir dir)const;
-    QString      GetVertices    (BoundaryDir dir)const;
     GradingType  GetGradigngType()const;
     QString      GetGradigngArgs()const;
+
+    void SetBoundaryName(BoundaryDir dir,QString name     )const;
+    void SetBoundaryType(BoundaryDir dir,BoundaryType type)const;
+    QString      GetVertices    (BoundaryDir dir)const;
+
 
     //エラー判定
     bool isFormatError()const;
 
-    //出力
+    //入出力
     CBlocks ExportCBlocks()const;
+    void    ImportCBlocks(const CBlocks& block);
 
     explicit CBoxDefineDialog(QWidget *parent = 0);
     ~CBoxDefineDialog();

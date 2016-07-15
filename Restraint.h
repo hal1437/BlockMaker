@@ -27,11 +27,11 @@ enum RestraintType{
 
 //拘束
 struct Restraint{
-    std::vector<CObject*> nodes;//拘束対象
+    QVector<CObject*> nodes;//拘束対象
     double value;      //値
     RestraintType type; //タイプ
 
-    static std::vector<RestraintType> Restraintable(const std::vector<CObject*>& values);
+    static QVector<RestraintType> Restraintable(const QVector<CObject *> &values);
 
     //最寄りの点に補完
     virtual bool Complete() = 0;
@@ -43,7 +43,7 @@ struct Restraint{
     }
 
     Restraint(){}
-    Restraint(std::vector<CObject*> Nodes,
+    Restraint(QVector<CObject*> Nodes,
               double Value):
         nodes(Nodes),
         value(Value){}
@@ -57,7 +57,7 @@ struct CLASS_NAME : public Restraint{                       \
     bool Complete();                                        \
                                                             \
     CLASS_NAME(){type = VERTICAL;};                         \
-    CLASS_NAME(std::vector<CObject*> Nodes,                 \
+    CLASS_NAME(QVector<CObject*> Nodes,                     \
               double Value=0):                              \
         Restraint(Nodes,Value){CLASS_NAME();};              \
     virtual ~CLASS_NAME(){};                                \

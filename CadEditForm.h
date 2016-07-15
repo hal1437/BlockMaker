@@ -67,6 +67,7 @@ public slots:
     void DrawObjectList (QListWidget *list); //オブジェクトリスト描画
     void ApplyCBoxList  (QListWidget *list); //ブロックリスト選択
     void DrawCBoxList   (QListWidget *list); //ブロックリスト描画
+    void ConfigureBlock (QListWidgetItem* item); //ブロック再編集
 
 };
 

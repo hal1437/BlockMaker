@@ -1,6 +1,6 @@
 #include "CBlocks.h"
 
-bool CBlocks::Creatable(std::vector<CObject*> values){
+bool CBlocks::Creatable(QVector<CObject*> values){
     //まず点以外が4つ
     if(std::count_if(values.begin(),values.end(),[](CObject* p){return !p->is<CPoint>();}) == 4){
         //構成点カウント
@@ -17,7 +17,7 @@ bool CBlocks::Creatable(std::vector<CObject*> values){
     return false;
 }
 
-void CBlocks::SetNodeAll(std::vector<CObject*> lines){
+void CBlocks::SetNodeAll(QVector<CObject*> lines){
     this->lines = lines;
 }
 void CBlocks::SetNode(int index,CObject* line){
@@ -30,7 +30,7 @@ CObject* CBlocks::GetNode(int index)const{
 
 void CBlocks::Draw(QPainter& painter)const{
     //描画範囲算出
-    std::vector<Pos> pp = this->GetVerticesPos();
+    QVector<Pos> pp = this->GetVerticesPos();
     float top,bottom,left,right;
     top    = std::min_element(pp.begin(),pp.end(),[](const Pos& lhs,const Pos& rhs){return lhs.y < rhs.y;})->y;
     bottom = std::max_element(pp.begin(),pp.end(),[](const Pos& lhs,const Pos& rhs){return lhs.y < rhs.y;})->y;
@@ -90,8 +90,8 @@ void CBlocks::Draw(QPainter& painter)const{
 }
 
 
-std::vector<Pos> CBlocks::GetVerticesPos()const{
-    std::vector<Pos> pp;
+QVector<Pos> CBlocks::GetVerticesPos()const{
+    QVector<Pos> pp;
     CObject* old = lines[0];
     pp.push_back(lines[0]->GetJointPos(0));
     pp.push_back(lines[0]->GetJointPos(lines[0]->GetJointNum()-1));
@@ -114,7 +114,7 @@ std::vector<Pos> CBlocks::GetVerticesPos()const{
 CBlocks::CBlocks()
 {
 }
-CBlocks::CBlocks(std::vector<CObject*> lines):
+CBlocks::CBlocks(QVector<CObject*> lines):
     lines(lines)
 {
 }

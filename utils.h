@@ -31,6 +31,35 @@ T Mod(T lhs,const U& rhs){
     return lhs;
 }
 
+#define CREATEGETTER(TYPE,NAME,VALUE) \
+TYPE get##NAME()const{                \
+    return this->VALUE;               \
+}
+#define CREATESETTER(TYPE,NAME,VALUE) \
+void set##NAME(const TYPE& arg){      \
+    VALUE = arg;                      \
+}
+#define CREATEGETTER_ARRAY(TYPE,NAME,VALUE) \
+TYPE get##NAME(int index)const{             \
+    return this->VALUE[index];                  \
+}
+#define CREATESETTER_ARRAY(TYPE,NAME,VALUE) \
+void set##NAME(const TYPE& arg,int index){      \
+    VALUE[index] = arg;                      \
+}
+#define CREATE_IO(TYPE,NAME,VALUE)    \
+CREATEGETTER(TYPE,NAME,VALUE)         \
+CREATESETTER(TYPE,NAME,VALUE)
+
+#define CREATE_IO_ARRAY(TYPE,NAME,VALUE)    \
+CREATEGETTER_ARRAY(TYPE,NAME,VALUE)         \
+CREATESETTER_ARRAY(TYPE,NAME,VALUE)
+
+
+
+
+
+
 
 #endif // UTILS
 

@@ -35,10 +35,10 @@ public:
 protected:
     void mousePressEvent  (QMouseEvent* event);
     void mouseReleaseEvent(QMouseEvent* event);
-    void wheelEvent(QWheelEvent * e);
-    void keyPressEvent(QKeyEvent* event);
-    void keyReleaseEvent(QKeyEvent* event);
-    void paintEvent    (QPaintEvent* event); //描画イベントハンドラ
+    void wheelEvent       (QWheelEvent * e);
+    void keyPressEvent    (QKeyEvent* event);
+    void keyReleaseEvent  (QKeyEvent* event);
+    void paintEvent       (QPaintEvent* event);
 
 private:
     Ui::MainWindow *ui;
@@ -67,14 +67,14 @@ public slots:
     void ToggledArc   (bool checked);
     void ToggledRect  (bool checked);
     void ToggledSpline(bool checked);
-    void Export();
+    void Export();                          //出力
 
-    void MakeRestraint(QListWidgetItem*);
-    void MakeObject();
-    bool MakeJoint(CObject *obj);
+    void MakeObject();                      //オブジェクト作成
+    bool MakeJoint(CObject *obj);           //ジョイント作成
+    void MakeRestraint(QListWidgetItem*);   //拘束作成
 
-    void ReciveObjectListChanged(QListWidgetItem*);
-    void ReciveBlockListChanged(QListWidgetItem*current);
+    void ReciveObjectListChanged(QListWidgetItem* current); //オブジェクトリスト更新
+    void ReciveBlockListChanged (QListWidgetItem* current); //ブロックリスト更新
 };
 
 #endif // MAINWINDOW_H

@@ -1,8 +1,8 @@
 #include "Restraint.h"
 
 
-std::vector<RestraintType> Restraint::Restraintable(const std::vector<CObject *> &values){
-    std::vector<RestraintType> answer;
+QVector<RestraintType> Restraint::Restraintable(const QVector<CObject *> &values){
+    QVector<RestraintType> answer;
     //等値
     if(values.size()>=2 && !values[0]->is<CPoint>() && std::all_of(values.begin(),values.end(),[&](CObject* v){return typeid(values[0])==typeid(v);}))answer.push_back(EQUAL);
     //マージ
@@ -72,7 +72,7 @@ bool VerticalRestraint::Complete(){
         }
     }
     int index = 0;
-    std::vector<CObject*>::iterator it = std::find_if(nodes.begin(),nodes.end(),[&](CObject* obj){
+    QVector<CObject*>::iterator it = std::find_if(nodes.begin(),nodes.end(),[&](CObject* obj){
         for(int i=0;i<obj->GetJointNum();i++){
             if(obj->GetJoint(i)->isLocked()){
                 index = 0;
@@ -116,7 +116,7 @@ bool HorizontalRestraint::Complete(){
         }
     }
     int index = 0;
-    std::vector<CObject*>::iterator it = std::find_if(nodes.begin(),nodes.end(),[&](CObject* obj){
+    QVector<CObject*>::iterator it = std::find_if(nodes.begin(),nodes.end(),[&](CObject* obj){
         for(int i=0;i<obj->GetJointNum();i++){
             if(obj->GetJoint(i)->isLocked()){
                 index = i;
@@ -138,7 +138,7 @@ bool HorizontalRestraint::Complete(){
 }
 bool MatchRestraint::Complete(){
     if(nodes[0]->isLocked() && nodes[1]->isLocked())return false;
-    std::vector<CObject*> cc = CObject::selected;
+    QVector<CObject*> cc = CObject::selected;
     if(nodes[1]->isLocked() ||
        exist(CObject::selected,nodes[1])){
         std::swap(nodes[0],nodes[1]);

@@ -14,8 +14,8 @@ class CObject
 public:
     const static int DRAWING_LINE_SIZE=3;
     static CObject* selecting;
-    static std::vector<CObject*> all_objects;
-    static std::vector<CObject*> selected;
+    static QVector<CObject*> all_objects;
+    static QVector<CObject*> selected;
     static Pos mouse_over;
 protected:
     bool is_Creating = false;
