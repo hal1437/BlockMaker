@@ -30,6 +30,7 @@ private:
     QVector<SmartDimension*>  dimensions; //寸法
     QVector<Restraint*>       restraints; //拘束
     QVector<CBlocks>          blocks;     //物体
+    QVector<CBlocks*>         selecting_block; //選択物体
 
     double scale = 1.0f;
     Pos transform = Pos(0,0);
@@ -62,8 +63,10 @@ public slots:
     void MakeSmartDimension();              //寸法設定
     bool MakeBlock();                       //物体生成
     void RefreshRestraints();               //拘束更新
-    void ApplyObjectList(QListWidget *list);
+    void ApplyObjectList(QListWidget *list); //オブジェクトリスト選択
     void DrawObjectList (QListWidget *list); //オブジェクトリスト描画
+    void ApplyCBoxList  (QListWidget *list); //ブロックリスト選択
+    void DrawCBoxList   (QListWidget *list); //ブロックリスト描画
 
 };
 

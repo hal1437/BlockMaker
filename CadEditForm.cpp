@@ -313,18 +313,46 @@ void CadEditForm::ApplyObjectList(QListWidget* list){
     }
 }
 void CadEditForm::DrawObjectList(QListWidget* list){
-    list->clear();
-    for(CObject* ptr: this->objects){
-        std::pair<std::string,std::string> p;
-        if(ptr->is<CPoint> ())p = std::make_pair("CPoint" ,":/ToolImages/Dot.png");
-        if(ptr->is<CLine>  ())p = std::make_pair("CLine"  ,":/ToolImages/Line.png");
-        if(ptr->is<CRect>  ())p = std::make_pair("CRect"  ,":/ToolImages/Rect.png");
-        if(ptr->is<CArc>   ())p = std::make_pair("CArc"   ,":/ToolImages/Arc.png");
-        if(ptr->is<CSpline>())p = std::make_pair("CSpline",":/ToolImages/Spline.png");
-        list->addItem(new QListWidgetItem(p.first.c_str()));
-        list->item(list->count()-1)->setIcon(QIcon(p.second.c_str()));
-        bool existed = exist(CObject::selected,ptr);
-        list->item(list->count()-1)->setSelected(existed);
+    bool clear = false;
+    if(list->count() != this->objects.size()){
+        clear=true;
+        list->clear();
+    }
+    for(int i=0;i<this->objects.size();i++){
+        if(clear){
+            std::pair<std::string,std::string> p;
+            if(objects[i]->is<CPoint> ())p = std::make_pair("CPoint" ,":/ToolImages/Dot.png");
+            if(objects[i]->is<CLine>  ())p = std::make_pair("CLine"  ,":/ToolImages/Line.png");
+            if(objects[i]->is<CRect>  ())p = std::make_pair("CRect"  ,":/ToolImages/Rect.png");
+            if(objects[i]->is<CArc>   ())p = std::make_pair("CArc"   ,":/ToolImages/Arc.png");
+            if(objects[i]->is<CSpline>())p = std::make_pair("CSpline",":/ToolImages/Spline.png");
+            list->addItem(new QListWidgetItem(p.first.c_str()));
+            list->item(list->count()-1)->setIcon(QIcon(p.second.c_str()));
+        }
+        list->item(i)->setSelected(exist(CObject::selected,objects[i]));
     }
 }
-
+void CadEditForm::ApplyCBoxList  (QListWidget *list){
+    this->selecting_block.clear();
+    for(int i=0;i<list->count();i++){
+        //選択していればリストに追加
+        if(list->item(i)->isSelected()){
+            this->selecting_block.push_back(&this->blocks[i]);
+        }
+    }
+}
+void CadEditForm::DrawCBoxList   (QListWidget *list){
+    bool clear = false;
+    if(list->count() != this->blocks.size()){
+        clear=true;
+        list->clear();
+    }
+    for(int i=0;i<this->blocks.size();i++){
+        if(clear){
+            list->addItem(new QListWidgetItem("CBox"));
+            list->item(list->count()-1)->setIcon(QIcon(":/ToolImages/Blocks.png"));
+            list->item(list->count()-1)->setSelected(exist(selecting_block,&blocks[i]));
+        }
+        list->item(i)->setSelected(exist(this->selecting_block,&blocks[i]));
+    }
+}

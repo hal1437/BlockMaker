@@ -214,7 +214,7 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="QListWidget" name="CBoxList"/>
+        <widget class="QListWidget" name="BlockList"/>
        </item>
       </layout>
      </widget>

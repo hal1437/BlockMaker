@@ -38,6 +38,7 @@ protected:
     void wheelEvent(QWheelEvent * e);
     void keyPressEvent(QKeyEvent* event);
     void keyReleaseEvent(QKeyEvent* event);
+    void paintEvent    (QPaintEvent* event); //描画イベントハンドラ
 
 private:
     Ui::MainWindow *ui;
@@ -72,7 +73,8 @@ public slots:
     void MakeObject();
     bool MakeJoint(CObject *obj);
 
-    void ReciveObjectListChanged(QModelIndex);
+    void ReciveObjectListChanged(QListWidgetItem*);
+    void ReciveBlockListChanged(QListWidgetItem*current);
 };
 
 #endif // MAINWINDOW_H

@@ -15,7 +15,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->SizeRateSpinBox,SIGNAL(valueChanged(double))             ,ui->CadEdit,SLOT(SetScale(double)));
     connect(ui->ToolDimension  ,SIGNAL(triggered())                      ,ui->CadEdit,SLOT(MakeSmartDimension()));
     connect(ui->ToolBlocks     ,SIGNAL(triggered())                      ,ui->CadEdit,SLOT(MakeBlock()));
-    connect(ui->ObjectList     ,SIGNAL(clicked(QModelIndex))             ,this,SLOT(ReciveObjectListChanged(QModelIndex)));
+    connect(ui->ObjectList     ,SIGNAL(itemClicked(QListWidgetItem*))    ,this,SLOT(ReciveObjectListChanged(QListWidgetItem*)));
+    connect(ui->BlockList      ,SIGNAL(itemClicked(QListWidgetItem*))    ,this,SLOT(ReciveBlockListChanged (QListWidgetItem*)));
     ConnectSignals();
     ui->ToolBlocks->setEnabled(false);
     ui->ObjectList->setSelectionMode(QAbstractItemView::ExtendedSelection);
@@ -54,6 +55,8 @@ void MainWindow::keyReleaseEvent(QKeyEvent* event){
     ctrl_pressed  = event->modifiers() & Qt::ControlModifier;
 }
 
+void MainWindow::paintEvent(QPaintEvent* event){
+}
 
 void MainWindow::CtrlZ(){
     if(!log.empty()){
@@ -90,13 +93,12 @@ void MainWindow::MovedMouse(QMouseEvent *event, CObject *under_object){
         }
     }
 
+    ui->CadEdit->RefreshRestraints();
     ui->ToolBlocks->setEnabled(CBlocks::Creatable(CObject::selected));
 
     past = CObject::mouse_over;
     release_flag=true;
 
-    ui->CadEdit->RefreshRestraints();
-    repaint();
 }
 
 
@@ -127,7 +129,7 @@ void MainWindow::ClearButton(){
 }
 void MainWindow::RefreshUI(){
     ui->RestraintList->clear();
-    ui->CBoxList->clear();
+    //ui->BlockList->clear();
     std::vector<RestraintType> able = Restraint::Restraintable(CObject::selected);
     for(RestraintType r:able){
         std::pair<std::string,std::string> p;
@@ -143,8 +145,8 @@ void MainWindow::RefreshUI(){
         ui->RestraintList->item(ui->RestraintList->count()-1)->setIcon(QIcon(p.second.c_str()));
     }
     this->ui->CadEdit->DrawObjectList(this->ui->ObjectList);
-
-    repaint();
+    this->ui->CadEdit->DrawCBoxList  (this->ui->BlockList);
+    this->repaint();
 }
 
 #define ToggledToolDefinition(TYPE)             \
@@ -266,9 +268,11 @@ bool MainWindow::MakeJoint(CObject* obj){
         return  obj->Make(new_point,creating_count);
     }
 }
-void MainWindow::ReciveObjectListChanged(QModelIndex){
+void MainWindow::ReciveObjectListChanged(QListWidgetItem* current){
     this->ui->CadEdit->ApplyObjectList(this->ui->ObjectList);
-
-    repaint();
+    RefreshUI();
 }
-
+void MainWindow::ReciveBlockListChanged(QListWidgetItem* current){
+    this->ui->CadEdit->ApplyCBoxList(this->ui->BlockList);
+    RefreshUI();
+}

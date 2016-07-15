@@ -104,7 +104,7 @@ CBoxDefineDialog::CBoxDefineDialog(QWidget *parent) :
     ui(new Ui::CBoxDefineDialog)
 {
     ui->setupUi(this);
-    ui->GradingEdit       ->setText("1 1 1");
+    ui->GradingEdit       ->setText("10 10 10");
 }
 
 CBoxDefineDialog::~CBoxDefineDialog()
