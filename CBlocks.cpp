@@ -29,23 +29,64 @@ CObject* CBlocks::GetNode(int index)const{
 }
 
 void CBlocks::Draw(QPainter& painter)const{
+    //描画範囲算出
+    std::vector<Pos> pp = this->GetVerticesPos();
+    float top,bottom,left,right;
+    top    = std::min_element(pp.begin(),pp.end(),[](const Pos& lhs,const Pos& rhs){return lhs.y < rhs.y;})->y;
+    bottom = std::max_element(pp.begin(),pp.end(),[](const Pos& lhs,const Pos& rhs){return lhs.y < rhs.y;})->y;
+    left   = std::min_element(pp.begin(),pp.end(),[](const Pos& lhs,const Pos& rhs){return lhs.x < rhs.x;})->x;
+    right  = std::max_element(pp.begin(),pp.end(),[](const Pos& lhs,const Pos& rhs){return lhs.x < rhs.x;})->x;
+
 
     //パスの作成
     QPainterPath myPath;
-    QPolygonF myPolygon;
+    myPath.moveTo(pp[0].x,pp[0].y);
     for(int i=0;i<4+1;i++){
-        Pos p =  this->GetVerticesPos()[i%4];
-        myPolygon.push_back(QPointF(p.x,p.y));
+        Pos p =  pp[i%4];
+        myPath.lineTo(p.x,p.y);
     }
-    myPath.addPolygon(myPolygon);
-    myPath.setFillRule(Qt::OddEvenFill);
+    myPath.closeSubpath();
 
     //マスクを作成
-    QPixmap *mask = new QPixmap(500,500);
-    QPainter *paint = new QPainter(mask);
-    paint->setPen(*(new QColor(255,255,255,255)));
-    painter.drawPath(myPath);
 
+    QImage mask(QSize(right+20,bottom+20), QImage::Format_ARGB32);
+    QPainter paint;// = new QPainter(mask);
+    mask.fill(0);
+    paint.begin(&mask);
+    paint.setCompositionMode(QPainter::CompositionMode_SourceOver);
+    paint.setPen  (painter.pen());
+    paint.setBrush(painter.brush());
+    paint.drawPath(myPath);
+    paint.setCompositionMode(QPainter::CompositionMode_SourceAtop);
+    for(int i =0;i<=this->grading_args[0];i++){
+        paint.drawLine(left ,top+(bottom-top)*i/this->grading_args[0],
+                       right,top+(bottom-top)*i/this->grading_args[0]);
+    }
+    //Y軸に並行
+    for(int i =0;i<=this->grading_args[1];i++){
+        paint.drawLine(left+(right-left)*i/this->grading_args[1],top,
+                       left+(right-left)*i/this->grading_args[1],bottom);
+    }
+    paint.end();
+
+    painter.drawImage(QPoint(0,0),mask);
+    /*
+
+    //マクス適用
+    painter.setCompositionMode(QPainter::CompositionMode_DestinationIn);
+
+
+    //分割して線を描画
+    //X軸に並行
+    for(int i =0;i<this->grading_args[0]-1;i++){
+        painter.drawLine(left ,top+(bottom-top)* i   /this->grading_args[0],
+                         right,top+(bottom-top)*(i+1)/this->grading_args[0]);
+    }
+    //Y軸に並行
+    for(int i =0;i<this->grading_args[1]-1;i++){
+        painter.drawLine(left+(right-left)* i   /this->grading_args[1],top,
+                         left+(right-left)*(i+1)/this->grading_args[1],bottom);
+    }*/
 }
 
 

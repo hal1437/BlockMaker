@@ -94,6 +94,16 @@ void CadEditForm::paintEvent(QPaintEvent*){
         dim->Draw(paint);
     }
 
+    //CBox描画
+    paint.setPen(QPen(Qt::blue , (CObject::DRAWING_LINE_SIZE/2)/scale));
+    paint.setBrush(QBrush(Qt::darkGray));
+    for(int i=0;i<this->blocks.size();i++){
+        //this->ui->CBoxList->addItem(new QListWidgetItem("CBox"));
+        //this->ui->CBoxList->item(i)->setIcon(QIcon(":/ToolImages/Blocks.png"));
+        this->blocks[i].Draw(paint);
+    }
+
+    paint.setBrush(QBrush(Qt::white));
     //普通のオブジェクト
     paint.setPen(QPen(Qt::blue, CObject::DRAWING_LINE_SIZE/scale));
     for(CObject* obj:objects){
@@ -109,13 +119,7 @@ void CadEditForm::paintEvent(QPaintEvent*){
     if(CObject::selecting!=nullptr){
         if(CObject::selecting->Refresh())CObject::selecting->Draw(paint);
     }
-    //CBox描画
-    paint.setPen(QPen(Qt::red , CObject::DRAWING_LINE_SIZE));
-    for(int i=0;i<this->blocks.size();i++){
-        //this->ui->CBoxList->addItem(new QListWidgetItem("CBox"));
-        //this->ui->CBoxList->item(i)->setIcon(QIcon(":/ToolImages/Blocks.png"));
-        this->blocks[i].Draw(paint);
-    }
+
     paint.restore();
 }
 
