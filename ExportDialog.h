@@ -13,6 +13,10 @@
 #include <QMessageBox>
 #include <QTextCodec>
 
+struct VPos{
+    double x,y,z;
+};
+
 namespace Ui {
 class ExportDialog;
 }

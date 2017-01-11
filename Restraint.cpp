@@ -151,7 +151,7 @@ bool MatchRestraint::Complete(){
         CObject *pos,*line;
 
         //点を移動
-        if(!nodes[0]->is<CPoint>()){
+        if(nodes[0]->is<CPoint>()){
             pos  = nodes[i];
             line = nodes[0];
             pp   = pos ->GetJointPos(0);
@@ -159,7 +159,7 @@ bool MatchRestraint::Complete(){
             pos->Move((near-pp)-(near-pp).GetNormalize()*value);
         }
         //線を移動
-        if(!nodes[i]->is<CPoint>()){
+        if(nodes[i]->is<CPoint>()){
             pos  = nodes[0];
             line = nodes[i];
             pp   = pos ->GetJointPos(0);

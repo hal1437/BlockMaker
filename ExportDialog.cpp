@@ -19,8 +19,13 @@ void ExportDialog::Export(QString filename)const{
     }
     QTextStream out(&file);
     out.setCodec(QTextCodec::codecForName("UTF8"));
+
+
     //out.setVersion(QDataStream::Qt_4_5);
     //contacts.empty();   // empty existing contacts
+
+
+    //ヘッダー書き込み
     out << "FoamFile"                       << "\n";
     out << "{"                              << "\n";
     out << "    version     2.0;"           << "\n";
@@ -30,25 +35,60 @@ void ExportDialog::Export(QString filename)const{
     out << "}"                              << "\n";
     out                                     << "\n";
 
-
+    //単位変換設定
     out << "convertToMeters " << ui->Scale->value() << ";\n";
     out                                             << "\n";
 
+    //頂点登録
+    QVector<VPos> vertices;
+    for(CBlocks block:this->blocks){
+        QVector<Pos> pp = block.GetVerticesPos();
+        for(Pos p:pp){
+            vertices.push_back(VPos{p.x,p.y,0});
+        }
+        for(Pos p:pp){
+            vertices.push_back(VPos{p.x,p.y,this->ui->Width->value()});
+        }
+    }
     out << "vertices"                       << "\n";
     out << "("                              << "\n";
-
-/*
-    for(int i=0;i<objects.size();i++)this->vertices.push_back({objects[i]->x,objects[i]->y,0});
-    for(int i=0;i<objects.size();i++)this->vertices.push_back({objects[i]->x,objects[i]->y,this->ui->Width->value()});
-    for(int i=0;i<vertices.size();i++){
-        out << "    ";
-        out << "(" << vertices.x << " " << vertices.y << " "<< vertices.z << ")" << "\n";
+    for(VPos p:vertices){
+        out << "\t(" << p.x << " " << p.y << " " << p.z << ")\n";
     }
-    out << ");" << "\n";
+    out << ");"                              << "\n";
+
+
+
 
     //ブロック出力
-    for
-    */
+    out << "blocks"                       << "\n";
+    out << "("                            << "\n";
+    for(CBlocks block:this->blocks){
+        /*
+        out << "\thex(";
+        //indexリストを作成
+        int index[4];
+        QVector<Pos> b_vertices = block.GetVerticesPos();
+        for(int i=0;i<4;i++){
+            index[i] = std::find(vertices.begin(),vertices.end(),VPos{b_vertices[i].x,b_vertices[i].y,0})-vertices.begin();
+        }
+        //頂点番号出力
+        for(int i=0;i<4;i++)cout << index[i] << " ";
+        for(int i=0;i<4;i++)cout << index[i] + vertices.size()/2 << " ";
+        out << ")";
+
+        //分割数出力
+        if(block.grading == GradingType::SimpleGrading){
+            out << "(" ;
+            for(int i=0;i<3;i++){
+                out << block.grading_args[i] << " ";
+            }
+            out << ")" ;
+        }else{
+
+        }*/
+    }
+
 }
 void ExportDialog::AcceptDialog(){
     if(ui->ExportPath->text() != ""){

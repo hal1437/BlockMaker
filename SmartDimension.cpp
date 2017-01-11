@@ -195,9 +195,7 @@ bool SmartDimension::Draw(QPainter& painter)const{
         Pos line2_cc = line2_base * line2_base.Dot(line_center-line2_pos[0]) + line2_pos[0];
         Pos dir      = (line1_cc - line2_cc).GetNormalize();
 
-
         //補助線
-
         if((line1_cc - line1_pos[0]).Length() > (line1_pos[1] - line1_pos[0]).Length() ||
            (line1_cc - line1_pos[1]).Length() > (line1_pos[0] - line1_pos[1]).Length()){
             Pos near = std::min(line1_pos[0],line1_pos[1],[&](Pos lhs,Pos rhs){return ((line1_cc - lhs).Length()<(line1_cc - rhs).Length());});
@@ -240,7 +238,6 @@ std::vector<Restraint*> SmartDimension::MakeRestraint(){
         }else{
             answer.push_back(new MatchRestraint({target[0],target[1]},value));
         }
-
     }
     //線だけ
     if(type == SmartDimension::length){
