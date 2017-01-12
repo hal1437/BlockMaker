@@ -76,12 +76,10 @@ bool CSpline::Refresh(){
 }
 bool CSpline::Create(CPoint* pos, int index){
     if(0 <= index){
-        is_Creating = true;
         this->pos.push_back(pos);
         Refresh();
         return false;
     }
-    this->is_Creating = false;
     return true;
 }
 
@@ -93,7 +91,6 @@ void CSpline::Lock(bool lock){
     for(int i =0;i<this->pos.size();i++){
         pos[i]->Lock(lock);
     }
-    this->is_Locking = lock;
 }
 
 bool CSpline::Draw(QPainter& painter)const{
@@ -112,7 +109,7 @@ bool CSpline::Draw(QPainter& painter)const{
     }
     return true;
 }
-bool CSpline::Selecting(){
+bool CSpline::isSelectable()const{
     double t, m;
     m = (double)(pos.size()-1);
 

@@ -53,14 +53,14 @@ bool VerticalRestraint::Complete(){
     //矛盾な点が存在
     if(std::count_if(nodes.begin(),nodes.end(),[](CObject* obj){
         for(int i=0;i<obj->GetJointNum();i++){
-            if(obj->GetJoint(i)->isLocked())return true;
+            if(obj->GetJoint(i)->isLock())return true;
         }
         return false;
     })){
         double x = 0;
         for(CObject* obj:nodes){
             for(int i=0;i<obj->GetJointNum();i++){
-                if(obj->GetJoint(i)->isLocked()){
+                if(obj->GetJoint(i)->isLock()){
                     if(x == 0.0)x = obj->GetJointPos(i).x;
                     else{
                         if(x != obj->GetJointPos(i).x){
@@ -74,7 +74,7 @@ bool VerticalRestraint::Complete(){
     int index = 0;
     QVector<CObject*>::iterator it = std::find_if(nodes.begin(),nodes.end(),[&](CObject* obj){
         for(int i=0;i<obj->GetJointNum();i++){
-            if(obj->GetJoint(i)->isLocked()){
+            if(obj->GetJoint(i)->isLock()){
                 index = 0;
                 return true;
             }
@@ -99,14 +99,14 @@ bool HorizontalRestraint::Complete(){
     //矛盾な点が存在
     if(std::count_if(nodes.begin(),nodes.end(),[](CObject* obj){
         for(int i=0;i<obj->GetJointNum();i++){
-            if(obj->GetJoint(i)->isLocked())return true;
+            if(obj->GetJoint(i)->isLock())return true;
         }
         return false;
     })){
         double y = 0;
         for(CObject* obj:nodes){
             for(int i=0;i<obj->GetJointNum();i++){
-                if(obj->GetJoint(i)->isLocked()){
+                if(obj->GetJoint(i)->isLock()){
                     if(y == 0.0)y = obj->GetJointPos(i).y;
                     else{
                         if(y != obj->GetJointPos(i).y){
@@ -120,7 +120,7 @@ bool HorizontalRestraint::Complete(){
     int index = 0;
     QVector<CObject*>::iterator it = std::find_if(nodes.begin(),nodes.end(),[&](CObject* obj){
         for(int i=0;i<obj->GetJointNum();i++){
-            if(obj->GetJoint(i)->isLocked()){
+            if(obj->GetJoint(i)->isLock()){
                 index = i;
                 return true;
             }
@@ -139,9 +139,9 @@ bool HorizontalRestraint::Complete(){
     return true;
 }
 bool MatchRestraint::Complete(){
-    if(nodes[0]->isLocked() && nodes[1]->isLocked())return false;
+    if(nodes[0]->isLock() && nodes[1]->isLock())return false;
     QVector<CObject*> cc = CObject::selected;
-    if(nodes[1]->isLocked() ||
+    if(nodes[1]->isLock() ||
        exist(CObject::selected,nodes[1])){
         std::swap(nodes[0],nodes[1]);
     }
@@ -172,8 +172,8 @@ bool MatchRestraint::Complete(){
     return true;
 }
 bool MatchHRestraint::Complete(){
-    if(nodes[0]->isLocked() && nodes[1]->isLocked())return false;
-    if(nodes[1]->isLocked() || exist(CObject::selected,nodes[1]))std::swap(nodes[0],nodes[1]);
+    if(nodes[0]->isLock() && nodes[1]->isLock())return false;
+    if(nodes[1]->isLock() || exist(CObject::selected,nodes[1]))std::swap(nodes[0],nodes[1]);
     //0へ1を近づける(CPoint,CPoint)
 
     Pos near = nodes[0]->GetNear(nodes[1]->GetJointPos(0));
@@ -189,8 +189,8 @@ bool MatchHRestraint::Complete(){
     return true;
 }
 bool MatchVRestraint::Complete(){
-    if(nodes[0]->isLocked() && nodes[1]->isLocked())return false;
-    if(nodes[1]->isLocked() || exist(CObject::selected,nodes[1]))std::swap(nodes[0],nodes[1]);
+    if(nodes[0]->isLock() && nodes[1]->isLock())return false;
+    if(nodes[1]->isLock() || exist(CObject::selected,nodes[1]))std::swap(nodes[0],nodes[1]);
     //0へ1を近づける(CPoint,CPoint)
 
     Pos near = nodes[0]->GetNear(nodes[1]->GetJointPos(0));
@@ -219,10 +219,10 @@ bool FixRestraint::Complete(){
 bool ConcurrentRestraint::Complete(){
     Pos base_line[2] = {nodes[0]->GetJointPos(0),nodes[0]->GetJointPos(1)};
     //矛盾な点が存在
-    if(nodes[0]->GetJoint(0)->isLocked()&&
-       nodes[0]->GetJoint(1)->isLocked()&&
-       nodes[1]->GetJoint(0)->isLocked()&&
-       nodes[1]->GetJoint(1)->isLocked()){
+    if(nodes[0]->GetJoint(0)->isLock()&&
+       nodes[0]->GetJoint(1)->isLock()&&
+       nodes[1]->GetJoint(0)->isLock()&&
+       nodes[1]->GetJoint(1)->isLock()){
             Pos dir1 = nodes[0]->GetJointPos(1)-nodes[0]->GetJointPos(0);
             Pos dir2 = nodes[0]->GetJointPos(1)-nodes[0]->GetJointPos(0);
 
@@ -250,10 +250,10 @@ bool ConcurrentRestraint::Complete(){
 bool CrossRestraint::Complete(){
 
     //矛盾な点が存在
-    if(nodes[0]->GetJoint(0)->isLocked()&&
-       nodes[0]->GetJoint(1)->isLocked()&&
-       nodes[1]->GetJoint(0)->isLocked()&&
-       nodes[1]->GetJoint(1)->isLocked()){
+    if(nodes[0]->GetJoint(0)->isLock()&&
+       nodes[0]->GetJoint(1)->isLock()&&
+       nodes[1]->GetJoint(0)->isLock()&&
+       nodes[1]->GetJoint(1)->isLock()){
             Pos dir = nodes[0]->GetJointPos(1)-nodes[0]->GetJointPos(0);
 
             if((nodes[0]->GetJointPos(1)-nodes[0]->GetJointPos(0)).GetNormalize().Dot(nodes[1]->GetJointPos(1)-nodes[1]->GetJointPos(0)) != 0){

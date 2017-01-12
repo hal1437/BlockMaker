@@ -7,7 +7,6 @@
 bool CRect::Create(CPoint *hand, int index){
     if(0 <= index && index < 2){
         if(index==1){
-            is_Creating = false;
             //構築
             for(int i=0;i<4;i++)lines[i] = new CLine();
             pos[1] = new CPoint();
@@ -32,7 +31,6 @@ bool CRect::Create(CPoint *hand, int index){
             return true;
         }else{
             this->pos[0] = hand;
-            this->is_Creating = true;
             return false;
         }
     }
@@ -46,11 +44,11 @@ void CRect::Lock(bool lock){
     for(int i =0;i<4;i++){
         this->lines[i]->Lock(lock);
     }
-    this->is_Locking = lock;
+    this->Lock(lock);
 }
 
 bool CRect::Draw(QPainter& painter)const{
-    if(is_Creating){
+    if(this->isCreating()){
         painter.drawRect(std::min(pos[0]->x,CPoint::mouse_over.x),
                          std::min(pos[0]->y,CPoint::mouse_over.y),
                          std::max(pos[0]->x,CPoint::mouse_over.x)-std::min(pos[0]->x,CPoint::mouse_over.x),
@@ -58,7 +56,7 @@ bool CRect::Draw(QPainter& painter)const{
     }
     return true;
 }
-bool CRect::Selecting(){
+bool CRect::isSelectable()const{
     return false;
 }
 
@@ -70,7 +68,7 @@ int CRect::GetJointNum()const{
     return 4;
 }
 Pos CRect::GetJointPos(int index)const{
-    if(index == 3 && isCreateing())return CObject::mouse_over;
+    if(index == 3 && this->isCreating())return CObject::mouse_over;
     return *pos[index];
 }
 CPoint* CRect::GetJoint(int index){
@@ -78,7 +76,7 @@ CPoint* CRect::GetJoint(int index){
 }
 std::vector<CObject*> CRect::GetChild(){
     std::vector<CObject*> answer;
-    if(this->isCreateing())return answer;
+    if(this->isCreating())return answer;
     for(int i=0;i<4;i++){
         answer.push_back(lines[i]);
         std::vector<CObject*> children = lines[i]->GetChild();

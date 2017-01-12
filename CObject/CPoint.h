@@ -7,30 +7,27 @@
 class CPoint : public CObject,public Pos
 {
 private:
-    const static int DRAWING_CIRCLE_SIZE = 5;
-    const static int COLLISION_SIZE = 8;
+    const static int DRAWING_CIRCLE_SIZE = 5; //描画半径
+    const static int COLLISION_SIZE = 8;      //当たり判定半径
 
 protected:
-    bool selectable = true;
-    bool control_point = false;
+    bool selectable = true;    //選択可能かどうか
+    bool control_point = false;//作用点
+
 protected:
-    bool Create(CPoint * pos,int index);
+    bool Create(CPoint * pos,int index);//作成関数
 
 public:
-    virtual Pos GetNear(const Pos&)const;
-    virtual bool Draw(QPainter& painter)const;
-    virtual bool Selecting();
-    virtual bool Move(const Pos& pos);
+    virtual Pos 　GetNear(const Pos&)const;    //最近点
+    virtual bool Draw(QPainter& painter)const; //描画関数
+    virtual bool Move(const Pos& pos);         //移動関数
     virtual int GetJointNum()const;
     virtual Pos GetJointPos(int index)const;
     virtual CPoint* GetJoint(int index);
 
-    virtual bool isCreateing()const;
-    virtual bool isSelectable()const;
-    virtual bool isControlPoint()const;
-
-    virtual bool Selectable(bool f);
-    virtual bool ControlPoint(bool f);
+    virtual bool isSelectable()const;   //選択中
+     virtual bool isControlPoint()const; //作用点
+    virtual bool ControlPoint(bool f); //作用点か
 
     CPoint();
     CPoint(const Pos& pos);

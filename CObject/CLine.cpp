@@ -1,16 +1,13 @@
 #include "CLine.h"
 
-#include <iostream>
-
 bool CLine::Create(CPoint *pos, int index){
-    if(0 <= index && index < 2){
+    if(index == 0 || index == 1){
         this->pos[index] = pos;
+        if(index==0){
+            return false;//継続
+        }
         if(index==1){
-            this->is_Creating = false;
-            return true;
-        }else{
-            this->is_Creating = true;
-            return false;
+            return true; //終了
         }
     }
     return false;
@@ -21,35 +18,39 @@ Pos CLine::GetNear(const Pos& hand)const{
 }
 
 bool CLine::Draw(QPainter& painter)const{
-    if(is_Creating){
-        //製作中
+    if(this->isCreating()){
+        //製作ならばマウスの位置を1番目にする
         painter.drawLine(QPointF(GetJointPos(0).x,GetJointPos(0).y),
                          QPointF(this->mouse_over.x,this->mouse_over.y));
     }else{
-        //制作済み
+        //二点間の直線
         painter.drawLine(QPointF(GetJointPos(0).x,GetJointPos(0).y),
                          QPointF(GetJointPos(1).x,GetJointPos(1).y));
-        //ロック
-        if(this->isLocked()){
-            Pos p = (GetJointPos(0) - GetJointPos(1))/2 + GetJointPos(1);
-            painter.drawImage(p.x+10,p.y-10,QImage(":/Restraint/FixRestraint.png"));
-        }
     }
+    //ロック
+    if(this->isLock()){
+        Pos p = (GetJointPos(0) - GetJointPos(1))/2 + GetJointPos(1);
+        painter.drawImage(p.x+10,p.y-10,QImage(":/Restraint/FixRestraint.png"));
+    }
+
     return true;
 }
-bool CLine::Selecting(){
+bool CLine::isSelectable()const{
     //直線と点の距離のアルゴリズムによって選択を決定
     float d;
-    Pos v1,v2;
-    v1 = GetJointPos(1) - GetJointPos(0);
-    v2 = mouse_over     - GetJointPos(0);
-    Pos near = Pos::LineNearPoint(Pos(),v1,v2);
-    d = (near - v2).Length();
+    Pos v1,v2,near;
+    v1   = GetJointPos(1) - GetJointPos(0);
+    v2   = mouse_over  - GetJointPos(0);
+    near = Pos::LineNearPoint(Pos(),v1,v2);
+    d    = (near - v2).Length();
 
-    if(d < COLLISION_SIZE && ((GetJointPos(0).x < mouse_over.x && mouse_over.x < GetJointPos(1).x) ||
-                              (GetJointPos(1).x < mouse_over.x && mouse_over.x < GetJointPos(0).x) ||
-                              (GetJointPos(0).y < mouse_over.y && mouse_over.y < GetJointPos(1).y) ||
-                              (GetJointPos(1).y < mouse_over.y && mouse_over.y < GetJointPos(0).y))){
+    //あたり判定処理
+    if(d < COLLISION_SIZE &&
+       ((GetJointPos(0).x < mouse_over.x && mouse_over.x < GetJointPos(1).x) ||
+        (GetJointPos(1).x < mouse_over.x && mouse_over.x < GetJointPos(0).x) ||
+        (GetJointPos(0).y < mouse_over.y && mouse_over.y < GetJointPos(1).y) ||
+        (GetJointPos(1).y < mouse_over.y && mouse_over.y < GetJointPos(0).y))){
+
         return true;
     }else{
         return false;
@@ -60,14 +61,15 @@ void CLine::Lock(bool lock){
     //それぞれロック
     pos[0]->Lock(lock);
     pos[1]->Lock(lock);
-    this->is_Locking = lock;
+    this->Lock(lock);
 }
 
 bool CLine::Move(const Pos& diff){
+    //子に伝達
     for(int i = 0;i<2;i++){
-        if(!pos[i]->isLocked()){
-            if(pos[i] != nullptr);//pos[i]->getReference()->diff += diff;
-            else ;//pos[i]->diff += diff;
+        //ロックしていない
+        if(!pos[i]->isLock()){
+            *pos[i] += diff;
         }
     }
     return true;
@@ -78,7 +80,7 @@ int CLine::GetJointNum()const{
     return 2;
 }
 Pos CLine::GetJointPos(int index)const{
-    if(index == 1 && isCreateing())return CObject::mouse_over;
+    if(index == 1 && this->isCreating())return CObject::mouse_over;
     return *pos[index];
 }
 CPoint* CLine::GetJoint(int index){
@@ -86,13 +88,11 @@ CPoint* CLine::GetJoint(int index){
 }
 std::vector<CObject*> CLine::GetChild(){
     std::vector<CObject*> ans;
-    if(this->isCreateing())return ans;
+    if(this->isCreating())return ans;
     ans.push_back(pos[0]);
     ans.push_back(pos[1]);
     return ans;
 }
-
-
 
 CLine::CLine()
 {

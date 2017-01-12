@@ -149,7 +149,7 @@ CObject* CadEditForm::getSelecting(){
     CObject* select_obj = nullptr;
     for(CObject* obj:objects){
         if(!selected){
-            if(obj->Selecting() && !obj->isCreateing()){
+            if(obj->isSelectable() && !obj->isCreating()){
                 selected = true;
                 select_obj = obj;
             }

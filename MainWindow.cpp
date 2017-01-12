@@ -89,7 +89,7 @@ void MainWindow::MovedMouse(QMouseEvent *event, CObject *under_object){
     }
     //編集
     if(move_flag == true){
-        if(CObject::selecting!=nullptr && !CObject::selecting->isLocked()){
+        if(CObject::selecting!=nullptr && !CObject::selecting->isLock()){
             CObject::selecting->Move(CObject::mouse_over-past);
         }
     }
@@ -121,7 +121,7 @@ void MainWindow::DisconnectSignals(){
 }
 
 void MainWindow::ClearButton(){
-    if(make_obj != nullptr && make_obj->isCreateing())make_obj->Make(nullptr,-1);
+    if(make_obj != nullptr && make_obj->isCreating())make_obj->Make(nullptr,-1);
     if(ui->ToolDot   ->isChecked())ui->ToolDot   ->setChecked(false);
     if(ui->ToolLine  ->isChecked())ui->ToolLine  ->setChecked(false);
     if(ui->ToolArc   ->isChecked())ui->ToolArc   ->setChecked(false);
@@ -158,7 +158,7 @@ void MainWindow::Toggled##TYPE (bool checked){  \
         state = TYPE;                           \
         ui->Tool##TYPE->setChecked(true);       \
     }else{                                      \
-        if(make_obj != nullptr && make_obj->isCreateing()){\
+        if(make_obj != nullptr && make_obj->isCreating()){\
             make_obj->Make(nullptr,-1);           \
             creating_count=0;                   \
         }                                       \

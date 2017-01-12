@@ -1,7 +1,7 @@
 #include "CArc.h"
 
 bool CArc::Refresh(){
-    if (is_Creating){
+    if (this->isCreating()){
         //center->setDifferent((GetJointPos(0) - CObject::mouse_over) / 2 + CObject::mouse_over);
         round = (GetJointPos(0) - GetCenter()).Length();
     }else{
@@ -24,14 +24,12 @@ bool CArc::Create(CPoint* pos, int index){
     if(0 <= index && index < 2){
         this->pos[index] = pos;
         if(index==1){
-            this->is_Creating = false;
             Refresh();
             //center->setDifferent((GetJointPos(0) - GetJointPos(1)) / 2 + GetJointPos(1));
             round = (GetJointPos(0) - GetCenter()).Length();
 
             return true;
         }else{
-            this->is_Creating = true;
             return false;
         }
     }
@@ -52,12 +50,12 @@ void CArc::Lock(bool lock){
     pos[0]->Lock(lock);
     pos[1]->Lock(lock);
     center->Lock(lock);
-    this->is_Locking = lock;
+    this->Lock(lock);
 }
 
 bool CArc::Draw(QPainter& painter)const{
     Pos end_point;
-    if(is_Creating){
+    if(this->isCreating()){
         end_point = this->mouse_over;
     }else{
         end_point = GetJointPos(1);
@@ -78,7 +76,7 @@ bool CArc::Draw(QPainter& painter)const{
 
     return true;
 }
-bool CArc::Selecting(){
+bool CArc::isSelectable()const{
     //円と点の距離のアルゴリズム
 
     Pos dir1 = GetJointPos(0) - GetCenter();
@@ -108,7 +106,7 @@ int CArc::GetJointNum()const{
 }
 Pos CArc::GetJointPos(int index)const{
     if(index == -1)return GetCenter();
-    else if(index == 1 && isCreateing())return CObject::mouse_over;
+    else if(index == 1 && isCreating())return CObject::mouse_over;
     else return *pos[index];
 }
 CPoint* CArc::GetJoint(int index){
@@ -117,7 +115,7 @@ CPoint* CArc::GetJoint(int index){
 }
 std::vector<CObject*> CArc::GetChild(){
     std::vector<CObject*>ans;
-    if(this->isCreateing())return ans;
+    if(this->isCreating())return ans;
     ans.push_back(pos[0]);
     ans.push_back(pos[1]);
     ans.push_back(center);

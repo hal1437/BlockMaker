@@ -34,7 +34,7 @@ public:
     virtual bool Refresh();
     virtual Pos GetNear(const Pos& hand)const;
     virtual bool Draw(QPainter& painter)const;
-    virtual bool Selecting();
+    virtual bool isSelectable()const;
     virtual void Lock(bool lock);
     virtual bool Move(const Pos& diff);
     virtual int GetJointNum()const;

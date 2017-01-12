@@ -20,16 +20,15 @@ public:
     double GetRound()const;
     Pos    GetCenter()const;
     virtual bool Refresh();
-    virtual Pos GetNear(const Pos& hand)const;
+    virtual Pos  GetNear(const Pos& hand)const;
     virtual void Lock(bool lock);
     virtual bool Draw(QPainter& painter)const;
-    virtual bool Selecting();
+    virtual bool isSelectable()const;
     virtual bool Move(const Pos& diff);
     virtual int GetJointNum()const;
     virtual Pos GetJointPos(int index)const;
     virtual CPoint* GetJoint(int index);
     virtual std::vector<CObject*> GetChild();
-
 
     CArc();
     ~CArc();
