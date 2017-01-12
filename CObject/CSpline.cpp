@@ -137,7 +137,7 @@ int CSpline::GetJointNum()const{
     return this->pos.size();
 }
 Pos CSpline::GetJointPos(int index)const{
-    return pos[index]->getRelative();
+    return *pos[index];
 }
 CPoint* CSpline::GetJoint(int index){
     return pos[index];

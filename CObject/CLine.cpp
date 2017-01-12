@@ -66,8 +66,8 @@ void CLine::Lock(bool lock){
 bool CLine::Move(const Pos& diff){
     for(int i = 0;i<2;i++){
         if(!pos[i]->isLocked()){
-            if(pos[i]->getReference() != nullptr)pos[i]->getReference()->diff += diff;
-            else pos[i]->diff += diff;
+            if(pos[i] != nullptr);//pos[i]->getReference()->diff += diff;
+            else ;//pos[i]->diff += diff;
         }
     }
     return true;
@@ -79,7 +79,7 @@ int CLine::GetJointNum()const{
 }
 Pos CLine::GetJointPos(int index)const{
     if(index == 1 && isCreateing())return CObject::mouse_over;
-    return pos[index]->getRelative();
+    return *pos[index];
 }
 CPoint* CLine::GetJoint(int index){
     return pos[index];

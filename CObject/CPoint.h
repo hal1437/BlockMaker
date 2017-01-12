@@ -4,7 +4,7 @@
 #include "CObject.h"
 
 //CAD上の点
-class CPoint : public CObject,public Relative<Pos>
+class CPoint : public CObject,public Pos
 {
 private:
     const static int DRAWING_CIRCLE_SIZE = 5;

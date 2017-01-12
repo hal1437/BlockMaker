@@ -5,11 +5,11 @@
 #include <QMouseEvent>
 #include <QListWidget>
 #include "SmartDimensionDialog.h"
-#include "CPoint.h"
-#include "CLine.h"
-#include "CRect.h"
-#include "CSpline.h"
-#include "CBlocks.h"
+#include "CObject/CPoint.h"
+#include "CObject/CLine.h"
+#include "CObject/CRect.h"
+#include "CObject/CSpline.h"
+#include "CObject/CBlocks.h"
 #include "CBoxDefineDialog.h"
 #include "ExportDialog.h"
 

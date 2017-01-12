@@ -2,7 +2,7 @@
 
 bool CArc::Refresh(){
     if (is_Creating){
-        center->setDifferent((GetJointPos(0) - CObject::mouse_over) / 2 + CObject::mouse_over);
+        //center->setDifferent((GetJointPos(0) - CObject::mouse_over) / 2 + CObject::mouse_over);
         round = (GetJointPos(0) - GetCenter()).Length();
     }else{
         for(int i=0;i<2;i++){
@@ -26,7 +26,7 @@ bool CArc::Create(CPoint* pos, int index){
         if(index==1){
             this->is_Creating = false;
             Refresh();
-            center->setDifferent((GetJointPos(0) - GetJointPos(1)) / 2 + GetJointPos(1));
+            //center->setDifferent((GetJointPos(0) - GetJointPos(1)) / 2 + GetJointPos(1));
             round = (GetJointPos(0) - GetCenter()).Length();
 
             return true;
@@ -42,7 +42,7 @@ double CArc::GetRound()const{
     return round;
 }
 Pos    CArc::GetCenter()const{
-    return this->center->getRelative();
+    return *this->center;
 }
 Pos CArc::GetNear(const Pos& hand)const{
     return Pos::CircleNearPoint(GetCenter(),round,hand);
@@ -109,7 +109,7 @@ int CArc::GetJointNum()const{
 Pos CArc::GetJointPos(int index)const{
     if(index == -1)return GetCenter();
     else if(index == 1 && isCreateing())return CObject::mouse_over;
-    else return pos[index]->getRelative();
+    else return *pos[index];
 }
 CPoint* CArc::GetJoint(int index){
     if(index == 2)return center;

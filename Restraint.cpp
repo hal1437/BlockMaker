@@ -87,7 +87,9 @@ bool VerticalRestraint::Complete(){
 
     for(int i=0;i<nodes.size();i++){
         for(int j=0;j<nodes[i]->GetJointNum();j++){
-            if(!(i==0 && j==index))nodes[i]->GetJoint(j)->Move(Pos((*nodes[0]->GetJoint(index))().x - (*nodes[i]->GetJoint(j))().x,0));
+            if(!(i==0 && j==index)){
+                nodes[i]->GetJoint(j)->Move(Pos((*nodes[0]->GetJoint(index)).x - (*nodes[i]->GetJoint(j)).x,0));
+            }
         }
     }
     return true;
@@ -131,7 +133,7 @@ bool HorizontalRestraint::Complete(){
 
     for(int i=0;i<nodes.size();i++){
         for(int j=0;j<nodes[i]->GetJointNum();j++){
-            if(!(i==0 && j==index))nodes[i]->GetJoint(j)->Move(Pos(0,(*nodes[0]->GetJoint(index))().y-(*nodes[i]->GetJoint(j))().y));
+            if(!(i==0 && j==index))nodes[i]->GetJoint(j)->Move(Pos(0,nodes[0]->GetJoint(index)->y-nodes[i]->GetJoint(j)->y));
         }
     }
     return true;
@@ -235,11 +237,11 @@ bool ConcurrentRestraint::Complete(){
             Pos line_near2 = Pos::LineNearPoint(base_line[0],base_line[1],nodes[i]->GetJointPos(1));
 
             double length = (line_near1 - nodes[i]->GetJointPos(0)).Length();
-            nodes[i]->GetJoint(0)->setDifferent(line_near1 + (nodes[i]->GetJointPos(0) - line_near1).GetNormalize()*length);
+            //nodes[i]->GetJoint(0)->setDifferent(line_near1 + (nodes[i]->GetJointPos(0) - line_near1).GetNormalize()*length);
             if(Pos::MoreThan(base_line[0],base_line[1],nodes[i]->GetJointPos(0)) == Pos::MoreThan(base_line[0],base_line[1],nodes[i]->GetJointPos(1))){
-                nodes[i]->GetJoint(1)->setDifferent(line_near2 + (nodes[i]->GetJointPos(1) - line_near2).GetNormalize()*length);
+                //nodes[i]->GetJoint(1)->setDifferent(line_near2 + (nodes[i]->GetJointPos(1) - line_near2).GetNormalize()*length);
             }else{
-                nodes[i]->GetJoint(1)->setDifferent(line_near2 - (nodes[i]->GetJointPos(1) - line_near2).GetNormalize()*length);
+                //nodes[i]->GetJoint(1)->setDifferent(line_near2 - (nodes[i]->GetJointPos(1) - line_near2).GetNormalize()*length);
             }
         }
     }
@@ -266,11 +268,11 @@ bool CrossRestraint::Complete(){
             Pos line_near2 = Pos::LineNearPoint(base_line[0],base_line[1],nodes[i]->GetJointPos(1));
 
             double length = (line_near1 - nodes[i]->GetJointPos(0)).Length();
-            nodes[i]->GetJoint(0)->setDifferent(line_near1 + (nodes[i]->GetJointPos(0) - line_near1).GetNormalize()*length);
+            //nodes[i]->GetJoint(0)->setDifferent(line_near1 + (nodes[i]->GetJointPos(0) - line_near1).GetNormalize()*length);
             if(Pos::MoreThan(base_line[0],base_line[1],nodes[i]->GetJointPos(0)) == Pos::MoreThan(base_line[0],base_line[1],nodes[i]->GetJointPos(1))){
-                nodes[i]->GetJoint(1)->setDifferent(line_near2 + (nodes[i]->GetJointPos(1) - line_near2).GetNormalize()*length);
+                //nodes[i]->GetJoint(1)->setDifferent(line_near2 + (nodes[i]->GetJointPos(1) - line_near2).GetNormalize()*length);
             }else{
-                nodes[i]->GetJoint(1)->setDifferent(line_near2 - (nodes[i]->GetJointPos(1) - line_near2).GetNormalize()*length);
+                //nodes[i]->GetJoint(1)->setDifferent(line_near2 - (nodes[i]->GetJointPos(1) - line_near2).GetNormalize()*length);
             }
         }
     }

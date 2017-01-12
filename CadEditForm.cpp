@@ -20,7 +20,7 @@ void CadEditForm::RemoveObject(CObject* obj){
     if(obj->is<CPoint>()){
         for(QVector<CObject*>::Iterator it = objects.begin();it != objects.end();it++){
             for(int i=0;i < (*it)->GetJointNum();i++){
-                if((*it)->GetJointPos(i) == dynamic_cast<CPoint*>(obj)->getRelative() && (*it) != obj){
+                if((*it)->GetJointPos(i) == *dynamic_cast<CPoint*>(obj) && (*it) != obj){
                     *it = nullptr;
                     break;
                 }
@@ -61,7 +61,7 @@ void CadEditForm::CompleteObject(CObject* make_obj){
         bool is_known_pos=false;
         //すでに点がなければ
         for(CObject* obj : objects){
-            if(obj->is<CPoint>() && (*dynamic_cast<CPoint*>(obj))() == make_obj->GetJointPos(i)){
+            if(obj->is<CPoint>() && *dynamic_cast<CPoint*>(obj) == make_obj->GetJointPos(i)){
                 is_known_pos=true;
                 break;
             }

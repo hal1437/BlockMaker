@@ -4,7 +4,7 @@
 #include <QDialog>
 #include <QComboBox>
 #include <QLineEdit>
-#include "CBlocks.h"
+#include "CObject/CBlocks.h"
 
 namespace Ui {
 class CBoxDefineDialog;

@@ -4,10 +4,10 @@
 #include <vector>
 #include <QMessageBox>
 #include <algorithm>
-#include "CObject.h"
-#include "CPoint.h"
-#include "CLine.h"
-#include "CArc.h"
+#include "CObject/CObject.h"
+#include "CObject/CPoint.h"
+#include "CObject/CLine.h"
+#include "CObject/CArc.h"
 #include "Restraint.h"
 
 

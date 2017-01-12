@@ -15,11 +15,11 @@ bool CRect::Create(CPoint *hand, int index){
             pos[3] = hand;
             if((GetJointPos(0).x < GetJointPos(3).x && GetJointPos(0).y < GetJointPos(3).y )||
                (GetJointPos(0).x > GetJointPos(3).x && GetJointPos(0).y > GetJointPos(3).y )){
-                pos[1]->setDifferent(Pos(std::min(GetJointPos(0).x,GetJointPos(3).x),std::max(GetJointPos(0).y,GetJointPos(3).y)));
-                pos[2]->setDifferent(Pos(std::max(GetJointPos(0).x,GetJointPos(3).x),std::min(GetJointPos(0).y,GetJointPos(3).y)));
+                //pos[1]->setDifferent(Pos(std::min(GetJointPos(0).x,GetJointPos(3).x),std::max(GetJointPos(0).y,GetJointPos(3).y)));
+                //pos[2]->setDifferent(Pos(std::max(GetJointPos(0).x,GetJointPos(3).x),std::min(GetJointPos(0).y,GetJointPos(3).y)));
             }else{
-                pos[1]->setDifferent(Pos(std::max(GetJointPos(0).x,GetJointPos(3).x),std::max(GetJointPos(0).y,GetJointPos(3).y)));
-                pos[2]->setDifferent(Pos(std::min(GetJointPos(0).x,GetJointPos(3).x),std::min(GetJointPos(0).y,GetJointPos(3).y)));
+                //pos[1]->setDifferent(Pos(std::max(GetJointPos(0).x,GetJointPos(3).x),std::max(GetJointPos(0).y,GetJointPos(3).y)));
+                //pos[2]->setDifferent(Pos(std::min(GetJointPos(0).x,GetJointPos(3).x),std::min(GetJointPos(0).y,GetJointPos(3).y)));
             }
             lines[0]->Make(GetJoint(0),0);
             lines[0]->Make(GetJoint(1),1);
@@ -51,10 +51,10 @@ void CRect::Lock(bool lock){
 
 bool CRect::Draw(QPainter& painter)const{
     if(is_Creating){
-        painter.drawRect(std::min((*pos[0])().x,CPoint::mouse_over.x),
-                         std::min((*pos[0])().y,CPoint::mouse_over.y),
-                         std::max((*pos[0])().x,CPoint::mouse_over.x)-std::min((*pos[0])().x,CPoint::mouse_over.x),
-                         std::max((*pos[0])().y,CPoint::mouse_over.y)-std::min((*pos[0])().y,CPoint::mouse_over.y));
+        painter.drawRect(std::min(pos[0]->x,CPoint::mouse_over.x),
+                         std::min(pos[0]->y,CPoint::mouse_over.y),
+                         std::max(pos[0]->x,CPoint::mouse_over.x)-std::min(pos[0]->x,CPoint::mouse_over.x),
+                         std::max(pos[0]->y,CPoint::mouse_over.y)-std::min(pos[0]->y,CPoint::mouse_over.y));
     }
     return true;
 }
@@ -71,7 +71,7 @@ int CRect::GetJointNum()const{
 }
 Pos CRect::GetJointPos(int index)const{
     if(index == 3 && isCreateing())return CObject::mouse_over;
-    return pos[index]->getRelative();
+    return *pos[index];
 }
 CPoint* CRect::GetJoint(int index){
     return pos[index];

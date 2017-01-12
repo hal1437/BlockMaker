@@ -14,37 +14,37 @@ CONFIG += c++11
 
 SOURCES += main.cpp\
         MainWindow.cpp \
-    CObject.cpp \
-    CPoint.cpp \
-    CLine.cpp \
     CadEditForm.cpp \
     SmartDimension.cpp \
-    CArc.cpp \
     SmartDimensionDialog.cpp \
     Restraint.cpp \
-    CSpline.cpp \
-    CRect.cpp \
     ExportDialog.cpp \
-    CBlocks.cpp \
-    CBoxDefineDialog.cpp
+    CBoxDefineDialog.cpp \
+    CObject/CArc.cpp \
+    CObject/CBlocks.cpp \
+    CObject/CLine.cpp \
+    CObject/CObject.cpp \
+    CObject/CPoint.cpp \
+    CObject/CRect.cpp \
+    CObject/CSpline.cpp
 
 HEADERS  += MainWindow.h \
-    CObject.h \
-    CPoint.h \
-    Relative.h \
     Point.h \
-    CLine.h \
     CadEditForm.h \
     Utils.h \
     SmartDimension.h \
-    CArc.h \
     SmartDimensionDialog.h \
     Restraint.h \
-    CSpline.h \
-    CRect.h \
     ExportDialog.h \
-    CBlocks.h \
-    CBoxDefineDialog.h
+    CBoxDefineDialog.h \
+    CObject/CArc.h \
+    CObject/CBlocks.h \
+    CObject/CBoxDefineDialog.h \
+    CObject/CLine.h \
+    CObject/CObject.h \
+    CObject/CPoint.h \
+    CObject/CRect.h \
+    CObject/CSpline.h
 
 FORMS    += MainWindow.ui \
     CadEditForm.ui \

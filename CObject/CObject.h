@@ -4,7 +4,6 @@
 #include <QDebug>
 #include "Utils.h"
 #include "Point.h"
-#include "Relative.h"
 
 class CPoint;
 

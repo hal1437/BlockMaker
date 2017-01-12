@@ -6,11 +6,11 @@ bool CPoint::Create(CPoint* pos,int){
 }
 
 Pos CPoint::GetNear(const Pos&)const{
-    return this->getRelative();
+    return *this;
 }
 
 bool CPoint::Draw(QPainter& painter)const{
-    Pos p = this->getRelative();
+    Pos p = *this;
     if(control_point){
         //四角
         QLine ps[4] = {QLine(p.x-DRAWING_CIRCLE_SIZE,p.y-DRAWING_CIRCLE_SIZE,p.x+DRAWING_CIRCLE_SIZE,p.y-DRAWING_CIRCLE_SIZE),
@@ -31,12 +31,12 @@ bool CPoint::Draw(QPainter& painter)const{
     return true;
 }
 bool CPoint::Selecting(){
-    return ((*this)().Length(CPoint::mouse_over) < COLLISION_SIZE);
+    return (this->Length(CPoint::mouse_over) < COLLISION_SIZE);
 }
 
 
 bool CPoint::Move(const Pos& pos){
-    if(!isLocked())diff = this->getRelative() + pos;
+    if(!isLocked());//diff = this->getRelative() + pos;
     return true;
 }
 
@@ -44,7 +44,7 @@ int CPoint::GetJointNum()const{
     return 1;
 }
 Pos CPoint::GetJointPos(int index)const{
-    if(index == 0) return (*this)();
+    if(index == 0)return *this;
     else return Pos();
 }
 CPoint* CPoint::GetJoint(int){
@@ -74,12 +74,12 @@ CPoint::CPoint(){
 }
 
 CPoint::CPoint(const Pos &pos):
-    Relative<Pos>(pos){
+    Pos(pos){
 
 }
 
 CPoint::CPoint(double x,double y):
-    Relative<Pos>(Pos(x,y)){
+    Pos(Pos(x,y)){
 
 }
 

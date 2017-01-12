@@ -3,10 +3,10 @@
 #include <algorithm>
 #include <vector>
 #include "Point.h"
-#include "CObject.h"
-#include "CLine.h"
-#include "CArc.h"
-#include "CSpline.h"
+#include "CObject/CObject.h"
+#include "CObject/CLine.h"
+#include "CObject/CArc.h"
+#include "CObject/CSpline.h"
 
 
 enum RestraintType{

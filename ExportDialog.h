@@ -2,12 +2,12 @@
 #define EXPORTDIALOG_H
 
 #include <QDialog>
-#include <CObject.h>
-#include <CPoint.h>
-#include <CLine.h>
-#include <CArc.h>
-#include <CSpline.h>
-#include <CBlocks.h>
+#include <CObject/CObject.h>
+#include <CObject/CPoint.h>
+#include <CObject/CLine.h>
+#include <CObject/CArc.h>
+#include <CObject/CSpline.h>
+#include <CObject/CBlocks.h>
 #include <QFileDialog>
 #include <QFile>
 #include <QMessageBox>
