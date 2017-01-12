@@ -18,7 +18,7 @@ protected:
     bool Create(CPoint * pos,int index);//作成関数
 
 public:
-    virtual Pos 　GetNear(const Pos&)const;    //最近点
+    virtual Pos  GetNear(const Pos&)const;    //最近点
     virtual bool Draw(QPainter& painter)const; //描画関数
     virtual bool Move(const Pos& pos);         //移動関数
     virtual int GetJointNum()const;

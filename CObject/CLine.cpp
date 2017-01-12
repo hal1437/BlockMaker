@@ -61,7 +61,7 @@ void CLine::Lock(bool lock){
     //それぞれロック
     pos[0]->Lock(lock);
     pos[1]->Lock(lock);
-    this->Lock(lock);
+    CObject::Lock(lock);
 }
 
 bool CLine::Move(const Pos& diff){

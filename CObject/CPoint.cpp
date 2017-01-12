@@ -36,7 +36,7 @@ bool CPoint::isSelectable()const{
 
 
 bool CPoint::Move(const Pos& pos){
-    if(!isLock());//diff = this->getRelative() + pos;
+    if(!isLock())(*this) += pos;
     return true;
 }
 
