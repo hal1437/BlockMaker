@@ -226,15 +226,20 @@ void MainWindow::MakeObject(){
             else if(state == Spline)make_obj = new CSpline();
             ui->CadEdit->AddObject(make_obj);
             log.push_back(make_obj);
+            CObject::createing = make_obj;
         }
         //作成
-        if(MakeJoint(make_obj)){
+        if(MakeJoint(make_obj) == true){
+            //生成完了
+            CObject::createing = nullptr;
 
             //未構築点を追加
             ui->CadEdit->CompleteObject(make_obj);
 
             creating_count = 0;
         }else {
+            //生成継続
+
             creating_count++;
         }
         //子オブジェクトを追加

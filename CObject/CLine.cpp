@@ -96,7 +96,7 @@ std::vector<CObject*> CLine::GetChild(){
 
 CLine::CLine()
 {
-
+    pos[0] = pos[1] = nullptr;
 }
 
 CLine::~CLine()
