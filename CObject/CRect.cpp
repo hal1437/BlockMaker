@@ -14,11 +14,11 @@ bool CRect::Create(CPoint *hand, int index){
             pos[3] = hand;
             if((GetJointPos(0).x < GetJointPos(3).x && GetJointPos(0).y < GetJointPos(3).y )||
                (GetJointPos(0).x > GetJointPos(3).x && GetJointPos(0).y > GetJointPos(3).y )){
-                //pos[1]->setDifferent(Pos(std::min(GetJointPos(0).x,GetJointPos(3).x),std::max(GetJointPos(0).y,GetJointPos(3).y)));
-                //pos[2]->setDifferent(Pos(std::max(GetJointPos(0).x,GetJointPos(3).x),std::min(GetJointPos(0).y,GetJointPos(3).y)));
+                *pos[1] = Pos(std::min(GetJointPos(0).x,GetJointPos(3).x),std::max(GetJointPos(0).y,GetJointPos(3).y));
+                *pos[2] = Pos(std::max(GetJointPos(0).x,GetJointPos(3).x),std::min(GetJointPos(0).y,GetJointPos(3).y));
             }else{
-                //pos[1]->setDifferent(Pos(std::max(GetJointPos(0).x,GetJointPos(3).x),std::max(GetJointPos(0).y,GetJointPos(3).y)));
-                //pos[2]->setDifferent(Pos(std::min(GetJointPos(0).x,GetJointPos(3).x),std::min(GetJointPos(0).y,GetJointPos(3).y)));
+                *pos[1] = Pos(std::max(GetJointPos(0).x,GetJointPos(3).x),std::max(GetJointPos(0).y,GetJointPos(3).y));
+                *pos[2] = Pos(std::min(GetJointPos(0).x,GetJointPos(3).x),std::min(GetJointPos(0).y,GetJointPos(3).y));
             }
             lines[0]->Make(GetJoint(0),0);
             lines[0]->Make(GetJoint(1),1);
@@ -49,10 +49,15 @@ void CRect::Lock(bool lock){
 
 bool CRect::Draw(QPainter& painter)const{
     if(this->isCreating()){
-        painter.drawRect(std::min(pos[0]->x,CPoint::mouse_over.x),
-                         std::min(pos[0]->y,CPoint::mouse_over.y),
-                         std::max(pos[0]->x,CPoint::mouse_over.x)-std::min(pos[0]->x,CPoint::mouse_over.x),
-                         std::max(pos[0]->y,CPoint::mouse_over.y)-std::min(pos[0]->y,CPoint::mouse_over.y));
+        QPoint p1(pos[0]->x            ,pos[0]->y);
+        QPoint p2(pos[0]->x            ,CPoint::mouse_over.y);
+        QPoint p3(CPoint::mouse_over.x ,pos[0]->y);
+        QPoint p4(CPoint::mouse_over.x ,CPoint::mouse_over.y);
+
+        painter.drawLine(p1,p2);
+        painter.drawLine(p1,p3);
+        painter.drawLine(p2,p4);
+        painter.drawLine(p3,p4);
     }
     return true;
 }
