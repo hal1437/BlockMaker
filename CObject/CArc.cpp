@@ -1,8 +1,9 @@
+
 #include "CArc.h"
 
 bool CArc::Refresh(){
     if (this->isCreating()){
-        //center->setDifferent((GetJointPos(0) - CObject::mouse_over) / 2 + CObject::mouse_over);
+        *center = (GetJointPos(0) - CObject::mouse_over) / 2 + CObject::mouse_over;
         round = (GetJointPos(0) - GetCenter()).Length();
     }else{
         for(int i=0;i<2;i++){
@@ -25,7 +26,7 @@ bool CArc::Create(CPoint* pos, int index){
         this->pos[index] = pos;
         if(index==1){
             Refresh();
-            //center->setDifferent((GetJointPos(0) - GetJointPos(1)) / 2 + GetJointPos(1));
+            *center = (GetJointPos(0) - GetJointPos(1)) / 2 + GetJointPos(1);
             round = (GetJointPos(0) - GetCenter()).Length();
 
             return true;

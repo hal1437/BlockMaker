@@ -8,6 +8,8 @@
 #include <QListWidgetItem>
 #include <iostream>
 #include <random>
+#include <queue>
+#include <utility>
 #include "CObject/CObject.h"
 #include "CObject/CPoint.h"
 #include "CObject/CLine.h"

@@ -270,17 +270,50 @@ bool CadEditForm::MakeBlock(){
 
 
 void CadEditForm::RefreshRestraints(){
+    //拘束を解決
     if(objects.size()!=0){
-        for(int i=0;i<objects.size()*2;i++){
+        std::vector<std::pair<int,CObject*>> rank;
 
+        //持ち手は0番に
+        if(CObject::selecting!=nullptr && CObject::selecting->is<CPoint>()){
+            rank.push_back(std::make_pair(0,CObject::selecting));
+        }
+
+        //ランク分けダイクストラ
+        std::queue<std::pair<int,CObject*>> queue;
+        queue.push(std::make_pair(0,CObject::selecting));//初期ノード
+        while(!queue.empty()){
+            //全ての拘束リストから
             for(Restraint* rest:restraints){
-                if(rest!=nullptr && rest->nodes.size()!=0){
-                   if(!rest->Complete()){
-                       qDebug() << "Conflict" << rest;
-                   }
+                std::vector<CObject*> child = rest->getChild();
+                //childにqueue.frontが含まれる
+                if(exist(child,queue.front().second)){
+                    //未探索ならばを次の探索点に追加
+                    for(int i=0;i<child.size();i++){
+                        bool not_alive = true;
+                        for(int j=0;j<rank.size();j++){
+                            if(child[i] == rank[j].second){
+                                not_alive = false;
+                            }
+                        }
+                        if(not_alive==true){
+                            queue.push    (std::make_pair(queue.front().first+1,child[i]));
+                            rank.push_back(std::make_pair(queue.front().first+1,child[i]));
+                        }
+                    }
                 }
             }
-         }
+            queue.pop();
+        }
+
+        //拘束を解決
+        for(Restraint* rest:restraints){
+            if(rest!=nullptr && rest->nodes.size()!=0){
+               if(!rest->Complete()){
+                   qDebug() << "Conflict" << rest;
+               }
+            }
+        }
     }
 }
 
