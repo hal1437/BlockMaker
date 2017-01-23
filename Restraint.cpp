@@ -1,12 +1,5 @@
 #include "Restraint.h"
 
-std::vector<CObject*> Restraint::getChild(){
-    std::vector<CObject*> ans;
-    ans.resize(this->nodes.size());
-    std::copy(this->nodes.begin(),this->nodes.end(),ans.begin());
-    return ans;
-}
-
 QVector<RestraintType> Restraint::Restraintable(const QVector<CObject *> &values){
     QVector<RestraintType> answer;
     //等値
@@ -147,11 +140,11 @@ bool HorizontalRestraint::Complete(){
 bool MatchRestraint::Complete(){
     if(nodes[0]->isLock() && nodes[1]->isLock())return false;
     QVector<CObject*> cc = CObject::selected;
-    /*
+
     if(nodes[1]->isLock() ||
        exist(CObject::selected,nodes[1])){
         std::swap(nodes[0],nodes[1]);
-    }*/
+    }
 
     //0へ1を近づける
 

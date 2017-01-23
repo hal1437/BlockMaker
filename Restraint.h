@@ -42,9 +42,6 @@ struct Restraint{
         return (dynamic_cast<const T*>(this) != nullptr);
     }
 
-    //子を返す
-    std::vector<CObject*> getChild();
-
 
     Restraint(){}
     Restraint(QVector<CObject*> Nodes,

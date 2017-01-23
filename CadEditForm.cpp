@@ -218,12 +218,9 @@ void CadEditForm::MakeSmartDimension(){
                     delete dim;
                 }
                 //restraints.clear();
-                for(SmartDimension* dim:dimensions){
-
-                    std::vector<Restraint*> rs = dim->MakeRestraint();
-                    for(Restraint* r : rs){
-                        restraints.push_back(r);
-                    }
+                std::vector<Restraint*> rs = dim->MakeRestraint();
+                for(Restraint* r : rs){
+                    restraints.push_back(r);
                 }
             }
         }
@@ -274,18 +271,23 @@ void CadEditForm::RefreshRestraints(){
     if(objects.size()!=0){
         std::vector<std::pair<int,CObject*>> rank;
 
+        //過去の選択位置を保持する
+        static CObject* hand;
+
         //持ち手は0番に
-        if(CObject::selecting!=nullptr && CObject::selecting->is<CPoint>()){
-            rank.push_back(std::make_pair(0,CObject::selecting));
+        if(CObject::selecting != nullptr && CObject::selecting->is<CPoint>()){
+            hand = CObject::selecting;
         }
+        rank.push_back(std::make_pair(0,hand));
 
         //ランク分けダイクストラ
+        int max_rank=0;
         std::queue<std::pair<int,CObject*>> queue;
-        queue.push(std::make_pair(0,CObject::selecting));//初期ノード
+        queue.push(std::make_pair(0,hand));//初期ノード
         while(!queue.empty()){
             //全ての拘束リストから
             for(Restraint* rest:restraints){
-                std::vector<CObject*> child = rest->getChild();
+                QVector<CObject*> child = rest->nodes;
                 //childにqueue.frontが含まれる
                 if(exist(child,queue.front().second)){
                     //未探索ならばを次の探索点に追加
@@ -299,6 +301,7 @@ void CadEditForm::RefreshRestraints(){
                         if(not_alive==true){
                             queue.push    (std::make_pair(queue.front().first+1,child[i]));
                             rank.push_back(std::make_pair(queue.front().first+1,child[i]));
+                            max_rank = queue.front().first+1;
                         }
                     }
                 }
@@ -306,12 +309,42 @@ void CadEditForm::RefreshRestraints(){
             queue.pop();
         }
 
+        std::vector<std::pair<int,Restraint*>> solver;
+        if(max_rank > 0){
+            //拘束を捜査
+            for(Restraint* rest:restraints){
+                std::vector<std::pair<int,CObject*>>::iterator it1,it2;
+                int score1,score2,current;
+
+                //拘束ランクごとに拘束の親関係を修正
+                score1 = score2 = -1;
+                it1 = std::find_if(rank.begin(),rank.end(),[&](std::pair<int,CObject*>obj){
+                    return (obj.second == rest->nodes[0]);
+                });
+                it2 = std::find_if(rank.begin(),rank.end(),[&](std::pair<int,CObject*>obj){
+                    return (obj.second == rest->nodes[1]);
+                });
+                if(it1 != rank.end())score1 = it1->first;
+                if(it2 != rank.end())score2 = it2->first;
+                if(score1 > score2){
+                    std::swap(rest->nodes[0],rest->nodes[1]);
+                }
+
+                //解決順序を決定
+                current = std::min(score1,score2);
+
+                //解決順と拘束を組み合わせて保存
+                solver.push_back(std::make_pair(current,rest));
+            }
+        }
+        //解決順が小さい順にソート
+        std::sort(solver.begin(),solver.end());
+
+
         //拘束を解決
-        for(Restraint* rest:restraints){
-            if(rest!=nullptr && rest->nodes.size()!=0){
-               if(!rest->Complete()){
-                   qDebug() << "Conflict" << rest;
-               }
+        for(std::pair<int,Restraint *> rest:solver){
+            if(!rest.second->Complete()){
+                qDebug() << "CONFLICT" ;
             }
         }
     }
