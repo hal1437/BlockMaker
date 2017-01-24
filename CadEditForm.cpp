@@ -87,7 +87,10 @@ void CadEditForm::paintEvent(QPaintEvent*){
     paint.save();
     paint.fillRect(0,0,this->width(),this->height(),Qt::white);//白塗りにする
     if(scale == 0) paint.scale(0.00001f,0.00001f);
-    else paint.scale(scale,scale);
+    else {
+        //スケール変換
+        paint.scale(scale,scale);
+    }
 
     paint.setPen(QPen(Qt::blue, 1));
     for(SmartDimension* dim:dimensions){
@@ -125,8 +128,11 @@ void CadEditForm::paintEvent(QPaintEvent*){
 
 
 void CadEditForm::mouseMoveEvent   (QMouseEvent* event){
-    CObject::mouse_over = Pos(event->pos().x(),event->pos().y());
+    //マウス移動を監視
+    CObject::mouse_over = Pos(event->pos().x() / scale,event->pos().y() / scale);
     CObject* answer = getSelecting();
+
+    //UI更新
     repaint();
     emit MovedMouse(event,answer);
 }

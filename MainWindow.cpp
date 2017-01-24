@@ -40,11 +40,9 @@ void MainWindow::mouseReleaseEvent(QMouseEvent*){
     if(release_flag==true)MakeObject();
 }
 void MainWindow::wheelEvent(QWheelEvent * e){
-    if(ctrl_pressed){
-        double value = ui->CadEdit->GetScale() + (e->angleDelta().y() / 256.0f);
-        ui->SizeRateSpinBox->setValue(value);
-        ui->CadEdit->SetScale(value);
-    }
+    double value = ui->CadEdit->GetScale() - (e->angleDelta().y())/1000.0;
+    ui->SizeRateSpinBox->setValue(value);
+    ui->CadEdit->SetScale(value);
 }
 
 void MainWindow::keyPressEvent(QKeyEvent* event){
