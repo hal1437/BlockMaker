@@ -35,14 +35,14 @@ private:
     QVector<CBlocks*>         selecting_block; //選択物体
 
     double scale = 1.0f;
-    Pos transform = Pos(0,0);
+    Pos translate = Pos(0,0);
 public:
 
     void AddObject(CObject* obj);           //物体追加
     void RemoveObject(CObject* obj);        //物体削除
     void CompleteObject(CObject* make_obj); //非端点を追加
     double GetScale()const;     //スケール
-    Pos    GetTransform()const; //平行移動
+    Pos    GetTranslate()const; //平行移動
 
     void paintEvent    (QPaintEvent* event); //描画イベントハンドラ
     void mouseMoveEvent(QMouseEvent* event); //マウス移動
@@ -60,7 +60,7 @@ signals:
 public slots:
     CObject* getSelecting();      //選択中オブジェクト取得
     void SetScale(double scale);  //スケールセット
-    void SetTransform(Pos trans); //並行移動セット
+    void SetTranslate(Pos trans); //並行移動セット
     void MakeRestraint(RestraintType type); //拘束作成
     void MakeSmartDimension();              //寸法設定
     bool MakeBlock();                       //物体生成

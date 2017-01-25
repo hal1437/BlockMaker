@@ -77,8 +77,8 @@ void CadEditForm::CompleteObject(CObject* make_obj){
 double CadEditForm::GetScale()const{
     return scale;
 }
-Pos    CadEditForm::GetTransform()const{
-    return transform;
+Pos    CadEditForm::GetTranslate()const{
+    return translate;
 }
 
 
@@ -88,9 +88,12 @@ void CadEditForm::paintEvent(QPaintEvent*){
     paint.fillRect(0,0,this->width(),this->height(),Qt::white);//白塗りにする
     if(scale == 0) paint.scale(0.00001f,0.00001f);
     else {
-        //スケール変換
+        //拡大変換
         paint.scale(scale,scale);
+        //平行移動変換
+        paint.translate(translate.x,translate.y);
     }
+
 
     paint.setPen(QPen(Qt::blue, 1));
     for(SmartDimension* dim:dimensions){
@@ -129,7 +132,10 @@ void CadEditForm::paintEvent(QPaintEvent*){
 
 void CadEditForm::mouseMoveEvent   (QMouseEvent* event){
     //マウス移動を監視
-    CObject::mouse_over = Pos(event->pos().x() / scale,event->pos().y() / scale);
+    CObject::mouse_over = Pos(event->pos().x(),event->pos().y())/scale;
+    //平行移動量を適用
+    CObject::mouse_over -= translate;
+
     CObject* answer = getSelecting();
 
     //UI更新
@@ -169,8 +175,8 @@ void CadEditForm::SetScale(double scale){
     repaint();
 }
 
-void CadEditForm::SetTransform(Pos trans){
-    this->transform = trans;
+void CadEditForm::SetTranslate(Pos trans){
+    this->translate = trans;
     repaint();
 }
 

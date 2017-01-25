@@ -40,9 +40,21 @@ void MainWindow::mouseReleaseEvent(QMouseEvent*){
     if(release_flag==true)MakeObject();
 }
 void MainWindow::wheelEvent(QWheelEvent * e){
-    double value = ui->CadEdit->GetScale() - (e->angleDelta().y())/1000.0;
-    ui->SizeRateSpinBox->setValue(value);
-    ui->CadEdit->SetScale(value);
+    //拡大
+    double delta = (e->angleDelta().y())/1000.0;//差分値
+    double next_scale = ui->CadEdit->GetScale() + delta;//次の拡大値
+    Pos    next_translate = ui->CadEdit->GetTranslate();//次の平行移動値
+
+    Pos center = CObject::mouse_over;
+    double rate = (next_scale / ui->CadEdit->GetScale());
+
+
+    qDebug() << next_translate.x << "," << next_translate.y << rate;
+
+    //適応
+    ui->SizeRateSpinBox->setValue(next_scale);
+    ui->CadEdit->SetScale(next_scale);
+    ui->CadEdit->SetTranslate(next_translate);
 }
 
 void MainWindow::keyPressEvent(QKeyEvent* event){
@@ -82,17 +94,35 @@ void MainWindow::Escape(){
 
 void MainWindow::MovedMouse(QMouseEvent *event, CObject *under_object){
     static Pos past;
+    static Pos past_translate;
+
+
+    //選択
     if(!(event->buttons() & Qt::LeftButton) || !move_flag){
         CObject::selecting = under_object;
+        past_translate = Pos(0,0);
     }
+    //画面移動
+    if((event->buttons() & Qt::LeftButton) && CObject::selecting == nullptr && this->state == Edit){
+        if(past_translate == Pos(0,0)){
+            past_translate = CObject::mouse_over;
+        }
+        Pos next = this->ui->CadEdit->GetTranslate();
+        next += CObject::mouse_over - past_translate;
+        this->ui->CadEdit->SetTranslate(next);
+    }
+
+
     //編集
     if(move_flag == true){
         if(CObject::selecting!=nullptr && !CObject::selecting->isLock()){
-            CObject::selecting->Move(CObject::mouse_over-past);
+            CObject::selecting->Move(CObject::mouse_over - past);
         }
     }
 
+    //拘束更新
     ui->CadEdit->RefreshRestraints();
+    //ブロック生成可否判定
     ui->ToolBlocks->setEnabled(CBlocks::Creatable(CObject::selected));
 
     past = CObject::mouse_over;
