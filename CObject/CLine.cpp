@@ -17,19 +17,24 @@ Pos CLine::GetNear(const Pos& hand)const{
     return Pos::LineNearPoint(GetJointPos(0),GetJointPos(1),hand);
 }
 
-bool CLine::Draw(QPainter& painter)const{
+bool CLine::Draw(QPainter& painter,QTransform trans)const{
+    Pos pos1,pos2;
+    pos1 = GetJointPos(0).Transform(trans);
+
     if(this->isCreating()){
         //製作ならばマウスの位置を1番目にする
-        painter.drawLine(QPointF(GetJointPos(0).x,GetJointPos(0).y),
-                         QPointF(this->mouse_over.x,this->mouse_over.y));
+        pos2 = this->mouse_over.Transform(trans);
     }else{
         //二点間の直線
-        painter.drawLine(QPointF(GetJointPos(0).x,GetJointPos(0).y),
-                         QPointF(GetJointPos(1).x,GetJointPos(1).y));
+        pos2 = GetJointPos(1).Transform(trans);
     }
-    //ロック
+    //描画
+    painter.drawLine(pos1.x,pos1.y,pos2.x,pos2.y);
+
+    //ロックマーク
     if(this->isLock()){
         Pos p = (GetJointPos(0) - GetJointPos(1))/2 + GetJointPos(1);
+        p.Transform(trans);
         painter.drawImage(p.x+10,p.y-10,QImage(":/Restraint/FixRestraint.png"));
     }
 
@@ -45,7 +50,7 @@ bool CLine::isSelectable()const{
     d    = (near - v2).Length();
 
     //あたり判定処理
-    if(d < COLLISION_SIZE &&
+    if(d < COLLISION_SIZE / CObject::Drawing_scale &&
        ((GetJointPos(0).x < mouse_over.x && mouse_over.x < GetJointPos(1).x) ||
         (GetJointPos(1).x < mouse_over.x && mouse_over.x < GetJointPos(0).x) ||
         (GetJointPos(0).y < mouse_over.y && mouse_over.y < GetJointPos(1).y) ||

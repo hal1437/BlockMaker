@@ -48,7 +48,7 @@ public:
     CObject* GetTarget(int index)const;
     std::vector<Restraint *> MakeRestraint();
 
-    bool Draw(QPainter& painter)const;
+    bool Draw(QPainter& painter,QTransform trans)const;
 
     SmartDimension();
 };

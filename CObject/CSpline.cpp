@@ -93,7 +93,7 @@ void CSpline::Lock(bool lock){
     }
 }
 
-bool CSpline::Draw(QPainter& painter)const{
+bool CSpline::Draw(QPainter& painter,QTransform trans)const{
     if(pos.size() > 1){
         QPainterPath path;
         double t, m;
@@ -103,7 +103,8 @@ bool CSpline::Draw(QPainter& painter)const{
         const double dt = 1.0/DIVISION;
         for(t=0; t<=m; t += dt){
             if(t + dt > m)t=m;
-            path.lineTo(xs.culc(t), ys.culc(t));
+            QPointF pos(xs.culc(t), ys.culc(t));
+            path.lineTo(pos*trans);
         }
         painter.drawPath(path);
     }

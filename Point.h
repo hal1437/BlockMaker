@@ -2,6 +2,7 @@
 #define POINT_H
 #include <cmath>
 #include <QPoint>
+#include <QTransform>
 #include <iostream>
 #include <limits>
 #include "Utils.h"
@@ -72,6 +73,13 @@ public:
     }
     current GetNormalize()const{
         return current(x/Length(),y/Length());
+    }
+    current& Transform(QTransform rhs){
+        QPointF p(x,y);
+        p = p * rhs;
+        this->x = p.x();
+        this->y = p.y();
+        return (*this);
     }
 
 

@@ -87,21 +87,20 @@ void CadEditForm::paintEvent(QPaintEvent*){
     paint.save();
     paint.fillRect(0,0,this->width(),this->height(),Qt::white);//白塗りにする
     if(scale == 0) paint.scale(0.00001f,0.00001f);
-    else {
-        //拡大変換
-        paint.scale(scale,scale);
-        //平行移動変換
-        paint.translate(translate.x,translate.y);
-    }
 
+    //変換行列を作成
+    QTransform trans;
+    trans.translate(translate.x,translate.y);
+    trans.scale(scale,scale);
 
+    //寸法を表示
     paint.setPen(QPen(Qt::blue, 1));
     for(SmartDimension* dim:dimensions){
-        dim->Draw(paint);
+        dim->Draw(paint,trans);
     }
 
     //CBox描画
-    paint.setPen(QPen(Qt::blue , (CObject::DRAWING_LINE_SIZE/2)/scale));
+    paint.setPen(QPen(Qt::blue , (CObject::DRAWING_LINE_SIZE/2)));
     paint.setBrush(QBrush(Qt::darkGray));
     for(int i=0;i<this->blocks.size();i++){
         //this->ui->CBoxList->addItem(new QListWidgetItem("CBox"));
@@ -111,19 +110,19 @@ void CadEditForm::paintEvent(QPaintEvent*){
 
     paint.setBrush(QBrush(Qt::white));
     //普通のオブジェクト
-    paint.setPen(QPen(Qt::blue, CObject::DRAWING_LINE_SIZE/scale));
+    paint.setPen(QPen(Qt::blue, CObject::DRAWING_LINE_SIZE));
     for(CObject* obj:objects){
-        if(obj->Refresh())obj->Draw(paint);
+        if(obj->Refresh())obj->Draw(paint,trans);
     }
     //選択された
-    paint.setPen(QPen(Qt::cyan, CObject::DRAWING_LINE_SIZE/scale));
+    paint.setPen(QPen(Qt::cyan, CObject::DRAWING_LINE_SIZE));
     for(CObject* obj:CObject::selected){
-        if(obj->Refresh())obj->Draw(paint);
+        if(obj->Refresh())obj->Draw(paint,trans);
     }
     //メイン選択中
-    paint.setPen(QPen(Qt::red , CObject::DRAWING_LINE_SIZE/scale));
+    paint.setPen(QPen(Qt::red , CObject::DRAWING_LINE_SIZE));
     if(CObject::selecting!=nullptr){
-        if(CObject::selecting->Refresh())CObject::selecting->Draw(paint);
+        if(CObject::selecting->Refresh())CObject::selecting->Draw(paint,trans);
     }
 
     paint.restore();
@@ -135,7 +134,6 @@ void CadEditForm::mouseMoveEvent   (QMouseEvent* event){
     CObject::mouse_over = Pos(event->pos().x(),event->pos().y())/scale;
     //平行移動量を適用
     CObject::mouse_over -= translate;
-
     CObject* answer = getSelecting();
 
     //UI更新
@@ -281,84 +279,93 @@ bool CadEditForm::MakeBlock(){
 void CadEditForm::RefreshRestraints(){
     //拘束を解決
     if(objects.size()!=0){
-        std::vector<std::pair<int,CObject*>> rank;
+        //持ち手が存在すれば
+        if(CObject::selecting != nullptr){
+            std::vector<std::pair<int,CObject*>> rank;
 
-        //過去の選択位置を保持する
-        static CObject* hand;
+            //過去の選択位置を保持する
+            static CObject* hand = nullptr;
 
-        //持ち手は0番に
-        if(CObject::selecting != nullptr && CObject::selecting->is<CPoint>()){
-            hand = CObject::selecting;
-        }
-        rank.push_back(std::make_pair(0,hand));
-
-        //ランク分けダイクストラ
-        int max_rank=0;
-        std::queue<std::pair<int,CObject*>> queue;
-        queue.push(std::make_pair(0,hand));//初期ノード
-        while(!queue.empty()){
-            //全ての拘束リストから
-            for(Restraint* rest:restraints){
-                QVector<CObject*> child = rest->nodes;
-                //childにqueue.frontが含まれる
-                if(exist(child,queue.front().second)){
-                    //未探索ならばを次の探索点に追加
-                    for(int i=0;i<child.size();i++){
-                        bool not_alive = true;
-                        for(int j=0;j<rank.size();j++){
-                            if(child[i] == rank[j].second){
-                                not_alive = false;
+            //持ち手は0番に
+            if(CObject::selecting != nullptr && CObject::selecting->is<CPoint>()){
+                hand = CObject::selecting;
+            }
+            rank.push_back(std::make_pair(0,hand));
+            //ランク分けダイクストラ
+            int max_rank=0;
+            std::queue<std::pair<int,CObject*>> queue;
+            queue.push(std::make_pair(0,hand));//初期ノード
+            while(!queue.empty()){
+                //全ての拘束リストから
+                for(Restraint* rest:restraints){
+                    QVector<CObject*> child = rest->nodes;
+                    //childにqueue.frontが含まれる
+                    if(exist(child,queue.front().second)){
+                        //未探索ならばを次の探索点に追加
+                        for(int i=0;i<child.size();i++){
+                            bool not_alive = true;
+                            for(int j=0;j<rank.size();j++){
+                                if(child[i] == rank[j].second){
+                                    not_alive = false;
+                                }
                             }
-                        }
-                        if(not_alive==true){
-                            queue.push    (std::make_pair(queue.front().first+1,child[i]));
-                            rank.push_back(std::make_pair(queue.front().first+1,child[i]));
-                            max_rank = queue.front().first+1;
+                            if(not_alive==true){
+                                queue.push    (std::make_pair(queue.front().first+1,child[i]));
+                                rank.push_back(std::make_pair(queue.front().first+1,child[i]));
+                                max_rank = queue.front().first+1;
+                            }
                         }
                     }
                 }
+                queue.pop();
             }
-            queue.pop();
-        }
 
-        std::vector<std::pair<int,Restraint*>> solver;
-        if(max_rank > 0){
-            //拘束を捜査
-            for(Restraint* rest:restraints){
-                std::vector<std::pair<int,CObject*>>::iterator it1,it2;
-                int score1,score2,current;
+            std::vector<std::pair<int,Restraint*>> solver;
+            if(max_rank > 0){
+                //拘束を捜査
+                for(Restraint* rest:restraints){
+                    std::vector<std::pair<int,CObject*>>::iterator it1,it2;
+                    int score1,score2,current;
 
-                //拘束ランクごとに拘束の親関係を修正
-                score1 = score2 = -1;
-                it1 = std::find_if(rank.begin(),rank.end(),[&](std::pair<int,CObject*>obj){
-                    return (obj.second == rest->nodes[0]);
-                });
-                it2 = std::find_if(rank.begin(),rank.end(),[&](std::pair<int,CObject*>obj){
-                    return (obj.second == rest->nodes[1]);
-                });
-                if(it1 != rank.end())score1 = it1->first;
-                if(it2 != rank.end())score2 = it2->first;
-                if(score1 > score2){
-                    std::swap(rest->nodes[0],rest->nodes[1]);
+                    //拘束ランクごとに拘束の親関係を修正
+                    score1 = score2 = -1;
+                    it1 = std::find_if(rank.begin(),rank.end(),[&](std::pair<int,CObject*>obj){
+                        return (obj.second == rest->nodes[0]);
+                    });
+                    it2 = std::find_if(rank.begin(),rank.end(),[&](std::pair<int,CObject*>obj){
+                        return (obj.second == rest->nodes[1]);
+                    });
+                    if(it1 != rank.end())score1 = it1->first;
+                    if(it2 != rank.end())score2 = it2->first;
+                    if(score1 > score2){
+                        std::swap(rest->nodes[0],rest->nodes[1]);
+                    }
+
+                    //解決順序を決定
+                    current = std::min(score1,score2);
+
+                    //解決順と拘束を組み合わせて保存
+                    solver.push_back(std::make_pair(current,rest));
                 }
-
-                //解決順序を決定
-                current = std::min(score1,score2);
-
-                //解決順と拘束を組み合わせて保存
-                solver.push_back(std::make_pair(current,rest));
             }
-        }
-        //解決順が小さい順にソート
-        std::sort(solver.begin(),solver.end());
+            //解決順が小さい順にソート
+            std::sort(solver.begin(),solver.end());
 
 
-        //拘束を解決
-        for(std::pair<int,Restraint *> rest:solver){
-            if(!rest.second->Complete()){
-                qDebug() << "CONFLICT" ;
+            //拘束を解決
+            for(std::pair<int,Restraint *> rest:solver){
+                if(!rest.second->Complete()){
+                    qDebug() << "CONFLICT" ;
+                }
             }
-        }
+        }else{
+            //持ち手が存在しなければ
+            for(Restraint* rest:restraints){
+                if(!rest->Complete()){
+                    qDebug() << "CONFLICT" ;
+                }
+            }
+       }
     }
 }
 

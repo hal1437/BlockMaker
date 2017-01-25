@@ -21,7 +21,7 @@ protected:
 public:
 
     virtual Pos GetNear(const Pos& hand)const;
-    virtual bool Draw(QPainter& painter)const;
+    virtual bool Draw(QPainter& painter,QTransform trans)const;
     virtual bool isSelectable()const;
     virtual void Lock(bool lock);
     virtual bool Move(const Pos& diff);

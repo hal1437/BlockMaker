@@ -2,6 +2,7 @@
 #ifndef COBJECT_H
 #define COBJECT_H
 #include <QPainter>
+#include <QTransform>
 #include <QDebug>
 #include "Utils.h"
 #include "Point.h"
@@ -12,12 +13,13 @@ class CPoint;
 class CObject
 {
 public:
-    const static int DRAWING_LINE_SIZE = 3; //描画線幅
-    static CObject* selecting;              //選択中オブジェクト
-    static CObject* createing;              //作成中オブジェクト
-    static QVector<CObject*> selected;      //選択オブジェクト
-    static QVector<CObject*> all_objects;   //全てのオブジェクト
-    static Pos mouse_over;                  //マウス位置
+    const static int DRAWING_LINE_SIZE = 3;   //描画線幅
+    static double   Drawing_scale;            //描画拡大率
+    static CObject* selecting;                //選択中オブジェクト
+    static CObject* createing;                //作成中オブジェクト
+    static QVector<CObject*> selected;        //選択オブジェクト
+    static QVector<CObject*> all_objects;     //全てのオブジェクト
+    static Pos mouse_over;                    //マウス位置
 
 protected:
     bool lock  = false; //ロック
@@ -35,7 +37,7 @@ public:
     virtual bool Refresh(){return true;}
 
     //描画関数
-    virtual bool Draw(QPainter& painter)const = 0;
+    virtual bool Draw(QPainter& painter,QTransform trans)const = 0;
 
     virtual bool isSelecting()const;  //選択中
     virtual bool isSelected() const;  //選択済

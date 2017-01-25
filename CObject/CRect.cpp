@@ -47,12 +47,12 @@ void CRect::Lock(bool lock){
     this->Lock(lock);
 }
 
-bool CRect::Draw(QPainter& painter)const{
+bool CRect::Draw(QPainter& painter, QTransform trans)const{
     if(this->isCreating()){
-        QPoint p1(pos[0]->x            ,pos[0]->y);
-        QPoint p2(pos[0]->x            ,CPoint::mouse_over.y);
-        QPoint p3(CPoint::mouse_over.x ,pos[0]->y);
-        QPoint p4(CPoint::mouse_over.x ,CPoint::mouse_over.y);
+        QPointF p1 = QPointF(pos[0]->x            ,pos[0]->y           ) * trans;
+        QPointF p2 = QPointF(pos[0]->x            ,CPoint::mouse_over.y) * trans;
+        QPointF p3 = QPointF(CPoint::mouse_over.x ,pos[0]->y           ) * trans;
+        QPointF p4 = QPointF(CPoint::mouse_over.x ,CPoint::mouse_over.y) * trans;
 
         painter.drawLine(p1,p2);
         painter.drawLine(p1,p3);

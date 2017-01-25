@@ -19,7 +19,7 @@ protected:
 
 public:
     virtual Pos  GetNear(const Pos&)const;    //最近点
-    virtual bool Draw(QPainter& painter)const; //描画関数
+    virtual bool Draw(QPainter& painter,QTransform trans)const; //描画関数
     virtual bool Move(const Pos& pos);         //移動関数
     virtual int GetJointNum()const;
     virtual Pos GetJointPos(int index)const;

@@ -1,5 +1,6 @@
 #include "CObject.h"
 
+double   CObject::Drawing_scale;
 CObject* CObject::selecting;
 CObject* CObject::createing;
 QVector<CObject*> CObject::selected;

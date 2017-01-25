@@ -9,8 +9,9 @@ Pos CPoint::GetNear(const Pos&)const{
     return *this;
 }
 
-bool CPoint::Draw(QPainter& painter)const{
+bool CPoint::Draw(QPainter& painter, QTransform trans)const{
     Pos center = *this;
+    center.Transform(trans);
     if(control_point){
         //四角
         QLine ps[4] = {QLine(center.x-DRAWING_CIRCLE_SIZE,center.y-DRAWING_CIRCLE_SIZE,center.x+DRAWING_CIRCLE_SIZE,center.y-DRAWING_CIRCLE_SIZE),
@@ -31,7 +32,7 @@ bool CPoint::Draw(QPainter& painter)const{
     return true;
 }
 bool CPoint::isSelectable()const{
-    return (this->Length(CPoint::mouse_over) < COLLISION_SIZE);
+    return (this->Length(CPoint::mouse_over) < COLLISION_SIZE / CObject::Drawing_scale);
 }
 
 

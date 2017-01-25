@@ -3,16 +3,21 @@
 
 
 void SmartDimension::DrawString(QPainter& painter,const Pos& pos,const QString& str,double angle)const{
-    painter.save();
     QTransform trans;
-    int bit = (90 <= angle && angle < 270) ? 1 : 0;
-    trans = QTransform::fromTranslate(pos.x,pos.y);
     QFontMetrics fm = painter.fontMetrics();
+    int bit = (90 <= angle && angle < 270) ? 1 : 0;
 
+    painter.save();//状態を保存
+
+    //平行移動+回転
+    trans.translate(pos.x,pos.y);
     trans.rotate(angle + 180*bit);
     painter.setTransform(trans);
+
+    //文字を描画
     painter.drawText(-fm.width(str)*bit,-2,str);
-    painter.restore();
+
+    painter.restore();//状態を復元
 }
 
 void SmartDimension::DrawArrow(QPainter& painter,const Pos& pos,const Pos& rote,double angle,double length)const{
@@ -72,32 +77,32 @@ CObject* SmartDimension::GetTarget(int index)const{
 }
 
 
-bool SmartDimension::Draw(QPainter& painter)const{
+bool SmartDimension::Draw(QPainter& painter, QTransform trans)const{
     //描画
     if (this->type == none)return true;
     if (this->type == length){
         //矢印
-        Pos diff_base((target[0]->GetJointPos(0)-target[0]->GetJointPos(1)).GetNormalize());
+        Pos p0 = target[0]->GetJointPos(0).Transform(trans);
+        Pos p1 = target[0]->GetJointPos(1).Transform(trans);
+        Pos diff_base((p0-p1).GetNormalize());
         QPointF diff_(QPointF(diff_base.x,diff_base.y)*QTransform().rotate(90));
         Pos diff = Pos(diff_.x(),diff_.y());
-        Pos p0 = target[0]->GetJointPos(0);
-        Pos p1 = target[0]->GetJointPos(1);
-        Pos t0 = target[0]->GetJointPos(0)+diff*15;
-        Pos t1 = target[0]->GetJointPos(1)+diff*15;
+        Pos t0 = p0 + diff*15;
+        Pos t1 = p1 + diff*15;
 
         painter.drawLine(t0.x,t0.y,t1.x,t1.y);
         painter.drawLine((p0+diff*20).x,(p0+diff*20).y,p0.x,p0.y);
         painter.drawLine((p1+diff*20).x,(p1+diff*20).y,p1.x,p1.y);
         this->DrawArrow(painter,t0,(t0-t1).GetNormalize(),3.0);
         this->DrawArrow(painter,t1,(t1-t0).GetNormalize(),3.0);
-        this->DrawString(painter,(t1+t0)/2.0,QString::number(value),Pos::Angle(p1-p0,Pos(1,0)));
         //寸法の文字
+        this->DrawString(painter,(t1+t0)/2.0,QString::number(value),Pos::Angle(p1-p0,Pos(1,0)));
         return true;
     }
     if (this->type == distance){
         //矢印
-        Pos t0 = target[0]->GetJointPos(0);
-        Pos t1 = target[1]->GetJointPos(0);
+        Pos t0 = target[0]->GetJointPos(0).Transform(trans);
+        Pos t1 = target[1]->GetJointPos(0).Transform(trans);
         float flow = 20;
         if(this->X_type == true){
             //X軸拘束
@@ -133,11 +138,14 @@ bool SmartDimension::Draw(QPainter& painter)const{
     }
     if (this->type == distanceLine){
         //矢印
-        Pos lines[2] = {target[0]->GetJointPos(0),target[0]->GetJointPos(1)};
+        Pos lines0[2] = {target[0]->GetJointPos(0).Transform(trans),
+                         target[0]->GetJointPos(1).Transform(trans)};
+        Pos lines1[2] = {target[1]->GetJointPos(0).Transform(trans),
+                         target[1]->GetJointPos(1).Transform(trans)};
         Pos d_pos[2];
-        d_pos[0] = target[1]->GetJointPos(0);
-        d_pos[1] = (target[0]->GetJointPos(1)-target[0]->GetJointPos(0)).GetNormalize();
-        d_pos[1] = d_pos[1] * d_pos[1].GetNormalize().Dot(target[1]->GetJointPos(0)-target[0]->GetJointPos(0));
+        d_pos[0] = lines1[0];
+        d_pos[1] = (lines0[1]-lines0[0]).GetNormalize();
+        d_pos[1] = d_pos[1] * d_pos[1].GetNormalize().Dot(lines1[0]-lines0[0]);
         d_pos[1] = d_pos[1] + target[0]->GetJointPos(0);
 
         painter.drawLine(d_pos[0].x,d_pos[0].y,d_pos[1].x,d_pos[1].y);
@@ -147,9 +155,9 @@ bool SmartDimension::Draw(QPainter& painter)const{
         this->DrawString(painter,(d_pos[0]+d_pos[1])/2,QString::number(value),Pos::Angle(d_pos[0]-d_pos[1],Pos(1,0)));
 
         //線からはみ出たら補助線を引く
-        if(d_pos[1].y < std::min(lines[0].y,lines[1].y) ||  std::max(lines[0].y,lines[1].y) < d_pos[1].y){
+        if(d_pos[1].y < std::min(lines0[0].y,lines0[1].y) ||  std::max(lines0[0].y,lines0[1].y) < d_pos[1].y){
             Pos near;//近い方
-            near = std::max(lines[0],lines[1],[&](Pos l,Pos r){return ((l-d_pos[1]).Length() < (r-d_pos[1]).Length());});
+            near = std::max(lines0[0],lines0[1],[&](Pos l,Pos r){return ((l-d_pos[1]).Length() < (r-d_pos[1]).Length());});
             painter.drawLine(near.x,near.y,d_pos[1].x,d_pos[1].y);
         }
         return true;
