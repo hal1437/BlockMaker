@@ -64,13 +64,11 @@ bool CArc::Draw(QPainter& painter, QTransform trans)const{
 
     Pos dir1 = (end_point      - GetCenter());
     Pos dir2 = (GetJointPos(0) - GetCenter());
-    dir1.Transform(trans);
-    dir2.Transform(trans);
     double angle1 = std::atan2(-dir1.y,dir1.x) * 180 / PI;
     double angle2 = 360 - angle1 + (std::atan2(-dir2.y,dir2.x))*180 / PI;
 
-    painter.drawArc (GetCenter().x-round,
-                     GetCenter().y-round,
+    painter.drawArc (GetCenter().Transform(trans).x-round,
+                     GetCenter().Transform(trans).y-round,
                      round*2,
                      round*2,
                      angle1*16,
