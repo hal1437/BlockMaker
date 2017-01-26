@@ -1,5 +1,5 @@
-#ifndef CBLOCKS_H
-#define CBLOCKS_H
+#ifndef CBLOCK_H
+#define CBLOCK_H
 
 #include <vector>
 #include <QPainter>
@@ -35,7 +35,7 @@ enum GradingType{
 };
 
 
-class CBlocks{
+class CBlock{
 private:
     QVector<CObject*> lines;
 public:
@@ -50,7 +50,7 @@ public:
     bool isParadox()const;//矛盾確認
 
     //描画
-    void Draw(QPainter& painter)const;
+    void Draw(QPainter& painter,QTransform trans)const;
 
     void SetNodeAll(QVector<CObject*> lines);
     void SetNode(int index,CObject* line);
@@ -58,9 +58,9 @@ public:
     QVector<Pos> GetVerticesPos()const;
 
 
-    CBlocks();
-    CBlocks(QVector<CObject*> lines);
-    ~CBlocks();
+    CBlock();
+    CBlock(QVector<CObject*> lines);
+    ~CBlock();
 };
 
-#endif // CBLOCKS_H
+#endif // CBLOCK_H

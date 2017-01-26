@@ -2,7 +2,7 @@
 #include "ui_ExportDialog.h"
 
 
-void ExportDialog::SetBlocks(std::vector<CBlocks> blocks){
+void ExportDialog::SetBlocks(std::vector<CBlock> blocks){
     this->blocks = blocks;
 }
 
@@ -41,7 +41,7 @@ void ExportDialog::Export(QString filename)const{
 
     //頂点登録
     QVector<VPos> vertices;
-    for(CBlocks block:this->blocks){
+    for(CBlock block:this->blocks){
         QVector<Pos> pp = block.GetVerticesPos();
         for(Pos p:pp){
             vertices.push_back(VPos{p.x,p.y,0});
@@ -63,7 +63,7 @@ void ExportDialog::Export(QString filename)const{
     //ブロック出力
     out << "blocks"                       << "\n";
     out << "("                            << "\n";
-    for(CBlocks block:this->blocks){
+    for(CBlock block:this->blocks){
         /*
         out << "\thex(";
         //indexリストを作成

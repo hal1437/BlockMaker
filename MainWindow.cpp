@@ -124,7 +124,7 @@ void MainWindow::MovedMouse(QMouseEvent *event, CObject *under_object){
     //拘束更新
     ui->CadEdit->RefreshRestraints();
     //ブロック生成可否判定
-    ui->ToolBlocks->setEnabled(CBlocks::Creatable(CObject::selected));
+    ui->ToolBlocks->setEnabled(CBlock::Creatable(CObject::selected));
 
     past = CObject::mouse_over;
     release_flag=true;

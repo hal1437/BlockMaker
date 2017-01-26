@@ -14,7 +14,7 @@
 #include "CObject/CPoint.h"
 #include "CObject/CLine.h"
 #include "CObject/CRect.h"
-#include "CObject/CBlocks.h"
+#include "CObject/CBlock.h"
 #include "CBoxDefineDialog.h"
 #include "SmartDimension.h"
 #include "SmartDimensionDialog.h"
@@ -31,8 +31,8 @@ private:
     QVector<CObject*>         objects;    //物体
     QVector<SmartDimension*>  dimensions; //寸法
     QVector<Restraint*>       restraints; //拘束
-    QVector<CBlocks>          blocks;     //物体
-    QVector<CBlocks*>         selecting_block; //選択物体
+    QVector<CBlock>          blocks;     //物体
+    QVector<CBlock*>         selecting_block; //選択物体
 
     double scale = 1.0f;
     Pos translate = Pos(0,0);

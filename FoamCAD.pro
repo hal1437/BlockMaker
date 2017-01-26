@@ -21,12 +21,12 @@ SOURCES += main.cpp\
     ExportDialog.cpp \
     CBoxDefineDialog.cpp \
     CObject/CArc.cpp \
-    CObject/CBlocks.cpp \
     CObject/CLine.cpp \
     CObject/CObject.cpp \
     CObject/CPoint.cpp \
     CObject/CRect.cpp \
-    CObject/CSpline.cpp
+    CObject/CSpline.cpp \
+    CObject/CBlock.cpp
 
 HEADERS  += MainWindow.h \
     Point.h \
@@ -38,13 +38,13 @@ HEADERS  += MainWindow.h \
     ExportDialog.h \
     CBoxDefineDialog.h \
     CObject/CArc.h \
-    CObject/CBlocks.h \
     CObject/CBoxDefineDialog.h \
     CObject/CLine.h \
     CObject/CObject.h \
     CObject/CPoint.h \
     CObject/CRect.h \
-    CObject/CSpline.h
+    CObject/CSpline.h \
+    CObject/CBlock.h
 
 FORMS    += MainWindow.ui \
     CadEditForm.ui \

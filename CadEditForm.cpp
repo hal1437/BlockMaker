@@ -105,7 +105,7 @@ void CadEditForm::paintEvent(QPaintEvent*){
     for(int i=0;i<this->blocks.size();i++){
         //this->ui->CBoxList->addItem(new QListWidgetItem("CBox"));
         //this->ui->CBoxList->item(i)->setIcon(QIcon(":/ToolImages/Blocks.png"));
-        this->blocks[i].Draw(paint);
+        this->blocks[i].Draw(paint,trans);
     }
 
     paint.setBrush(QBrush(Qt::white));
@@ -268,7 +268,7 @@ void CadEditForm::MakeRestraint(RestraintType type){
 bool CadEditForm::MakeBlock(){
     CBoxDefineDialog* diag = new CBoxDefineDialog();
     if(diag->exec()){
-        CBlocks block = diag->ExportCBlocks();
+        CBlock block = diag->ExportCBlock();
         block.SetNodeAll(CObject::selected);
         this->blocks.push_back(block);
         CObject::selected.clear();
@@ -443,11 +443,11 @@ void CadEditForm::DrawCBoxList   (QListWidget *list){
 }
 void CadEditForm::ConfigureBlock(QListWidgetItem*){
     CBoxDefineDialog* diag = new CBoxDefineDialog(this);
-    diag->ImportCBlocks(*this->selecting_block[0]);
+    diag->ImportCBlock(*this->selecting_block[0]);
     if(diag->exec()){
         QVector<CObject*> ll;
         for(int i =0;i<4;i++)ll.push_back(this->selecting_block[0]->GetNode(i));
-        *this->selecting_block[0] = diag->ExportCBlocks();
+        *this->selecting_block[0] = diag->ExportCBlock();
         this->selecting_block[0]->SetNodeAll(ll);
     }
 }

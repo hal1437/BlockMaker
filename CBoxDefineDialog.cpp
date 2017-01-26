@@ -93,8 +93,8 @@ bool CBoxDefineDialog::isFormatError()const{
 }
 
 //出力
-CBlocks CBoxDefineDialog::ExportCBlocks()const{
-    CBlocks blocks;
+CBlock CBoxDefineDialog::ExportCBlock()const{
+    CBlock blocks;
     for(int i=0;i<6;i++){
         BoundaryDir dir = static_cast<BoundaryDir>(i);
         blocks.boundery[i] = this->GetBoundaryType(dir);
@@ -107,7 +107,7 @@ CBlocks CBoxDefineDialog::ExportCBlocks()const{
     }
     return blocks;
 }
-void CBoxDefineDialog::ImportCBlocks(const CBlocks &block){
+void CBoxDefineDialog::ImportCBlock(const CBlock &block){
     //麺の設定
     for(int i = 0;i<6;i++){
         this->ConvertDirToNameEdit(static_cast<BoundaryDir>(i))->setText(block.name[i]);

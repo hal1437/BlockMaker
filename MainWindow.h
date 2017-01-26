@@ -9,7 +9,7 @@
 #include "CObject/CLine.h"
 #include "CObject/CRect.h"
 #include "CObject/CSpline.h"
-#include "CObject/CBlocks.h"
+#include "CObject/CBlock.h"
 #include "CBoxDefineDialog.h"
 #include "ExportDialog.h"
 

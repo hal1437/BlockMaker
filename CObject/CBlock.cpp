@@ -1,6 +1,6 @@
-#include "CBlocks.h"
+#include "CBlock.h"
 
-bool CBlocks::Creatable(QVector<CObject*> values){
+bool CBlock::Creatable(QVector<CObject*> values){
     //まず点以外が4つ
     if(std::count_if(values.begin(),values.end(),[](CObject* p){return !p->is<CPoint>();}) == 4){
         //構成点カウント
@@ -17,20 +17,26 @@ bool CBlocks::Creatable(QVector<CObject*> values){
     return false;
 }
 
-void CBlocks::SetNodeAll(QVector<CObject*> lines){
+void CBlock::SetNodeAll(QVector<CObject*> lines){
     this->lines = lines;
 }
-void CBlocks::SetNode(int index,CObject* line){
+void CBlock::SetNode(int index,CObject* line){
     this->lines[index] = line;
 }
 
-CObject* CBlocks::GetNode(int index)const{
+CObject* CBlock::GetNode(int index)const{
     return this->lines[index];
 }
 
-void CBlocks::Draw(QPainter& painter)const{
+void CBlock::Draw(QPainter& painter, QTransform trans)const{
     //描画範囲算出
     QVector<Pos> pp = this->GetVerticesPos();
+
+    //全て変換
+    for(Pos& p:pp){
+        p.Transform(trans);
+    }
+
     float top,bottom,left,right;
     top    = std::min_element(pp.begin(),pp.end(),[](const Pos& lhs,const Pos& rhs){return lhs.y < rhs.y;})->y;
     bottom = std::max_element(pp.begin(),pp.end(),[](const Pos& lhs,const Pos& rhs){return lhs.y < rhs.y;})->y;
@@ -48,7 +54,6 @@ void CBlocks::Draw(QPainter& painter)const{
     myPath.closeSubpath();
 
     //マスクを作成
-
     QImage mask(QSize(right+20,bottom+20), QImage::Format_ARGB32);
     QPainter paint;// = new QPainter(mask);
     mask.fill(0);
@@ -90,7 +95,7 @@ void CBlocks::Draw(QPainter& painter)const{
 }
 
 
-QVector<Pos> CBlocks::GetVerticesPos()const{
+QVector<Pos> CBlock::GetVerticesPos()const{
     QVector<Pos> pp;
     CObject* old = lines[0];
     pp.push_back(lines[0]->GetJointPos(0));
@@ -111,15 +116,15 @@ QVector<Pos> CBlocks::GetVerticesPos()const{
     return pp;
 }
 
-CBlocks::CBlocks()
+CBlock::CBlock()
 {
 }
-CBlocks::CBlocks(QVector<CObject*> lines):
+CBlock::CBlock(QVector<CObject*> lines):
     lines(lines)
 {
 }
 
-CBlocks::~CBlocks()
+CBlock::~CBlock()
 {
 
 }

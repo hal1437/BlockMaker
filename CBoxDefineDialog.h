@@ -4,7 +4,7 @@
 #include <QDialog>
 #include <QComboBox>
 #include <QLineEdit>
-#include "CObject/CBlocks.h"
+#include "CObject/CBlock.h"
 
 namespace Ui {
 class CBoxDefineDialog;
@@ -40,8 +40,8 @@ public:
     bool isFormatError()const;
 
     //入出力
-    CBlocks ExportCBlocks()const;
-    void    ImportCBlocks(const CBlocks& block);
+    CBlock ExportCBlock()const;
+    void    ImportCBlock(const CBlock& block);
 
     explicit CBoxDefineDialog(QWidget *parent = 0);
     ~CBoxDefineDialog();

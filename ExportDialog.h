@@ -7,7 +7,7 @@
 #include <CObject/CLine.h>
 #include <CObject/CArc.h>
 #include <CObject/CSpline.h>
-#include <CObject/CBlocks.h>
+#include <CObject/CBlock.h>
 #include <QFileDialog>
 #include <QFile>
 #include <QMessageBox>
@@ -26,10 +26,10 @@ class ExportDialog : public QDialog
     Q_OBJECT
 private:
     std::vector<CObject*> objects;
-    std::vector<CBlocks> blocks;
+    std::vector<CBlock> blocks;
 
 public:
-    void SetBlocks(std::vector<CBlocks> blocks);
+    void SetBlocks(std::vector<CBlock> blocks);
 
     explicit ExportDialog(QWidget *parent = 0);
     ExportDialog(std::vector<CObject*> objects,QWidget *parent = 0);
