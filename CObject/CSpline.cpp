@@ -99,14 +99,19 @@ bool CSpline::Draw(QPainter& painter,QTransform trans)const{
         double t, m;
         m = (double)(pos.size()-1);
 
-        path.moveTo(GetJointPos(0).x,GetJointPos(0).y);
+        path.moveTo(GetJointPos(0).Transform(trans).x,GetJointPos(0).Transform(trans).y);
         const double dt = 1.0/DIVISION;
         for(t=0; t<=m; t += dt){
             if(t + dt > m)t=m;
             QPointF pos(xs.culc(t), ys.culc(t));
             path.lineTo(pos*trans);
         }
+        painter.setBrush(QColor(0,0,0,0));
         painter.drawPath(path);
+
+    }
+    for(int i=0;i<this->GetJointNum();i++){
+        this->pos[i]->Draw(painter,trans);
     }
     return true;
 }
@@ -114,10 +119,10 @@ bool CSpline::isSelectable()const{
     double t, m;
     m = (double)(pos.size()-1);
 
-    const double dt = 1.0/DIVISION;
+    const double dt = 1.0/(DIVISION*CObject::Drawing_scale);
     for(t=0; t<=m; t += dt){
         if(t + dt > m)t=m;
-        if((Pos(xs.culc(t),ys.culc(t)) - CObject::mouse_over).Length() < COLLISION_SIZE){
+        if((Pos(xs.culc(t),ys.culc(t)) - CObject::mouse_over).Length() < COLLISION_SIZE/CObject::Drawing_scale){
             return true;
         }
     }
