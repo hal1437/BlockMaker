@@ -324,28 +324,33 @@ void CadEditForm::RefreshRestraints(){
             if(max_rank > 0){
                 //拘束を捜査
                 for(Restraint* rest:restraints){
-                    std::vector<std::pair<int,CObject*>>::iterator it1,it2;
-                    int score1,score2,current;
+                    if(rest->nodes.size()==2){
+                        std::vector<std::pair<int,CObject*>>::iterator it1,it2;
+                        int score1,score2,current;
 
-                    //拘束ランクごとに拘束の親関係を修正
-                    score1 = score2 = -1;
-                    it1 = std::find_if(rank.begin(),rank.end(),[&](std::pair<int,CObject*>obj){
-                        return (obj.second == rest->nodes[0]);
-                    });
-                    it2 = std::find_if(rank.begin(),rank.end(),[&](std::pair<int,CObject*>obj){
-                        return (obj.second == rest->nodes[1]);
-                    });
-                    if(it1 != rank.end())score1 = it1->first;
-                    if(it2 != rank.end())score2 = it2->first;
-                    if(score1 > score2){
-                        std::swap(rest->nodes[0],rest->nodes[1]);
+                        //拘束ランクごとに拘束の親関係を修正
+                        score1 = score2 = -1;
+                        it1 = std::find_if(rank.begin(),rank.end(),[&](std::pair<int,CObject*>obj){
+                            return (obj.second == rest->nodes[0]);
+                        });
+                        it2 = std::find_if(rank.begin(),rank.end(),[&](std::pair<int,CObject*>obj){
+                            return (obj.second == rest->nodes[1]);
+                        });
+                        if(it1 != rank.end())score1 = it1->first;
+                        if(it2 != rank.end())score2 = it2->first;
+                        if(score1 > score2){
+                            std::swap(rest->nodes[0],rest->nodes[1]);
+                        }
+
+                        //解決順序を決定
+                        current = std::min(score1,score2);
+
+                        //解決順と拘束を組み合わせて保存
+                        solver.push_back(std::make_pair(current,rest));
+                    }else{
+                        //解決順と拘束を組み合わせて保存
+                        solver.push_back(std::make_pair(0,rest));
                     }
-
-                    //解決順序を決定
-                    current = std::min(score1,score2);
-
-                    //解決順と拘束を組み合わせて保存
-                    solver.push_back(std::make_pair(current,rest));
                 }
             }
             //解決順が小さい順にソート

@@ -183,8 +183,8 @@
       </property>
       <property name="minimumSize">
        <size>
-        <width>0</width>
-        <height>0</height>
+        <width>100</width>
+        <height>100</height>
        </size>
       </property>
      </widget>
@@ -234,8 +234,16 @@
     <property name="title">
      <string>ファイル</string>
     </property>
+    <addaction name="actionNanika"/>
+    <addaction name="separator"/>
+   </widget>
+   <widget class="QMenu" name="menu_2">
+    <property name="title">
+     <string>編集</string>
+    </property>
    </widget>
    <addaction name="menu"/>
+   <addaction name="menu_2"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <property name="enabled">
@@ -386,6 +394,11 @@
    </property>
    <property name="text">
     <string>Blocks</string>
+   </property>
+  </action>
+  <action name="actionNanika">
+   <property name="text">
+    <string>Nanika</string>
    </property>
   </action>
  </widget>
