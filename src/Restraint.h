@@ -35,6 +35,8 @@ struct Restraint{
 
     //最寄りの点に補完
     virtual bool Complete() = 0;
+    //解決しているか
+    virtual bool isComplete() = 0;
 
     //いつもの
     template<class T>
@@ -54,8 +56,10 @@ struct Restraint{
 
 #define RESTRAINT_MAKE_DEF(CLASS_NAME ,TYPE_VAL)            \
 struct CLASS_NAME : public Restraint{                       \
-                                                            \
+    /* 最寄りの点に補完 */                                     \
     bool Complete();                                        \
+    /* 解決しているか */                                      \
+    bool isComplete();                                      \
                                                             \
     CLASS_NAME(){type = VERTICAL;};                         \
     CLASS_NAME(QVector<CObject*> Nodes,                     \

@@ -25,7 +25,6 @@ QVector<RestraintType> Restraint::Restraintable(const QVector<CObject *> &values
 
 
 bool EqualRestraint::Complete(){
-
     std::sort(nodes.begin(),nodes.end(),[](CObject* lhs,CObject* rhs){
         return lhs->GetJointNum() > rhs->GetJointNum();
     });
@@ -46,6 +45,9 @@ bool EqualRestraint::Complete(){
         }
     }
 
+    return true;
+}
+bool EqualRestraint::isComplete(){
     return true;
 }
 bool VerticalRestraint::Complete(){
@@ -93,6 +95,10 @@ bool VerticalRestraint::Complete(){
     }
     return true;
 }
+bool VerticalRestraint::isComplete(){
+    return true;
+}
+
 bool HorizontalRestraint::Complete(){
 
     //矛盾な点が存在
@@ -137,6 +143,11 @@ bool HorizontalRestraint::Complete(){
     }
     return true;
 }
+bool HorizontalRestraint::isComplete(){
+    return true;
+}
+
+
 bool MatchRestraint::Complete(){
     if(nodes[0]->isLock() && nodes[1]->isLock())return false;
     QVector<CObject*> cc = CObject::selected;
@@ -147,7 +158,6 @@ bool MatchRestraint::Complete(){
     }
 
     //0へ1を近づける
-
     for(int i=1;i<nodes.size();i++){
         Pos pp,near;
         CObject *pos,*line;
@@ -171,6 +181,18 @@ bool MatchRestraint::Complete(){
     }
     return true;
 }
+bool MatchRestraint::isComplete(){
+
+    const float EPS = 0.0001;
+    //点と線の距離
+    float length = std::abs((this->nodes[0]->GetJointPos(0) - this->nodes[1]->GetJointPos(0)).Length() - this->value);
+    if(length < EPS){
+        return true;
+    }else{
+        return false;
+    }
+}
+
 bool MatchHRestraint::Complete(){
     if(nodes[0]->isLock() && nodes[1]->isLock())return false;
     if(nodes[1]->isLock() || exist(CObject::selected,nodes[1]))std::swap(nodes[0],nodes[1]);
@@ -188,6 +210,11 @@ bool MatchHRestraint::Complete(){
     }
     return true;
 }
+bool MatchHRestraint::isComplete(){
+    return true;
+}
+
+
 bool MatchVRestraint::Complete(){
     if(nodes[0]->isLock() && nodes[1]->isLock())return false;
     if(nodes[1]->isLock() || exist(CObject::selected,nodes[1]))std::swap(nodes[0],nodes[1]);
@@ -206,7 +233,9 @@ bool MatchVRestraint::Complete(){
     }
     return true;
 }
-
+bool MatchVRestraint::isComplete(){
+    return true;
+}
 
 bool FixRestraint::Complete(){
     for(int i=0;i<nodes.size();i++){
@@ -216,6 +245,11 @@ bool FixRestraint::Complete(){
     }
     return true;
 }
+bool FixRestraint::isComplete(){
+    return true;
+}
+
+
 bool ConcurrentRestraint::Complete(){
     Pos base_line[2] = {nodes[0]->GetJointPos(0),nodes[0]->GetJointPos(1)};
     //矛盾な点が存在
@@ -245,6 +279,9 @@ bool ConcurrentRestraint::Complete(){
             }
         }
     }
+    return true;
+}
+bool ConcurrentRestraint::isComplete(){
     return true;
 }
 bool CrossRestraint::Complete(){
@@ -278,4 +315,8 @@ bool CrossRestraint::Complete(){
     }
     return true;
 }
+bool CrossRestraint::isComplete(){
+    return true;
+}
+
 

@@ -16,6 +16,10 @@
         <file>MatchRestraint.png</file>
         <file>TangentRestraint.png</file>
         <file>VerticalRestraint.png</file>
+        <file>FixRestraint.png</file>
     </qresource>
-    <qresource prefix="/Others"/>
+    <qresource prefix="/Others">
+        <file>Conflict.png</file>
+        <file>NotConflict.png</file>
+    </qresource>
 </RCC>

@@ -124,8 +124,16 @@ void CadEditForm::paintEvent(QPaintEvent*){
     if(CObject::selecting!=nullptr){
         if(CObject::selecting->Refresh())CObject::selecting->Draw(paint,trans);
     }
-
     paint.restore();
+
+    //競合確認
+    bool is_conflict = false;
+    for(Restraint* rest:this->restraints){
+        if(rest->isComplete()==false){
+            is_conflict = true;
+        }
+    }
+    emit ToggleConflict(is_conflict);
 }
 
 

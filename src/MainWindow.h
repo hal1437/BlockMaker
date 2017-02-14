@@ -49,7 +49,6 @@ private:
     bool move_flag    = false;
     QVector<CObject*> log;
 
-
     bool shift_pressed = false;
     bool ctrl_pressed  = false;
 
@@ -62,11 +61,12 @@ public slots:
     void DisconnectSignals();
     void ClearButton();
     void RefreshUI();
-    void ToggledDot   (bool checked);
-    void ToggledLine  (bool checked);
-    void ToggledArc   (bool checked);
-    void ToggledRect  (bool checked);
-    void ToggledSpline(bool checked);
+    void ToggledDot    (bool checked);
+    void ToggledLine   (bool checked);
+    void ToggledArc    (bool checked);
+    void ToggledRect   (bool checked);
+    void ToggledSpline (bool checked);
+    void ToggleConflict(bool conflict);
     void Export();                          //出力
 
     void MakeObject();                      //オブジェクト作成

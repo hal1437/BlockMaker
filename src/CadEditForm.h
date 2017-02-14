@@ -56,6 +56,7 @@ private:
 
 signals:
     void MovedMouse(QMouseEvent *event, CObject *under_object);
+    void ToggleConflict(bool conflict);
 
 public slots:
     CObject* getSelecting();      //選択中オブジェクト取得
