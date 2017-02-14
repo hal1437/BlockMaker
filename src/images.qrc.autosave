@@ -1,13 +1,5 @@
 <RCC>
-    <qresource prefix="/ToolImages">
-        <file>Resource/Arc.png</file>
-        <file>Resource/Blocks.png</file>
-        <file>Resource/Dimension.png</file>
-        <file>Resource/Dot.png</file>
-        <file>Resource/Rect.png</file>
-        <file>Resource/Spline.png</file>
-        <file>Resource/Line.png</file>
-    </qresource>
+    <qresource prefix="/ToolImages"/>
     <qresource prefix="/Restraint">
         <file>Resource/ConcurrentRestraint.png</file>
         <file>Resource/EqualRestraint.png</file>
