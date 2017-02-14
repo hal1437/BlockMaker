@@ -296,7 +296,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="images.qrc">
+    <iconset resource="../Resource/images.qrc">
      <normaloff>:/ToolImages/Line.png</normaloff>:/ToolImages/Line.png</iconset>
    </property>
    <property name="text">
@@ -311,7 +311,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="images.qrc">
+    <iconset resource="../Resource/images.qrc">
      <normaloff>:/ToolImages/Arc.png</normaloff>:/ToolImages/Arc.png</iconset>
    </property>
    <property name="text">
@@ -334,7 +334,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="images.qrc">
+    <iconset resource="../Resource/images.qrc">
      <normaloff>:/ToolImages/Dimension.png</normaloff>:/ToolImages/Dimension.png</iconset>
    </property>
    <property name="text">
@@ -365,7 +365,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="images.qrc">
+    <iconset resource="../Resource/images.qrc">
      <normaloff>:/ToolImages/Spline.png</normaloff>:/ToolImages/Spline.png</iconset>
    </property>
    <property name="text">
@@ -380,7 +380,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="images.qrc">
+    <iconset resource="../Resource/images.qrc">
      <normaloff>:/ToolImages/Rect.png</normaloff>:/ToolImages/Rect.png</iconset>
    </property>
    <property name="text">
@@ -389,7 +389,7 @@
   </action>
   <action name="ToolBlocks">
    <property name="icon">
-    <iconset resource="images.qrc">
+    <iconset resource="../Resource/images.qrc">
      <normaloff>:/ToolImages/Blocks.png</normaloff>:/ToolImages/Blocks.png</iconset>
    </property>
    <property name="text">
@@ -412,7 +412,7 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="images.qrc"/>
+  <include location="../Resource/images.qrc"/>
  </resources>
  <connections>
   <connection>

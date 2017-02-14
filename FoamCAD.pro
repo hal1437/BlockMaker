@@ -12,45 +12,47 @@ TARGET = FoamCAD
 TEMPLATE = app
 CONFIG += c++11
 
-SOURCES += main.cpp\
-        MainWindow.cpp \
-    CadEditForm.cpp \
-    SmartDimension.cpp \
-    SmartDimensionDialog.cpp \
-    Restraint.cpp \
-    ExportDialog.cpp \
-    CBoxDefineDialog.cpp \
-    CObject/CArc.cpp \
-    CObject/CLine.cpp \
-    CObject/CObject.cpp \
-    CObject/CPoint.cpp \
-    CObject/CRect.cpp \
-    CObject/CSpline.cpp \
-    CObject/CBlock.cpp
+INCLUDEPATH += ./src/
 
-HEADERS  += MainWindow.h \
-    Point.h \
-    CadEditForm.h \
-    Utils.h \
-    SmartDimension.h \
-    SmartDimensionDialog.h \
-    Restraint.h \
-    ExportDialog.h \
-    CBoxDefineDialog.h \
-    CObject/CArc.h \
-    CObject/CBoxDefineDialog.h \
-    CObject/CLine.h \
-    CObject/CObject.h \
-    CObject/CPoint.h \
-    CObject/CRect.h \
-    CObject/CSpline.h \
-    CObject/CBlock.h
+SOURCES += src/main.cpp\
+        src/MainWindow.cpp \
+    src/CadEditForm.cpp \
+    src/SmartDimension.cpp \
+    src/SmartDimensionDialog.cpp \
+    src/Restraint.cpp \
+    src/ExportDialog.cpp \
+    src/CBoxDefineDialog.cpp \
+    src/CObject/CArc.cpp \
+    src/CObject/CLine.cpp \
+    src/CObject/CObject.cpp \
+    src/CObject/CPoint.cpp \
+    src/CObject/CRect.cpp \
+    src/CObject/CSpline.cpp \
+    src/CObject/CBlock.cpp
 
-FORMS    += MainWindow.ui \
-    CadEditForm.ui \
-    SmartDimensionDialog.ui \
-    ExportDialog.ui \
-    CBoxDefineDialog.ui
+HEADERS  += src/MainWindow.h \
+    src/Point.h \
+    src/CadEditForm.h \
+    src/Utils.h \
+    src/SmartDimension.h \
+    src/SmartDimensionDialog.h \
+    src/Restraint.h \
+    src/ExportDialog.h \
+    src/CBoxDefineDialog.h \
+    src/CObject/CArc.h \
+    src/CObject/CBoxDefineDialog.h \
+    src/CObject/CLine.h \
+    src/CObject/CObject.h \
+    src/CObject/CPoint.h \
+    src/CObject/CRect.h \
+    src/CObject/CSpline.h \
+    src/CObject/CBlock.h
+
+FORMS    += src/MainWindow.ui \
+    src/CadEditForm.ui \
+    src/SmartDimensionDialog.ui \
+    src/ExportDialog.ui \
+    src/CBoxDefineDialog.ui
 
 RESOURCES += \
-    images.qrc
+    Resource/images.qrc

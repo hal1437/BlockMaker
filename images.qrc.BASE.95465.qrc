@@ -1,0 +1,21 @@
+<RCC>
+    <qresource prefix="/ToolImages">
+        <file>Resource/Arc.png</file>
+        <file>Resource/Blocks.png</file>
+        <file>Resource/Dimension.png</file>
+        <file>Resource/Dot.png</file>
+        <file>Resource/Rect.png</file>
+        <file>Resource/Spline.png</file>
+        <file>Resource/Line.png</file>
+    </qresource>
+    <qresource prefix="/Restraint">
+        <file>Resource/ConcurrentRestraint.png</file>
+        <file>Resource/EqualRestraint.png</file>
+        <file>Resource/FixRestraint.png</file>
+        <file>Resource/HorizontalRestraint.png</file>
+        <file>Resource/MatchRestraint.png</file>
+        <file>Resource/TangentRestraint.png</file>
+        <file>Resource/VerticalRestraint.png</file>
+    </qresource>
+    <qresource prefix="/Others"/>
+</RCC>
