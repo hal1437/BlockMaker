@@ -1,6 +1,39 @@
 #include "SmartDimension.h"
 
 
+double SmartDimension::currentValue()const{
+    double answer;
+
+    //線の長さ
+    if(type == SmartDimension::length){
+        answer = (this->target[0]->GetJointPos(1) - this->target[0]->GetJointPos(0)).Length();
+    }
+    //点と直線
+    if(type == SmartDimension::distanceLine){
+        answer = dynamic_cast<CLine*>(this->target[0])->DistanceToPoint(this->target[1]->GetJointPos(0));
+    }
+    //点と点
+    if(type == SmartDimension::distance){
+        if(this->X_type){
+            answer = std::abs(this->target[0]->GetJointPos(0).x - this->target[1]->GetJointPos(0).x);
+        }else if(this->Y_type){
+            answer = std::abs(this->target[0]->GetJointPos(0).y - this->target[1]->GetJointPos(0).y);
+        }else{
+            answer = (this->target[0]->GetJointPos(0) - this->target[1]->GetJointPos(0)).Length();
+        }
+    }
+    //円弧
+    if(type == SmartDimension::radius){
+        CArc* arc = dynamic_cast<CArc*>(target[0]);
+        answer = (arc->GetJointPos(0) - arc->GetCenter()).Length();
+    }
+    //並行
+    if(type == SmartDimension::concurrent){
+        answer = 0;
+    }
+    return answer;
+
+}
 
 void SmartDimension::DrawString(QPainter& painter,const Pos& pos,const QString& str,double angle)const{
     QTransform trans;
@@ -37,12 +70,12 @@ void SmartDimension::DrawArrow(QPainter& painter,const Pos& pos,const Pos& rote,
 
 
 SmartDimension::DimensionType SmartDimension::GetDimensionType(CObject* obj1, CObject* obj2){
-    if     (obj1->is<CLine >() && obj2 == nullptr   )return SmartDimension::length;
-    else if(obj1->is<CArc  >() && obj2 == nullptr   )return SmartDimension::radius;
-    else if(obj1->is<CPoint>() && obj2->is<CPoint>())return SmartDimension::distance;
-    else if(obj1->is<CLine >() && obj2->is<CPoint>())return SmartDimension::distanceLine;
-    else if(obj1->is<CPoint>() && obj2->is<CLine >())return SmartDimension::distanceLine;
-    else if(obj1->is<CLine >() && obj2->is<CLine >())return SmartDimension::concurrent;
+    if     (obj1->is<CLine >() && obj2 == nullptr   )return SmartDimension::length;       //線のみ
+    else if(obj1->is<CArc  >() && obj2 == nullptr   )return SmartDimension::radius;       //円弧のみ
+    else if(obj1->is<CPoint>() && obj2->is<CPoint>())return SmartDimension::distance;     //点同士
+    else if(obj1->is<CLine >() && obj2->is<CPoint>())return SmartDimension::distanceLine; //線と点
+    else if(obj1->is<CPoint>() && obj2->is<CLine >())return SmartDimension::distanceLine; //線と点
+    else if(obj1->is<CLine >() && obj2->is<CLine >())return SmartDimension::concurrent;   //線と線
     else return SmartDimension::none;
 }
 
@@ -77,9 +110,12 @@ CObject* SmartDimension::GetTarget(int index)const{
 }
 
 
+//描画
 bool SmartDimension::Draw(QPainter& painter, QTransform trans)const{
-    //描画
+    //無効
     if (this->type == none)return true;
+
+    //線の長さ
     if (this->type == length){
         //矢印
         Pos p0 = target[0]->GetJointPos(0).Transform(trans);
@@ -99,6 +135,7 @@ bool SmartDimension::Draw(QPainter& painter, QTransform trans)const{
         this->DrawString(painter,(t1+t0)/2.0,QString::number(value),Pos::Angle(p1-p0,Pos(1,0)));
         return true;
     }
+    //二点間距離
     if (this->type == distance){
         //矢印
         Pos t0 = target[0]->GetJointPos(0).Transform(trans);
@@ -136,6 +173,7 @@ bool SmartDimension::Draw(QPainter& painter, QTransform trans)const{
         //寸法の文字
         return true;
     }
+    //点と線の距離
     if (this->type == distanceLine){
         //矢印
         Pos lines0[2] = {target[0]->GetJointPos(0).Transform(trans),
@@ -162,6 +200,7 @@ bool SmartDimension::Draw(QPainter& painter, QTransform trans)const{
         }
         return true;
     }
+    //半径
     if (this->type == radius){
         //矢印
         CArc* arc = dynamic_cast<CArc*>(target[0]);
@@ -182,6 +221,7 @@ bool SmartDimension::Draw(QPainter& painter, QTransform trans)const{
         return true;
     }
 
+    //平行
     if (this->type == concurrent){
         //矢印
         CLine* line1 = dynamic_cast<CLine*>(target[0]);

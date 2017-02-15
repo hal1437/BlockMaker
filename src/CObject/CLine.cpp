@@ -99,6 +99,15 @@ std::vector<CObject*> CLine::GetChild(){
     return ans;
 }
 
+double CLine::DistanceToPoint(const Pos& pos)const{
+    Pos AP = pos - this ->GetJointPos(0);
+    Pos AB = pos - this ->GetJointPos(1);
+    double AB_l = AB.Length() * AB.Length();
+    Pos I = this->GetJointPos(0) + AB * (AP.Dot(AB) / AB_l);
+    return (I - pos).Length();
+}
+
+
 CLine::CLine()
 {
     pos[0] = pos[1] = nullptr;

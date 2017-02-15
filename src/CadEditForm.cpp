@@ -187,10 +187,33 @@ void CadEditForm::SetTranslate(Pos trans){
 }
 
 void CadEditForm::MakeSmartDimension(){
-    if(CObject::selected.size()!=0){
-        //スマート寸法生成
+    if(CObject::selected.size() > 0){
+        //スマート寸法ダイアログ生成
         SmartDimensionDialog* diag = new SmartDimensionDialog(this);
+        SmartDimension* dim = new SmartDimension();
 
+        //ターゲット設定
+        CObject* target[2];
+        target[0] = CObject::selected[0];
+        if(CObject::selected.size() == 1)target[1] = nullptr;
+        else                             target[1] = CObject::selected[1];
+
+        if(dim->SetTarget(target[0],target[1])){//寸法定義可能ならば
+
+            //ダイアログ起動
+            diag->SetValue(dim->currentValue());//ダイアログ初期値設定
+            if(diag->exec()){
+                //登録
+                dim->SetValue(diag->GetValue());
+                this->dimensions.push_back(dim);
+            }
+            //スマート寸法の拘束も追加
+            std::vector<Restraint*> rs = dim->MakeRestraint();
+            for(Restraint* r : rs){
+                restraints.push_back(r);
+            }
+        }
+/*
         //XY軸成分指定
         if(CObject::selected.size()==2 && CObject::selected[0]->is<CPoint>() && CObject::selected[1]->is<CPoint>()){
             diag->UseRadioLayout(true);
@@ -205,7 +228,7 @@ void CadEditForm::MakeSmartDimension(){
                     delete dim;
                 }
                 for(SmartDimension* dim:dimensions){
-                    Restraint* rs ;
+                    Restraint* rs;
                     if(diag->GetCurrentRadio()==0)rs = new MatchRestraint();
                     if(diag->GetCurrentRadio()==1)rs = new MatchHRestraint();
                     if(diag->GetCurrentRadio()==2)rs = new MatchVRestraint();
@@ -217,22 +240,24 @@ void CadEditForm::MakeSmartDimension(){
 
             }
         }else{
+            //直線距離指定
             diag->UseRadioLayout(false);
             if(diag->exec()){
                 double value = diag->GetValue();
                 SmartDimension* dim = new SmartDimension();
 
-
                 //有効寸法であれば
                 CObject* sel[2];
                 sel[0] = CObject::selected[0];
                 if(CObject::selected.size()==1)sel[1] = nullptr;
-                else sel[1] = CObject::selected[1];
+                else                           sel[1] = CObject::selected[1];
 
+                //ターゲット設定
                 if(dim->SetTarget(sel[0],sel[1])){
                     dim->SetValue(value);
                     this->dimensions.push_back(dim);
                 }else{
+                    //ターゲット生成不可
                     delete dim;
                 }
                 //restraints.clear();
@@ -242,6 +267,7 @@ void CadEditForm::MakeSmartDimension(){
                 }
             }
         }
+        */
     }
     RefreshRestraints();
 }

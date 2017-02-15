@@ -25,6 +25,8 @@ public:
     virtual CPoint* GetJoint(int index);
     virtual std::vector<CObject*> GetChild();
 
+    double DistanceToPoint(const Pos& pos)const;
+
 
     CLine();
     ~CLine();

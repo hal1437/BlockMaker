@@ -7,6 +7,8 @@ double SmartDimensionDialog::GetValue()const{
 }
 void   SmartDimensionDialog::SetValue(double value){
     ui->lineEdit->setText(QString::number(value));
+    //全て選択
+    ui->lineEdit->selectAll();
 }
 void SmartDimensionDialog::UseRadioLayout(bool enable){
     ui->LinerRadio->setEnabled(enable);
@@ -19,8 +21,6 @@ int SmartDimensionDialog::GetCurrentRadio()const{
     if(ui->YRadio    ->isChecked())return 2;
     return -1;
 }
-
-
 
 SmartDimensionDialog::SmartDimensionDialog(QWidget *parent) :
     QDialog(parent),
