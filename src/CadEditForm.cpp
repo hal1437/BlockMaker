@@ -187,7 +187,7 @@ void CadEditForm::SetTranslate(Pos trans){
 }
 
 void CadEditForm::MakeSmartDimension(){
-    if(CObject::selected.size() > 0){
+    if(CObject::selected.size() > 0 && CObject::selected.size() < 3){
         //スマート寸法ダイアログ生成
         SmartDimensionDialog* diag = new SmartDimensionDialog(this);
         SmartDimension* dim = new SmartDimension();
@@ -206,11 +206,11 @@ void CadEditForm::MakeSmartDimension(){
                 //登録
                 dim->SetValue(diag->GetValue());
                 this->dimensions.push_back(dim);
-            }
-            //スマート寸法の拘束も追加
-            std::vector<Restraint*> rs = dim->MakeRestraint();
-            for(Restraint* r : rs){
-                restraints.push_back(r);
+                //スマート寸法の拘束も追加
+                std::vector<Restraint*> rs = dim->MakeRestraint();
+                for(Restraint* r : rs){
+                    restraints.push_back(r);
+                }
             }
         }
 /*

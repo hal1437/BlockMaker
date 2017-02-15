@@ -122,12 +122,6 @@ void MainWindow::MovedMouse(QMouseEvent *event, CObject *under_object){
             CObject::selecting->Move(CObject::mouse_over - past);
         }
     }
-
-    //拘束更新
-    ui->CadEdit->RefreshRestraints();
-    //ブロック生成可否判定
-    ui->ToolBlocks->setEnabled(CBlock::Creatable(CObject::selected));
-
     past = CObject::mouse_over;
     release_flag=true;
 
@@ -178,6 +172,14 @@ void MainWindow::RefreshUI(){
     }
     this->ui->CadEdit->DrawObjectList(this->ui->ObjectList);
     this->ui->CadEdit->DrawCBoxList  (this->ui->BlockList);
+
+    //拘束更新
+    ui->CadEdit->RefreshRestraints();
+    //ブロック生成可否判定
+    ui->ToolBlocks->setEnabled(CBlock::Creatable(CObject::selected));
+    //スマート寸法は1つから
+    ui->ToolDimension->setEnabled(CObject::selected.size() >= 1);
+
     this->repaint();
 }
 
@@ -252,8 +254,6 @@ void MainWindow::MakeObject(){
         if(exist(CObject::selected,CObject::selecting))erase(CObject::selected,CObject::selecting);
         else if(CObject::selecting != nullptr)CObject::selected.push_back(CObject::selecting);
 
-        //スマート寸法は1つから
-        ui->ToolDimension->setEnabled(CObject::selected.size() >= 1);
     }else{
         //新規オブジェクト
         if(creating_count == 0){
