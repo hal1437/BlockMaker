@@ -122,6 +122,10 @@ void MainWindow::MovedMouse(QMouseEvent *event, CObject *under_object){
             CObject::selecting->Move(CObject::mouse_over - past);
         }
     }
+
+    //拘束更新
+    ui->CadEdit->RefreshRestraints();
+
     past = CObject::mouse_over;
     release_flag=true;
 
