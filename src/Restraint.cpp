@@ -13,11 +13,10 @@ QVector<RestraintType> Restraint::Restraintable(const QVector<CObject *> &values
     //並行
     if(std::count_if(values.begin(),values.end(),[](CObject* obj){return obj->is<CLine>();}) == 2)answer.push_back(CONCURRENT);
     if(values.size()>=1){
-        answer.push_back(FIX);//固定
-        //if(values[0]->is<CLine>()){
+        if(std::any_of(values.begin(),values.end(),[](CObject* obj){return !obj->isLock();}))answer.push_back(LOCK);  //固定
+        if(std::any_of(values.begin(),values.end(),[](CObject* obj){return  obj->isLock();}))answer.push_back(UNLOCK);//固定解除
         answer.push_back(VERTICAL);//垂直
         answer.push_back(HORIZONTAL);//水平
-        //}
     }
 
     return answer;

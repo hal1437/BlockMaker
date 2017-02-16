@@ -163,14 +163,15 @@ void MainWindow::RefreshUI(){
     QVector<RestraintType> able = Restraint::Restraintable(CObject::selected);
     for(RestraintType r:able){
         std::pair<std::string,std::string> p;
-        if(r == MATCH     )p = std::make_pair("一致",":/Restraint/MatchRestraint.png");
-        if(r == EQUAL     )p = std::make_pair("等値",":/Restraint/EqualRestraint.png");
-        if(r == CONCURRENT)p = std::make_pair("並行",":/Restraint/ConcurrentRestraint.png");
-        if(r == VERTICAL  )p = std::make_pair("垂直",":/Restraint/VerticalRestraint.png");
-        if(r == HORIZONTAL)p = std::make_pair("水平",":/Restraint/HorizontalRestraint.png");
-        if(r == TANGENT   )p = std::make_pair("正接",":/Restraint/TangentRestraint.png");
-        if(r == FIX       )p = std::make_pair("固定",":/Restraint/FixRestraint.png");
-        if(r == MARGE     )p = std::make_pair("マージ",":/Restraint/Marge.png");
+        if(r == MATCH     )p = std::make_pair("一致"   ,":/Restraint/MatchRestraint.png");
+        if(r == EQUAL     )p = std::make_pair("等値"   ,":/Restraint/EqualRestraint.png");
+        if(r == CONCURRENT)p = std::make_pair("並行"   ,":/Restraint/ConcurrentRestraint.png");
+        if(r == VERTICAL  )p = std::make_pair("垂直"   ,":/Restraint/VerticalRestraint.png");
+        if(r == HORIZONTAL)p = std::make_pair("水平"   ,":/Restraint/HorizontalRestraint.png");
+        if(r == TANGENT   )p = std::make_pair("正接"   ,":/Restraint/TangentRestraint.png");
+        if(r == LOCK      )p = std::make_pair("固定"   ,":/Restraint/LockRestraint.png");
+        if(r == UNLOCK    )p = std::make_pair("固定解除",":/Restraint/UnlockRestraint.png");
+        if(r == MARGE     )p = std::make_pair("マージ"  ,":/Restraint/Marge.png");
         ui->RestraintList->addItem(new QListWidgetItem(p.first.c_str()));
         ui->RestraintList->item(ui->RestraintList->count()-1)->setIcon(QIcon(p.second.c_str()));
     }
@@ -232,8 +233,11 @@ void MainWindow::MakeRestraint(QListWidgetItem *){
     if(ui->RestraintList->currentItem()->text() == "垂直")type = VERTICAL;
     if(ui->RestraintList->currentItem()->text() == "水平")type = HORIZONTAL;
     if(ui->RestraintList->currentItem()->text() == "正接")type = TANGENT;
-    if(ui->RestraintList->currentItem()->text() == "固定")type = FIX;
-    if(type != Paradox)ui->CadEdit->MakeRestraint(type);
+    if(ui->RestraintList->currentItem()->text() == "固定")type = LOCK;
+    if(ui->RestraintList->currentItem()->text() == "固定解除")type = UNLOCK;
+    if(type != Paradox){
+        ui->CadEdit->MakeRestraint(type);
+    }
 
     if(ui->RestraintList->currentItem()->text() == "マージ"){
     //    ui->CadEdit->

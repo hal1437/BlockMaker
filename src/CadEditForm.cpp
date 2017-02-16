@@ -107,7 +107,6 @@ void CadEditForm::paintEvent(QPaintEvent*){
         //this->ui->CBoxList->item(i)->setIcon(QIcon(":/ToolImages/Blocks.png"));
         this->blocks[i].Draw(paint,trans);
     }
-
     paint.setBrush(QBrush(Qt::white));
     //普通のオブジェクト
     paint.setPen(QPen(Qt::blue, CObject::DRAWING_LINE_SIZE));
@@ -274,25 +273,19 @@ void CadEditForm::MakeSmartDimension(){
 
 void CadEditForm::MakeRestraint(RestraintType type){
     Restraint* rest = nullptr;
-    /*
-    RestraintType
-            EQUAL      ,//等しい値
-            VERTICAL   ,//垂直拘束 c:[-.]
-            HORIZONTAL ,//水平拘束 c:[-.]
-            MATCH      ,//一致拘束 c:[p.-]
-            CONCURRENT ,//並行拘束 c:[l,l]
-            ANGLE      ,//角度拘束 c:[l,l]
-            TANGENT    ,//正接拘束 c:[l]
-            FIX        ,//固定拘束 c:[]
-            Paradox    ,//矛盾拘束 c:[]
-            */
     if(type == EQUAL)     rest = new EqualRestraint({CObject::selected[0],CObject::selected[1]});
-    if(type == FIX)       rest = new FixRestraint(CObject::selected);
     if(type == VERTICAL)  rest = new VerticalRestraint(CObject::selected);
     if(type == HORIZONTAL)rest = new HorizontalRestraint(CObject::selected);
     if(type == MATCH)     rest = new MatchRestraint({CObject::selected[0],CObject::selected[1]});
     if(type == CONCURRENT)rest = new ConcurrentRestraint({CObject::selected[0],CObject::selected[1]});
     //if(type == TANGENT)   rest = new TangentRestraint(CObject::selected[0],CObject::selected[1]);
+
+    //固定
+    if(type == LOCK | type == UNLOCK){
+        for(CObject* obj : CObject::selected){
+            obj->Lock(type == LOCK);
+        }
+    }
 
     if(rest != nullptr){
         restraints.push_back(rest);

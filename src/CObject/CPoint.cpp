@@ -27,7 +27,7 @@ bool CPoint::Draw(QPainter& painter, QTransform trans)const{
                         2*DRAWING_CIRCLE_SIZE,0,360*16);
     }
     if(this->isLock()){
-        painter.drawImage(center.x+10,center.y-10,QImage(":/Restraint/FixRestraint.png"));
+        painter.drawImage(center.x+10,center.y-10,QImage(":/Restraint/LockRestraint.png"));
     }
     return true;
 }

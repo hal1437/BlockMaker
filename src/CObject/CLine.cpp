@@ -32,11 +32,12 @@ bool CLine::Draw(QPainter& painter,QTransform trans)const{
     painter.drawLine(pos1.x,pos1.y,pos2.x,pos2.y);
 
     //ロックマーク
+    /*
     if(this->isLock()){
         Pos p = (GetJointPos(0) - GetJointPos(1))/2 + GetJointPos(1);
         p.Transform(trans);
-        painter.drawImage(p.x+10,p.y-10,QImage(":/Restraint/FixRestraint.png"));
-    }
+        painter.drawImage(p.x+10,p.y-10,QImage(":/Restraint/LockRestraint.png"));
+    }*/
 
     return true;
 }
@@ -66,7 +67,7 @@ void CLine::Lock(bool lock){
     //それぞれロック
     pos[0]->Lock(lock);
     pos[1]->Lock(lock);
-    CObject::Lock(lock);
+    CObject::Lock(pos[0]->isLock() & pos[1]->isLock());
 }
 
 bool CLine::Move(const Pos& diff){

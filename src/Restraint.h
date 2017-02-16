@@ -20,7 +20,8 @@ enum RestraintType{
     CROSS      ,
     ANGLE      ,//角度拘束 c:[l,l]
     TANGENT    ,//正接拘束 c:[l]
-    FIX        ,//固定拘束 c:[]
+    LOCK       ,//固定拘束 c:[]
+    UNLOCK     ,//固定解除 c:[]
     Paradox    ,//矛盾拘束 c:[]
     MARGE      ,
 };

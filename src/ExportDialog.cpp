@@ -88,7 +88,6 @@ void ExportDialog::Export(QString filename)const{
 
         }*/
     }
-
 }
 void ExportDialog::AcceptDialog(){
     if(ui->ExportPath->text() != ""){
