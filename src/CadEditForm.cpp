@@ -181,7 +181,7 @@ void CadEditForm::SetScale(double scale){
 }
 
 void CadEditForm::SetTranslate(Pos trans){
-    this->translate = trans;
+    this->translate = trans*this->scale;
     repaint();
 }
 
