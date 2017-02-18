@@ -138,9 +138,13 @@ void CadEditForm::paintEvent(QPaintEvent*){
 
 void CadEditForm::mouseMoveEvent   (QMouseEvent* event){
     //マウス移動を監視
-    CObject::mouse_over = Pos(event->pos().x(),event->pos().y())/scale;
+    CObject::mouse_over = Pos(event->pos().x(),event->pos().y());
     //平行移動量を適用
     CObject::mouse_over -= translate;
+    //拡大移動量を適用
+    CObject::mouse_over /= scale;
+
+    //選択オブジェクトの選定
     CObject* answer = getSelecting();
 
     //UI更新

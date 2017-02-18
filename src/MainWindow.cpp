@@ -283,7 +283,7 @@ void MainWindow::MakeObject(){
             CObject::createing = nullptr;
 
             //未構築点を追加
-            ui->CadEdit->CompleteObject(make_obj);
+            //ui->CadEdit->CompleteObject(make_obj);
 
             creating_count = 0;
         }else {
