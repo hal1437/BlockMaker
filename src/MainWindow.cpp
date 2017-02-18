@@ -51,17 +51,16 @@ void MainWindow::wheelEvent(QWheelEvent * e){
     Pos center = CObject::mouse_over;
     double rate = (next_scale / ui->CadEdit->GetScale());
 
+    next_translate = center + (ui->CadEdit->GetTranslate() - center) / rate;
+
     //拡大値は負にならない
-    if(next_scale < 0)next_scale = 0;
-
-
-    next_translate = center + (ui->CadEdit->GetTranslate() - center) * rate;
-
-    //適応
-    ui->SizeRateSpinBox->setValue(next_scale);
-    ui->CadEdit->SetScale(next_scale);
-    ui->CadEdit->SetTranslate(next_translate);
-    CObject::Drawing_scale = next_scale;
+    if(next_scale > 0){
+        //適応
+        ui->SizeRateSpinBox->setValue(next_scale);
+        ui->CadEdit->SetScale(next_scale);
+        ui->CadEdit->SetTranslate(next_translate);
+        CObject::Drawing_scale = next_scale;
+    }
 }
 
 void MainWindow::keyPressEvent(QKeyEvent* event){
@@ -101,21 +100,21 @@ void MainWindow::Escape(){
 
 void MainWindow::MovedMouse(QMouseEvent *event, CObject *under_object){
     static Pos past;
-    static Pos past_translate;
+    static Pos piv;//画面移動ピボット
 
     //選択
     if(!(event->buttons() & Qt::LeftButton) || !move_flag){
         CObject::selecting = under_object;
-        past_translate = Pos(0,0);
+        piv = Pos(-1,-1);
     }
     //画面移動
     if((event->buttons() & Qt::LeftButton) && CObject::selecting == nullptr && this->state == Edit){
-        if(past_translate == Pos(0,0)){
-            past_translate = CObject::mouse_over;
+        if(piv == Pos(-1,-1)){
+            piv = (CObject::mouse_over - this->ui->CadEdit->GetTranslate());
         }
-        Pos next = this->ui->CadEdit->GetTranslate();
-        next += CObject::mouse_over - past_translate;
-        this->ui->CadEdit->SetTranslate(next);
+        Pos hand = (CObject::mouse_over - this->ui->CadEdit->GetTranslate());
+        this->ui->CadEdit->SetTranslate((this->ui->CadEdit->GetTranslate() + piv - hand) / this->ui->CadEdit->GetScale());
+        piv = hand;
     }
 
 
@@ -261,7 +260,7 @@ void MainWindow::MakeObject(){
         //シフト状態
         if(!shift_pressed)CObject::selected.clear();
 
-        //トグル化
+        //選択状態をトグル
         if(exist(CObject::selected,CObject::selecting))erase(CObject::selected,CObject::selecting);
         else if(CObject::selecting != nullptr)CObject::selected.push_back(CObject::selecting);
 

@@ -90,7 +90,7 @@ void CadEditForm::paintEvent(QPaintEvent*){
 
     //変換行列を作成
     QTransform trans;
-    trans.translate(translate.x,translate.y);
+    trans.translate(-translate.x,-translate.y);
     trans.scale(scale,scale);
 
     //寸法を表示
@@ -102,6 +102,12 @@ void CadEditForm::paintEvent(QPaintEvent*){
     //CBox描画
     paint.setPen(QPen(Qt::blue , (CObject::DRAWING_LINE_SIZE/2)));
     paint.setBrush(QBrush(Qt::darkGray));
+    paint.drawText(0,10,QString("(") + QString::number(this->translate.x) + "," + QString::number(this->translate.y) + ")");
+    paint.drawText(0,20,QString("(") + QString::number(CObject::mouse_over.x) + "," + QString::number(CObject::mouse_over.y) + ")");
+    paint.drawLine(-this->translate.x-3,-this->translate.y-3,-this->translate.x+3,-this->translate.y-3);
+    paint.drawLine(-this->translate.x+3,-this->translate.y-3,-this->translate.x+3,-this->translate.y+3);
+    paint.drawLine(-this->translate.x+3,-this->translate.y+3,-this->translate.x-3,-this->translate.y+3);
+    paint.drawLine(-this->translate.x-3,-this->translate.y+3,-this->translate.x-3,-this->translate.y-3);
     for(int i=0;i<this->blocks.size();i++){
         //this->ui->CBoxList->addItem(new QListWidgetItem("CBox"));
         //this->ui->CBoxList->item(i)->setIcon(QIcon(":/ToolImages/Blocks.png"));
@@ -140,7 +146,7 @@ void CadEditForm::mouseMoveEvent   (QMouseEvent* event){
     //マウス移動を監視
     CObject::mouse_over = Pos(event->pos().x(),event->pos().y());
     //平行移動量を適用
-    CObject::mouse_over -= translate;
+    CObject::mouse_over += translate;
     //拡大移動量を適用
     CObject::mouse_over /= scale;
 
