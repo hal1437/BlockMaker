@@ -54,6 +54,9 @@ void MainWindow::wheelEvent(QWheelEvent * e){
     //拡大値は負にならない
     if(next_scale < 0)next_scale = 0;
 
+
+    next_translate = center + (ui->CadEdit->GetTranslate() - center) * rate;
+
     //適応
     ui->SizeRateSpinBox->setValue(next_scale);
     ui->CadEdit->SetScale(next_scale);

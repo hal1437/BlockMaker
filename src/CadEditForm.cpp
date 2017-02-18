@@ -162,17 +162,12 @@ CadEditForm::~CadEditForm()
 }
 
 CObject* CadEditForm::getSelecting(){
-    bool selected = false;
-    CObject* select_obj = nullptr;
     for(CObject* obj:objects){
-        if(!selected){
-            if(obj->isSelectable() && !obj->isCreating()){
-                selected = true;
-                select_obj = obj;
-            }
+        if(obj->isSelectable() && !obj->isCreating()){
+            return obj;
         }
     }
-    return select_obj;
+    return nullptr;
 }
 
 void CadEditForm::SetScale(double scale){
