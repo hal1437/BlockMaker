@@ -69,7 +69,7 @@ void CadEditForm::CompleteObject(CObject* make_obj){
         //追加
         if(!is_known_pos){
             CPoint* new_point = make_obj->GetJoint(i);
-            new_point->Make(new_point);
+            new_point->Create(new_point,0);
         }
     }
 }
@@ -84,51 +84,58 @@ Pos    CadEditForm::GetTranslate()const{
 
 void CadEditForm::paintEvent(QPaintEvent*){
     QPainter paint(this);
+
+    //状態を保存
     paint.save();
-    paint.fillRect(0,0,this->width(),this->height(),Qt::white);//白塗りにする
-    if(scale == 0) paint.scale(0.00001f,0.00001f);
+    paint.fillRect(0,0,this->width(),this->height(),Qt::white); //背景を白塗りにする
 
     //変換行列を作成
     QTransform trans;
     trans.translate(-translate.x,-translate.y);
     trans.scale(scale,scale);
+    paint.setTransform(trans); // 変換行列を以降の描画に適応
 
-    //寸法を表示
+    //寸法を描画
     paint.setPen(QPen(Qt::blue, 1));
     for(SmartDimension* dim:dimensions){
         dim->Draw(paint,trans);
     }
 
-    //CBox描画
-    paint.setPen(QPen(Qt::blue , (CObject::DRAWING_LINE_SIZE/2)));
-    paint.setBrush(QBrush(Qt::darkGray));
-    paint.drawText(0,10,QString("(") + QString::number(this->translate.x) + "," + QString::number(this->translate.y) + ")");
-    paint.drawText(0,20,QString("(") + QString::number(CObject::mouse_over.x) + "," + QString::number(CObject::mouse_over.y) + ")");
+    //原点座標・マウス座標を描画
+    paint.drawText(0,10,QString("(") + QString::number(this->translate.x    ) + "," + QString::number(this->translate.y    ) + ")");
+    paint.drawText(0,20,QString("(") + QString::number(CObject::mouse_pos.x) + "," + QString::number(CObject::mouse_pos.y) + ")");
+
+    //原点を描画
     paint.drawLine(-this->translate.x-3,-this->translate.y-3,-this->translate.x+3,-this->translate.y-3);
     paint.drawLine(-this->translate.x+3,-this->translate.y-3,-this->translate.x+3,-this->translate.y+3);
     paint.drawLine(-this->translate.x+3,-this->translate.y+3,-this->translate.x-3,-this->translate.y+3);
     paint.drawLine(-this->translate.x-3,-this->translate.y+3,-this->translate.x-3,-this->translate.y-3);
-    for(int i=0;i<this->blocks.size();i++){
-        //this->ui->CBoxList->addItem(new QListWidgetItem("CBox"));
-        //this->ui->CBoxList->item(i)->setIcon(QIcon(":/ToolImages/Blocks.png"));
+
+    //CBox描画
+    paint.setPen(QPen(Qt::blue , (CObject::DRAWING_LINE_SIZE/2)));    //太さ設定
+    paint.setBrush(QBrush(Qt::darkGray));                             //背景設定
+    for(int i=0;i<this->blocks.size();i++){ //エリア描画
         this->blocks[i].Draw(paint,trans);
     }
-    paint.setBrush(QBrush(Qt::white));
+    paint.setBrush(QBrush(Qt::white));      //ブラシ復元
+
     //普通のオブジェクト
     paint.setPen(QPen(Qt::blue, CObject::DRAWING_LINE_SIZE));
     for(CObject* obj:objects){
-        if(obj->Refresh())obj->Draw(paint,trans);
+        if(obj->Refresh())obj->Draw(paint);
     }
-    //選択された
+    //選択されたオブジェクト
     paint.setPen(QPen(Qt::cyan, CObject::DRAWING_LINE_SIZE));
     for(CObject* obj:CObject::selected){
-        if(obj->Refresh())obj->Draw(paint,trans);
+        if(obj->Refresh())obj->Draw(paint);
     }
     //メイン選択中
     paint.setPen(QPen(Qt::red , CObject::DRAWING_LINE_SIZE));
-    if(CObject::selecting!=nullptr){
-        if(CObject::selecting->Refresh())CObject::selecting->Draw(paint,trans);
+    if(CObject::hanged!=nullptr){
+        if(CObject::hanged->Refresh())CObject::hanged->Draw(paint);
     }
+
+    //描画復元
     paint.restore();
 
     //競合確認
@@ -144,14 +151,14 @@ void CadEditForm::paintEvent(QPaintEvent*){
 
 void CadEditForm::mouseMoveEvent   (QMouseEvent* event){
     //マウス移動を監視
-    CObject::mouse_over = Pos(event->pos().x(),event->pos().y());
+    CObject::mouse_pos = Pos(event->pos().x(),event->pos().y());
     //平行移動量を適用
-    CObject::mouse_over += translate;
+    CObject::mouse_pos += translate;
     //拡大移動量を適用
-    CObject::mouse_over /= scale;
+    CObject::mouse_pos /= scale;
 
     //選択オブジェクトの選定
-    CObject* answer = getSelecting();
+    CObject* answer = this->getHanged();
 
     //UI更新
     repaint();
@@ -171,7 +178,7 @@ CadEditForm::~CadEditForm()
     delete ui;
 }
 
-CObject* CadEditForm::getSelecting(){
+CObject* CadEditForm::getHanged(){
     for(CObject* obj:objects){
         if(obj->isSelectable() && !obj->isCreating()){
             return obj;
@@ -312,15 +319,15 @@ void CadEditForm::RefreshRestraints(){
     //拘束を解決
     if(objects.size()!=0){
         //持ち手が存在すれば
-        if(CObject::selecting != nullptr){
+        if(CObject::hanged != nullptr){
             std::vector<std::pair<int,CObject*>> rank;
 
             //過去の選択位置を保持する
             static CObject* hand = nullptr;
 
             //持ち手は0番に
-            if(CObject::selecting != nullptr && CObject::selecting->is<CPoint>()){
-                hand = CObject::selecting;
+            if(CObject::hanged != nullptr && CObject::hanged->is<CPoint>()){
+                hand = CObject::hanged;
             }
             rank.push_back(std::make_pair(0,hand));
             //ランク分けダイクストラ

@@ -1,25 +1,18 @@
 #include "CObject.h"
 
-double   CObject::Drawing_scale;
-CObject* CObject::selecting;
+CObject* CObject::hanged;
 CObject* CObject::createing;
 QVector<CObject*> CObject::selected;
-Pos CObject::mouse_over;
+Pos CObject::mouse_pos;
 
 bool CObject::isSelecting()const{
-    return (selecting == this);
+    return (hanged == this);
 }
 bool CObject::isCreating()const{
     return (createing == this);
 }
-
 bool CObject::isSelected()const{
     return exist(selected,this);
-}
-
-
-bool CObject::Make(CPoint* pos,int index){
-    return Create(pos,index);
 }
 
 void CObject::Lock(bool lock){

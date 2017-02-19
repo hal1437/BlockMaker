@@ -23,7 +23,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ConnectSignals();
     ui->ToolBlocks->setEnabled(false);
     ui->ObjectList->setSelectionMode(QAbstractItemView::ExtendedSelection);
-    CObject::Drawing_scale = 1.0;
+    //CObject::Drawing_scale = 1.0;
 }
 
 MainWindow::~MainWindow()
@@ -32,7 +32,7 @@ MainWindow::~MainWindow()
 }
 
 void MainWindow::mousePressEvent  (QMouseEvent*){
-    release_flag=false;
+    release_flag = false;
     if(state==Edit)move_flag = true;
     MakeObject();
 }
@@ -48,18 +48,17 @@ void MainWindow::wheelEvent(QWheelEvent * e){
     double next_scale = ui->CadEdit->GetScale() + delta;//次の拡大値
     Pos    next_translate = ui->CadEdit->GetTranslate();//次の平行移動値
 
-    Pos center = CObject::mouse_over;
+    Pos center = CObject::mouse_pos;
     double rate = (next_scale / ui->CadEdit->GetScale());
 
-    next_translate = center + (ui->CadEdit->GetTranslate() - center) / rate;
-
+    next_translate = center + (ui->CadEdit->GetTranslate() - center) * rate;
     //拡大値は負にならない
     if(next_scale > 0){
         //適応
         ui->SizeRateSpinBox->setValue(next_scale);
-        ui->CadEdit->SetScale(next_scale);
         ui->CadEdit->SetTranslate(next_translate);
-        CObject::Drawing_scale = next_scale;
+        ui->CadEdit->SetScale(next_scale);
+        //CObject::Drawing_scale = next_scale;
     }
 }
 
@@ -72,7 +71,7 @@ void MainWindow::keyReleaseEvent(QKeyEvent* event){
     ctrl_pressed  = event->modifiers() & Qt::ControlModifier;
 }
 
-void MainWindow::paintEvent(QPaintEvent* event){
+void MainWindow::paintEvent(QPaintEvent*){
 }
 
 void MainWindow::CtrlZ(){
@@ -91,7 +90,7 @@ void MainWindow::Delete(){
     RefreshUI();
 }
 void MainWindow::Escape(){
-    if(make_obj != nullptr && !make_obj->Make(nullptr,-1)){
+    if(make_obj != nullptr && !make_obj->Create(nullptr,-1)){
         ui->CadEdit->RemoveObject(make_obj);
     }
     creating_count=0;
@@ -104,31 +103,30 @@ void MainWindow::MovedMouse(QMouseEvent *event, CObject *under_object){
 
     //選択
     if(!(event->buttons() & Qt::LeftButton) || !move_flag){
-        CObject::selecting = under_object;
+        CObject::hanged = under_object;
         piv = Pos(-1,-1);
     }
     //画面移動
-    if((event->buttons() & Qt::LeftButton) && CObject::selecting == nullptr && this->state == Edit){
+    if((event->buttons() & Qt::LeftButton) && CObject::hanged == nullptr && this->state == Edit){
         if(piv == Pos(-1,-1)){
-            piv = (CObject::mouse_over - this->ui->CadEdit->GetTranslate());
+            piv = (CObject::mouse_pos - this->ui->CadEdit->GetTranslate());
         }
-        Pos hand = (CObject::mouse_over - this->ui->CadEdit->GetTranslate());
+        Pos hand = (CObject::mouse_pos - this->ui->CadEdit->GetTranslate());
         this->ui->CadEdit->SetTranslate((this->ui->CadEdit->GetTranslate() + piv - hand) / this->ui->CadEdit->GetScale());
         piv = hand;
     }
 
-
     //編集
     if(move_flag == true){
-        if(CObject::selecting!=nullptr && !CObject::selecting->isLock()){
-            CObject::selecting->Move(CObject::mouse_over - past);
+        if(CObject::hanged != nullptr && !CObject::hanged->isLock()){
+            CObject::hanged->Move(CObject::mouse_pos - past);
         }
     }
 
     //拘束更新
     ui->CadEdit->RefreshRestraints();
 
-    past = CObject::mouse_over;
+    past = CObject::mouse_pos;
     release_flag=true;
 
 }
@@ -152,7 +150,7 @@ void MainWindow::DisconnectSignals(){
 }
 
 void MainWindow::ClearButton(){
-    if(make_obj != nullptr && make_obj->isCreating())make_obj->Make(nullptr,-1);
+    if(make_obj != nullptr && make_obj->isCreating())make_obj->Create(nullptr,-1);
     if(ui->ToolDot   ->isChecked())ui->ToolDot   ->setChecked(false);
     if(ui->ToolLine  ->isChecked())ui->ToolLine  ->setChecked(false);
     if(ui->ToolArc   ->isChecked())ui->ToolArc   ->setChecked(false);
@@ -199,7 +197,7 @@ void MainWindow::Toggled##TYPE (bool checked){  \
         ui->Tool##TYPE->setChecked(true);       \
     }else{                                      \
         if(make_obj != nullptr && make_obj->isCreating()){\
-            make_obj->Make(nullptr,-1);           \
+            make_obj->Create(nullptr,-1);       \
             creating_count=0;                   \
         }                                       \
         make_obj = nullptr;                     \
@@ -248,8 +246,8 @@ void MainWindow::MakeRestraint(QListWidgetItem *){
 
 void MainWindow::MakeObject(){
 
-    Pos local_pos = CObject::mouse_over;
-    if(CObject::selecting != nullptr)local_pos = CObject::selecting->GetNear(local_pos);
+    Pos local_pos = CObject::mouse_pos;
+    if(CObject::hanged != nullptr)local_pos = CObject::hanged->GetNear(local_pos);
 
     release_flag=false;
 
@@ -261,8 +259,8 @@ void MainWindow::MakeObject(){
         if(!shift_pressed)CObject::selected.clear();
 
         //選択状態をトグル
-        if(exist(CObject::selected,CObject::selecting))erase(CObject::selected,CObject::selecting);
-        else if(CObject::selecting != nullptr)CObject::selected.push_back(CObject::selecting);
+        if(exist(CObject::selected,CObject::hanged))erase(CObject::selected,CObject::hanged);
+        else if(CObject::hanged != nullptr)CObject::selected.push_back(CObject::hanged);
 
     }else{
         //新規オブジェクト
@@ -280,46 +278,44 @@ void MainWindow::MakeObject(){
         if(MakeJoint(make_obj) == true){
             //生成完了
             CObject::createing = nullptr;
-
-            //未構築点を追加
-            //ui->CadEdit->CompleteObject(make_obj);
-
             creating_count = 0;
+
+            //ジョイントを追加
+            for(int i=0;i<make_obj->GetJointNum();i++){
+                ui->CadEdit->AddObject(make_obj->GetJoint(i));
+            }
         }else {
             //生成継続
 
             creating_count++;
         }
-        //子オブジェクトを追加
-        std::vector<CObject*> cc = make_obj->GetChild();
-        for(CObject* c:cc)ui->CadEdit->AddObject(c);
     }
     ui->CadEdit->RefreshRestraints();
     RefreshUI();
 }
 
 bool MainWindow::MakeJoint(CObject* obj){
-    Pos local_pos = CObject::mouse_over;
-    if(CObject::selecting != nullptr)local_pos = CObject::selecting->GetNear(local_pos);
+    Pos local_pos = CObject::mouse_pos;
+    if(CObject::hanged != nullptr)local_pos = CObject::hanged->GetNear(local_pos);
 
     //端点に点を作成
-    if(CObject::selecting == nullptr){
+    if(CObject::hanged == nullptr){
         //端点に点を作成
-        CPoint* new_point = new CPoint(CObject::mouse_over);
-        new_point->Make(new_point);
+        CPoint* new_point = new CPoint(CObject::mouse_pos);
+        new_point->Create(new_point,0);
         log.push_back(new_point);
-        return obj->Make(new_point,creating_count);
-    }else if(CObject::selecting->is<CPoint>()){
+        return obj->Create(new_point,creating_count);
+    }else if(CObject::hanged->is<CPoint>()){
         //点をマージ
-        return obj->Make(dynamic_cast<CPoint*>(CObject::selecting),creating_count);
+        return obj->Create(dynamic_cast<CPoint*>(CObject::hanged),creating_count);
     }else{
         //点をオブジェクト上に追加
-        CPoint* new_point = new CPoint(CObject::selecting->GetNear(CObject::mouse_over));
-        new_point->Make(new_point);
+        CPoint* new_point = new CPoint(CObject::hanged->GetNear(CObject::mouse_pos));
+        new_point->Create(new_point,0);
         log.push_back(new_point);
 
         //一致の幾何拘束を付与
-        return  obj->Make(new_point,creating_count);
+        return  obj->Create(new_point,creating_count);
     }
 }
 void MainWindow::ReciveObjectListChanged(QListWidgetItem* current){

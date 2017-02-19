@@ -17,19 +17,33 @@ protected:
     CLine*  lines[4];
     //12
     //34
-    virtual bool Create(CPoint * hand, int index);
+
+    // 1
+    //4 2
+    // 3
+
 public:
 
-    virtual Pos GetNear(const Pos& hand)const;
-    virtual bool Draw(QPainter& painter,QTransform trans)const;
-    virtual bool isSelectable()const;
-    virtual void Lock(bool lock);
-    virtual bool Move(const Pos& diff);
-    virtual int GetJointNum()const;
-    virtual Pos GetJointPos(int index)const;
-    virtual CPoint* GetJoint(int index);
-    virtual std::vector<CObject*> GetChild();
+    //作成関数(完了時:true , 継続時:false)
+    virtual bool Create(CPoint* pos,int index);
 
+    virtual bool Draw(QPainter& painter)const;//描画関数
+    virtual bool Move(const Pos& diff);//移動関数
+    virtual void Lock(bool lock);//ロック
+
+    //virtual bool isSelecting() const;  //選択中
+    //virtual bool isSelected()  const;  //選択済
+    //virtual bool isCreating()  const;  //作成中
+    //virtual bool isLock()      const;  //固定中
+    virtual bool isSelectable()const;  //mouse_posの位置で選択可能か
+
+    //近接点
+    virtual Pos GetNear(const Pos& hand)const;
+
+    //ジョイント関係
+    virtual int     GetJointNum()         const;
+    virtual Pos     GetJointPos(int index)const;
+    virtual CPoint* GetJoint   (int index);
 
     CRect();
     ~CRect();

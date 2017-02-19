@@ -84,34 +84,35 @@ bool CSpline::Create(CPoint* pos, int index){
 }
 
 Pos CSpline::GetNear(const Pos& hand)const{
-    return Pos();
+    return Pos();// ちょっと解決策が浮かばない
 }
 
 void CSpline::Lock(bool lock){
     for(int i =0;i<this->pos.size();i++){
         pos[i]->Lock(lock);
     }
+    CObject::Lock(lock);
 }
 
-bool CSpline::Draw(QPainter& painter,QTransform trans)const{
+bool CSpline::Draw(QPainter& painter)const{
     if(pos.size() > 1){
         QPainterPath path;
         double t, m;
         m = (double)(pos.size()-1);
 
-        path.moveTo(GetJointPos(0).Transform(trans).x,GetJointPos(0).Transform(trans).y);
+        path.moveTo(GetJointPos(0).x,GetJointPos(0).y);
         const double dt = 1.0/DIVISION;
         for(t=0; t<=m; t += dt){
             if(t + dt > m)t=m;
             QPointF pos(xs.culc(t), ys.culc(t));
-            path.lineTo(pos*trans);
+            path.lineTo(pos);
         }
         painter.setBrush(QColor(0,0,0,0));
         painter.drawPath(path);
 
     }
     for(int i=0;i<this->GetJointNum();i++){
-        this->pos[i]->Draw(painter,trans);
+        this->pos[i]->Draw(painter);
     }
     return true;
 }
@@ -119,10 +120,10 @@ bool CSpline::isSelectable()const{
     double t, m;
     m = (double)(pos.size()-1);
 
-    const double dt = 1.0/(DIVISION*CObject::Drawing_scale);
+    const double dt = 1.0/(DIVISION);
     for(t=0; t<=m; t += dt){
         if(t + dt > m)t=m;
-        if((Pos(xs.culc(t),ys.culc(t)) - CObject::mouse_over).Length() < COLLISION_SIZE/CObject::Drawing_scale){
+        if((Pos(xs.culc(t),ys.culc(t)) - CObject::mouse_pos).Length() < COLLISION_SIZE){
             return true;
         }
     }
@@ -145,12 +146,4 @@ Pos CSpline::GetJointPos(int index)const{
 CPoint* CSpline::GetJoint(int index){
     return pos[index];
 }
-
-std::vector<CObject*> CSpline::GetChild(){
-    std::vector<CObject*> ans;
-    ans.resize(pos.size());
-    std::copy(pos.begin(),pos.end(),ans.begin());
-    return ans;
-}
-
 

@@ -1,18 +1,14 @@
 #include "CPoint.h"
 
-bool CPoint::Create(CPoint* pos,int){
+bool CPoint::Create(CPoint* pos,int index){
     (*this) = *pos;
     return true;//生成終了
 }
 
-Pos CPoint::GetNear(const Pos&)const{
-    return *this;
-}
-
-bool CPoint::Draw(QPainter& painter, QTransform trans)const{
+bool CPoint::Draw(QPainter& painter)const{
     Pos center = *this;
-    center.Transform(trans);
-    if(control_point){
+
+    if(control_point){//制御点ならば
         //四角
         QLine ps[4] = {QLine(center.x-DRAWING_CIRCLE_SIZE,center.y-DRAWING_CIRCLE_SIZE,center.x+DRAWING_CIRCLE_SIZE,center.y-DRAWING_CIRCLE_SIZE),
                        QLine(center.x+DRAWING_CIRCLE_SIZE,center.y-DRAWING_CIRCLE_SIZE,center.x+DRAWING_CIRCLE_SIZE,center.y+DRAWING_CIRCLE_SIZE),
@@ -26,18 +22,23 @@ bool CPoint::Draw(QPainter& painter, QTransform trans)const{
                         2*DRAWING_CIRCLE_SIZE,
                         2*DRAWING_CIRCLE_SIZE,0,360*16);
     }
+    //ロック時
     if(this->isLock()){
         painter.drawImage(center.x+10,center.y-10,QImage(":/Restraint/LockRestraint.png"));
     }
     return true;
 }
 bool CPoint::isSelectable()const{
-    return (this->Length(CPoint::mouse_over) < COLLISION_SIZE / CObject::Drawing_scale);
+    //当たり判定式
+    return ((*this - CPoint::mouse_pos).Length() < COLLISION_SIZE);
 }
 
 
-bool CPoint::Move(const Pos& pos){
-    if(!isLock())(*this) += pos;
+bool CPoint::Move(const Pos& diff){
+    //ロックされていなければ
+    if(isLock() == false){
+        (*this) += diff;//単純な平行移動
+    }
     return true;
 }
 
@@ -58,6 +59,10 @@ bool CPoint::isControlPoint()const{
 
 bool CPoint::ControlPoint(bool f){
     control_point = f;
+}
+
+Pos CPoint::GetNear(const Pos&)const{
+    return *this;
 }
 
 

@@ -13,17 +13,17 @@ class CPoint;
 class CObject
 {
 public:
-    const static int DRAWING_LINE_SIZE = 3;   //描画線幅
-    static double   Drawing_scale;            //描画拡大率
-    static CObject* selecting;                //選択中オブジェクト
-    static CObject* createing;                //作成中オブジェクト
-    static QVector<CObject*> selected;        //選択オブジェクト
-    static QVector<CObject*> all_objects;     //全てのオブジェクト
-    static Pos mouse_over;                    //マウス位置
+    static constexpr double DRAWING_LINE_SIZE = 3; //描画線幅
+    static constexpr double SAME_POINT_EPS = 0.001;    //同一点誤差
+
+    static CObject* hanged;                //マウス直下のオブジェクト
+    static CObject* createing;             //作成中オブジェクト
+    static QVector<CObject*> selected;     //選択オブジェクト
+    static QVector<CObject*> all_objects;  //全てのオブジェクト
+    static Pos mouse_pos;                 //マウス位置
 
 protected:
-    bool lock  = false; //ロック
-    virtual bool Create(CPoint* pos,int index)=0;
+    bool lock  = false; //ロック状態
 
 public:
 
@@ -33,36 +33,29 @@ public:
         return (dynamic_cast<const T*>(this) != nullptr);
     }
 
+    //作成関数(完了時:true , 継続時:false)
+    virtual bool Create(CPoint* pos,int index) = 0;
+
     //更新関数
     virtual bool Refresh(){return true;}
 
-    //描画関数
-    virtual bool Draw(QPainter& painter,QTransform trans)const = 0;
+    virtual bool Draw(QPainter& painter)const = 0;//描画関数
+    virtual bool Move(const Pos& diff) = 0;//移動関数
+    virtual void Lock(bool lock);//ロック
 
-    virtual bool isSelecting()const;  //選択中
-    virtual bool isSelected() const;  //選択済
-    virtual bool isCreating()const;   //作成中
-    virtual bool isSelectable()const=0; //選択可能
+    virtual bool isSelecting() const;  //選択中
+    virtual bool isSelected()  const;  //選択済
+    virtual bool isCreating()  const;  //作成中
+    virtual bool isLock()      const;  //固定中
+    virtual bool isSelectable()const = 0;  //mouse_posの位置で選択可能か
 
     //近接点
     virtual Pos GetNear(const Pos& hand)const=0;
 
-    //子オブジェクト取得
-    virtual std::vector<CObject*> GetChild(){return std::vector<CObject*>();}
-
-    //座標取得
-    virtual int GetJointNum()const = 0;
-    virtual Pos GetJointPos(int index)const = 0;
-    virtual CPoint* GetJoint(int index) = 0;
-
-    //生成関数
-    virtual bool Make(CPoint *pos, int index = 0);
-    //移動関数
-    virtual bool Move(const Pos& move) = 0;
-
-    //ロック関係
-    virtual void Lock(bool lock);
-    virtual bool isLock()const;
+    //ジョイント関係
+    virtual int     GetJointNum()         const = 0;
+    virtual Pos     GetJointPos(int index)const = 0;
+    virtual CPoint* GetJoint   (int index) = 0;
 
     //コンストラクタ
     CObject();

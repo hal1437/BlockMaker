@@ -59,7 +59,7 @@ signals:
     void ToggleConflict(bool conflict);
 
 public slots:
-    CObject* getSelecting();      //選択中オブジェクト取得
+    CObject* getHanged(); //直下オブジェクト選定
     void SetScale(double scale);  //スケールセット
     void SetTranslate(Pos trans); //並行移動セット
     void MakeRestraint(RestraintType type); //拘束作成
