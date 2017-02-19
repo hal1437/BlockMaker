@@ -23,7 +23,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ConnectSignals();
     ui->ToolBlocks->setEnabled(false);
     ui->ObjectList->setSelectionMode(QAbstractItemView::ExtendedSelection);
-    //CObject::Drawing_scale = 1.0;
+    CObject::drawing_scale = 1.0;
 }
 
 MainWindow::~MainWindow()
@@ -51,14 +51,14 @@ void MainWindow::wheelEvent(QWheelEvent * e){
     Pos center = CObject::mouse_pos;
     double rate = (next_scale / ui->CadEdit->GetScale());
 
-    next_translate = center + (ui->CadEdit->GetTranslate() - center) * rate;
+    //next_translate = center + (ui->CadEdit->GetTranslate() - center) * rate;
     //拡大値は負にならない
     if(next_scale > 0){
         //適応
         ui->SizeRateSpinBox->setValue(next_scale);
         ui->CadEdit->SetTranslate(next_translate);
         ui->CadEdit->SetScale(next_scale);
-        //CObject::Drawing_scale = next_scale;
+        CObject::drawing_scale = next_scale;
     }
 }
 

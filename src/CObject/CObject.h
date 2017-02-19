@@ -16,11 +16,12 @@ public:
     static constexpr double DRAWING_LINE_SIZE = 3; //描画線幅
     static constexpr double SAME_POINT_EPS = 0.001;    //同一点誤差
 
+    static double drawing_scale;           //同一点誤差
     static CObject* hanged;                //マウス直下のオブジェクト
     static CObject* createing;             //作成中オブジェクト
     static QVector<CObject*> selected;     //選択オブジェクト
     static QVector<CObject*> all_objects;  //全てのオブジェクト
-    static Pos mouse_pos;                 //マウス位置
+    static Pos mouse_pos;                  //マウス位置
 
 protected:
     bool lock  = false; //ロック状態

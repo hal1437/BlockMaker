@@ -6,7 +6,17 @@ bool CPoint::Create(CPoint* pos,int index){
 }
 
 bool CPoint::Draw(QPainter& painter)const{
-    Pos center = *this;
+    Pos center;
+    QTransform conv;
+
+    //CPointの円の大きさ・太さは、拡大によらず常に一定である。
+    painter.save();
+    conv = painter.transform();
+    center = Pos(*this).Transform(conv);
+
+    //描画設定
+    painter.setTransform(QTransform());//変換行列解除
+    painter.setPen(QPen(painter.pen().color(), CObject::DRAWING_LINE_SIZE));
 
     if(control_point){//制御点ならば
         //四角
@@ -26,11 +36,15 @@ bool CPoint::Draw(QPainter& painter)const{
     if(this->isLock()){
         painter.drawImage(center.x+10,center.y-10,QImage(":/Restraint/LockRestraint.png"));
     }
+
+    //復元
+    painter.restore();
+
     return true;
 }
 bool CPoint::isSelectable()const{
     //当たり判定式
-    return ((*this - CPoint::mouse_pos).Length() < COLLISION_SIZE);
+    return ((*this - CPoint::mouse_pos).Length() < COLLISION_SIZE / CObject::drawing_scale);
 }
 
 

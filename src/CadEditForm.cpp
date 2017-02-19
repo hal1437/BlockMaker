@@ -106,13 +106,13 @@ void CadEditForm::paintEvent(QPaintEvent*){
     paint.drawText(0,20,QString("(") + QString::number(CObject::mouse_pos.x) + "," + QString::number(CObject::mouse_pos.y) + ")");
 
     //原点を描画
-    paint.drawLine(-this->translate.x-3,-this->translate.y-3,-this->translate.x+3,-this->translate.y-3);
-    paint.drawLine(-this->translate.x+3,-this->translate.y-3,-this->translate.x+3,-this->translate.y+3);
-    paint.drawLine(-this->translate.x+3,-this->translate.y+3,-this->translate.x-3,-this->translate.y+3);
-    paint.drawLine(-this->translate.x-3,-this->translate.y+3,-this->translate.x-3,-this->translate.y-3);
+    paint.drawLine(-3,-3,+3,-3);
+    paint.drawLine(+3,-3,+3,+3);
+    paint.drawLine(+3,+3,-3,+3);
+    paint.drawLine(-3,+3,-3,-3);
 
     //CBox描画
-    paint.setPen(QPen(Qt::blue , (CObject::DRAWING_LINE_SIZE/2)));    //太さ設定
+    paint.setPen(QPen(Qt::blue , (CObject::DRAWING_LINE_SIZE/2 / this->scale)));    //太さ設定
     paint.setBrush(QBrush(Qt::darkGray));                             //背景設定
     for(int i=0;i<this->blocks.size();i++){ //エリア描画
         this->blocks[i].Draw(paint,trans);
@@ -120,17 +120,17 @@ void CadEditForm::paintEvent(QPaintEvent*){
     paint.setBrush(QBrush(Qt::white));      //ブラシ復元
 
     //普通のオブジェクト
-    paint.setPen(QPen(Qt::blue, CObject::DRAWING_LINE_SIZE));
+    paint.setPen(QPen(Qt::blue, CObject::DRAWING_LINE_SIZE / this->scale));
     for(CObject* obj:objects){
         if(obj->Refresh())obj->Draw(paint);
     }
     //選択されたオブジェクト
-    paint.setPen(QPen(Qt::cyan, CObject::DRAWING_LINE_SIZE));
+    paint.setPen(QPen(Qt::cyan, CObject::DRAWING_LINE_SIZE / this->scale));
     for(CObject* obj:CObject::selected){
         if(obj->Refresh())obj->Draw(paint);
     }
     //メイン選択中
-    paint.setPen(QPen(Qt::red , CObject::DRAWING_LINE_SIZE));
+    paint.setPen(QPen(Qt::red , CObject::DRAWING_LINE_SIZE / this->scale));
     if(CObject::hanged!=nullptr){
         if(CObject::hanged->Refresh())CObject::hanged->Draw(paint);
     }

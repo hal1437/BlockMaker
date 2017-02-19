@@ -44,7 +44,7 @@ bool CLine::isSelectable()const{
     d    = (near - v2).Length();
 
     //あたり判定処理
-    if(d < COLLISION_SIZE &&
+    if(d < COLLISION_SIZE / drawing_scale &&
        ((GetJointPos(0).x < CObject::mouse_pos.x && CObject::mouse_pos.x < GetJointPos(1).x) ||
         (GetJointPos(1).x < CObject::mouse_pos.x && CObject::mouse_pos.x < GetJointPos(0).x) ||
         (GetJointPos(0).y < CObject::mouse_pos.y && CObject::mouse_pos.y < GetJointPos(1).y) ||

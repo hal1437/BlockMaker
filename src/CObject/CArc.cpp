@@ -48,8 +48,8 @@ void CArc::Lock(bool lock){
 }
 
 bool CArc::Draw(QPainter& painter)const{
-    Pos dir1 = (GetJointPos(1) - GetCenter());
-    Pos dir2 = (GetJointPos(0) - GetCenter());
+    Pos dir1 = (GetJointPos(2) - GetCenter());
+    Pos dir2 = (GetJointPos(1) - GetCenter());
     double angle1 = std::atan2(-dir1.y,dir1.x) * 180 / PI;
     double angle2 = 360 - angle1 + (std::atan2(-dir2.y,dir2.x)) * 180 / PI;
 
@@ -70,8 +70,8 @@ bool CArc::isSelectable()const{
     Pos dir3 = CObject::mouse_pos - GetCenter();
 
     float d = dir3.Length();
-    if((d                 < COLLISION_SIZE ||
-       (std::abs(d-round) < COLLISION_SIZE)) &&
+    if((d                 < COLLISION_SIZE / drawing_scale ||
+       (std::abs(d-round) < COLLISION_SIZE / drawing_scale)) &&
        (Pos::Angle(dir2,dir3) < Pos::Angle(dir2,dir1))){
         return true;
     }else{
@@ -112,9 +112,11 @@ CPoint* CArc::GetJoint(int index){
 
 CArc::CArc()
 {
+    pos[0] = new CPoint();
 }
 
 CArc::~CArc()
 {
+    delete pos[0];
 }
 
