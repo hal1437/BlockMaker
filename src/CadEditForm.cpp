@@ -89,6 +89,14 @@ void CadEditForm::paintEvent(QPaintEvent*){
     paint.save();
     paint.fillRect(0,0,this->width(),this->height(),Qt::white); //背景を白塗りにする
 
+    //ペン設定
+    paint.setPen(QPen(Qt::blue , (CObject::DRAWING_LINE_SIZE/2 / this->scale)));    //太さ設定
+
+    //原点座標・マウス座標を描画
+    paint.drawText(0,10,QString("(") + QString::number(this->translate.x    ) + "," + QString::number(this->translate.y    ) + ")");
+    paint.drawText(0,20,QString("(") + QString::number(CObject::mouse_pos.x) + "," + QString::number(CObject::mouse_pos.y) + ")");
+
+
     //変換行列を作成
     QTransform trans;
     trans.translate(-translate.x,-translate.y);
@@ -101,10 +109,6 @@ void CadEditForm::paintEvent(QPaintEvent*){
         dim->Draw(paint,trans);
     }
 
-    //原点座標・マウス座標を描画
-    paint.drawText(0,10,QString("(") + QString::number(this->translate.x    ) + "," + QString::number(this->translate.y    ) + ")");
-    paint.drawText(0,20,QString("(") + QString::number(CObject::mouse_pos.x) + "," + QString::number(CObject::mouse_pos.y) + ")");
-
     //原点を描画
     paint.drawLine(-3,-3,+3,-3);
     paint.drawLine(+3,-3,+3,+3);
@@ -112,7 +116,6 @@ void CadEditForm::paintEvent(QPaintEvent*){
     paint.drawLine(-3,+3,-3,-3);
 
     //CBox描画
-    paint.setPen(QPen(Qt::blue , (CObject::DRAWING_LINE_SIZE/2 / this->scale)));    //太さ設定
     paint.setBrush(QBrush(Qt::darkGray));                             //背景設定
     for(int i=0;i<this->blocks.size();i++){ //エリア描画
         this->blocks[i].Draw(paint,trans);
