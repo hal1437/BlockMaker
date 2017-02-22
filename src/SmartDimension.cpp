@@ -36,13 +36,14 @@ double SmartDimension::currentValue()const{
 }
 
 void SmartDimension::DrawString(QPainter& painter,const Pos& pos,const QString& str,double angle)const{
-    QTransform trans;
     QFontMetrics fm = painter.fontMetrics();
     int bit = (90 <= angle && angle < 270) ? 1 : 0;
+    QTransform trans;
 
     painter.save();//状態を保存
 
     //平行移動+回転
+    trans = painter.transform();
     trans.translate(pos.x,pos.y);
     trans.rotate(angle + 180*bit);
     painter.setTransform(trans);
@@ -111,15 +112,15 @@ CObject* SmartDimension::GetTarget(int index)const{
 
 
 //描画
-bool SmartDimension::Draw(QPainter& painter, QTransform trans)const{
+bool SmartDimension::Draw(QPainter& painter)const{
     //無効
     if (this->type == none)return true;
 
     //線の長さ
     if (this->type == length){
         //矢印
-        Pos p0 = target[0]->GetJointPos(0).Transform(trans);
-        Pos p1 = target[0]->GetJointPos(1).Transform(trans);
+        Pos p0 = target[0]->GetJointPos(0);
+        Pos p1 = target[0]->GetJointPos(1);
         Pos diff_base((p0-p1).GetNormalize());
         QPointF diff_(QPointF(diff_base.x,diff_base.y)*QTransform().rotate(90));
         Pos diff = Pos(diff_.x(),diff_.y());
@@ -138,8 +139,8 @@ bool SmartDimension::Draw(QPainter& painter, QTransform trans)const{
     //二点間距離
     if (this->type == distance){
         //矢印
-        Pos t0 = target[0]->GetJointPos(0).Transform(trans);
-        Pos t1 = target[1]->GetJointPos(0).Transform(trans);
+        Pos t0 = target[0]->GetJointPos(0);
+        Pos t1 = target[1]->GetJointPos(0);
         float flow = 20;
         if(this->X_type == true){
             //X軸拘束
@@ -176,10 +177,10 @@ bool SmartDimension::Draw(QPainter& painter, QTransform trans)const{
     //点と線の距離
     if (this->type == distanceLine){
         //矢印
-        Pos lines0[2] = {target[0]->GetJointPos(0).Transform(trans),
-                         target[0]->GetJointPos(1).Transform(trans)};
-        Pos lines1[2] = {target[1]->GetJointPos(0).Transform(trans),
-                         target[1]->GetJointPos(1).Transform(trans)};
+        Pos lines0[2] = {target[0]->GetJointPos(0),
+                         target[0]->GetJointPos(1)};
+        Pos lines1[2] = {target[1]->GetJointPos(0),
+                         target[1]->GetJointPos(1)};
         Pos d_pos[2];
         d_pos[0] = lines1[0];
         d_pos[1] = (lines0[1]-lines0[0]).GetNormalize();

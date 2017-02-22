@@ -57,7 +57,7 @@ public:
     //拘束作成
     std::vector<Restraint *> MakeRestraint();
 
-    bool Draw(QPainter& painter,QTransform trans)const;
+    bool Draw(QPainter& painter)const;
 
     SmartDimension();
 };
