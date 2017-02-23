@@ -65,17 +65,16 @@ bool CArc::Draw(QPainter& painter)const{
 }
 bool CArc::isSelectable()const{
     //円と点の距離のアルゴリズム
-    Pos dir1 = GetJointPos(0) - GetCenter();
-    Pos dir2 = GetJointPos(1) - GetCenter();
+    Pos dir1 = GetJointPos(1) - GetCenter();
+    Pos dir2 = GetJointPos(2) - GetCenter();
     Pos dir3 = CObject::mouse_pos - GetCenter();
 
+    qDebug() << Pos::Angle(dir2,dir3) << "," <<  Pos::Angle(dir2,dir1);
+
     float d = dir3.Length();
-    if((d                 < COLLISION_SIZE / drawing_scale ||
-       (std::abs(d-round) < COLLISION_SIZE / drawing_scale)) &&
+    if((std::abs(d-round) < COLLISION_SIZE / drawing_scale) &&
        (Pos::Angle(dir2,dir3) < Pos::Angle(dir2,dir1))){
         return true;
-    }else{
-        return false;
     }
     return false;
 }

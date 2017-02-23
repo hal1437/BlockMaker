@@ -8,7 +8,7 @@
 class CArc : public CObject
 {
 private:
-    const static int COLLISION_SIZE = 10; //当たり判定半径
+    const static int COLLISION_SIZE = 5; //当たり判定半径
 
 protected:
     CPoint* pos[3]; //円弧の端点 0:中心
