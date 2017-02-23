@@ -26,11 +26,12 @@ bool CPoint::Draw(QPainter& painter)const{
                        QLine(center.x-DRAWING_CIRCLE_SIZE,center.y+DRAWING_CIRCLE_SIZE,center.x-DRAWING_CIRCLE_SIZE,center.y-DRAWING_CIRCLE_SIZE)};
         painter.drawLines(ps,4);
     }else{
+        QRectF rect(center.x-DRAWING_CIRCLE_SIZE,
+                    center.y-DRAWING_CIRCLE_SIZE,
+                    DRAWING_CIRCLE_SIZE*2,
+                    DRAWING_CIRCLE_SIZE*2);
         //丸
-        painter.drawArc(center.x-DRAWING_CIRCLE_SIZE,
-                        center.y-DRAWING_CIRCLE_SIZE,
-                        2*DRAWING_CIRCLE_SIZE,
-                        2*DRAWING_CIRCLE_SIZE,0,360*16);
+        painter.drawArc(rect,0,360*16);
     }
     //ロック時
     if(this->isLock()){
