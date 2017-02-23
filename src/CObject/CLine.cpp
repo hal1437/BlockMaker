@@ -45,11 +45,10 @@ bool CLine::isSelectable()const{
 
     //あたり判定処理
     if(d < COLLISION_SIZE / drawing_scale &&
-       ((GetJointPos(0).x < CObject::mouse_pos.x && CObject::mouse_pos.x < GetJointPos(1).x) ||
-        (GetJointPos(1).x < CObject::mouse_pos.x && CObject::mouse_pos.x < GetJointPos(0).x) ||
-        (GetJointPos(0).y < CObject::mouse_pos.y && CObject::mouse_pos.y < GetJointPos(1).y) ||
-        (GetJointPos(1).y < CObject::mouse_pos.y && CObject::mouse_pos.y < GetJointPos(0).y))){
-
+       (std::min(GetJointPos(0).x,GetJointPos(1).x) <= CObject::mouse_pos.x &&
+        std::max(GetJointPos(0).x,GetJointPos(1).x) >= CObject::mouse_pos.x &&
+        std::min(GetJointPos(0).y,GetJointPos(1).y) <= CObject::mouse_pos.y &&
+        std::max(GetJointPos(0).y,GetJointPos(1).y) >= CObject::mouse_pos.y)){
         return true;
     }else{
         return false;
