@@ -42,9 +42,10 @@ void SmartDimension::DrawString(QPainter& painter,const Pos& pos,const QString& 
 
     painter.save();//状態を保存
 
-    //平行移動+回転
+    //拡大無効化+平行移動+回転
     trans = painter.transform();
-    trans.translate(pos.x,pos.y);
+    trans.scale(1/CObject::drawing_scale,1/CObject::drawing_scale);
+    trans.translate(pos.x*CObject::drawing_scale,pos.y*CObject::drawing_scale);
     trans.rotate(angle + 180*bit);
     painter.setTransform(trans);
 
