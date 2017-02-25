@@ -44,8 +44,9 @@ public:
     double GetScale()const;     //スケール
     Pos    GetTranslate()const; //平行移動
 
-    void paintEvent    (QPaintEvent* event); //描画イベントハンドラ
-    void mouseMoveEvent(QMouseEvent* event); //マウス移動
+    void paintEvent    (QPaintEvent*  event); //描画イベントハンドラ
+    void mouseMoveEvent(QMouseEvent*  event); //マウス移動
+    void resizeEvent   (QResizeEvent* event); //リサイズ
 
 
     explicit CadEditForm(QWidget *parent = 0);

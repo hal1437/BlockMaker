@@ -167,6 +167,12 @@ void CadEditForm::mouseMoveEvent   (QMouseEvent* event){
     repaint();
     emit MovedMouse(event,answer);
 }
+void CadEditForm::resizeEvent(QResizeEvent* event){
+    //原点を中心に
+    this->translate.x = -this->width()  / 2;
+    this->translate.y = -this->height() / 2;
+}
+
 
 CadEditForm::CadEditForm(QWidget *parent) :
     QWidget(parent),
@@ -174,6 +180,7 @@ CadEditForm::CadEditForm(QWidget *parent) :
 {
     ui->setupUi(this);
     setMouseTracking(true);
+
 }
 
 CadEditForm::~CadEditForm()
