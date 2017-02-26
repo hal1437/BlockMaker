@@ -48,6 +48,9 @@ public:
     void mouseMoveEvent(QMouseEvent*  event); //マウス移動
     void resizeEvent   (QResizeEvent* event); //リサイズ
 
+    QPoint ConvertLocalPos(QPoint pos)const; //ローカル座標へ変換
+    QPoint ConvertWorldPos(QPoint pos)const; //ワールド座標へ変換
+
 
     explicit CadEditForm(QWidget *parent = 0);
     ~CadEditForm();

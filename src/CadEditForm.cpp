@@ -84,10 +84,11 @@ Pos    CadEditForm::GetTranslate()const{
 
 void CadEditForm::paintEvent(QPaintEvent*){
     QPainter paint(this);
+    paint.fillRect(0,0,this->width(),this->height(),Qt::white); //背景を白塗りにする
+
 
     //状態を保存
     paint.save();
-    paint.fillRect(0,0,this->width(),this->height(),Qt::white); //背景を白塗りにする
 
     //ペン設定
     paint.setPen(QPen(Qt::blue , (CObject::DRAWING_LINE_SIZE/2 / this->scale)));    //太さ設定
@@ -173,6 +174,18 @@ void CadEditForm::resizeEvent(QResizeEvent* event){
     this->translate.y = -this->height() / 2;
 }
 
+QPoint CadEditForm::ConvertLocalPos(QPoint pos)const{
+    QTransform trans;
+    trans.translate(-translate.x,-translate.y);
+    trans.scale(scale,scale);
+    return trans.map(pos);
+}
+QPoint CadEditForm::ConvertWorldPos(QPoint pos)const{
+    QTransform trans;
+    trans.translate(translate.x,translate.y);
+    trans.scale(1/scale,1/scale);
+    return trans.map(pos);
+}
 
 CadEditForm::CadEditForm(QWidget *parent) :
     QWidget(parent),
