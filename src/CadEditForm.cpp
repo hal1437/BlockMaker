@@ -174,18 +174,26 @@ void CadEditForm::resizeEvent(QResizeEvent* event){
     this->translate.y = -this->height() / 2;
 }
 
-QPoint CadEditForm::ConvertLocalPos(QPoint pos)const{
+Pos CadEditForm::ConvertLocalPos(Pos pos)const{
     QTransform trans;
     trans.translate(-translate.x,-translate.y);
     trans.scale(scale,scale);
-    return trans.map(pos);
+    QPoint ans = trans.map(QPoint(pos.x,pos.y));
+    return Pos(ans.x(),ans.y());
 }
-QPoint CadEditForm::ConvertWorldPos(QPoint pos)const{
+Pos CadEditForm::ConvertWorldPos(Pos pos)const{
     QTransform trans;
     trans.translate(translate.x,translate.y);
     trans.scale(1/scale,1/scale);
-    return trans.map(pos);
+    QPoint ans = trans.map(QPoint(pos.x,pos.y));
+    return Pos(ans.x(),ans.y());
 }
+void CadEditForm::Zoom(double scale,Pos local_piv){
+    //this->translate = this->translate + (this->translate - local_piv) * (scale - this->scale);
+    this->scale = scale;
+
+}
+
 
 CadEditForm::CadEditForm(QWidget *parent) :
     QWidget(parent),

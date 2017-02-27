@@ -48,8 +48,10 @@ public:
     void mouseMoveEvent(QMouseEvent*  event); //マウス移動
     void resizeEvent   (QResizeEvent* event); //リサイズ
 
-    QPoint ConvertLocalPos(QPoint pos)const; //ローカル座標へ変換
-    QPoint ConvertWorldPos(QPoint pos)const; //ワールド座標へ変換
+    Pos ConvertLocalPos(Pos pos)const; //ローカル座標へ変換
+    Pos ConvertWorldPos(Pos pos)const; //ワールド座標へ変換
+
+    void Zoom(double scale,Pos local_piv); //ズーム
 
 
     explicit CadEditForm(QWidget *parent = 0);
