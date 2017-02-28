@@ -94,8 +94,9 @@ void CadEditForm::paintEvent(QPaintEvent*){
     paint.setPen(QPen(Qt::blue , (CObject::DRAWING_LINE_SIZE/2 / this->scale)));    //太さ設定
 
     //原点座標・マウス座標を描画
-    paint.drawText(0,10,QString("(") + QString::number(this->translate.x   ) + "," + QString::number(this->translate.y   ) + ")");
-    paint.drawText(0,20,QString("(") + QString::number(CObject::mouse_pos.x) + "," + QString::number(CObject::mouse_pos.y) + ")");
+    paint.drawText(0,12,QString("(") + QString::number(this->translate.x   ) + "," + QString::number(this->translate.y   ) + ")");
+    paint.drawText(0,24,QString("MousePosLocal(") + QString::number(CObject::mouse_pos.x) + "," + QString::number(CObject::mouse_pos.y) + ")");
+    paint.drawText(0,36,QString("MousePosWorld(") + QString::number(this->ConvertWorldPos(CObject::mouse_pos).x) + "," + QString::number(this->ConvertWorldPos(CObject::mouse_pos).y) + ")");
 
 
     //変換行列を作成
@@ -155,12 +156,12 @@ void CadEditForm::paintEvent(QPaintEvent*){
 
 void CadEditForm::mouseMoveEvent   (QMouseEvent* event){
     //マウス移動を監視
-    CObject::mouse_pos = Pos(event->pos().x(),event->pos().y());
-    //平行移動量を適用
+    CObject::mouse_pos = this->ConvertLocalPos(Pos(event->pos().x(),event->pos().y()));
+/*    //平行移動量を適用
     CObject::mouse_pos += translate;
     //拡大移動量を適用
     CObject::mouse_pos /= scale;
-
+*/
     //選択オブジェクトの選定
     CObject* answer = this->getHanged();
 
@@ -176,7 +177,7 @@ void CadEditForm::resizeEvent(QResizeEvent* event){
 
 Pos CadEditForm::ConvertLocalPos(Pos pos)const{
     QTransform trans;
-    trans.translate(-translate.x,-translate.y);
+    trans.translate(translate.x,translate.y);
     trans.scale(scale,scale);
     QPoint ans = trans.map(QPoint(pos.x,pos.y));
     return Pos(ans.x(),ans.y());
@@ -184,14 +185,15 @@ Pos CadEditForm::ConvertLocalPos(Pos pos)const{
 Pos CadEditForm::ConvertWorldPos(Pos pos)const{
     QTransform trans;
     trans.translate(translate.x,translate.y);
-    trans.scale(1/scale,1/scale);
+    trans.scale(scale,scale);
+    trans = trans.inverted();
     QPoint ans = trans.map(QPoint(pos.x,pos.y));
     return Pos(ans.x(),ans.y());
 }
 void CadEditForm::Zoom(double scale,Pos local_piv){
-    //this->translate = this->translate + (this->translate - local_piv) * (scale - this->scale);
+    //qDebug() << (1 - (scale / this->scale));
+    this->translate = this->translate + (this->translate - local_piv) * (1 - (scale / this->scale));
     this->scale = scale;
-
 }
 
 

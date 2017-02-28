@@ -44,16 +44,18 @@ void MainWindow::mouseReleaseEvent(QMouseEvent*){
 }
 void MainWindow::wheelEvent(QWheelEvent * e){
     //拡大
-    double delta = (e->angleDelta().y())/10000.0;//差分値
+    double delta = (e->angleDelta().y())/1000.0;//差分値
     double x = std::log(ui->CadEdit->GetScale());
     double next_scale = std::exp(x + delta);//次の拡大値
+
+    qDebug() << e->angleDelta().y() <<  (1 - (next_scale / ui->CadEdit->GetScale()));
 
     //拡大値は負にならない
     if(next_scale > 0){
         //適応
         CObject::drawing_scale = next_scale;
         ui->SizeRateSpinBox->setValue(next_scale);
-        this->ui->CadEdit->Zoom(next_scale,this->ui->CadEdit->ConvertLocalPos(CObject::mouse_pos));
+        this->ui->CadEdit->Zoom(next_scale,CObject::mouse_pos);
     }
 
 }
