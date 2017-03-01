@@ -156,12 +156,8 @@ void CadEditForm::paintEvent(QPaintEvent*){
 
 void CadEditForm::mouseMoveEvent   (QMouseEvent* event){
     //マウス移動を監視
-    CObject::mouse_pos = this->ConvertLocalPos(Pos(event->pos().x(),event->pos().y()));
-/*    //平行移動量を適用
-    CObject::mouse_pos += translate;
-    //拡大移動量を適用
-    CObject::mouse_pos /= scale;
-*/
+    CObject::mouse_pos = this->ConvertLocalPos(Pos(event->pos().x(),event->pos().y()) + this->translate);
+
     //選択オブジェクトの選定
     CObject* answer = this->getHanged();
 
@@ -177,23 +173,27 @@ void CadEditForm::resizeEvent(QResizeEvent* event){
 
 Pos CadEditForm::ConvertLocalPos(Pos pos)const{
     QTransform trans;
-    trans.translate(translate.x,translate.y);
+    trans.translate(-translate.x,-translate.y);
     trans.scale(scale,scale);
     QPoint ans = trans.map(QPoint(pos.x,pos.y));
     return Pos(ans.x(),ans.y());
 }
 Pos CadEditForm::ConvertWorldPos(Pos pos)const{
     QTransform trans;
-    trans.translate(translate.x,translate.y);
+    trans.translate(-translate.x,-translate.y);
     trans.scale(scale,scale);
     trans = trans.inverted();
     QPoint ans = trans.map(QPoint(pos.x,pos.y));
     return Pos(ans.x(),ans.y());
 }
 void CadEditForm::Zoom(double scale,Pos local_piv){
-    //qDebug() << (1 - (scale / this->scale));
-    this->translate = this->translate + (this->translate - local_piv) * (1 - (scale / this->scale));
+    Pos origin = this->ConvertWorldPos(CObject::mouse_pos);
+
+    qDebug() << local_piv.x << local_piv.y;
+    this->translate = this->translate + (-origin) * (1 - (scale / this->scale));
     this->scale = scale;
+
+    CObject::mouse_pos = this->ConvertLocalPos(origin);
 }
 
 
@@ -226,7 +226,7 @@ void CadEditForm::SetScale(double scale){
 }
 
 void CadEditForm::SetTranslate(Pos trans){
-    this->translate = trans*this->scale;
+    this->translate = trans;
     repaint();
 }
 

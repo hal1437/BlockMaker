@@ -48,14 +48,12 @@ void MainWindow::wheelEvent(QWheelEvent * e){
     double x = std::log(ui->CadEdit->GetScale());
     double next_scale = std::exp(x + delta);//次の拡大値
 
-    qDebug() << e->angleDelta().y() <<  (1 - (next_scale / ui->CadEdit->GetScale()));
-
     //拡大値は負にならない
     if(next_scale > 0){
         //適応
-        CObject::drawing_scale = next_scale;
-        ui->SizeRateSpinBox->setValue(next_scale);
         this->ui->CadEdit->Zoom(next_scale,CObject::mouse_pos);
+        ui->SizeRateSpinBox->setValue(next_scale);
+        CObject::drawing_scale = next_scale;
     }
 
 }
@@ -102,16 +100,18 @@ void MainWindow::MovedMouse(QMouseEvent *event, CObject *under_object){
     //選択
     if(!(event->buttons() & Qt::LeftButton) || !move_flag){
         CObject::hanged = under_object;
-        piv = Pos(-1,-1);
+        piv = Pos(std::numeric_limits<double>::lowest(),std::numeric_limits<double>::lowest());
     }
     //画面移動
     if((event->buttons() & Qt::LeftButton) && CObject::hanged == nullptr && this->state == Edit){
-        if(piv == Pos(-1,-1)){
-            piv = (CObject::mouse_pos - this->ui->CadEdit->GetTranslate());
+        if(piv == Pos(std::numeric_limits<double>::lowest(),std::numeric_limits<double>::lowest())){
+            piv = this->ui->CadEdit->ConvertWorldPos(CObject::mouse_pos);
         }
-        Pos hand = (CObject::mouse_pos - this->ui->CadEdit->GetTranslate());
-        this->ui->CadEdit->SetTranslate((this->ui->CadEdit->GetTranslate() + piv - hand) / this->ui->CadEdit->GetScale());
-        piv = hand;
+        Pos hand = this->ui->CadEdit->ConvertWorldPos(CObject::mouse_pos);
+
+        qDebug() << (piv - hand).x << (piv - hand).y;
+        this->ui->CadEdit->SetTranslate(this->ui->CadEdit->GetTranslate() + (piv - hand));
+        piv = this->ui->CadEdit->ConvertWorldPos(CObject::mouse_pos);
     }
 
     //編集

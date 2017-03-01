@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QMouseEvent>
 #include <QListWidget>
+#include <limits>
 #include "SmartDimensionDialog.h"
 #include "CObject/CPoint.h"
 #include "CObject/CLine.h"
