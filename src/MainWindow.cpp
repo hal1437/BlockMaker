@@ -108,9 +108,10 @@ void MainWindow::MovedMouse(QMouseEvent *event, CObject *under_object){
             piv = this->ui->CadEdit->ConvertWorldPos(CObject::mouse_pos);
         }
         Pos hand = this->ui->CadEdit->ConvertWorldPos(CObject::mouse_pos);
+        Pos diff = (piv - hand);
+        qDebug() << diff.x << diff.y;
 
-        qDebug() << (piv - hand).x << (piv - hand).y;
-        this->ui->CadEdit->SetTranslate(this->ui->CadEdit->GetTranslate() + (piv - hand));
+        this->ui->CadEdit->SetTranslate(this->ui->CadEdit->GetTranslate() + diff);
         piv = this->ui->CadEdit->ConvertWorldPos(CObject::mouse_pos);
     }
 

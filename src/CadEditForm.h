@@ -48,8 +48,8 @@ public:
     void mouseMoveEvent(QMouseEvent*  event); //マウス移動
     void resizeEvent   (QResizeEvent* event); //リサイズ
 
-    Pos ConvertLocalPos(Pos pos)const; //ローカル座標へ変換
-    Pos ConvertWorldPos(Pos pos)const; //ワールド座標へ変換
+    Pos ConvertLocalPos(Pos pos)const; //仮装座標へ変換
+    Pos ConvertWorldPos(Pos pos)const; //表示座標へ変換
 
     void Zoom(double scale,Pos local_piv); //ズーム
 
