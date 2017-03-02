@@ -84,6 +84,7 @@ Pos    CadEditForm::GetTranslate()const{
 
 void CadEditForm::paintEvent(QPaintEvent*){
     QPainter paint(this);
+    paint.setRenderHint(QPainter::Antialiasing, true);//アンチエイリアスセット
     paint.fillRect(0,0,this->width(),this->height(),Qt::white); //背景を白塗りにする
 
     //状態を保存
