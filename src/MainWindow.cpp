@@ -94,24 +94,25 @@ void MainWindow::Escape(){
 
 void MainWindow::MovedMouse(QMouseEvent *event, CObject *under_object){
     static Pos past;
-    static Pos piv;//画面移動ピボット
+    static Pos piv; //画面移動支点
+    const  Pos null_pos = Pos(std::numeric_limits<double>::lowest(),std::numeric_limits<double>::lowest()); //無効な点
 
     //選択
     if(!(event->buttons() & Qt::LeftButton) || !move_flag){
         CObject::hanged = under_object;
-        piv = Pos(std::numeric_limits<double>::lowest(),std::numeric_limits<double>::lowest());
+        piv = null_pos;//移動支点を解除
     }
     //画面移動
     if((event->buttons() & Qt::LeftButton) && CObject::hanged == nullptr && this->state == Edit){
-        if(piv == Pos(std::numeric_limits<double>::lowest(),std::numeric_limits<double>::lowest())){
+        //支点登録
+        if(piv == null_pos){
             piv = this->ui->CadEdit->ConvertWorldPos(CObject::mouse_pos);
         }
         Pos hand = this->ui->CadEdit->ConvertWorldPos(CObject::mouse_pos);
         Pos diff = (piv - hand);
-        qDebug() << diff.x << diff.y;
 
         this->ui->CadEdit->SetTranslate(this->ui->CadEdit->GetTranslate() + diff);
-        piv = this->ui->CadEdit->ConvertWorldPos(CObject::mouse_pos);
+        piv = hand;
     }
 
     //編集

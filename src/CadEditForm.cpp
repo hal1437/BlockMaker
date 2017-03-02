@@ -94,7 +94,7 @@ void CadEditForm::paintEvent(QPaintEvent*){
 
     //原点座標・マウス座標を描画
     paint.drawText(0,12,QString("(") + QString::number(this->translate.x   ) + "," + QString::number(this->translate.y   ) + ")");
-    paint.drawText(0,24,QString("MouseLocal(") + QString::number(CObject::mouse_pos.x) + "," + QString::number(CObject::mouse_pos.y) + ")");
+    paint.drawText(0,24,QString("MouseLocal(") + QString::number(CObject::mouse_pos.x)                  + "," + QString::number(CObject::mouse_pos.y)                  + ")");
     paint.drawText(0,36,QString("MouseWorld(") + QString::number(ConvertWorldPos(CObject::mouse_pos).x) + "," + QString::number(ConvertWorldPos(CObject::mouse_pos).y) + ")");
 
     //変換行列を作成
@@ -191,11 +191,11 @@ Pos CadEditForm::ConvertWorldPos(Pos pos)const{
 }
 
 
-void CadEditForm::Zoom(double scale,Pos local_pos){
+void CadEditForm::Zoom(double scale,Pos local_piv){
 
     //ズーム支点保存
     if(zoom_piv == Pos(0,0)){
-          zoom_piv = this->ConvertWorldPos(local_pos);
+          zoom_piv = this->ConvertWorldPos(local_piv);
     }
 
     //ズーム適用
@@ -205,6 +205,10 @@ void CadEditForm::Zoom(double scale,Pos local_pos){
     //マウス座標復元
     CObject::mouse_pos = this->ConvertLocalPos(zoom_piv);
 }
+void CadEditForm::Move(Pos local_diff){
+    this->translate += local_diff;
+}
+
 
 
 CadEditForm::CadEditForm(QWidget *parent) :

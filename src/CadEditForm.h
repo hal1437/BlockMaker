@@ -52,6 +52,7 @@ public:
     Pos ConvertWorldPos(Pos pos)const; //表示座標へ変換
 
     void Zoom(double scale,Pos local_piv); //ズーム
+    void Move(Pos local_diff);             //平行移動
 
 
     explicit CadEditForm(QWidget *parent = 0);
@@ -59,7 +60,7 @@ public:
 
 private:
     Ui::CadEditForm *ui;
-    Pos zoom_piv; //ズーム支店
+    Pos zoom_piv; //ズーム支点
 
 signals:
     void MovedMouse(QMouseEvent *event, CObject *under_object);
