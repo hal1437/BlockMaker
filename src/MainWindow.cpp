@@ -44,9 +44,8 @@ void MainWindow::mouseReleaseEvent(QMouseEvent*){
 }
 void MainWindow::wheelEvent(QWheelEvent * e){
     //拡大
-    double delta = (e->angleDelta().y())/1000.0;//差分値
-    double x = std::log(ui->CadEdit->GetScale());
-    double next_scale = std::exp(x + delta);//次の拡大値
+    double delta = (e->angleDelta().y())/10000.0;//差分値
+    double next_scale = std::exp(std::log(ui->CadEdit->GetScale()) + delta);//次の拡大値
 
     //拡大値は負にならない
     if(next_scale > 0){
@@ -249,8 +248,6 @@ void MainWindow::MakeObject(){
     if(CObject::hanged != nullptr)local_pos = CObject::hanged->GetNear(local_pos);
 
     release_flag=false;
-
-    //並行移動
 
     //編集
     if(state == Edit){

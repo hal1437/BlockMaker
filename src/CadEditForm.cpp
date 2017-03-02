@@ -110,10 +110,12 @@ void CadEditForm::paintEvent(QPaintEvent*){
     }
 
     //原点を描画
-    paint.drawLine(-3,-3,+3,-3);
-    paint.drawLine(+3,-3,+3,+3);
-    paint.drawLine(+3,+3,-3,+3);
-    paint.drawLine(-3,+3,-3,-3);
+    paint.drawLine(-100,-100,+100,-100);
+    paint.drawLine(+100,-100,+100,+100);
+    paint.drawLine(+100,+100,-100,+100);
+    paint.drawLine(-100,+100,-100,-100);
+    paint.drawLine(+100,+100,-100,-100);
+    paint.drawLine(+100,-100,-100,+100);
 
     //CBox描画
     paint.setBrush(QBrush(Qt::darkGray));   //背景設定
@@ -174,16 +176,16 @@ void CadEditForm::resizeEvent(QResizeEvent*){
 
 Pos CadEditForm::ConvertLocalPos(Pos pos)const{
     QTransform trans;
+    trans.translate(-translate.x,-translate.y);
     trans.scale(scale,scale);
-    trans.translate(translate.x,translate.y);
+    trans = trans.inverted();//逆行列化
     QPoint ans = trans.map(QPoint(pos.x,pos.y));
     return Pos(ans.x(),ans.y());
 }
 Pos CadEditForm::ConvertWorldPos(Pos pos)const{
     QTransform trans;
+    trans.translate(-translate.x,-translate.y);
     trans.scale(scale,scale);
-    trans.translate(translate.x,translate.y);
-    trans = trans.inverted();
     QPoint ans = trans.map(QPoint(pos.x,pos.y));
     return Pos(ans.x(),ans.y());
 }
