@@ -116,7 +116,7 @@ void CadEditForm::paintEvent(QPaintEvent*){
     paint.drawLine(-3,+3,-3,-3);
 
     //CBox描画
-    paint.setBrush(QBrush(Qt::darkGray));                             //背景設定
+    paint.setBrush(QBrush(Qt::darkGray));   //背景設定
     for(int i=0;i<this->blocks.size();i++){ //エリア描画
         this->blocks[i].Draw(paint,trans);
     }
@@ -162,6 +162,9 @@ void CadEditForm::mouseMoveEvent   (QMouseEvent* event){
     //UI更新
     repaint();
     emit MovedMouse(event,answer);
+
+    //ズーム支点リセット
+    zoom_piv = Pos(0,0);
 }
 void CadEditForm::resizeEvent(QResizeEvent*){
     //原点を中心に
@@ -187,14 +190,18 @@ Pos CadEditForm::ConvertWorldPos(Pos pos)const{
 
 
 void CadEditForm::Zoom(double scale,Pos local_pos){
-    Pos origin_m = this->ConvertWorldPos(CObject::mouse_pos);
-    Pos origin_h = this->ConvertWorldPos(local_pos);
 
-    this->translate += (origin_h) * ((scale / this->scale) - 1);
-    origin_m        += (origin_h) * ((scale / this->scale) - 1);
+    //ズーム支点保存
+    if(zoom_piv == Pos(0,0)){
+          zoom_piv = this->ConvertWorldPos(local_pos);
+    }
+
+    //ズーム適用
+    this->translate += (zoom_piv + this->translate) * ((scale / this->scale) - 1);
     this->scale = scale;
 
-    CObject::mouse_pos = this->ConvertLocalPos(origin_m);
+    //マウス座標復元
+    CObject::mouse_pos = this->ConvertLocalPos(zoom_piv);
 }
 
 

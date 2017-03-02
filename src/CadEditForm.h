@@ -59,6 +59,7 @@ public:
 
 private:
     Ui::CadEditForm *ui;
+    Pos zoom_piv; //ズーム支店
 
 signals:
     void MovedMouse(QMouseEvent *event, CObject *under_object);
