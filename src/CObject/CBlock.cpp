@@ -42,53 +42,50 @@ CObject* CBlock::GetNode(int index)const{
     return this->lines[index];
 }
 
-void CBlock::Draw(QPainter& painter, QTransform trans)const{
+void CBlock::Draw(QPainter& painter)const{
     //描画範囲算出
+    double top,bottom,left,right;
     QVector<Pos> pp = this->GetVerticesPos();
-
-    //全て変換
-    for(Pos& p:pp){
-        p.Transform(trans);
-    }
-
-    float top,bottom,left,right;
     top    = std::min_element(pp.begin(),pp.end(),[](const Pos& lhs,const Pos& rhs){return lhs.y < rhs.y;})->y;
     bottom = std::max_element(pp.begin(),pp.end(),[](const Pos& lhs,const Pos& rhs){return lhs.y < rhs.y;})->y;
     left   = std::min_element(pp.begin(),pp.end(),[](const Pos& lhs,const Pos& rhs){return lhs.x < rhs.x;})->x;
     right  = std::max_element(pp.begin(),pp.end(),[](const Pos& lhs,const Pos& rhs){return lhs.x < rhs.x;})->x;
 
-
     //パスの作成
     QPainterPath myPath;
-    myPath.moveTo(pp[0].x,pp[0].y);
-    for(int i=0;i<4+1;i++){
-        Pos p =  pp[i%4];
-        myPath.lineTo(p.x,p.y);
+    myPath.moveTo(pp[4].x- left,pp[4].y -top);
+    for(int i=0;i<4;i++){
+        myPath.lineTo(pp[i].x - left,pp[i].y-top);
     }
     myPath.closeSubpath();
 
     //マスクを作成
-    QImage mask(QSize(right+20,bottom+20), QImage::Format_ARGB32);
+    double width  = right  - left;
+    double height = bottom - top;
+    QImage mask(QSize(width,height), QImage::Format_ARGB32);
     QPainter paint;// = new QPainter(mask);
     mask.fill(0);
     paint.begin(&mask);
+    paint.setRenderHint(QPainter::Antialiasing, true);//アンチエイリアスセット
     paint.setCompositionMode(QPainter::CompositionMode_SourceOver);
     paint.setPen  (painter.pen());
     paint.setBrush(painter.brush());
     paint.drawPath(myPath);
     paint.setCompositionMode(QPainter::CompositionMode_SourceAtop);
+
+
+    //並行線の描画
     for(int i =0;i<=this->grading_args[0];i++){
-        paint.drawLine(left ,top+(bottom-top)*i/this->grading_args[0],
-                       right,top+(bottom-top)*i/this->grading_args[0]);
+        paint.drawLine(0    ,height*i/this->grading_args[0],
+                       width,height*i/this->grading_args[0]);
     }
-    //Y軸に並行
     for(int i =0;i<=this->grading_args[1];i++){
-        paint.drawLine(left+(right-left)*i/this->grading_args[1],top,
-                       left+(right-left)*i/this->grading_args[1],bottom);
+        paint.drawLine(width*i/this->grading_args[1],0,
+                       width*i/this->grading_args[1],height);
     }
     paint.end();
 
-    painter.drawImage(QPoint(0,0),mask);
+    painter.drawImage(QPoint(left,top),mask);
     /*
 
     //マクス適用

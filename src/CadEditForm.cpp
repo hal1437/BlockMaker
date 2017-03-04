@@ -121,7 +121,7 @@ void CadEditForm::paintEvent(QPaintEvent*){
     //CBox描画
     paint.setBrush(QBrush(Qt::darkGray));   //背景設定
     for(int i=0;i<this->blocks.size();i++){ //エリア描画
-        this->blocks[i].Draw(paint,trans);
+        this->blocks[i].Draw(paint);
     }
     paint.setBrush(QBrush(Qt::white));      //ブラシ復元
 

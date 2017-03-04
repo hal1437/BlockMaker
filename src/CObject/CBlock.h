@@ -51,7 +51,7 @@ public:
     bool isParadox()const;//矛盾確認
 
     //描画
-    void Draw(QPainter& painter,QTransform trans)const;
+    void Draw(QPainter& painter)const;
 
     void SetNodeAll(QVector<CObject*> lines);
     void SetNode(int index,CObject* line);
