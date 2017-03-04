@@ -14,12 +14,26 @@ bool CBlock::Creatable(QVector<CObject*> values){
             return v.second == 2;
         });
     }
+
+    //CRect一つでも可
+    if(values.size() == 1 && values[0]->is<CRect>()){
+        return true;
+    }
+
     return false;
 }
 
 void CBlock::SetNodeAll(QVector<CObject*> lines){
-    this->lines = lines;
+    //CRect一つでも可
+    if(lines.size() == 1 && lines[0]->is<CRect>()){
+        for(int i=0;i<4;i++){
+            this->lines.push_back(dynamic_cast<CRect*>(lines[0])->GetLines()[i]);
+        }
+    }else{
+        this->lines = lines;
+    }
 }
+
 void CBlock::SetNode(int index,CObject* line){
     this->lines[index] = line;
 }

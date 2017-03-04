@@ -7,6 +7,7 @@
 #include "CLine.h"
 #include "CArc.h"
 #include "CSpline.h"
+#include "CRect.h"
 
 //面の方向
 enum BoundaryDir{

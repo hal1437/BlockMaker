@@ -40,6 +40,9 @@ public:
     //近接点
     virtual Pos GetNear(const Pos& hand)const;
 
+    //線の取得
+    CLine **GetLines();
+
     //ジョイント関係
     virtual int     GetJointNum()         const;
     virtual Pos     GetJointPos(int index)const;

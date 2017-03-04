@@ -77,6 +77,10 @@ bool CRect::Move(const Pos& diff){
     }
 }
 
+CLine** CRect::GetLines(){
+    return lines;
+}
+
 int CRect::GetJointNum()const{
     return 4;
 }
