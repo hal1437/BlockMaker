@@ -16,14 +16,8 @@ bool CRect::Create(CPoint *hand, int index){
             pos[1] = new CPoint();
             pos[2] = new CPoint();
             pos[3] = hand;
-            if((GetJointPos(0).x < GetJointPos(3).x && GetJointPos(0).y < GetJointPos(3).y )||
-               (GetJointPos(0).x > GetJointPos(3).x && GetJointPos(0).y > GetJointPos(3).y )){
-                *pos[1] = Pos(std::min(GetJointPos(0).x,GetJointPos(3).x),std::max(GetJointPos(0).y,GetJointPos(3).y));
-                *pos[2] = Pos(std::max(GetJointPos(0).x,GetJointPos(3).x),std::min(GetJointPos(0).y,GetJointPos(3).y));
-            }else{
-                *pos[1] = Pos(std::max(GetJointPos(0).x,GetJointPos(3).x),std::max(GetJointPos(0).y,GetJointPos(3).y));
-                *pos[2] = Pos(std::min(GetJointPos(0).x,GetJointPos(3).x),std::min(GetJointPos(0).y,GetJointPos(3).y));
-            }
+            *pos[1] = Pos(pos[0]->x,pos[3]->y);
+            *pos[2] = Pos(pos[3]->x,pos[0]->y);
             lines[0]->Create(GetJoint(0),0);
             lines[0]->Create(GetJoint(1),1);
             lines[1]->Create(GetJoint(0),0);
