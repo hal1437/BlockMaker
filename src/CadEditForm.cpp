@@ -94,9 +94,7 @@ void CadEditForm::paintEvent(QPaintEvent*){
     paint.setPen(QPen(Qt::blue , (CObject::DRAWING_LINE_SIZE/2 / this->scale)));    //太さ設定
 
     //原点座標・マウス座標を描画
-    paint.drawText(0,12,QString("(") + QString::number(this->translate.x   ) + "," + QString::number(this->translate.y   ) + ")");
-    paint.drawText(0,24,QString("MouseLocal(") + QString::number(CObject::mouse_pos.x)                  + "," + QString::number(CObject::mouse_pos.y)                  + ")");
-    paint.drawText(0,36,QString("MouseWorld(") + QString::number(ConvertWorldPos(CObject::mouse_pos).x) + "," + QString::number(ConvertWorldPos(CObject::mouse_pos).y) + ")");
+    paint.drawText(0,12,QString("(") + QString::number(CObject::mouse_pos.x) + "," + QString::number(CObject::mouse_pos.y) + ")");
 
     //変換行列を作成
     QTransform trans;
