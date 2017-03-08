@@ -16,7 +16,7 @@
   <widget class="QWidget" name="centralWidget">
    <layout class="QHBoxLayout" name="horizontalLayout">
     <item>
-     <widget class="QWidget" name="" native="true">
+     <widget class="QWidget" name="widget" native="true">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
         <horstretch>0</horstretch>
@@ -254,6 +254,8 @@
     </property>
     <addaction name="actionCopy"/>
     <addaction name="actionPaste"/>
+    <addaction name="separator"/>
+    <addaction name="actionResetExpantion"/>
    </widget>
    <addaction name="menu"/>
    <addaction name="menuEdit"/>
@@ -448,6 +450,11 @@
   <action name="actionCheckConflict">
    <property name="text">
     <string>CheckConflict</string>
+   </property>
+  </action>
+  <action name="actionResetExpantion">
+   <property name="text">
+    <string>ResetExpantion</string>
    </property>
   </action>
  </widget>

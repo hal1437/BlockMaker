@@ -168,7 +168,6 @@ void CadEditForm::mouseMoveEvent   (QMouseEvent* event){
     zoom_piv = Pos(0,0);
 }
 void CadEditForm::resizeEvent(QResizeEvent*){
-    //原点を中心に
     this->translate.x = -this->width()  / 2;
     this->translate.y = -this->height() / 2;
 }
@@ -540,5 +539,11 @@ void CadEditForm::ConfigureBlock(QListWidgetItem*){
         *this->selecting_block[0] = diag->ExportCBlock();
         this->selecting_block[0]->SetNodeAll(ll);
     }
+}
+void CadEditForm::ResetAllExpantion(){
+    //原点を中心に
+    this->translate.x = -this->width()  / 2;
+    this->translate.y = -this->height() / 2;
+    this->scale = 1.0;
 }
 

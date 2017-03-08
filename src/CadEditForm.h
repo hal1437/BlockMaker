@@ -80,6 +80,8 @@ public slots:
     void DrawCBoxList   (QListWidget *list); //ブロックリスト描画
     void ConfigureBlock (QListWidgetItem* item); //ブロック再編集
 
+    void ResetAllExpantion();//拡大、移動リセット
+
 };
 
 #endif // CADEDITFORM_H

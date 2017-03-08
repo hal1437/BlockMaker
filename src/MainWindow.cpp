@@ -7,18 +7,19 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     setMouseTracking(true);
-    connect(ui->CadEdit          ,SIGNAL(MovedMouse(QMouseEvent*,CObject*))  ,this       ,SLOT(MovedMouse(QMouseEvent*,CObject*)));
-    connect(ui->actionCtrlZ      ,SIGNAL(triggered())                        ,this       ,SLOT(CtrlZ()));
-    connect(ui->actionDelete     ,SIGNAL(triggered())                        ,this       ,SLOT(Delete()));
-    connect(ui->actionEsc        ,SIGNAL(triggered())                        ,this       ,SLOT(Escape()));
-    connect(ui->RestraintList    ,SIGNAL(itemClicked(QListWidgetItem*))      ,this       ,SLOT(MakeRestraint(QListWidgetItem*)));
-    connect(ui->SizeRateSpinBox  ,SIGNAL(valueChanged(double))               ,ui->CadEdit,SLOT(SetScale(double)));
-    connect(ui->ToolDimension    ,SIGNAL(triggered())                        ,ui->CadEdit,SLOT(MakeSmartDimension()));
-    connect(ui->ToolBlocks       ,SIGNAL(triggered())                        ,ui->CadEdit,SLOT(MakeBlock()));
-    connect(ui->ObjectList       ,SIGNAL(itemClicked(QListWidgetItem*))      ,this       ,SLOT(ReciveObjectListChanged(QListWidgetItem*)));
-    connect(ui->BlockList        ,SIGNAL(itemClicked(QListWidgetItem*))      ,this       ,SLOT(ReciveBlockListChanged (QListWidgetItem*)));
-    connect(ui->BlockList        ,SIGNAL(itemDoubleClicked(QListWidgetItem*)),ui->CadEdit,SLOT(ConfigureBlock(QListWidgetItem*)));
-    connect(ui->CadEdit          ,SIGNAL(ToggleConflict(bool))               ,this       ,SLOT(ToggleConflict(bool)));
+    connect(ui->CadEdit              ,SIGNAL(MovedMouse(QMouseEvent*,CObject*))  ,this       ,SLOT(MovedMouse(QMouseEvent*,CObject*)));
+    connect(ui->actionCtrlZ          ,SIGNAL(triggered())                        ,this       ,SLOT(CtrlZ()));
+    connect(ui->actionDelete         ,SIGNAL(triggered())                        ,this       ,SLOT(Delete()));
+    connect(ui->actionEsc            ,SIGNAL(triggered())                        ,this       ,SLOT(Escape()));
+    connect(ui->actionResetExpantion ,SIGNAL(triggered())                        ,ui->CadEdit,SLOT(ResetAllExpantion()));
+    connect(ui->RestraintList        ,SIGNAL(itemClicked(QListWidgetItem*))      ,this       ,SLOT(MakeRestraint(QListWidgetItem*)));
+    connect(ui->SizeRateSpinBox      ,SIGNAL(valueChanged(double))               ,ui->CadEdit,SLOT(SetScale(double)));
+    connect(ui->ToolDimension        ,SIGNAL(triggered())                        ,ui->CadEdit,SLOT(MakeSmartDimension()));
+    connect(ui->ToolBlocks           ,SIGNAL(triggered())                        ,ui->CadEdit,SLOT(MakeBlock()));
+    connect(ui->ObjectList           ,SIGNAL(itemClicked(QListWidgetItem*))      ,this       ,SLOT(ReciveObjectListChanged(QListWidgetItem*)));
+    connect(ui->BlockList            ,SIGNAL(itemClicked(QListWidgetItem*))      ,this       ,SLOT(ReciveBlockListChanged (QListWidgetItem*)));
+    connect(ui->BlockList            ,SIGNAL(itemDoubleClicked(QListWidgetItem*)),ui->CadEdit,SLOT(ConfigureBlock(QListWidgetItem*)));
+    connect(ui->CadEdit              ,SIGNAL(ToggleConflict(bool))               ,this       ,SLOT(ToggleConflict(bool)));
 
     ConnectSignals();
     ui->ToolBlocks->setEnabled(false);
