@@ -69,6 +69,8 @@ public slots:
     void ToggledSpline (bool checked);
     void ToggleConflict(bool conflict);
     void Export();                          //出力
+    void ResetAllExpantion();//拡大、移動リセット
+
 
     void MakeObject();                      //オブジェクト作成
     bool MakeJoint(CObject *obj);           //ジョイント作成

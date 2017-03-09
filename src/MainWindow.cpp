@@ -11,7 +11,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionCtrlZ          ,SIGNAL(triggered())                        ,this       ,SLOT(CtrlZ()));
     connect(ui->actionDelete         ,SIGNAL(triggered())                        ,this       ,SLOT(Delete()));
     connect(ui->actionEsc            ,SIGNAL(triggered())                        ,this       ,SLOT(Escape()));
-    connect(ui->actionResetExpantion ,SIGNAL(triggered())                        ,ui->CadEdit,SLOT(ResetAllExpantion()));
+    connect(ui->actionResetExpantion ,SIGNAL(triggered())                        ,this       ,SLOT(ResetAllExpantion()));
     connect(ui->RestraintList        ,SIGNAL(itemClicked(QListWidgetItem*))      ,this       ,SLOT(MakeRestraint(QListWidgetItem*)));
     connect(ui->SizeRateSpinBox      ,SIGNAL(valueChanged(double))               ,ui->CadEdit,SLOT(SetScale(double)));
     connect(ui->ToolDimension        ,SIGNAL(triggered())                        ,ui->CadEdit,SLOT(MakeSmartDimension()));
@@ -223,6 +223,11 @@ void MainWindow::Export(){
     ExportDialog* diag = new ExportDialog(this);
     //diag->SetBlocks(blocks);
     diag->exec();
+}
+void MainWindow::ResetAllExpantion(){
+    CObject::drawing_scale = 1.0;
+    this->ui->SizeRateSpinBox->setValue(1.0);
+    this->ui->CadEdit->ResetAllExpantion();
 }
 
 void MainWindow::MakeRestraint(QListWidgetItem *){
