@@ -55,13 +55,16 @@ bool CRect::Draw(QPainter& painter)const{
     return true;
 }
 bool CRect::isSelectable()const{
+    /*
     if(!this->isCreating()){
         for(int i=0;i<4;i++){
             if(this->lines[i]!=nullptr && this->lines[i]->isSelectable()){
                 return true;
             }
         }
-    }
+    }*/
+
+    //CRectを座標上から選択することはできない
     return false;
 }
 
@@ -71,8 +74,8 @@ bool CRect::Move(const Pos& diff){
     }
 }
 
-CLine** CRect::GetLines(){
-    return lines;
+CLine *CRect::GetLines(int index){
+    return lines[index];
 }
 
 int CRect::GetJointNum()const{

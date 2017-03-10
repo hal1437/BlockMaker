@@ -41,7 +41,7 @@ public:
     virtual Pos GetNear(const Pos& hand)const;
 
     //線の取得
-    CLine **GetLines();
+    CLine *GetLines(int index);
 
     //ジョイント関係
     virtual int     GetJointNum()         const;

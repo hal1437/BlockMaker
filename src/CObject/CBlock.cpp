@@ -27,7 +27,7 @@ void CBlock::SetNodeAll(QVector<CObject*> lines){
     //CRect一つでも可
     if(lines.size() == 1 && lines[0]->is<CRect>()){
         for(int i=0;i<4;i++){
-            this->lines.push_back(dynamic_cast<CRect*>(lines[0])->GetLines()[i]);
+            this->lines.push_back(dynamic_cast<CRect*>(lines[0])->GetLines(i));
         }
     }else{
         this->lines = lines;

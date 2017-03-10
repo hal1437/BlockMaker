@@ -289,9 +289,14 @@ void MainWindow::MakeObject(){
             for(int i=0;i<make_obj->GetJointNum();i++){
                 ui->CadEdit->AddObject(make_obj->GetJoint(i));
             }
+            //CRectならば構成線も追加
+            if(make_obj->is<CRect>()){
+                for(int i=0;i<4;i++){
+                    ui->CadEdit->AddObject(dynamic_cast<CRect*>(make_obj)->GetLines(i));
+                }
+            }
         }else {
             //生成継続
-
             creating_count++;
         }
     }
