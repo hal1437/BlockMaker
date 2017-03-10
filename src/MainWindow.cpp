@@ -86,11 +86,13 @@ void MainWindow::Delete(){
     RefreshUI();
 }
 void MainWindow::Escape(){
-    if(make_obj != nullptr && !make_obj->Create(nullptr,-1)){
+    if(CObject::createing != nullptr){
         ui->CadEdit->RemoveObject(make_obj);
     }
     creating_count=0;
     ClearButton();
+    RefreshUI();
+
 }
 
 void MainWindow::MovedMouse(QMouseEvent *event, CObject *under_object){

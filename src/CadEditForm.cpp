@@ -16,7 +16,7 @@ void CadEditForm::AddObject(CObject* obj){
 void CadEditForm::RemoveObject(CObject* obj){
     if(obj == nullptr)return;
 
-    //点ならば含むObjectを全て削除する。
+    //点ならばその点を含むObjectを全てnullptrにする。
     if(obj->is<CPoint>()){
         for(QVector<CObject*>::Iterator it = objects.begin();it != objects.end();it++){
             for(int i=0;i < (*it)->GetJointNum();i++){
@@ -26,30 +26,17 @@ void CadEditForm::RemoveObject(CObject* obj){
                 }
             }
         }
-    }/*
-    else{
-        //点以外ならば端点の被参照数を確認して1なら消す
-
-        //点を抽出
-        QMap<Pos,int> map;//位置,個数
-        for(QVector<CObject*>::Iterator it = objects.begin();it != objects.end();it++){
-            if((*it)->is<CPoint>()){
-                map[(*it)->GetJointPos(0)]++;//増える
-            }
-        }
-        for(int i=0;i<obj->GetJointNum();i++){
-            map.insert(obj->GetJointPos(i),1);
-        }
-    }*/
+    }
 
     //objを消す
     QVector<CObject*>::Iterator it = std::find(objects.begin(),objects.end(),obj);
-    if(it != objects.end())objects.erase(it);
+    if(it != objects.end()){
+        objects.erase(it);
+    }
 
     //nullptrを消す
     it = std::find(objects.begin(),objects.end(),nullptr);
     while(it != objects.end()){
-        delete *it;
         objects.erase(it);
         it = std::find(objects.begin(),objects.end(),nullptr);
     }
