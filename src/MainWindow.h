@@ -68,13 +68,13 @@ public slots:
     void ToggledRect   (bool checked);
     void ToggledSpline (bool checked);
     void ToggleConflict(bool conflict);
-    void Export();                          //出力
     void ResetAllExpantion();//拡大、移動リセット
 
 
     void MakeObject();                      //オブジェクト作成
     bool MakeJoint(CObject *obj);           //ジョイント作成
     void MakeRestraint(QListWidgetItem*);   //拘束作成
+    void MakeBlock();                      //ブロック作成
 
     void ReciveObjectListChanged(QListWidgetItem* current); //オブジェクトリスト更新
     void ReciveBlockListChanged (QListWidgetItem* current); //ブロックリスト更新

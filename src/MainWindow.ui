@@ -159,7 +159,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="pushButton">
+        <widget class="QPushButton" name="ExportButton">
          <property name="maximumSize">
           <size>
            <width>100</width>

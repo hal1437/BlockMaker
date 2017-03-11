@@ -25,19 +25,19 @@ class ExportDialog : public QDialog
 {
     Q_OBJECT
 private:
-    std::vector<CObject*> objects;
-    std::vector<CBlock> blocks;
+    QVector<CObject*> objects;
+    QVector<CBlock> blocks;
+    void Export(QString filename)const;
 
 public:
-    void SetBlocks(std::vector<CBlock> blocks);
+    void SetBlocks(QVector<CBlock> blocks);
 
     explicit ExportDialog(QWidget *parent = 0);
-    ExportDialog(std::vector<CObject*> objects,QWidget *parent = 0);
+    ExportDialog(QVector<CObject *> objects, QWidget *parent = 0);
     ~ExportDialog();
 
 public slots:
     void ChangeDirctory();
-    void Export(QString filename)const;
     void AcceptDialog();
 
 private:

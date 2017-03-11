@@ -19,6 +19,7 @@
 #include "SmartDimension.h"
 #include "SmartDimensionDialog.h"
 #include "Restraint.h"
+#include "ExportDialog.h"
 
 namespace Ui {
 class CadEditForm;
@@ -81,6 +82,7 @@ public slots:
     void ConfigureBlock (QListWidgetItem* item); //ブロック再編集
 
     void ResetAllExpantion();//拡大、移動リセット
+    void Export(); //出力
 
 };
 

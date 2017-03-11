@@ -534,3 +534,11 @@ void CadEditForm::ResetAllExpantion(){
     this->scale = 1.0;
 }
 
+void CadEditForm::Export(){
+    ExportDialog* diag = new ExportDialog(this);
+    diag->SetBlocks(this->blocks);
+    diag->exec();
+}
+
+
+

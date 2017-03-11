@@ -15,11 +15,12 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->RestraintList        ,SIGNAL(itemClicked(QListWidgetItem*))      ,this       ,SLOT(MakeRestraint(QListWidgetItem*)));
     connect(ui->SizeRateSpinBox      ,SIGNAL(valueChanged(double))               ,ui->CadEdit,SLOT(SetScale(double)));
     connect(ui->ToolDimension        ,SIGNAL(triggered())                        ,ui->CadEdit,SLOT(MakeSmartDimension()));
-    connect(ui->ToolBlocks           ,SIGNAL(triggered())                        ,ui->CadEdit,SLOT(MakeBlock()));
     connect(ui->ObjectList           ,SIGNAL(itemClicked(QListWidgetItem*))      ,this       ,SLOT(ReciveObjectListChanged(QListWidgetItem*)));
+    connect(ui->ToolBlocks           ,SIGNAL(triggered())                        ,this       ,SLOT(MakeBlock()));
     connect(ui->BlockList            ,SIGNAL(itemClicked(QListWidgetItem*))      ,this       ,SLOT(ReciveBlockListChanged (QListWidgetItem*)));
     connect(ui->BlockList            ,SIGNAL(itemDoubleClicked(QListWidgetItem*)),ui->CadEdit,SLOT(ConfigureBlock(QListWidgetItem*)));
     connect(ui->CadEdit              ,SIGNAL(ToggleConflict(bool))               ,this       ,SLOT(ToggleConflict(bool)));
+    connect(ui->ExportButton         ,SIGNAL(pressed())                          ,ui->CadEdit,SLOT(Export()));
 
     ConnectSignals();
     ui->ToolBlocks->setEnabled(false);
@@ -221,11 +222,6 @@ void MainWindow::ToggleConflict(bool conflict){
         this->ui->actionCheckConflict->setIcon(QIcon(":/Others/NotConflict.png"));
     }
 }
-void MainWindow::Export(){
-    ExportDialog* diag = new ExportDialog(this);
-    //diag->SetBlocks(blocks);
-    diag->exec();
-}
 void MainWindow::ResetAllExpantion(){
     CObject::drawing_scale = 1.0;
     this->ui->SizeRateSpinBox->setValue(1.0);
@@ -328,6 +324,12 @@ bool MainWindow::MakeJoint(CObject* obj){
         return  obj->Create(new_point,creating_count);
     }
 }
+void MainWindow::MakeBlock(){
+    this->ui->CadEdit->MakeBlock();
+    RefreshUI();
+}
+
+
 void MainWindow::ReciveObjectListChanged(QListWidgetItem* current){
     this->ui->CadEdit->ApplyObjectList(this->ui->ObjectList);
     RefreshUI();
