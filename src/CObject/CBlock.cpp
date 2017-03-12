@@ -53,8 +53,8 @@ void CBlock::Draw(QPainter& painter)const{
 
     //パスの作成
     QPainterPath myPath;
-    myPath.moveTo(pp[4].x- left,pp[4].y -top);
-    for(int i=0;i<4;i++){
+    myPath.moveTo(pp[pp.size()-1].x- left,pp[pp.size()-1].y -top);
+    for(int i=0;i<pp.size();i++){
         myPath.lineTo(pp[i].x - left,pp[i].y-top);
     }
     myPath.closeSubpath();
@@ -107,23 +107,26 @@ void CBlock::Draw(QPainter& painter)const{
 
 
 QVector<Pos> CBlock::GetVerticesPos()const{
+    //0~4で巡回するように
+
     QVector<Pos> pp;
-    CObject* old = lines[0];
-    pp.push_back(lines[0]->GetJointPos(0));
-    pp.push_back(lines[0]->GetJointPos(lines[0]->GetJointNum()-1));
-    //連結を探索
-    for(int i=0;lines[0]->GetJointPos(0) != pp[pp.size()-1];i++){
-        if(lines[i%4] == old)continue;
-        Pos p1 = lines[i%4]->GetJointPos(0);
-        Pos p2 = lines[i%4]->GetJointPos(lines[i%4]->GetJointNum()-1);
-        if(p1 == pp[pp.size()-1]){
-            pp.push_back(p2);
-            old=lines[i%4];
-        }else if(p2 == pp[pp.size()-1]){
-            pp.push_back(p1);
-            old=lines[i%4];
+    Pos old;
+    pp.push_back(lines[0]->GetJointPos(0)); //先頭
+    old = lines[0]->GetJointPos(0);
+
+    //oldの相方を含むlineを探す
+    for(int i=0;i<4;i++){
+        if(lines[i]->GetJointPos(0) == old && !exist(pp,lines[i]->GetJointPos(1))){
+            pp.push_back(lines[i]->GetJointPos(1));
+            old = lines[i]->GetJointPos(1);
+            i = 0;
+        }else if(lines[i]->GetJointPos(1) == old && !exist(pp,lines[i]->GetJointPos(0))){
+            pp.push_back(lines[i]->GetJointPos(0));
+            old = lines[i]->GetJointPos(0);
+            i = 0;
         }
     }
+
     return pp;
 }
 

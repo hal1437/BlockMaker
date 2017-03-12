@@ -69,9 +69,9 @@ void ExportDialog::Export(QString filename)const{
         int index[4];
         QVector<Pos> b_vertices = block.GetVerticesPos();
         for(int i=0;i<4;i++){
-            index[i] = std::find_if(vertices.begin(),vertices.end(),[&](VPos p){
+            index[i] = std::distance(vertices.begin(),std::find_if(vertices.begin(),vertices.end(),[&](VPos p){
                 return (p.x == b_vertices[i].x && p.y == b_vertices[i].y,p.z == 0);
-            }) - vertices.begin();
+            }));
         }
         //頂点番号出力
         for(int i=0;i<4;i++)out << index[i] << " ";
