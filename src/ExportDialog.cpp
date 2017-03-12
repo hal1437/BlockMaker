@@ -70,7 +70,7 @@ void ExportDialog::Export(QString filename)const{
         QVector<Pos> b_vertices = block.GetVerticesPos();
         for(int i=0;i<4;i++){
             index[i] = std::distance(vertices.begin(),std::find_if(vertices.begin(),vertices.end(),[&](VPos p){
-                return (p.x == b_vertices[i].x && p.y == b_vertices[i].y,p.z == 0);
+                return (p.x == b_vertices[i].x && p.y == b_vertices[i].y && p.z == 0);
             }));
         }
         //頂点番号出力
@@ -80,7 +80,7 @@ void ExportDialog::Export(QString filename)const{
 
         //分割数出力
         if(block.grading == GradingType::SimpleGrading){
-            out << " SimpleGrading (" ;
+            out << " (" ;
             for(int i=0;i<3;i++){
                 out << block.grading_args[i];
                 if(i != 2){
