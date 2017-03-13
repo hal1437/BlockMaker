@@ -12,6 +12,7 @@
 #include "CObject/CSpline.h"
 #include "CObject/CBlock.h"
 #include "CBoxDefineDialog.h"
+#include "MoveTransformDialog.h"
 #include "ExportDialog.h"
 
 namespace Ui {
@@ -68,8 +69,8 @@ public slots:
     void ToggledRect   (bool checked);
     void ToggledSpline (bool checked);
     void ToggleConflict(bool conflict);
-    void ResetAllExpantion();//拡大、移動リセット
-
+    void ResetAllExpantion(); //拡大、移動リセット
+    void MoveTransform();     //移動
 
     void MakeObject();                      //オブジェクト作成
     bool MakeJoint(CObject *obj);           //ジョイント作成

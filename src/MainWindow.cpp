@@ -11,6 +11,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionCtrlZ          ,SIGNAL(triggered())                        ,this       ,SLOT(CtrlZ()));
     connect(ui->actionDelete         ,SIGNAL(triggered())                        ,this       ,SLOT(Delete()));
     connect(ui->actionEsc            ,SIGNAL(triggered())                        ,this       ,SLOT(Escape()));
+    connect(ui->actionMove           ,SIGNAL(triggered())                        ,this       ,SLOT(MoveTransform()));
     connect(ui->actionResetExpantion ,SIGNAL(triggered())                        ,this       ,SLOT(ResetAllExpantion()));
     connect(ui->RestraintList        ,SIGNAL(itemClicked(QListWidgetItem*))      ,this       ,SLOT(MakeRestraint(QListWidgetItem*)));
     connect(ui->SizeRateSpinBox      ,SIGNAL(valueChanged(double))               ,ui->CadEdit,SLOT(SetScale(double)));
@@ -227,6 +228,12 @@ void MainWindow::ResetAllExpantion(){
     this->ui->SizeRateSpinBox->setValue(1.0);
     this->ui->CadEdit->ResetAllExpantion();
 }
+
+void MainWindow::MoveTransform(){
+    MoveTransformDialog* diag = new MoveTransformDialog(this);
+    diag->exec();
+}
+
 
 void MainWindow::MakeRestraint(QListWidgetItem *){
     //qDebug() << text;

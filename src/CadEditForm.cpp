@@ -96,12 +96,10 @@ void CadEditForm::paintEvent(QPaintEvent*){
     }
 
     //原点を描画
-    paint.drawLine(-100,-100,+100,-100);
-    paint.drawLine(+100,-100,+100,+100);
-    paint.drawLine(+100,+100,-100,+100);
-    paint.drawLine(-100,+100,-100,-100);
-    paint.drawLine(+100,+100,-100,-100);
-    paint.drawLine(+100,-100,-100,+100);
+    paint.drawLine(-5,-5,+5,-5);
+    paint.drawLine(+5,-5,+5,+5);
+    paint.drawLine(+5,+5,-5,+5);
+    paint.drawLine(-5,+5,-5,-5);
 
     //CBox描画
     paint.setBrush(QBrush(Qt::darkGray));   //背景設定

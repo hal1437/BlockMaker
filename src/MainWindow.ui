@@ -286,6 +286,8 @@
    <addaction name="ToolBlocks"/>
    <addaction name="separator"/>
    <addaction name="ToolDimension"/>
+   <addaction name="actionMove"/>
+   <addaction name="separator"/>
    <addaction name="actionCtrlZ"/>
    <addaction name="actionDelete"/>
    <addaction name="actionEsc"/>
@@ -455,6 +457,15 @@
   <action name="actionResetExpantion">
    <property name="text">
     <string>ResetExpantion</string>
+   </property>
+  </action>
+  <action name="actionMove">
+   <property name="icon">
+    <iconset resource="../Resource/images.qrc">
+     <normaloff>:/Others/Move.png</normaloff>:/Others/Move.png</iconset>
+   </property>
+   <property name="text">
+    <string>Move</string>
    </property>
   </action>
  </widget>

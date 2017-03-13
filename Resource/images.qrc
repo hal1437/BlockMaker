@@ -22,5 +22,6 @@
     <qresource prefix="/Others">
         <file>Conflict.png</file>
         <file>NotConflict.png</file>
+        <file>Move.png</file>
     </qresource>
 </RCC>

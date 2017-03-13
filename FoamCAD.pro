@@ -28,7 +28,8 @@ SOURCES += src/main.cpp\
     src/CObject/CPoint.cpp \
     src/CObject/CRect.cpp \
     src/CObject/CSpline.cpp \
-    src/CObject/CBlock.cpp
+    src/CObject/CBlock.cpp \
+    src/MoveTransformDialog.cpp
 
 HEADERS  += src/MainWindow.h \
     src/Point.h \
@@ -46,13 +47,15 @@ HEADERS  += src/MainWindow.h \
     src/CObject/CPoint.h \
     src/CObject/CRect.h \
     src/CObject/CSpline.h \
-    src/CObject/CBlock.h
+    src/CObject/CBlock.h \
+    src/MoveTransformDialog.h
 
 FORMS    += src/MainWindow.ui \
     src/CadEditForm.ui \
     src/SmartDimensionDialog.ui \
     src/ExportDialog.ui \
-    src/CBoxDefineDialog.ui
+    src/CBoxDefineDialog.ui \
+    src/MoveTransformDialog.ui
 
 RESOURCES += \
     Resource/images.qrc
