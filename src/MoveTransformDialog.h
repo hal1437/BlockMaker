@@ -2,6 +2,7 @@
 #define MOVETRANSFORMDIALOG_H
 
 #include <QDialog>
+#include "CObject/CObject.h"
 
 namespace Ui {
 class MoveTransformDialog;

@@ -6,7 +6,7 @@ MoveTransformDialog::MoveTransformDialog(QWidget *parent) :
     ui(new Ui::MoveTransformDialog)
 {
     ui->setupUi(this);
-    connect(this->ui->buttonBox,SIGNAL(accepted()),this,SLOT(accept()));
+    connect(this->ui->buttonBox,SIGNAL(accepted()),this,SLOT(Accept()));
 }
 
 MoveTransformDialog::~MoveTransformDialog()
@@ -15,6 +15,15 @@ MoveTransformDialog::~MoveTransformDialog()
 }
 
 void MoveTransformDialog::Accept(){
-
+    if(this->ui->RelativeRadio->isChecked()){
+        for(CObject* obj : CObject::selected){
+            obj->Move(Pos(this->ui->XSpinBox->value(),this->ui->YSpinBox->value()));
+        }
+    }
+    if(this->ui->AbsoluteRadio->isChecked()){
+        for(CObject* obj : CObject::selected){
+            obj->Move(Pos(this->ui->XSpinBox->value(),this->ui->YSpinBox->value()) - obj->GetJointPos(0));
+        }
+    }
 }
 
