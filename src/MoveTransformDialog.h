@@ -22,6 +22,9 @@ public:
 public slots:
     void Accept();
 
+signals:
+    void RepaintRequest();
+
 };
 
 #endif // MOVETRANSFORMDIALOG_H

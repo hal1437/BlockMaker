@@ -231,7 +231,8 @@ void MainWindow::ResetAllExpantion(){
 
 void MainWindow::MoveTransform(){
     MoveTransformDialog* diag = new MoveTransformDialog(this);
-    diag->exec();
+    connect(diag,SIGNAL(RepaintRequest()),this,SLOT(repaint()));
+    diag->show();
 }
 
 

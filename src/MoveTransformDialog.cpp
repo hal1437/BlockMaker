@@ -6,7 +6,9 @@ MoveTransformDialog::MoveTransformDialog(QWidget *parent) :
     ui(new Ui::MoveTransformDialog)
 {
     ui->setupUi(this);
-    connect(this->ui->buttonBox,SIGNAL(accepted()),this,SLOT(Accept()));
+    this->setWindowTitle("MoveTransformDialog");
+    connect(this->ui->ApplyButton,SIGNAL(clicked()),this,SLOT(Accept()));
+    connect(this->ui->CloseButton ,SIGNAL(clicked()),this,SLOT(close()));
 }
 
 MoveTransformDialog::~MoveTransformDialog()
@@ -25,5 +27,6 @@ void MoveTransformDialog::Accept(){
             obj->Move(Pos(this->ui->XSpinBox->value(),this->ui->YSpinBox->value()) - obj->GetJointPos(0));
         }
     }
+    emit RepaintRequest();
 }
 
