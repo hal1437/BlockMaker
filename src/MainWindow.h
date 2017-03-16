@@ -74,11 +74,11 @@ public slots:
 
     void MakeObject();                      //オブジェクト作成
     bool MakeJoint(CObject *obj);           //ジョイント作成
-    void MakeRestraint(QListWidgetItem*);   //拘束作成
+    void MakeRestraint();   //拘束作成
     void MakeBlock();                      //ブロック作成
 
-    void ReciveObjectListChanged(QListWidgetItem* current); //オブジェクトリスト更新
-    void ReciveBlockListChanged (QListWidgetItem* current); //ブロックリスト更新
+    void ReciveObjectListChanged(); //オブジェクトリスト更新
+    void ReciveBlockListChanged (); //ブロックリスト更新
 };
 
 #endif // MAINWINDOW_H

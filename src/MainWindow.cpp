@@ -13,15 +13,17 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionEsc            ,SIGNAL(triggered())                        ,this       ,SLOT(Escape()));
     connect(ui->actionMove           ,SIGNAL(triggered())                        ,this       ,SLOT(MoveTransform()));
     connect(ui->actionResetExpantion ,SIGNAL(triggered())                        ,this       ,SLOT(ResetAllExpantion()));
-    connect(ui->RestraintList        ,SIGNAL(itemClicked(QListWidgetItem*))      ,this       ,SLOT(MakeRestraint(QListWidgetItem*)));
     connect(ui->SizeRateSpinBox      ,SIGNAL(valueChanged(double))               ,ui->CadEdit,SLOT(SetScale(double)));
     connect(ui->ToolDimension        ,SIGNAL(triggered())                        ,ui->CadEdit,SLOT(MakeSmartDimension()));
-    connect(ui->ObjectList           ,SIGNAL(itemClicked(QListWidgetItem*))      ,this       ,SLOT(ReciveObjectListChanged(QListWidgetItem*)));
     connect(ui->ToolBlocks           ,SIGNAL(triggered())                        ,this       ,SLOT(MakeBlock()));
-    connect(ui->BlockList            ,SIGNAL(itemClicked(QListWidgetItem*))      ,this       ,SLOT(ReciveBlockListChanged (QListWidgetItem*)));
     connect(ui->BlockList            ,SIGNAL(itemDoubleClicked(QListWidgetItem*)),ui->CadEdit,SLOT(ConfigureBlock(QListWidgetItem*)));
     connect(ui->CadEdit              ,SIGNAL(ToggleConflict(bool))               ,this       ,SLOT(ToggleConflict(bool)));
     connect(ui->ExportButton         ,SIGNAL(pressed())                          ,ui->CadEdit,SLOT(Export()));
+
+    //リスト変更系
+    connect(ui->RestraintList        ,SIGNAL(itemSelectionChanged())      ,this       ,SLOT(MakeRestraint()));
+    connect(ui->ObjectList           ,SIGNAL(itemSelectionChanged())      ,this       ,SLOT(ReciveObjectListChanged()));
+    connect(ui->BlockList            ,SIGNAL(itemSelectionChanged())      ,this       ,SLOT(ReciveBlockListChanged ()));
 
     ConnectSignals();
     ui->ToolBlocks->setEnabled(false);
@@ -162,8 +164,14 @@ void MainWindow::ClearButton(){
     if(ui->ToolSpline->isChecked())ui->ToolSpline->setChecked(false);
 }
 void MainWindow::RefreshUI(){
+    //変更によるトリガーを無効化
+    //disconnect(ui->RestraintList        ,SIGNAL(itemChanged(QListWidgetItem*))      ,this       ,SLOT(MakeRestraint(QListWidgetItem*)));
+    //disconnect(ui->ObjectList           ,SIGNAL(itemChanged(QListWidgetItem*))      ,this       ,SLOT(ReciveObjectListChanged(QListWidgetItem*)));
+    //disconnect(ui->BlockList            ,SIGNAL(itemChanged(QListWidgetItem*))      ,this       ,SLOT(ReciveBlockListChanged (QListWidgetItem*)));
+
     ui->RestraintList->clear();
     //ui->BlockList->clear();
+
     QVector<RestraintType> able = Restraint::Restraintable(CObject::selected);
     for(RestraintType r:able){
         std::pair<std::string,std::string> p;
@@ -190,6 +198,12 @@ void MainWindow::RefreshUI(){
     ui->ToolDimension->setEnabled(CObject::selected.size() >= 1);
 
     this->repaint();
+
+    //再接続
+    //connect(ui->RestraintList        ,SIGNAL(itemChanged(QListWidgetItem*))      ,this       ,SLOT(MakeRestraint(QListWidgetItem*)));
+    //connect(ui->ObjectList           ,SIGNAL(itemChanged(QListWidgetItem*))      ,this       ,SLOT(ReciveObjectListChanged(QListWidgetItem*)));
+    //connect(ui->BlockList            ,SIGNAL(itemChanged(QListWidgetItem*))      ,this       ,SLOT(ReciveBlockListChanged (QListWidgetItem*)));
+
 }
 
 #define ToggledToolDefinition(TYPE)             \
@@ -236,7 +250,7 @@ void MainWindow::MoveTransform(){
 }
 
 
-void MainWindow::MakeRestraint(QListWidgetItem *){
+void MainWindow::MakeRestraint(){
     //qDebug() << text;
     RestraintType type = Paradox;
     if(ui->RestraintList->currentItem()->text() == "一致")type = MATCH;
@@ -338,11 +352,11 @@ void MainWindow::MakeBlock(){
 }
 
 
-void MainWindow::ReciveObjectListChanged(QListWidgetItem* current){
+void MainWindow::ReciveObjectListChanged(){
     this->ui->CadEdit->ApplyObjectList(this->ui->ObjectList);
     RefreshUI();
 }
-void MainWindow::ReciveBlockListChanged(QListWidgetItem* current){
+void MainWindow::ReciveBlockListChanged(){
     this->ui->CadEdit->ApplyCBoxList(this->ui->BlockList);
     RefreshUI();
 }
