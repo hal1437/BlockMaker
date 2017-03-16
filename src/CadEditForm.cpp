@@ -77,10 +77,8 @@ void CadEditForm::paintEvent(QPaintEvent*){
     //状態を保存
     paint.save();
 
-    //ペン設定
-    paint.setPen(QPen(Qt::blue , (CObject::DRAWING_LINE_SIZE/2 / this->scale)));    //太さ設定
-
     //原点座標・マウス座標を描画
+    paint.setPen(QPen(Qt::blue , (CObject::DRAWING_LINE_SIZE/2 / this->scale)));    //太さ設定
     paint.drawText(0,12,QString("(") + QString::number(CObject::mouse_pos.x) + "," + QString::number(CObject::mouse_pos.y) + ")");
 
     //変換行列を作成
@@ -88,6 +86,13 @@ void CadEditForm::paintEvent(QPaintEvent*){
     trans.translate(-translate.x,-translate.y);
     trans.scale(scale,scale);
     paint.setTransform(trans); // 変換行列を以降の描画に適応
+
+    //CBox描画
+    paint.setPen(QPen(Qt::darkGray, CObject::DRAWING_LINE_SIZE/2 / this->scale));
+    paint.setBrush(QBrush(Qt::lightGray));   //背景設定
+    for(int i=0;i<this->blocks.size();i++){ //エリア描画
+        this->blocks[i].Draw(paint);
+    }
 
     //寸法を描画
     paint.setPen(QPen(Qt::blue, 1));
@@ -100,13 +105,6 @@ void CadEditForm::paintEvent(QPaintEvent*){
     paint.drawLine(+5,-5,+5,+5);
     paint.drawLine(+5,+5,-5,+5);
     paint.drawLine(-5,+5,-5,-5);
-
-    //CBox描画
-    paint.setBrush(QBrush(Qt::darkGray));   //背景設定
-    for(int i=0;i<this->blocks.size();i++){ //エリア描画
-        this->blocks[i].Draw(paint);
-    }
-    paint.setBrush(QBrush(Qt::white));      //ブラシ復元
 
     //普通のオブジェクト
     paint.setPen(QPen(Qt::blue, CObject::DRAWING_LINE_SIZE / this->scale));
@@ -445,6 +443,7 @@ void CadEditForm::RefreshRestraints(){
 
 
 void CadEditForm::ApplyObjectList(QListWidget* list){
+    //CObject::selectedを更新する。
     //ポインタを保持していないため、添字でカウント
     CObject::selected.clear();
     QMap<QString,int>map;
@@ -488,26 +487,27 @@ void CadEditForm::DrawObjectList(QListWidget* list){
     }
 }
 void CadEditForm::ApplyCBoxList  (QListWidget *list){
+    //selecting_blockを更新する
     this->selecting_block.clear();
     for(int i=0;i<list->count();i++){
-        //選択していればリストに追加
+        //選択していればselecting_blockを更新する
         if(list->item(i)->isSelected()){
             this->selecting_block.push_back(&this->blocks[i]);
         }
     }
 }
 void CadEditForm::DrawCBoxList   (QListWidget *list){
-    bool clear = false;
+    //数が一致しなければ、全て削除し再度代入する
     if(list->count() != this->blocks.size()){
-        clear=true;
         list->clear();
-    }
-    for(int i=0;i<this->blocks.size();i++){
-        if(clear){
+        for(int i=0;i<this->blocks.size();i++){
             list->addItem(new QListWidgetItem("CBox"));
             list->item(list->count()-1)->setIcon(QIcon(":/ToolImages/Blocks.png"));
             list->item(list->count()-1)->setSelected(exist(selecting_block,&blocks[i]));
         }
+    }
+    //選択情報を更新
+    for(int i=0;i<this->blocks.size();i++){
         list->item(i)->setSelected(exist(this->selecting_block,&blocks[i]));
     }
 }

@@ -164,10 +164,6 @@ void MainWindow::ClearButton(){
     if(ui->ToolSpline->isChecked())ui->ToolSpline->setChecked(false);
 }
 void MainWindow::RefreshUI(){
-    //変更によるトリガーを無効化
-    //disconnect(ui->RestraintList        ,SIGNAL(itemChanged(QListWidgetItem*))      ,this       ,SLOT(MakeRestraint(QListWidgetItem*)));
-    //disconnect(ui->ObjectList           ,SIGNAL(itemChanged(QListWidgetItem*))      ,this       ,SLOT(ReciveObjectListChanged(QListWidgetItem*)));
-    //disconnect(ui->BlockList            ,SIGNAL(itemChanged(QListWidgetItem*))      ,this       ,SLOT(ReciveBlockListChanged (QListWidgetItem*)));
 
     ui->RestraintList->clear();
     //ui->BlockList->clear();
@@ -198,12 +194,6 @@ void MainWindow::RefreshUI(){
     ui->ToolDimension->setEnabled(CObject::selected.size() >= 1);
 
     this->repaint();
-
-    //再接続
-    //connect(ui->RestraintList        ,SIGNAL(itemChanged(QListWidgetItem*))      ,this       ,SLOT(MakeRestraint(QListWidgetItem*)));
-    //connect(ui->ObjectList           ,SIGNAL(itemChanged(QListWidgetItem*))      ,this       ,SLOT(ReciveObjectListChanged(QListWidgetItem*)));
-    //connect(ui->BlockList            ,SIGNAL(itemChanged(QListWidgetItem*))      ,this       ,SLOT(ReciveBlockListChanged (QListWidgetItem*)));
-
 }
 
 #define ToggledToolDefinition(TYPE)             \
@@ -265,7 +255,6 @@ void MainWindow::MakeRestraint(){
     }
 
     if(ui->RestraintList->currentItem()->text() == "マージ"){
-    //    ui->CadEdit->
     }
 }
 
@@ -354,10 +343,10 @@ void MainWindow::MakeBlock(){
 
 void MainWindow::ReciveObjectListChanged(){
     this->ui->CadEdit->ApplyObjectList(this->ui->ObjectList);
+    this->ui->CadEdit->ApplyCBoxList(this->ui->BlockList);
     RefreshUI();
 }
 void MainWindow::ReciveBlockListChanged(){
-    this->ui->CadEdit->ApplyCBoxList(this->ui->BlockList);
     RefreshUI();
 }
 
