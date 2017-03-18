@@ -48,16 +48,25 @@ void MainWindow::mouseReleaseEvent(QMouseEvent*){
     if(release_flag==true)MakeObject();
 }
 void MainWindow::wheelEvent(QWheelEvent * e){
-    //拡大
-    double delta = (e->angleDelta().y())/10000.0;//差分値
-    double next_scale = std::exp(std::log(ui->CadEdit->GetScale()) + delta);//次の拡大値
+    Pos world_pos = this->ui->CadEdit->ConvertWorldPos(CObject::mouse_pos);
 
-    //拡大値は負にならない
-    if(next_scale > 0){
-        //適応
-        this->ui->CadEdit->Zoom(next_scale,CObject::mouse_pos);
-        ui->SizeRateSpinBox->setValue(next_scale);
-        CObject::drawing_scale = next_scale;
+    //範囲内ならば
+    if(world_pos.x > 0 &&
+       world_pos.y > 0 &&
+       world_pos.x < ui->CadEdit->width()  &&
+       world_pos.y < ui->CadEdit->height() ){
+
+        //拡大
+        double delta = (e->angleDelta().y())/10000.0;//差分値
+        double next_scale = std::exp(std::log(ui->CadEdit->GetScale()) + delta);//次の拡大値
+
+        //拡大値は負にならない
+        if(next_scale > 0){
+            //適応
+            this->ui->CadEdit->Zoom(next_scale,CObject::mouse_pos);
+            ui->SizeRateSpinBox->setValue(next_scale);
+            CObject::drawing_scale = next_scale;
+        }
     }
 
 }
