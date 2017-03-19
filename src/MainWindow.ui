@@ -288,10 +288,7 @@
    <addaction name="ToolDimension"/>
    <addaction name="actionMove"/>
    <addaction name="separator"/>
-   <addaction name="actionCtrlZ"/>
    <addaction name="actionDelete"/>
-   <addaction name="actionEsc"/>
-   <addaction name="actionCheckConflict"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="ToolDot">

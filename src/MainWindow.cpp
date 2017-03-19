@@ -8,7 +8,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     setMouseTracking(true);
     connect(ui->CadEdit              ,SIGNAL(MovedMouse(QMouseEvent*,CObject*))  ,this       ,SLOT(MovedMouse(QMouseEvent*,CObject*)));
-    connect(ui->actionCtrlZ          ,SIGNAL(triggered())                        ,this       ,SLOT(CtrlZ()));
+    //connect(ui->actionCtrlZ          ,SIGNAL(triggered())                        ,this       ,SLOT(CtrlZ()));
     connect(ui->actionDelete         ,SIGNAL(triggered())                        ,this       ,SLOT(Delete()));
     connect(ui->actionEsc            ,SIGNAL(triggered())                        ,this       ,SLOT(Escape()));
     connect(ui->actionMove           ,SIGNAL(triggered())                        ,this       ,SLOT(MoveTransform()));
