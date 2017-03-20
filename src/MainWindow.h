@@ -46,6 +46,7 @@ private:
     Ui::MainWindow *ui;
     CEnum state = Edit;
     CObject* make_obj = nullptr;
+    CPoint*  origin   = nullptr;
     int creating_count=0;
     bool release_flag = false;
     bool move_flag    = false;

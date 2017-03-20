@@ -51,7 +51,7 @@ bool CPoint::isSelectable()const{
 
 bool CPoint::Move(const Pos& diff){
     //ロックされていなければ
-    if(isLock() == false){
+    if(isLock() == false && !isControlPoint()){
         (*this) += diff;//単純な平行移動
     }
     return true;

@@ -20,15 +20,22 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->CadEdit              ,SIGNAL(ToggleConflict(bool))               ,this       ,SLOT(ToggleConflict(bool)));
     connect(ui->ExportButton         ,SIGNAL(pressed())                          ,ui->CadEdit,SLOT(Export()));
 
+    //原点追加
+    origin = new CPoint();
+    origin->ControlPoint(true);
+    ui->CadEdit->AddObject(origin);
+
     //リスト変更系
     connect(ui->RestraintList        ,SIGNAL(itemSelectionChanged())      ,this       ,SLOT(MakeRestraint()));
     connect(ui->ObjectList           ,SIGNAL(itemSelectionChanged())      ,this       ,SLOT(ReciveObjectListChanged()));
     connect(ui->BlockList            ,SIGNAL(itemSelectionChanged())      ,this       ,SLOT(ReciveBlockListChanged ()));
 
+    RefreshUI();
     ConnectSignals();
     ui->ToolBlocks->setEnabled(false);
     ui->ObjectList->setSelectionMode(QAbstractItemView::ExtendedSelection);
     CObject::drawing_scale = 1.0;
+
 }
 
 MainWindow::~MainWindow()

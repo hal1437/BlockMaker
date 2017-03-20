@@ -99,13 +99,13 @@ void CadEditForm::paintEvent(QPaintEvent*){
     for(SmartDimension* dim:dimensions){
         dim->Draw(paint);
     }
-
+/*
     //原点を描画
     paint.drawLine(-5,-5,+5,-5);
     paint.drawLine(+5,-5,+5,+5);
     paint.drawLine(+5,+5,-5,+5);
     paint.drawLine(-5,+5,-5,-5);
-
+*/
     //普通のオブジェクト
     paint.setPen(QPen(Qt::blue, CObject::DRAWING_LINE_SIZE / this->scale));
     for(CObject* obj:objects){
@@ -475,7 +475,8 @@ void CadEditForm::DrawObjectList(QListWidget* list){
         list->clear();
         for(int i=0;i<this->objects.size();i++){
             std::pair<std::string,std::string> p;
-            if(objects[i]->is<CPoint> ())p = std::make_pair("CPoint" ,":/ToolImages/Dot.png");
+            if(objects[i]->is<CPoint> () && !dynamic_cast<CPoint*>(this->objects[i])->isControlPoint())p = std::make_pair("CPoint" ,":/ToolImages/Dot.png");
+            if(objects[i]->is<CPoint> () &&  dynamic_cast<CPoint*>(this->objects[i])->isControlPoint())p = std::make_pair("Origin" ,":/ToolImages/Dot.png");
             if(objects[i]->is<CLine>  ())p = std::make_pair("CLine"  ,":/ToolImages/Line.png");
             if(objects[i]->is<CRect>  ())p = std::make_pair("CRect"  ,":/ToolImages/Rect.png");
             if(objects[i]->is<CArc>   ())p = std::make_pair("CArc"   ,":/ToolImages/Arc.png");

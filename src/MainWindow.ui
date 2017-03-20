@@ -284,11 +284,11 @@
    <addaction name="ToolSpline"/>
    <addaction name="separator"/>
    <addaction name="ToolBlocks"/>
-   <addaction name="separator"/>
    <addaction name="ToolDimension"/>
    <addaction name="actionMove"/>
    <addaction name="separator"/>
    <addaction name="actionDelete"/>
+   <addaction name="actionCheckConflict"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="ToolDot">
