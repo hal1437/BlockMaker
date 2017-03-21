@@ -71,7 +71,11 @@ void MainWindow::wheelEvent(QWheelEvent * e){
         //拡大値は負にならない
         if(next_scale > 0){
             //適応
-            this->ui->CadEdit->Zoom(next_scale,CObject::mouse_pos);
+            if(CObject::hanged == nullptr){
+                this->ui->CadEdit->Zoom(next_scale,CObject::mouse_pos);
+            }else{
+                this->ui->CadEdit->Zoom(next_scale,CObject::hanged->GetNear(CObject::mouse_pos));
+            }
             ui->SizeRateSpinBox->setValue(next_scale);
             CObject::drawing_scale = next_scale;
         }
