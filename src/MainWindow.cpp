@@ -19,6 +19,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->BlockList            ,SIGNAL(itemDoubleClicked(QListWidgetItem*)),ui->CadEdit,SLOT(ConfigureBlock(QListWidgetItem*)));
     connect(ui->CadEdit              ,SIGNAL(ToggleConflict(bool))               ,this       ,SLOT(ToggleConflict(bool)));
     connect(ui->ExportButton         ,SIGNAL(pressed())                          ,ui->CadEdit,SLOT(Export()));
+    connect(ui->CadEdit              ,SIGNAL(MovedMouse(QMouseEvent*,CObject*))  ,this       ,SLOT(RefreshStatusBar(QMouseEvent*,CObject*)));
 
     //原点追加
     origin = new CPoint();
@@ -365,4 +366,15 @@ void MainWindow::ReciveObjectListChanged(){
 void MainWindow::ReciveBlockListChanged(){
     RefreshUI();
 }
+void MainWindow::RefreshStatusBar(QMouseEvent*,CObject* under){
+    Pos out;
+    if(under == nullptr){
+        //マウス位置のローカル座標
+        out = CObject::mouse_pos;
+    }else{
+        //選択オブジェクトの最近点
+        out = under->GetNear(CObject::mouse_pos);
+    }
+    this->ui->statusBar->showMessage(QString("(") + QString::number(out.x) + "," + QString::number(out.y) + ")");
 
+}
