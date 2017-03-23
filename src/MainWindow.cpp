@@ -145,8 +145,8 @@ void MainWindow::MovedMouse(QMouseEvent *event, CObject *under_object){
 
     //編集
     if(move_flag == true){
-        if(CObject::hanged != nullptr && !CObject::hanged->isLock()){
-            CObject::hanged->Move(CObject::mouse_pos - past);
+        for(CObject* p : CObject::selected){
+            p->Move(CObject::mouse_pos - past);
         }
     }
 
