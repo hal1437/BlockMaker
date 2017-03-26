@@ -15,6 +15,9 @@
 
 struct VPos{
     double x,y,z;
+    bool operator==(const VPos& rhs)const{
+        return std::tie(this->x,this->y,this->z) == std::tie(rhs.x,rhs.y,rhs.z);
+    }
 };
 
 namespace Ui {
@@ -28,6 +31,12 @@ private:
     QVector<CObject*> objects;
     QVector<CBlock> blocks;
     void Export(QString filename)const;
+
+    //座標から番号へ変換
+    int GetPosIndex(VPos p)const;
+
+    //全頂点リストを取得
+    QVector<VPos> GetVerticesPos()const;
 
 public:
     void SetBlocks(QVector<CBlock> blocks);
