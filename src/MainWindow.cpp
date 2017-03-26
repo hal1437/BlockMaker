@@ -213,6 +213,9 @@ void MainWindow::RefreshUI(){
     ui->ToolBlocks->setEnabled(CBlock::Creatable(CObject::selected));
     //スマート寸法は1つから
     ui->ToolDimension->setEnabled(CObject::selected.size() >= 1);
+    //リスト要素数で出力ボタンの無効化を決定
+    ui->ExportButton->setEnabled(this->ui->BlockList->count() > 0);
+
 
     this->repaint();
 }

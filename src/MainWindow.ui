@@ -160,6 +160,9 @@
        </item>
        <item>
         <widget class="QPushButton" name="ExportButton">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
          <property name="maximumSize">
           <size>
            <width>100</width>
