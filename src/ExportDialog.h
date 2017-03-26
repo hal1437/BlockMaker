@@ -38,6 +38,9 @@ private:
     //全頂点リストを取得
     QVector<VPos> GetVerticesPos()const;
 
+    //境界面の座標を取得
+    QVector<VPos> GetBoundaryPos(CBlock block,BoundaryDir dir)const;
+
 public:
     void SetBlocks(QVector<CBlock> blocks);
 

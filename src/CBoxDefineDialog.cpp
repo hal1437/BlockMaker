@@ -62,13 +62,25 @@ BoundaryType CBoxDefineDialog::GetBoundaryType(BoundaryDir dir)const{
     return this->ConvertStringToBoundary(index);
 }
 QString CBoxDefineDialog::GetBoundaryName(BoundaryDir dir)const{
-    if     (dir == Top   )return ui->TopNameEdit   ->text();
-    else if(dir == Right )return ui->RightNameEdit ->text();
-    else if(dir == Left  )return ui->LeftNameEdit  ->text();
-    else if(dir == Bottom)return ui->BottomNameEdit->text();
-    else if(dir == Front )return ui->FrontNameEdit ->text();
-    else if(dir == Back  )return ui->BackNameEdit  ->text();
-    else return "";
+    if     (dir == Top   ){
+        if(ui->TopNameEdit->text() == "")return "Top";
+        else return ui->TopNameEdit   ->text();
+    }else if(dir == Right ){
+        if(ui->RightNameEdit->text() == "")return "Right";
+        else return ui->RightNameEdit ->text();
+    }else if(dir == Left  ){
+        if(ui->LeftNameEdit->text() == "")return "Left";
+        else return ui->LeftNameEdit  ->text();
+    }else if(dir == Bottom){
+        if(ui->BottomNameEdit->text() == "")return "Bottom";
+        else return ui->BottomNameEdit->text();
+    }else if(dir == Front ){
+        if(ui->FrontNameEdit->text() == "")return "Front";
+        else return ui->FrontNameEdit ->text();
+    }else if(dir == Back  ){
+        if(ui->BackNameEdit->text() == "")return "Back";
+        else return ui->BackNameEdit  ->text();
+    }else return "";
 }
 
 GradingType CBoxDefineDialog::GetGradigngType()const{

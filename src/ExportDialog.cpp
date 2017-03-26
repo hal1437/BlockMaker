@@ -37,6 +37,33 @@ QVector<VPos> ExportDialog::GetVerticesPos() const{
     return ans;
 }
 
+QVector<VPos> ExportDialog::GetBoundaryPos(CBlock block,BoundaryDir dir)const{
+    QVector<Pos> vertices = block.GetVerticesPos();
+    QVector<VPos> ans;
+
+    if(dir == BoundaryDir::Front){    //前面
+        for(Pos p:vertices){
+            ans.push_back(VPos{p.x,p.y,0});
+        }
+    }else if(dir == BoundaryDir::Back){    //背面
+        for(Pos p:vertices){
+            ans.push_back(VPos{p.x,p.y,this->ui->Width->value()});
+        }
+    }else{
+        if(dir == BoundaryDir::Top   )std::sort(vertices.begin(),vertices.end(),[](Pos lhs,Pos rhs){return lhs.y > rhs.y;}); //上面
+        if(dir == BoundaryDir::Bottom)std::sort(vertices.begin(),vertices.end(),[](Pos lhs,Pos rhs){return lhs.y < rhs.y;}); //下面
+        if(dir == BoundaryDir::Right )std::sort(vertices.begin(),vertices.end(),[](Pos lhs,Pos rhs){return lhs.x > rhs.x;}); //右面
+        if(dir == BoundaryDir::Left  )std::sort(vertices.begin(),vertices.end(),[](Pos lhs,Pos rhs){return lhs.x < rhs.x;}); //左面
+
+        //ソート結果の1番2番のみ抽出
+        ans.push_back(VPos{vertices[0].x,vertices[0].y,0});
+        ans.push_back(VPos{vertices[1].x,vertices[1].y,0});
+        ans.push_back(VPos{vertices[1].x,vertices[1].y,this->ui->Width->value()});
+        ans.push_back(VPos{vertices[0].x,vertices[0].y,this->ui->Width->value()});
+    }
+
+    return ans;
+}
 
 void ExportDialog::ChangeDirctory(){
     //ファイルパス変更ダイアログ
@@ -80,19 +107,20 @@ void ExportDialog::Export(QString filename)const{
     // 頂点登録
     //
     QVector<VPos> vertices;
-    out << "vertices"                       << "\n";
-    out << "("                              << "\n";
+    out << "vertices" << "\n";
+    out << "("        << "\n";
     for(VPos p:this->GetVerticesPos()){
         out << "\t(" << p.x << " " << p.y << " " << p.z << ")\n";
     }
-    out << ");"                              << "\n";
+    out << ");"       << "\n";
+    out               << "\n";
 
 
     //
     // ブロック出力
     //
-    out << "blocks"                       << "\n";
-    out << "("                            << "\n";
+    out << "blocks" << "\n";
+    out << "("      << "\n";
     for(CBlock block:this->blocks){
 
         out << "\t" << "hex(";
@@ -111,6 +139,7 @@ void ExportDialog::Export(QString filename)const{
         }
     }    
     out << ");" << "\n";
+    out         << "\n";
 
     //
     // エッジ定義
@@ -123,21 +152,56 @@ void ExportDialog::Export(QString filename)const{
     //
     // 境界定義
     //
-    QMap<QString,QVector<int>> boundary_list;
 
     //境界追加
+    QMap<QString,std::pair<BoundaryType,QVector<int>>> boundary_list; //(name ,[[index]])
     for(CBlock block:this->blocks){
         for(int i=0;i<6;i++){
             //頂点番号リスト出力
-            QVector<int> v_list;
-//            for(int j=0;j<block.GetVerticesPos())
-
-  //          boundary_list.insert(block.name[i],block.);
+            QVector<VPos> vp = this->GetBoundaryPos(block,static_cast<BoundaryDir>(i));
+            for(VPos v:vp){
+                boundary_list[block.name[i]].first = block.boundery[i];
+                boundary_list[block.name[i]].second.push_back(GetPosIndex(v));
+            }
         }
     }
 
     out << "boundary" << "\n";
     out << "("        << "\n";
+    QMap<QString,std::pair<BoundaryType,QVector<int>>>::const_iterator it = boundary_list.constBegin();
+    while (it != boundary_list.constEnd()) {
+        //境界名
+        out << "\t" << it.key() << "\n";
+        out << "\t{\n";
+
+        //境界タイプ
+        if(it.value().first == BoundaryType::Patch        ) out << "\t\ttype patch;\n";
+        if(it.value().first == BoundaryType::Wall         ) out << "\t\ttype wall;\n";
+        if(it.value().first == BoundaryType::SymmetryPlane) out << "\t\ttype symmetryPlane;\n";
+        if(it.value().first == BoundaryType::Cyclic       ) out << "\t\ttype cyclic;\n";
+        if(it.value().first == BoundaryType::CyclicAMI    ) out << "\t\ttype cyclicAMI;\n";
+        if(it.value().first == BoundaryType::Wedge        ) out << "\t\ttype wedge;\n";
+        if(it.value().first == BoundaryType::Empty        ) out << "\t\ttype empty;\n";
+
+        //頂点定義
+        out << "\t\tfaces\n";
+        out << "\t\t(\n";
+        for(int i=0;i<it.value().second.size();i++){
+            if(i % 4 == 0){
+                out << "\t\t\t("; //先端文字列
+            }else{
+                out << " ";       //中間文字列
+            }
+            out << it.value().second[i]; //インデックス出力
+
+            if((i+1) % 4 == 0){
+                out << ")\n";     //終端文字列
+            }
+        }
+        out << "\t\t);\n";
+        out << "\t}\n";
+        it++;
+    }
 
     out << ");"       << "\n";
 
