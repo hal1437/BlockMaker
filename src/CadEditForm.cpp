@@ -84,7 +84,7 @@ void CadEditForm::paintEvent(QPaintEvent*){
     //変換行列を作成
     QTransform trans;
     trans.translate(-translate.x,-translate.y);
-    trans.scale(scale,scale);
+    trans.scale(scale,-scale);
     paint.setTransform(trans); // 変換行列を以降の描画に適応
 
     //CBox描画
@@ -158,7 +158,7 @@ void CadEditForm::resizeEvent(QResizeEvent*){
 Pos CadEditForm::ConvertLocalPos(Pos pos)const{
     QTransform trans;
     trans.translate(-translate.x,-translate.y);
-    trans.scale(scale,scale);
+    trans.scale(scale,-scale);
     trans = trans.inverted();//逆行列化
     QPoint ans = trans.map(QPoint(pos.x,pos.y));
     return Pos(ans.x(),ans.y());
@@ -166,7 +166,7 @@ Pos CadEditForm::ConvertLocalPos(Pos pos)const{
 Pos CadEditForm::ConvertWorldPos(Pos pos)const{
     QTransform trans;
     trans.translate(-translate.x,-translate.y);
-    trans.scale(scale,scale);
+    trans.scale(scale,-scale);
     QPoint ans = trans.map(QPoint(pos.x,pos.y));
     return Pos(ans.x(),ans.y());
 }
