@@ -1,8 +1,8 @@
 # FoamCAD
 
-流体解析ソフトOpenFOAMの付属ユーティリティBlockMesh用のCADソフト
+流体解析ソフトOpenFOAMの付属ユーティリティBlockMesh用のCADソフト  
+▼FoamCADメインウインドウ  
 ![screenshot1](https://github.com/hal1437/FoamCAD/blob/master/Resource/screenshot/screenshot1.png)
-
 数値流体力学のツールボックスとして知られるOpenFOAMの『メッシュ生成』を行うソフトウェア。
 本来は各頂点と辺の定義はテキストで行わなければならないが、
 このソフトは視覚的に頂点の配置と辺の定義を行うことができる。
