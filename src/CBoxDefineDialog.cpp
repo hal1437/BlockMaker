@@ -3,7 +3,7 @@
 #include <QMessageBox>
 
 
-void CBoxDefineDialog::paintEvent    (QPaintEvent* event){
+void CBoxDefineDialog::paintEvent    (QPaintEvent* ){
 }
 QComboBox* CBoxDefineDialog::ConvertDirToCombo   (BoundaryDir dir)const{
     if     (dir == Top   )return ui->TopTypecombo;
@@ -44,10 +44,12 @@ BoundaryType CBoxDefineDialog::ConvertStringToBoundary(QString str)const{
 QString      CBoxDefineDialog::ConvertGradingToString (GradingType  dir)const{
     if     (dir == GradingType::SimpleGrading)return QString("SimpleGrading");
     else if(dir == GradingType::EdgeGrading  )return QString("EdgeGrading");
+    else return QString("");
 }
 GradingType  CBoxDefineDialog::ConvertStringToGrading (QString str)const{
     if     (str == "SimpleGrading")return GradingType::SimpleGrading;
     else if(str == "EdgeGrading"  )return GradingType::EdgeGrading;
+    else return GradingType::EmptyGrading;
 }
 
 //面の情報を取得

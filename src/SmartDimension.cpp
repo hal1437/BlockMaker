@@ -104,6 +104,7 @@ bool SmartDimension::SetTarget(CObject* obj1,CObject* obj2){
 bool SmartDimension::SetXYType(bool x,bool y){
     this->X_type = x;
     this->Y_type = y;
+    return true;
 }
 
 

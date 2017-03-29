@@ -31,6 +31,7 @@ enum BoundaryType{
 };
 //格子点間隔の種類
 enum GradingType{
+    EmptyGrading,
     SimpleGrading,
     EdgeGrading,
 };

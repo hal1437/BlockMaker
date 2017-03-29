@@ -1,6 +1,6 @@
 #include "CPoint.h"
 
-bool CPoint::Create(CPoint* pos,int index){
+bool CPoint::Create(CPoint* pos,int ){
     (*this) = *pos;
     return true;//生成終了
 }
@@ -74,6 +74,7 @@ bool CPoint::isControlPoint()const{
 
 bool CPoint::ControlPoint(bool f){
     control_point = f;
+    return true;
 }
 
 Pos CPoint::GetNear(const Pos&)const{

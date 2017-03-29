@@ -267,9 +267,9 @@ bool ConcurrentRestraint::Complete(){
     for(int i=1;i<nodes.size();i++){
         if(nodes[i]->is<CLine>()){
             Pos line_near1 = Pos::LineNearPoint(base_line[0],base_line[1],nodes[i]->GetJointPos(0));
-            Pos line_near2 = Pos::LineNearPoint(base_line[0],base_line[1],nodes[i]->GetJointPos(1));
+            //Pos line_near2 = Pos::LineNearPoint(base_line[0],base_line[1],nodes[i]->GetJointPos(1));
 
-            double length = (line_near1 - nodes[i]->GetJointPos(0)).Length();
+            //double length = (line_near1 - nodes[i]->GetJointPos(0)).Length();
             //nodes[i]->GetJoint(0)->setDifferent(line_near1 + (nodes[i]->GetJointPos(0) - line_near1).GetNormalize()*length);
             if(Pos::MoreThan(base_line[0],base_line[1],nodes[i]->GetJointPos(0)) == Pos::MoreThan(base_line[0],base_line[1],nodes[i]->GetJointPos(1))){
                 //nodes[i]->GetJoint(1)->setDifferent(line_near2 + (nodes[i]->GetJointPos(1) - line_near2).GetNormalize()*length);
@@ -290,7 +290,7 @@ bool CrossRestraint::Complete(){
        nodes[0]->GetJoint(1)->isLock()&&
        nodes[1]->GetJoint(0)->isLock()&&
        nodes[1]->GetJoint(1)->isLock()){
-            Pos dir = nodes[0]->GetJointPos(1)-nodes[0]->GetJointPos(0);
+            //Pos dir = nodes[0]->GetJointPos(1)-nodes[0]->GetJointPos(0);
 
             if((nodes[0]->GetJointPos(1)-nodes[0]->GetJointPos(0)).GetNormalize().Dot(nodes[1]->GetJointPos(1)-nodes[1]->GetJointPos(0)) != 0){
                 return false;
@@ -301,9 +301,9 @@ bool CrossRestraint::Complete(){
     for(int i=1;i<nodes.size();i++){
         if(nodes[i]->is<CLine>()){
             Pos line_near1 = Pos::LineNearPoint(base_line[0],base_line[1],nodes[i]->GetJointPos(0));
-            Pos line_near2 = Pos::LineNearPoint(base_line[0],base_line[1],nodes[i]->GetJointPos(1));
+            //Pos line_near2 = Pos::LineNearPoint(base_line[0],base_line[1],nodes[i]->GetJointPos(1));
 
-            double length = (line_near1 - nodes[i]->GetJointPos(0)).Length();
+            //double length = (line_near1 - nodes[i]->GetJointPos(0)).Length();
             //nodes[i]->GetJoint(0)->setDifferent(line_near1 + (nodes[i]->GetJointPos(0) - line_near1).GetNormalize()*length);
             if(Pos::MoreThan(base_line[0],base_line[1],nodes[i]->GetJointPos(0)) == Pos::MoreThan(base_line[0],base_line[1],nodes[i]->GetJointPos(1))){
                 //nodes[i]->GetJoint(1)->setDifferent(line_near2 + (nodes[i]->GetJointPos(1) - line_near2).GetNormalize()*length);

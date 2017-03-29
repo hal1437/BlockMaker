@@ -72,6 +72,7 @@ bool CRect::Move(const Pos& diff){
     for(int i=0;i<4;i++){
         this->pos[i]->Move(diff);
     }
+    return true;
 }
 
 CLine *CRect::GetLines(int index){

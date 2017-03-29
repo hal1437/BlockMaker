@@ -340,6 +340,7 @@ bool CadEditForm::MakeBlock(){
         this->blocks.push_back(block);
         CObject::selected.clear();
     }
+    return true;
 }
 
 
@@ -371,7 +372,7 @@ void CadEditForm::RefreshRestraints(){
                         //未探索ならばを次の探索点に追加
                         for(int i=0;i<child.size();i++){
                             bool not_alive = true;
-                            for(int j=0;j<rank.size();j++){
+                            for(int j=0;j<static_cast<int>(rank.size());j++){
                                 if(child[i] == rank[j].second){
                                     not_alive = false;
                                 }

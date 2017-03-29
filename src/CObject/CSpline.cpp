@@ -66,7 +66,7 @@ CSpline::~CSpline()
 
 bool CSpline::Refresh(){
     std::vector<double> x,y;
-    for(int i=0;i<this->pos.size();i++){
+    for(int i=0;i<static_cast<int>(this->pos.size());i++){
         x.push_back(GetJointPos(i).x);
         y.push_back(GetJointPos(i).y);
     }
@@ -83,12 +83,12 @@ bool CSpline::Create(CPoint* pos, int index){
     return true;
 }
 
-Pos CSpline::GetNear(const Pos& hand)const{
+Pos CSpline::GetNear(const Pos& )const{
     return Pos();// ちょっと解決策が浮かばない
 }
 
 void CSpline::Lock(bool lock){
-    for(int i =0;i<this->pos.size();i++){
+    for(int i =0;i<static_cast<int>(this->pos.size());i++){
         pos[i]->Lock(lock);
     }
     CObject::Lock(lock);
@@ -131,7 +131,7 @@ bool CSpline::isSelectable()const{
 }
 
 bool CSpline::Move(const Pos& diff){
-    for(int i=0;i<pos.size();i++){
+    for(int i=0;i<static_cast<int>(pos.size());i++){
         pos[i]->Move(diff);
     }
     return true;
