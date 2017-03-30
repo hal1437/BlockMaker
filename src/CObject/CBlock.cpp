@@ -130,7 +130,55 @@ QVector<Pos> CBlock::GetVerticesPos()const{
     return pp;
 }
 Pos CBlock::GetClockworksPos(int index){
+    QVector<Pos> pp;
+    //点を集結
+    for(CObject* line:lines){
+        if(!exist(pp,dynamic_cast<CLine*>(line)->GetJointPos(0)))pp.push_back(dynamic_cast<CLine*>(line)->GetJointPos(0));
+        if(!exist(pp,dynamic_cast<CLine*>(line)->GetJointPos(1)))pp.push_back(dynamic_cast<CLine*>(line)->GetJointPos(1));
+    }
 
+    //左下の探索
+    QVector<Pos> hit;
+    Pos corner;//左下
+    std::sort(pp.begin(),pp.end(),[](Pos p1,Pos p2){return std::tie(p1.x,p1.y) < std::tie(p2.x,p2.y);});//X座標が小さい順
+    hit.push_back(pp[0]);//もっともX座標の小さいもの
+    hit.push_back(pp[1]);//二番目にX座標の小さいもの
+    std::sort(pp.begin(),pp.end(),[](Pos p1,Pos p2){return std::tie(p1.y,p1.x) < std::tie(p2.y,p2.x);});//Y座標が小さい順
+    hit.push_back(pp[0]);//もっともY座標の小さいもの
+    hit.push_back(pp[1]);//二番目にY座標の小さいもの
+    //hitに二回入った奴が左下
+    for(int i=0;i<4;i++){
+        Pos piv = hit[i];
+        for(int j=i;j<4;j++){
+            if(piv == hit[j]){
+                corner = piv;
+            }
+        }
+    }
+
+    //index回だけ連鎖させる
+    Pos ans = corner;
+    Pos old = corner; //反復連鎖防止
+    QVector<Pos> candidate;//連鎖候補
+    for(int i=0;i<index%4;i++){
+        //ansを含むlineを探す
+        for(CObject* line:lines){
+            if(ans == dynamic_cast<CLine*>(line)->GetJointPos(0) && old != dynamic_cast<CLine*>(line)->GetJointPos(1)){
+                candidate.push_back(dynamic_cast<CLine*>(line)->GetJointPos(1));
+            }else if(ans == dynamic_cast<CLine*>(line)->GetJointPos(1) && old == dynamic_cast<CLine*>(line)->GetJointPos(0)){
+                candidate.push_back(dynamic_cast<CLine*>(line)->GetJointPos(0));
+            }
+        }
+        //選定
+        old = ans;
+        if(candidate.size() == 2){
+            //二択
+            ans = std::min(candidate[0],candidate[1],[](Pos p1,Pos p2){return std::tie(p1.x,p1.y) < std::tie(p2.x,p2.y);});
+        }else{
+            ans = candidate[0];
+        }
+    }
+    return ans;
 }
 
 
