@@ -114,6 +114,9 @@ CBlock CBoxDefineDialog::ExportCBlock()const{
         blocks.boundery[i] = this->GetBoundaryType(dir);
         blocks.name[i]     = this->GetBoundaryName(dir);
     }
+    blocks.div[0] = this->ui->XspinBox->value();
+    blocks.div[1] = this->ui->YspinBox->value();
+    blocks.div[2] = this->ui->ZspinBox->value();
     blocks.grading   = this->GetGradigngType();
     QStringList list = ui->GradingEdit->text().split(' ');
     for(int i=0;i<list.size();i++){
@@ -141,7 +144,7 @@ CBoxDefineDialog::CBoxDefineDialog(QWidget *parent) :
     ui(new Ui::CBoxDefineDialog)
 {
     ui->setupUi(this);
-    ui->GradingEdit       ->setText("10 10 10");
+    ui->GradingEdit       ->setText("1 1 1");
 }
 
 CBoxDefineDialog::~CBoxDefineDialog()

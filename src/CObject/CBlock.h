@@ -41,11 +41,12 @@ class CBlock{
 private:
     QVector<CObject*> lines;
 public:
-    BoundaryType boundery[6];
-    QString name[6];
+    BoundaryType boundery[6]; // 境界タイプ
+    QString name[6];          // 境界名
 
-    GradingType grading;
-    QVector<double> grading_args;
+    int div[3];               // 分割数
+    GradingType grading;          // 分割間隔タイプ
+    QVector<double> grading_args; // 分割パラメータ
 public:
 
     static bool Creatable(QVector<CObject*> values);//BOX定義可能か
