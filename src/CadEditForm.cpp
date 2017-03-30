@@ -515,6 +515,7 @@ void CadEditForm::DrawCBoxList   (QListWidget *list){
 }
 void CadEditForm::ConfigureBlock(QListWidgetItem*){
     CBoxDefineDialog* diag = new CBoxDefineDialog(this);
+    if(this->selecting_block.size() == 0)return;
     diag->ImportCBlock(*this->selecting_block[0]);
     if(diag->exec()){
         QVector<CObject*> ll;

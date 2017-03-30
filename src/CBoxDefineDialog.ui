@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>892</width>
-    <height>360</height>
+    <width>843</width>
+    <height>377</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,166 +16,6 @@
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <layout class="QGridLayout" name="gridLayout">
-     <item row="2" column="1" rowspan="4">
-      <widget class="QGroupBox" name="BottomGroup">
-       <property name="maximumSize">
-        <size>
-         <width>260</width>
-         <height>130</height>
-        </size>
-       </property>
-       <property name="title">
-        <string>Bottom</string>
-       </property>
-       <layout class="QGridLayout" name="gridLayout_6">
-        <item row="1" column="0" colspan="2">
-         <widget class="QLabel" name="BottomTypeLabel">
-          <property name="text">
-           <string>Type</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="2">
-         <widget class="QComboBox" name="BottomTypecombo">
-          <item>
-           <property name="text">
-            <string>empty (2次元)</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>patch (パッチ)</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>wall (壁)</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>symmetryPlane (対称面)</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>cyclic (周期境界)</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>cyclicAMI (不整合周期境界)</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>wedge (2次元軸対称)</string>
-           </property>
-          </item>
-         </widget>
-        </item>
-        <item row="0" column="0">
-         <widget class="QLabel" name="BottomNameLabel">
-          <property name="text">
-           <string>Name</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1" colspan="2">
-         <widget class="QLineEdit" name="BottomNameEdit">
-          <property name="placeholderText">
-           <string>Bottom</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-     </item>
-     <item row="5" column="2">
-      <widget class="QDialogButtonBox" name="buttonBox">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="standardButtons">
-        <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="0" rowspan="4">
-      <widget class="QGroupBox" name="FrontGroup">
-       <property name="maximumSize">
-        <size>
-         <width>260</width>
-         <height>130</height>
-        </size>
-       </property>
-       <property name="title">
-        <string>Front</string>
-       </property>
-       <layout class="QGridLayout" name="gridLayout_7">
-        <item row="0" column="0">
-         <widget class="QLabel" name="FrontNameLabel">
-          <property name="text">
-           <string>Name</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="2">
-         <widget class="QComboBox" name="FrontTypecombo">
-          <item>
-           <property name="text">
-            <string>empty (2次元)</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>patch (パッチ)</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>wall (壁)</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>symmetryPlane (対称面)</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>cyclic (周期境界)</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>cyclicAMI (不整合周期境界)</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>wedge (2次元軸対称)</string>
-           </property>
-          </item>
-         </widget>
-        </item>
-        <item row="0" column="1" colspan="2">
-         <widget class="QLineEdit" name="FrontNameEdit">
-          <property name="placeholderText">
-           <string>Front</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0" colspan="2">
-         <widget class="QLabel" name="FrontTypeLabel">
-          <property name="text">
-           <string>Type</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-     </item>
      <item row="1" column="0">
       <widget class="QGroupBox" name="LeftGroup">
        <property name="maximumSize">
@@ -243,6 +83,283 @@
         </item>
         <item row="1" column="0" colspan="2">
          <widget class="QLabel" name="LeftTypeLabel">
+          <property name="text">
+           <string>Type</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item row="0" column="2">
+      <widget class="QGroupBox" name="BackGroup">
+       <property name="maximumSize">
+        <size>
+         <width>260</width>
+         <height>130</height>
+        </size>
+       </property>
+       <property name="title">
+        <string>Back</string>
+       </property>
+       <layout class="QGridLayout" name="gridLayout_3">
+        <item row="1" column="0" colspan="2">
+         <widget class="QLabel" name="BackTypeLabel">
+          <property name="text">
+           <string>Type</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="2">
+         <widget class="QComboBox" name="BackTypecombo">
+          <item>
+           <property name="text">
+            <string>empty (2次元)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>patch (パッチ)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>wall (壁)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>symmetryPlane (対称面)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>cyclic (周期境界)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>cyclicAMI (不整合周期境界)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>wedge (2次元軸対称)</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item row="0" column="0">
+         <widget class="QLabel" name="BackNameLabel">
+          <property name="text">
+           <string>Name</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1" colspan="2">
+         <widget class="QLineEdit" name="BackNameEdit">
+          <property name="placeholderText">
+           <string>Back</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item row="3" column="2" rowspan="2">
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <item>
+        <widget class="QComboBox" name="GradingCombo">
+         <item>
+          <property name="text">
+           <string>simpleGrading</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>edgeGrading</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="GradingEdit">
+         <property name="placeholderText">
+          <string>(g0 g1 g2...)</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item row="1" column="1">
+      <widget class="QFrame" name="frame">
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="QWidget" name="Viewer" native="true"/>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QGroupBox" name="TopGroup">
+       <property name="maximumSize">
+        <size>
+         <width>260</width>
+         <height>130</height>
+        </size>
+       </property>
+       <property name="title">
+        <string>Top</string>
+       </property>
+       <layout class="QGridLayout" name="gridLayout_2">
+        <item row="0" column="0">
+         <widget class="QLabel" name="TopNameLabel">
+          <property name="text">
+           <string>Name</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1" colspan="2">
+         <widget class="QLineEdit" name="TopNameEdit">
+          <property name="placeholderText">
+           <string>Top</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0" colspan="2">
+         <widget class="QLabel" name="TopTypeLabel">
+          <property name="text">
+           <string>Type</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="2">
+         <widget class="QComboBox" name="TopTypecombo">
+          <item>
+           <property name="text">
+            <string>empty (2次元)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>patch (パッチ)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>wall (壁)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>symmetryPlane (対称面)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>cyclic (周期境界)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>cyclicAMI (不整合周期境界)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>wedge (2次元軸対称)</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item row="1" column="2">
+      <widget class="QGroupBox" name="RightGroup">
+       <property name="maximumSize">
+        <size>
+         <width>260</width>
+         <height>130</height>
+        </size>
+       </property>
+       <property name="title">
+        <string>Right</string>
+       </property>
+       <layout class="QGridLayout" name="gridLayout_4">
+        <item row="1" column="2">
+         <widget class="QComboBox" name="RightTypecombo">
+          <item>
+           <property name="text">
+            <string>empty (2次元)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>patch (パッチ)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>wall (壁)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>symmetryPlane (対称面)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>cyclic (周期境界)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>cyclicAMI (不整合周期境界)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>wedge (2次元軸対称)</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item row="0" column="1" colspan="2">
+         <widget class="QLineEdit" name="RightNameEdit">
+          <property name="placeholderText">
+           <string>Right</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0">
+         <widget class="QLabel" name="RightNameLabel">
+          <property name="text">
+           <string>Name</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0" colspan="2">
+         <widget class="QLabel" name="RightTypeLabel">
           <property name="text">
            <string>Type</string>
           </property>
@@ -371,278 +488,35 @@
        </layout>
       </widget>
      </item>
-     <item row="4" column="2">
+     <item row="5" column="2">
+      <widget class="QDialogButtonBox" name="buttonBox">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="standardButtons">
+        <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="2">
       <layout class="QHBoxLayout" name="horizontalLayout">
-       <item>
-        <widget class="QComboBox" name="GradingCombo">
-         <item>
-          <property name="text">
-           <string>simpleGrading</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>edgeGrading</string>
-          </property>
-         </item>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="GradingEdit">
-         <property name="placeholderText">
-          <string>(g0 g1 g2...)</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-     <item row="1" column="2">
-      <widget class="QGroupBox" name="RightGroup">
-       <property name="maximumSize">
-        <size>
-         <width>260</width>
-         <height>130</height>
-        </size>
-       </property>
-       <property name="title">
-        <string>Right</string>
-       </property>
-       <layout class="QGridLayout" name="gridLayout_4">
-        <item row="1" column="2">
-         <widget class="QComboBox" name="RightTypecombo">
-          <item>
-           <property name="text">
-            <string>empty (2次元)</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>patch (パッチ)</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>wall (壁)</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>symmetryPlane (対称面)</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>cyclic (周期境界)</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>cyclicAMI (不整合周期境界)</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>wedge (2次元軸対称)</string>
-           </property>
-          </item>
-         </widget>
-        </item>
-        <item row="0" column="1" colspan="2">
-         <widget class="QLineEdit" name="RightNameEdit">
-          <property name="placeholderText">
-           <string>Right</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="0">
-         <widget class="QLabel" name="RightNameLabel">
-          <property name="text">
-           <string>Name</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0" colspan="2">
-         <widget class="QLabel" name="RightTypeLabel">
-          <property name="text">
-           <string>Type</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-     </item>
-     <item row="0" column="2">
-      <widget class="QGroupBox" name="BackGroup">
-       <property name="maximumSize">
-        <size>
-         <width>260</width>
-         <height>130</height>
-        </size>
-       </property>
-       <property name="title">
-        <string>Back</string>
-       </property>
-       <layout class="QGridLayout" name="gridLayout_3">
-        <item row="1" column="0" colspan="2">
-         <widget class="QLabel" name="BackTypeLabel">
-          <property name="text">
-           <string>Type</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="2">
-         <widget class="QComboBox" name="BackTypecombo">
-          <item>
-           <property name="text">
-            <string>empty (2次元)</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>patch (パッチ)</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>wall (壁)</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>symmetryPlane (対称面)</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>cyclic (周期境界)</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>cyclicAMI (不整合周期境界)</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>wedge (2次元軸対称)</string>
-           </property>
-          </item>
-         </widget>
-        </item>
-        <item row="0" column="0">
-         <widget class="QLabel" name="BackNameLabel">
-          <property name="text">
-           <string>Name</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1" colspan="2">
-         <widget class="QLineEdit" name="BackNameEdit">
-          <property name="placeholderText">
-           <string>Back</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-     </item>
-     <item row="0" column="1">
-      <widget class="QGroupBox" name="TopGroup">
-       <property name="maximumSize">
-        <size>
-         <width>260</width>
-         <height>130</height>
-        </size>
-       </property>
-       <property name="title">
-        <string>Top</string>
-       </property>
-       <layout class="QGridLayout" name="gridLayout_2">
-        <item row="0" column="0">
-         <widget class="QLabel" name="TopNameLabel">
-          <property name="text">
-           <string>Name</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1" colspan="2">
-         <widget class="QLineEdit" name="TopNameEdit">
-          <property name="placeholderText">
-           <string>Top</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0" colspan="2">
-         <widget class="QLabel" name="TopTypeLabel">
-          <property name="text">
-           <string>Type</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="2">
-         <widget class="QComboBox" name="TopTypecombo">
-          <item>
-           <property name="text">
-            <string>empty (2次元)</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>patch (パッチ)</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>wall (壁)</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>symmetryPlane (対称面)</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>cyclic (周期境界)</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>cyclicAMI (不整合周期境界)</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>wedge (2次元軸対称)</string>
-           </property>
-          </item>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-     </item>
-     <item row="3" column="2">
-      <layout class="QHBoxLayout" name="horizontalLayout_2">
        <item>
         <widget class="QLabel" name="label_2">
          <property name="text">
-          <string>厚み(Z軸方向)：</string>
+          <string>Z軸方向長さ</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QDoubleSpinBox" name="doubleSpinBox">
+        <widget class="QDoubleSpinBox" name="DepthSpinBox">
          <property name="decimals">
-          <number>4</number>
+          <number>3</number>
          </property>
          <property name="minimum">
-          <double>0.000100000000000</double>
+          <double>0.001000000000000</double>
          </property>
          <property name="maximum">
-          <double>10000000000000000.000000000000000</double>
-         </property>
-         <property name="singleStep">
-          <double>0.100000000000000</double>
+          <double>99999999999.000000000000000</double>
          </property>
          <property name="value">
           <double>1.000000000000000</double>
@@ -651,29 +525,152 @@
        </item>
       </layout>
      </item>
-     <item row="1" column="1">
-      <widget class="QFrame" name="frame">
-       <property name="frameShape">
-        <enum>QFrame::StyledPanel</enum>
+     <item row="2" column="1" rowspan="4">
+      <widget class="QGroupBox" name="BottomGroup">
+       <property name="maximumSize">
+        <size>
+         <width>260</width>
+         <height>130</height>
+        </size>
        </property>
-       <property name="frameShadow">
-        <enum>QFrame::Raised</enum>
+       <property name="title">
+        <string>Bottom</string>
        </property>
-       <layout class="QVBoxLayout" name="verticalLayout_2">
-        <property name="leftMargin">
-         <number>0</number>
-        </property>
-        <property name="topMargin">
-         <number>0</number>
-        </property>
-        <property name="rightMargin">
-         <number>0</number>
-        </property>
-        <property name="bottomMargin">
-         <number>0</number>
-        </property>
-        <item>
-         <widget class="QWidget" name="Viewer" native="true"/>
+       <layout class="QGridLayout" name="gridLayout_6">
+        <item row="1" column="0" colspan="2">
+         <widget class="QLabel" name="BottomTypeLabel">
+          <property name="text">
+           <string>Type</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="2">
+         <widget class="QComboBox" name="BottomTypecombo">
+          <item>
+           <property name="text">
+            <string>empty (2次元)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>patch (パッチ)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>wall (壁)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>symmetryPlane (対称面)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>cyclic (周期境界)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>cyclicAMI (不整合周期境界)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>wedge (2次元軸対称)</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item row="0" column="0">
+         <widget class="QLabel" name="BottomNameLabel">
+          <property name="text">
+           <string>Name</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1" colspan="2">
+         <widget class="QLineEdit" name="BottomNameEdit">
+          <property name="placeholderText">
+           <string>Bottom</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item row="2" column="0" rowspan="4">
+      <widget class="QGroupBox" name="FrontGroup">
+       <property name="maximumSize">
+        <size>
+         <width>260</width>
+         <height>130</height>
+        </size>
+       </property>
+       <property name="title">
+        <string>Front</string>
+       </property>
+       <layout class="QGridLayout" name="gridLayout_7">
+        <item row="0" column="0">
+         <widget class="QLabel" name="FrontNameLabel">
+          <property name="text">
+           <string>Name</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="2">
+         <widget class="QComboBox" name="FrontTypecombo">
+          <item>
+           <property name="text">
+            <string>empty (2次元)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>patch (パッチ)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>wall (壁)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>symmetryPlane (対称面)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>cyclic (周期境界)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>cyclicAMI (不整合周期境界)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>wedge (2次元軸対称)</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item row="0" column="1" colspan="2">
+         <widget class="QLineEdit" name="FrontNameEdit">
+          <property name="placeholderText">
+           <string>Front</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0" colspan="2">
+         <widget class="QLabel" name="FrontTypeLabel">
+          <property name="text">
+           <string>Type</string>
+          </property>
+         </widget>
         </item>
        </layout>
       </widget>

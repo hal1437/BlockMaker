@@ -117,6 +117,7 @@ CBlock CBoxDefineDialog::ExportCBlock()const{
     blocks.div[0] = this->ui->XspinBox->value();
     blocks.div[1] = this->ui->YspinBox->value();
     blocks.div[2] = this->ui->ZspinBox->value();
+    blocks.depth  = this->ui->DepthSpinBox->value();
     blocks.grading   = this->GetGradigngType();
     QStringList list = ui->GradingEdit->text().split(' ');
     for(int i=0;i<list.size();i++){

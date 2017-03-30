@@ -45,6 +45,7 @@ public:
     QString name[6];          // 境界名
 
     int div[3];               // 分割数
+    double depth;             //深さ
     GradingType grading;          // 分割間隔タイプ
     QVector<double> grading_args; // 分割パラメータ
 public:
@@ -59,6 +60,7 @@ public:
     void SetNode(int index,CObject* line);
     CObject* GetNode(int index)const;
     QVector<Pos> GetVerticesPos()const;
+    Pos GetClockworksPos(int index);//時計回り番号取得
 
 
     CBlock();

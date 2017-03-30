@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>332</width>
+    <width>338</width>
     <height>241</height>
    </rect>
   </property>
@@ -20,46 +20,15 @@
       <string>プロパティ</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
-      <item row="0" column="2">
-       <widget class="QLabel" name="label_2">
-        <property name="text">
-         <string>[m]</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="1">
-       <widget class="QLineEdit" name="ExportPath">
-        <property name="frame">
-         <bool>true</bool>
-        </property>
-        <property name="readOnly">
-         <bool>false</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="label_3">
-        <property name="text">
-         <string>出力先　　　　：</string>
-        </property>
-       </widget>
-      </item>
       <item row="0" column="0">
-       <widget class="QLabel" name="label">
+       <widget class="QLabel" name="label_4">
         <property name="text">
-         <string>奥行き方向長さ：</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="2">
-       <widget class="QPushButton" name="ChangeDirectory">
-        <property name="text">
-         <string>...</string>
+         <string>スケーリング係数:</string>
         </property>
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="QDoubleSpinBox" name="Width">
+       <widget class="QDoubleSpinBox" name="Scale">
         <property name="decimals">
          <number>3</number>
         </property>
@@ -67,14 +36,14 @@
          <double>1000000.000000000000000</double>
         </property>
         <property name="singleStep">
-         <double>0.001000000000000</double>
+         <double>1.000000000000000</double>
         </property>
         <property name="value">
-         <double>0.001000000000000</double>
+         <double>1.000000000000000</double>
         </property>
        </widget>
       </item>
-      <item row="4" column="0" colspan="3">
+      <item row="3" column="0" colspan="3">
        <spacer name="verticalSpacer">
         <property name="orientation">
          <enum>Qt::Vertical</enum>
@@ -87,33 +56,34 @@
         </property>
        </spacer>
       </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="label_4">
+      <item row="1" column="2">
+       <widget class="QPushButton" name="ChangeDirectory">
         <property name="text">
-         <string>格子スケール　：</string>
+         <string>...</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>出力ディレクトリ:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <widget class="QLabel" name="label_5">
+        <property name="text">
+         <string>[m]</string>
         </property>
        </widget>
       </item>
       <item row="1" column="1">
-       <widget class="QDoubleSpinBox" name="Scale">
-        <property name="decimals">
-         <number>3</number>
+       <widget class="QLineEdit" name="ExportPath">
+        <property name="frame">
+         <bool>true</bool>
         </property>
-        <property name="maximum">
-         <double>1000000.000000000000000</double>
-        </property>
-        <property name="singleStep">
-         <double>0.001000000000000</double>
-        </property>
-        <property name="value">
-         <double>0.001000000000000</double>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="2">
-       <widget class="QLabel" name="label_5">
-        <property name="text">
-         <string>[m]</string>
+        <property name="readOnly">
+         <bool>false</bool>
         </property>
        </widget>
       </item>

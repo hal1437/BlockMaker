@@ -75,13 +75,13 @@ void CBlock::Draw(QPainter& painter)const{
 
 
     //並行線の描画
-    for(int i =0;i<=this->grading_args[0];i++){
-        paint.drawLine(0    ,height*i/this->grading_args[0],
-                       width,height*i/this->grading_args[0]);
+    for(int i =0;i<=this->div[0];i++){
+        paint.drawLine(width*i/this->div[0],0,
+                       width*i/this->div[0],height);
     }
-    for(int i =0;i<=this->grading_args[1];i++){
-        paint.drawLine(width*i/this->grading_args[1],0,
-                       width*i/this->grading_args[1],height);
+    for(int i =0;i<=this->div[1];i++){
+        paint.drawLine(0    ,height*i/this->div[1],
+                       width,height*i/this->div[1]);
     }
     paint.end();
 
@@ -129,6 +129,10 @@ QVector<Pos> CBlock::GetVerticesPos()const{
 
     return pp;
 }
+Pos CBlock::GetClockworksPos(int index){
+
+}
+
 
 CBlock::CBlock()
 {
