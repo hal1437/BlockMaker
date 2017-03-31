@@ -17,6 +17,7 @@
 
 ## 実装予定
 
++ ファイル・画像出力に対応
 + BlockMeshDict以外のファイルへの対応
 + BlockMeshやsnappyHexMeshに依存しないメッシュ作成
 + 寸法定義のルールをしっかり守る
