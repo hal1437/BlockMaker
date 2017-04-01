@@ -149,7 +149,7 @@ Pos CBlock::GetClockworksPos(int index){
     //hitに二回入った奴が左下
     for(int i=0;i<4;i++){
         Pos piv = hit[i];
-        for(int j=i;j<4;j++){
+        for(int j=i+1;j<4;j++){
             if(piv == hit[j]){
                 corner = piv;
             }
@@ -165,7 +165,7 @@ Pos CBlock::GetClockworksPos(int index){
         for(CObject* line:lines){
             if(ans == dynamic_cast<CLine*>(line)->GetJointPos(0) && old != dynamic_cast<CLine*>(line)->GetJointPos(1)){
                 candidate.push_back(dynamic_cast<CLine*>(line)->GetJointPos(1));
-            }else if(ans == dynamic_cast<CLine*>(line)->GetJointPos(1) && old == dynamic_cast<CLine*>(line)->GetJointPos(0)){
+            }else if(ans == dynamic_cast<CLine*>(line)->GetJointPos(1) && old != dynamic_cast<CLine*>(line)->GetJointPos(0)){
                 candidate.push_back(dynamic_cast<CLine*>(line)->GetJointPos(0));
             }
         }
@@ -173,10 +173,11 @@ Pos CBlock::GetClockworksPos(int index){
         old = ans;
         if(candidate.size() == 2){
             //二択
-            ans = std::min(candidate[0],candidate[1],[](Pos p1,Pos p2){return std::tie(p1.x,p1.y) < std::tie(p2.x,p2.y);});
+            ans = std::min(candidate[0],candidate[1],[](Pos p1,Pos p2){return std::tie(p1.x,p1.y) > std::tie(p2.x,p2.y);});
         }else{
             ans = candidate[0];
         }
+        candidate.clear();
     }
     return ans;
 }

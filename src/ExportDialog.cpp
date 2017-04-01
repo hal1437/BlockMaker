@@ -19,22 +19,42 @@ int ExportDialog::GetPosIndex(VPos p) const{
 }
 QVector<VPos> ExportDialog::GetVerticesPos() const{
     //全頂点リスト作成(重複無し)
-    QVector<VPos> ans;
+    QVector<std::pair<VPos,int>> list;
     for(CBlock block:blocks){
         for(Pos pos:block.GetVerticesPos()){
-            //配列内に存在していなければ
-            if(!exist(ans,VPos{pos.x,pos.y,0})){
-                ans.push_back(VPos{pos.x,pos.y,0});
-                ans.push_back(VPos{pos.x,pos.y,block.depth});
+            //配列内に存在していなければ追加
+            bool exist = false;
+            for(std::pair<VPos,int> pp :list){
+                if(pp.first == VPos{pos.x,pos.y,0}){
+                    exist = true;
+                }
+            }
+
+            if(exist == false){
+                //番号検索
+                int index = -1;
+                for(int i=0;i<4;i++){
+                    if(block.GetClockworksPos(i) == pos){
+                        index = i;
+                    }
+                }
+                //追加
+                list.push_back(std::make_pair(VPos{pos.x,pos.y,0}          ,index));
+                list.push_back(std::make_pair(VPos{pos.x,pos.y,block.depth},index));
             }
         }
     }
 
     //並び替え
-    std::sort(ans.begin(),ans.end(),[](VPos lhs,VPos rhs){
-        //return std::tie(lhs.z,) > std::tie(lhs.z);
+    std::sort(list.begin(),list.end(),[](std::pair<VPos,int> lhs,std::pair<VPos,int> rhs){
+        return std::tie(lhs.first.z,lhs.second) < std::tie(rhs.first.z,rhs.second);
         return true;
     });
+    //変換
+    QVector<VPos> ans;
+    for(std::pair<VPos,int> v:list){
+        ans.push_back(v.first);
+    }
 
     return ans;
 }
@@ -126,9 +146,13 @@ void ExportDialog::Export(QString filename)const{
 
         out << tab << "hex (";
         //頂点番号出力
-        for(int i=0;i<4;i++)out << this->GetPosIndex(VPos{block.GetVerticesPos()[i].x,block.GetVerticesPos()[i].y,0})     << " ";
+
         for(int i=0;i<4;i++){
-            out << this->GetPosIndex(VPos{block.GetVerticesPos()[i].x,block.GetVerticesPos()[i].y,block.depth});
+            Pos p = block.GetClockworksPos(i);
+            out << this->GetPosIndex(VPos{p.x,p.y,0})     << " ";
+        }for(int i=0;i<4;i++){
+            Pos p = block.GetClockworksPos(i);
+            out << this->GetPosIndex(VPos{p.x,p.y,block.depth})     << " ";
             if(i!=3)out << " ";
         };
         out << ") ";
