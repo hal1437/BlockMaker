@@ -152,9 +152,12 @@ Pos CBlock::GetClockworksPos(int index){
         for(int j=i+1;j<4;j++){
             if(piv == hit[j]){
                 corner = piv;
+                i=4;//即座に終了
+                break;
             }
         }
     }
+
 
     //index回だけ連鎖させる
     Pos ans = corner;
@@ -173,7 +176,11 @@ Pos CBlock::GetClockworksPos(int index){
         old = ans;
         if(candidate.size() == 2){
             //二択
-            ans = std::min(candidate[0],candidate[1],[](Pos p1,Pos p2){return std::tie(p1.x,p1.y) > std::tie(p2.x,p2.y);});
+            if(Pos::Angle(candidate[0]-corner,candidate[1]-corner) < Pos::Angle(candidate[0]-corner,candidate[1]-corner)){
+                ans = candidate[0];
+            }else{
+                ans = candidate[1];
+            }
         }else{
             ans = candidate[0];
         }
