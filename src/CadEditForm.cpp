@@ -450,22 +450,25 @@ void CadEditForm::ApplyObjectList(QListWidget* list){
     QMap<QString,int>map;
     for(int i=0;i<list->count();i++){
         QListWidgetItem* item = list->item(i);
+        QString text = item->text();
+        if(text == "Origin") text = "CPoint";
 
         //カウント
-        if(map.find(item->text()) != map.end())map[item->text()]++;
-        else map.insert(item->text(),1);
+        if(map.find(text) != map.end()){
+            map[text]++;
+        }else map.insert(text,1);
 
 
         if(item->isSelected()){
             //CObject::selected内をループ
             int count = 0;
             int j;
-            for(j = 0;count < map[item->text()];j++){
-                if(this->objects[j]->is<CPoint >() && item->text()=="CPoint" )count++;
-                if(this->objects[j]->is<CLine  >() && item->text()=="CLine"  )count++;
-                if(this->objects[j]->is<CRect  >() && item->text()=="CRect"  )count++;
-                if(this->objects[j]->is<CArc   >() && item->text()=="CArc"  )count++;
-                if(this->objects[j]->is<CSpline>() && item->text()=="CSpline")count++;
+            for(j = 0;count < map[text];j++){
+                if(this->objects[j]->is<CPoint >() && text=="CPoint" )count++;
+                if(this->objects[j]->is<CLine  >() && text=="CLine"  )count++;
+                if(this->objects[j]->is<CRect  >() && text=="CRect"  )count++;
+                if(this->objects[j]->is<CArc   >() && text=="CArc"   )count++;
+                if(this->objects[j]->is<CSpline>() && text=="CSpline")count++;
             }
             CObject::selected.push_back(this->objects[j-1]);
         }
