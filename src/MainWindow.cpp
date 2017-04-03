@@ -367,10 +367,10 @@ void MainWindow::MakeBlock(){
 
 void MainWindow::ReciveObjectListChanged(){
     this->ui->CadEdit->ApplyObjectList(this->ui->ObjectList);
-    this->ui->CadEdit->ApplyCBoxList(this->ui->BlockList);
     RefreshUI();
 }
 void MainWindow::ReciveBlockListChanged(){
+    this->ui->CadEdit->ApplyCBoxList  (this->ui->BlockList);
     RefreshUI();
 }
 void MainWindow::RefreshStatusBar(QMouseEvent*,CObject* under){

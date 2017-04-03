@@ -88,8 +88,12 @@ QString CBoxDefineDialog::GetBoundaryName(BoundaryDir dir)const{
 GradingType CBoxDefineDialog::GetGradigngType()const{
     GradingType type;
     if(ui->GradingCombo->currentText() == "simpleGrading")type = SimpleGrading;
-    if(ui->GradingCombo->currentText() == "EdgeGrading"  )type = EdgeGrading;
+    if(ui->GradingCombo->currentText() == "edgeGrading"  )type = EdgeGrading;
     return type;
+}
+void CBoxDefineDialog::SetGradigngType(GradingType type){
+    if(type == SimpleGrading)ui->GradingCombo->setCurrentText("simpleGrading");
+    if(type == EdgeGrading  )ui->GradingCombo->setCurrentText("edgeGrading");
 }
 QString CBoxDefineDialog::GetGradigngArgs()const{
     return ui->GradingEdit->text();
@@ -126,11 +130,16 @@ CBlock CBoxDefineDialog::ExportCBlock()const{
     return blocks;
 }
 void CBoxDefineDialog::ImportCBlock(const CBlock &block){
-    //麺の設定
+    //面の設定
     for(int i = 0;i<6;i++){
         this->ConvertDirToNameEdit(static_cast<BoundaryDir>(i))->setText(block.name[i]);
         this->ConvertDirToCombo   (static_cast<BoundaryDir>(i))->setCurrentText(this->ConvertBoundaryToString(block.boundery[i]));
     }
+    this->ui->XspinBox->setValue(block.div[0]);
+    this->ui->YspinBox->setValue(block.div[1]);
+    this->ui->ZspinBox->setValue(block.div[2]);
+    this->ui->DepthSpinBox->setValue(block.depth);
+    this->SetGradigngType(block.grading);
     //全体設定
     QStringList list;
     for(double d :block.grading_args)list.push_back(QString::number(d));

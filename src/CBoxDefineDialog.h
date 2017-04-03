@@ -31,6 +31,7 @@ public:
     GradingType  GetGradigngType()const;
     QString      GetGradigngArgs()const;
 
+    void SetGradigngType(GradingType type);
     void SetBoundaryName(BoundaryDir dir,QString name     )const;
     void SetBoundaryType(BoundaryDir dir,BoundaryType type)const;
     QString      GetVertices    (BoundaryDir dir)const;

@@ -513,12 +513,11 @@ void CadEditForm::DrawCBoxList   (QListWidget *list){
     }
     //選択情報を更新
     for(int i=0;i<this->blocks.size();i++){
-        list->item(i)->setSelected(exist(this->selecting_block,&blocks[i]));
+        //list->item(i)->setSelected(exist(this->selecting_block,&blocks[i]));
     }
 }
-void CadEditForm::ConfigureBlock(QListWidgetItem*){
+void CadEditForm::ConfigureBlock(QListWidgetItem* list){
     CBoxDefineDialog* diag = new CBoxDefineDialog(this);
-    if(this->selecting_block.size() == 0)return;
     diag->ImportCBlock(*this->selecting_block[0]);
     if(diag->exec()){
         QVector<CObject*> ll;

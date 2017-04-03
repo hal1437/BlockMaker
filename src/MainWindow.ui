@@ -225,7 +225,16 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="QListWidget" name="BlockList"/>
+        <widget class="QListWidget" name="BlockList">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <item>
+          <property name="text">
+           <string>1</string>
+          </property>
+         </item>
+        </widget>
        </item>
       </layout>
      </widget>
