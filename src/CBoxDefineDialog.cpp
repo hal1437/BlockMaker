@@ -147,6 +147,16 @@ void CBoxDefineDialog::ImportCBlock(const CBlock &block){
     this->ui->GradingEdit ->setText(list.join(" "));
 }
 
+void CBoxDefineDialog::GradigngComboChanged(QString text){
+    if(text == "simpleGrading"){
+        ui->GradingEdit->setText("1 1 1");
+        this->SetGradigngType(SimpleGrading);
+    }
+    if(text == "edgeGrading"  ){
+        ui->GradingEdit->setText("1 1 1 1 1 1 1 1 1 1 1 1");
+        this->SetGradigngType(EdgeGrading);
+    }
+}
 
 
 CBoxDefineDialog::CBoxDefineDialog(QWidget *parent) :
@@ -154,7 +164,8 @@ CBoxDefineDialog::CBoxDefineDialog(QWidget *parent) :
     ui(new Ui::CBoxDefineDialog)
 {
     ui->setupUi(this);
-    ui->GradingEdit       ->setText("1 1 1");
+    ui->GradingEdit->setText("1 1 1");
+    connect(this->ui->GradingCombo,SIGNAL(currentIndexChanged(QString)),this,SLOT(GradigngComboChanged(QString)));
 }
 
 CBoxDefineDialog::~CBoxDefineDialog()

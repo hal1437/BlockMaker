@@ -36,7 +36,6 @@ public:
     void SetBoundaryType(BoundaryDir dir,BoundaryType type)const;
     QString      GetVertices    (BoundaryDir dir)const;
 
-
     //エラー判定
     bool isFormatError()const;
 
@@ -44,11 +43,14 @@ public:
     CBlock ExportCBlock()const;
     void    ImportCBlock(const CBlock& block);
 
+
+
     explicit CBoxDefineDialog(QWidget *parent = 0);
     ~CBoxDefineDialog();
 
 public slots:
     void AcceptProxy();
+    void GradigngComboChanged(QString text);
 
 private:
     Ui::CBoxDefineDialog *ui;
