@@ -41,7 +41,7 @@ public:
 
     //入出力
     CBlock ExportCBlock()const;
-    void    ImportCBlock(const CBlock& block);
+    void   ImportCBlock(const CBlock& block);
 
 
 
