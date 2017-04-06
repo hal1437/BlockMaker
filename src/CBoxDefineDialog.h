@@ -37,7 +37,7 @@ public:
     QString      GetVertices    (BoundaryDir dir)const;
 
     //エラー判定
-    bool isFormatError()const;
+    QString FormatError()const;
 
     //入出力
     CBlock ExportCBlock()const;

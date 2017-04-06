@@ -100,13 +100,28 @@ QString CBoxDefineDialog::GetGradigngArgs()const{
 }
 
 //エラー判定
-bool CBoxDefineDialog::isFormatError()const{
+QString CBoxDefineDialog::FormatError()const{
     //引数の数があっているかな判定
-    bool failed=false;
+    QString failed = "";
 
     int args_num = (GetGradigngType() == SimpleGrading) ? 2 : 11;
-    if(GetGradigngArgs().split(' ').size() == args_num)failed = true;
+    if(GetGradigngArgs().split(' ').size() == args_num)failed = "Gradigngの引数が一致しません";
 
+    //名前とタイプは全て一致
+    QMap<QString,BoundaryType> map;
+    for(int i=0;i<6;i++){
+        BoundaryDir dir = static_cast<BoundaryDir>(i);
+
+        //map内に同じ境界名が存在する。
+        if(map.find(this->GetBoundaryName(dir)) != map.end()){
+            if(map.find(this->GetBoundaryName(dir)).value() != this->GetBoundaryType(dir)){
+                failed = "境界名と境界タイプが一致しない組み合わせがあります。";
+            }
+        }else{
+            //追加
+            map.insert(this->GetBoundaryName(dir),this->GetBoundaryType(dir));
+        }
+    }
     return failed;
 }
 
@@ -174,8 +189,9 @@ CBoxDefineDialog::~CBoxDefineDialog()
 }
 
 void CBoxDefineDialog::AcceptProxy(){
-    if(this->isFormatError()){
-        QMessageBox::information(this,"フォーマットエラー","Gradigngの引数が合っていません。",QMessageBox::Ok);
+    QString mes = this->FormatError();
+    if(mes != ""){
+        QMessageBox::information(this,"フォーマットエラー",mes,QMessageBox::Ok);
     }else{
         accept();
     }
