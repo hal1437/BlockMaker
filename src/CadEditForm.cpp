@@ -493,11 +493,11 @@ void CadEditForm::DrawObjectList(QListWidget* list){
 }
 void CadEditForm::ApplyCBoxList  (QListWidget *list){
     //selecting_blockを更新する
-    this->selecting_block.clear();
+    this->selecting_block = -1;
     for(int i=0;i<list->count();i++){
         //選択していればselecting_blockを更新する
         if(list->item(i)->isSelected()){
-            this->selecting_block.push_back(&this->blocks[i]);
+            this->selecting_block = i;
         }
     }
 }
@@ -508,7 +508,7 @@ void CadEditForm::DrawCBoxList   (QListWidget *list){
         for(int i=0;i<this->blocks.size();i++){
             list->addItem(new QListWidgetItem("CBox"));
             list->item(list->count()-1)->setIcon(QIcon(":/ToolImages/Blocks.png"));
-            list->item(list->count()-1)->setSelected(exist(selecting_block,&blocks[i]));
+            list->item(list->count()-1)->setSelected(selecting_block == i);
         }
     }
     //選択情報を更新
@@ -516,14 +516,16 @@ void CadEditForm::DrawCBoxList   (QListWidget *list){
         //list->item(i)->setSelected(exist(this->selecting_block,&blocks[i]));
     }
 }
-void CadEditForm::ConfigureBlock(QListWidgetItem* list){
+void CadEditForm::ConfigureBlock(QListWidgetItem*){
+    if(this->selecting_block == -1)return;
+
     CBoxDefineDialog* diag = new CBoxDefineDialog(this);
-    diag->ImportCBlock(*this->selecting_block[0]);
+    diag->ImportCBlock(this->blocks[selecting_block]);
     if(diag->exec()){
         QVector<CObject*> ll;
-        for(int i =0;i<4;i++)ll.push_back(this->selecting_block[0]->GetNode(i));
-        *this->selecting_block[0] = diag->ExportCBlock();
-        this->selecting_block[0]->SetNodeAll(ll);
+        for(int i =0;i<4;i++)ll.push_back(this->blocks[selecting_block].GetNode(i));
+        this->blocks[selecting_block] = diag->ExportCBlock();
+        this->blocks[selecting_block].SetNodeAll(ll);
     }
 }
 void CadEditForm::ResetAllExpantion(){

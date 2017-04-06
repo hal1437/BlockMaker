@@ -35,7 +35,7 @@ private:
     QVector<SmartDimension*>  dimensions;      //寸法
     QVector<Restraint*>       restraints;      //拘束
     QVector<CBlock>           blocks;          //立体
-    QVector<CBlock*>          selecting_block; //選択物体
+    int                       selecting_block; //選択物体
 
     double scale  = 1.0f;     //拡大率
     Pos translate = Pos(0,0); //平行移動
@@ -81,7 +81,7 @@ public slots:
     void DrawObjectList (QListWidget *list); //オブジェクトリスト描画
     void ApplyCBoxList  (QListWidget *list); //ブロックリスト選択
     void DrawCBoxList   (QListWidget *list); //ブロックリスト描画
-    void ConfigureBlock (QListWidgetItem* item); //ブロック再編集
+    void ConfigureBlock (QListWidgetItem*); //ブロック再編集
 
     void ResetAllExpantion();//拡大、移動リセット
     void Export(); //出力
