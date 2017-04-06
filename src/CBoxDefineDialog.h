@@ -18,7 +18,7 @@ protected:
     void paintEvent    (QPaintEvent* event); //描画イベントハンドラ
     QComboBox*   ConvertDirToCombo      (BoundaryDir  dir)const;
     QLineEdit*   ConvertDirToNameEdit   (BoundaryDir  dir)const;
-    QString      ConvertBoundaryToString(BoundaryType dir)const;
+    QString      ConvertBoundaryToString(BoundaryType type)const;
     BoundaryType ConvertStringToBoundary(QString      str)const;
     QString      ConvertGradingToString (GradingType  dir)const;
     GradingType  ConvertStringToGrading (QString      str)const;
@@ -32,8 +32,8 @@ public:
     QString      GetGradigngArgs()const;
 
     void SetGradigngType(GradingType type);
-    void SetBoundaryName(BoundaryDir dir,QString name     )const;
-    void SetBoundaryType(BoundaryDir dir,BoundaryType type)const;
+    void SetBoundaryName(BoundaryDir dir,QString name     );
+    void SetBoundaryType(BoundaryDir dir,BoundaryType type);
     QString      GetVertices    (BoundaryDir dir)const;
 
     //エラー判定
@@ -43,14 +43,15 @@ public:
     CBlock ExportCBlock()const;
     void   ImportCBlock(const CBlock& block);
 
-
-
     explicit CBoxDefineDialog(QWidget *parent = 0);
     ~CBoxDefineDialog();
 
 public slots:
     void AcceptProxy();
     void GradigngComboChanged(QString text);
+
+    //境界名と境界タイプを一致させる
+    void SyncOtherCombo(int);
 
 private:
     Ui::CBoxDefineDialog *ui;

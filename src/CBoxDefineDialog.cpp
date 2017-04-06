@@ -23,14 +23,14 @@ QLineEdit* CBoxDefineDialog::ConvertDirToNameEdit(BoundaryDir dir)const{
     else if(dir == Back  )return ui->BackNameEdit;
     return nullptr;
 }
-QString      CBoxDefineDialog::ConvertBoundaryToString(BoundaryType dir)const{
-    if     (dir == BoundaryType::Patch        )return QString("patch (パッチ)");
-    else if(dir == BoundaryType::Wall         )return QString("wall (壁)");
-    else if(dir == BoundaryType::SymmetryPlane)return QString("symmetryPlane (対称面)");
-    else if(dir == BoundaryType::Cyclic       )return QString("cyclic (周期境界)");
-    else if(dir == BoundaryType::CyclicAMI    )return QString("cyclicAMI (不整合周期境界)");
-    else if(dir == BoundaryType::Wedge        )return QString("wedge (2次元軸対称)");
-    else if(dir == BoundaryType::Empty        )return QString("empty (2 次元)");
+QString      CBoxDefineDialog::ConvertBoundaryToString(BoundaryType type)const{
+    if     (type == BoundaryType::Patch        )return QString("patch (パッチ)");
+    else if(type == BoundaryType::Wall         )return QString("wall (壁)");
+    else if(type == BoundaryType::SymmetryPlane)return QString("symmetryPlane (対称面)");
+    else if(type == BoundaryType::Cyclic       )return QString("cyclic (周期境界)");
+    else if(type == BoundaryType::CyclicAMI    )return QString("cyclicAMI (不整合周期境界)");
+    else if(type == BoundaryType::Wedge        )return QString("wedge (2次元軸対称)");
+    else if(type == BoundaryType::Empty        )return QString("empty (2次元)");
     else return QString("Unknown");
 }
 BoundaryType CBoxDefineDialog::ConvertStringToBoundary(QString str)const{
@@ -94,6 +94,12 @@ GradingType CBoxDefineDialog::GetGradigngType()const{
 void CBoxDefineDialog::SetGradigngType(GradingType type){
     if(type == SimpleGrading)ui->GradingCombo->setCurrentText("simpleGrading");
     if(type == EdgeGrading  )ui->GradingCombo->setCurrentText("edgeGrading");
+}
+void CBoxDefineDialog::SetBoundaryName(BoundaryDir dir,QString name){
+    this->ConvertDirToNameEdit(dir)->setText(name);
+}
+void CBoxDefineDialog::SetBoundaryType(BoundaryDir dir,BoundaryType type){
+    this->ConvertDirToCombo(dir)->setCurrentText(ConvertBoundaryToString(type));
 }
 QString CBoxDefineDialog::GetGradigngArgs()const{
     return ui->GradingEdit->text();
@@ -172,7 +178,31 @@ void CBoxDefineDialog::GradigngComboChanged(QString text){
         this->SetGradigngType(EdgeGrading);
     }
 }
+void CBoxDefineDialog::SyncOtherCombo(int){
+    //全てのコネクトを解除
+    for(int i=0;i<6;i++){
+        disconnect(this->ConvertDirToCombo(static_cast<BoundaryDir>(i)),SIGNAL(currentIndexChanged(int)),this,SLOT(SyncOtherCombo(int)));
+    }
 
+    //すべての境界で
+    for(int i=0;i<6;i++){
+        QString name = this->GetBoundaryName(static_cast<BoundaryDir>(i));
+
+        //他の方向に対して
+        for(int j=0;j<6;j++){
+            if(i==j)continue;
+            //名前が一致すれば
+            if(name == this->GetBoundaryName(static_cast<BoundaryDir>(j))){
+                //コンボボックスを書き換える
+                this->SetBoundaryType(static_cast<BoundaryDir>(j),this->GetBoundaryType(static_cast<BoundaryDir>(i)));
+            }
+        }
+    }
+    //全てのコネクトを連結
+    for(int i=0;i<6;i++){
+        connect(this->ConvertDirToCombo(static_cast<BoundaryDir>(i)),SIGNAL(currentIndexChanged(int)),this,SLOT(SyncOtherCombo(int)));
+    }
+}
 
 CBoxDefineDialog::CBoxDefineDialog(QWidget *parent) :
     QDialog(parent),
@@ -181,6 +211,12 @@ CBoxDefineDialog::CBoxDefineDialog(QWidget *parent) :
     ui->setupUi(this);
     ui->GradingEdit->setText("1 1 1");
     connect(this->ui->GradingCombo,SIGNAL(currentIndexChanged(QString)),this,SLOT(GradigngComboChanged(QString)));
+    connect(this->ui->BackTypecombo  ,SIGNAL(currentIndexChanged(int)),this,SLOT(SyncOtherCombo(int)));
+    connect(this->ui->FrontTypecombo ,SIGNAL(currentIndexChanged(int)),this,SLOT(SyncOtherCombo(int)));
+    connect(this->ui->TopTypecombo   ,SIGNAL(currentIndexChanged(int)),this,SLOT(SyncOtherCombo(int)));
+    connect(this->ui->RightTypecombo ,SIGNAL(currentIndexChanged(int)),this,SLOT(SyncOtherCombo(int)));
+    connect(this->ui->LeftTypecombo  ,SIGNAL(currentIndexChanged(int)),this,SLOT(SyncOtherCombo(int)));
+    connect(this->ui->BottomTypecombo,SIGNAL(currentIndexChanged(int)),this,SLOT(SyncOtherCombo(int)));
 }
 
 CBoxDefineDialog::~CBoxDefineDialog()

@@ -505,7 +505,7 @@ void CadEditForm::DrawCBoxList   (QListWidget *list){
     //数が一致しなければ、全て削除し再度代入する
     if(list->count() != this->blocks.size()){
         list->clear();
-        for(int i=0;i<this->blocks.size();i++){
+        for(int i=0;i<this->blocks.size();i++) {
             list->addItem(new QListWidgetItem("CBox"));
             list->item(list->count()-1)->setIcon(QIcon(":/ToolImages/Blocks.png"));
             list->item(list->count()-1)->setSelected(selecting_block == i);
