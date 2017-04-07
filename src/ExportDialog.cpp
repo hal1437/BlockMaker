@@ -75,7 +75,7 @@ void ExportDialog::ChangeDirctory(){
     if(filename != "")this->ui->ExportPath->setText(filename);
 }
 void ExportDialog::Export(QString filename)const{
-    const char* tab = "    ";
+
     //出力
     QFile file(filename + "/blockMeshDict");
     if (!file.open(QIODevice::WriteOnly)) {
@@ -113,7 +113,7 @@ void ExportDialog::Export(QString filename)const{
     out << "vertices" << "\n";
     out << "("        << "\n";
     for(VPos p:this->GetVerticesPos()){
-        out << tab << "(" << p.x << " " << p.y << " " << p.z << ")\n";
+        out << TAB   << "(" << p.x << " " << p.y << " " << p.z << ")\n";
     }
     out << ");"       << "\n";
     out               << "\n";
@@ -126,7 +126,7 @@ void ExportDialog::Export(QString filename)const{
     out << "("      << "\n";
     for(CBlock block:this->blocks){
 
-        out << tab << "hex (";
+        out << TAB   << "hex (";
         //頂点番号出力
 
         for(int i=0;i<4;i++){
@@ -199,24 +199,24 @@ void ExportDialog::Export(QString filename)const{
     QMap<QString,std::pair<BoundaryType,QVector<int>>>::const_iterator it = boundary_list.constBegin();
     while (it != boundary_list.constEnd()) {
         //境界名
-        out << tab << it.key() << "\n";
-        out << tab <<"{\n";
+        out << TAB   << it.key() << "\n";
+        out << TAB  <<"{\n";
 
         //境界タイプ
-        if(it.value().first == BoundaryType::Patch        ) out << tab << tab << "type patch;\n";
-        if(it.value().first == BoundaryType::Wall         ) out << tab << tab << "type wall;\n";
-        if(it.value().first == BoundaryType::SymmetryPlane) out << tab << tab << "type symmetryPlane;\n";
-        if(it.value().first == BoundaryType::Cyclic       ) out << tab << tab << "type cyclic;\n";
-        if(it.value().first == BoundaryType::CyclicAMI    ) out << tab << tab << "type cyclicAMI;\n";
-        if(it.value().first == BoundaryType::Wedge        ) out << tab << tab << "type wedge;\n";
-        if(it.value().first == BoundaryType::Empty        ) out << tab << tab << "type empty;\n";
+        if(it.value().first == BoundaryType::Patch        ) out << TAB  << TAB  << "type patch;\n";
+        if(it.value().first == BoundaryType::Wall         ) out << TAB  << TAB  << "type wall;\n";
+        if(it.value().first == BoundaryType::SymmetryPlane) out << TAB  << TAB  << "type symmetryPlane;\n";
+        if(it.value().first == BoundaryType::Cyclic       ) out << TAB  << TAB  << "type cyclic;\n";
+        if(it.value().first == BoundaryType::CyclicAMI    ) out << TAB  << TAB  << "type cyclicAMI;\n";
+        if(it.value().first == BoundaryType::Wedge        ) out << TAB  << TAB  << "type wedge;\n";
+        if(it.value().first == BoundaryType::Empty        ) out << TAB  << TAB  << "type empty;\n";
 
         //頂点定義
-        out << tab << tab << "faces\n";
-        out << tab << tab << "(\n";
+        out << TAB  << TAB  << "faces\n";
+        out << TAB  << TAB  << "(\n";
         for(int i=0;i<it.value().second.size();i++){
             if(i % 4 == 0){
-                out << tab << tab << tab << "("; //先端文字列
+                out << TAB  << TAB  << TAB  << "("; //先端文字列
             }else{
                 out << " ";       //中間文字列
             }
@@ -226,8 +226,8 @@ void ExportDialog::Export(QString filename)const{
                 out << ")\n";     //終端文字列
             }
         }
-        out << tab << tab << ");\n";
-        out << tab << "}\n";
+        out << TAB  << TAB  << ");\n";
+        out << TAB  << "}\n";
         it++;
     }
 

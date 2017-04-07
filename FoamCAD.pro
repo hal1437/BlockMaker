@@ -29,7 +29,8 @@ SOURCES += src/main.cpp\
     src/CObject/CRect.cpp \
     src/CObject/CSpline.cpp \
     src/CObject/CBlock.cpp \
-    src/MoveTransformDialog.cpp
+    src/MoveTransformDialog.cpp \
+    src/FoamFile.cpp
 
 HEADERS  += src/MainWindow.h \
     src/Point.h \
@@ -48,7 +49,8 @@ HEADERS  += src/MainWindow.h \
     src/CObject/CRect.h \
     src/CObject/CSpline.h \
     src/CObject/CBlock.h \
-    src/MoveTransformDialog.h
+    src/MoveTransformDialog.h \
+    src/FoamFile.h
 
 FORMS    += src/MainWindow.ui \
     src/CadEditForm.ui \

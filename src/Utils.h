@@ -6,6 +6,7 @@
 #include <QStringList>
 #include <tuple>
 #define PI 3.1415926535897932384626433832795
+#define TAB "    "
 
 template<class T>
 bool exist(std::iterator<std::forward_iterator_tag,T> begin ,std::iterator<std::forward_iterator_tag,T> end,const T& value){
