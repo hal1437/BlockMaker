@@ -17,6 +17,8 @@
 
 ## 実装予定
 
++ 初期条件定義、ソルバー選択
++ BlockMeshのみの出力機能、上書きボタン
 + ファイル・画像出力に対応
 + BlockMeshDict以外のファイルへの対応
 + BlockMeshやsnappyHexMeshに依存しないメッシュ作成
