@@ -12,6 +12,7 @@
 #include <QFile>
 #include <QMessageBox>
 #include <QTextCodec>
+#include "FoamFile.h"
 
 struct VPos{
     double x,y,z;

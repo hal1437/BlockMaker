@@ -13,7 +13,7 @@ class FoamFile
 private:
 
     //括弧タイプ
-    enum DIFINITON{
+    enum DEFINITON{
         DICTIONARY,
         LIST ,
     };
@@ -30,9 +30,9 @@ public:
     void StartListDifinition(QString title);       //リスト()
     //各出力
     template<class T>
-    void VectorToString(QVector<T> vector);        //ベクトル出力
+    void OutVector(QVector<T> vector);        //ベクトル出力
     void OutValue(QString name,QString value);     //値出力
-    void OutString(QString name,QString value);    //文字列出力
+    void OutString(QString str);    //文字列出力
     void EndScope();//閉じかっこ出力
 
     //ベクトルを文字列に変換

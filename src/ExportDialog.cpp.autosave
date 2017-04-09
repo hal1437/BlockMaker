@@ -99,9 +99,9 @@ void ExportDialog::Export(QString filename)const{
     // 頂点登録
     QVector<FoamFileVector<double>> vectors;
     for(VPos p:this->GetVerticesPos()){
-        vectors.push_back(FoamFileVector<double>({p.x , p.y , p.z}));
+        vectors.push_back(new FoamFileVector<double>({p.x , p.y , p.z}));
     }
-    file.AddToken(FoamFileList<FoamFileVector<double>>("vertices",vectors));
+    file.AddToken(new FoamFileList<FoamFileVector<double>*>("vertices",vectors));
 
     //
     // ブロック出力

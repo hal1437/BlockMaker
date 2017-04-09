@@ -1,56 +1,59 @@
 #include "FoamFile.h"
-
-void FoamFileValue::Inline(std::ostream& out, int depth)const{
-    for(int i=0;i<depth;i++)out << TAB;
-    out << this->name.toStdString().c_str() << " " << this->value.toStdString().c_str() << std::endl;
-}
-template<class T>
-void FoamFileVector<T>::Inline(std::ostream& out, int depth)const{
-    for(int i=0;i<depth;i++)out << TAB;
-    out << "(";
-    for(typename std::initializer_list<T>::iterator it = this->array.begin();it != array.end();it++){
-        out << *it << " ";
-    }
-    out << "\b)" << std::endl;
-}
-template<class T>
-void FoamFileDictionary<T>::Inline(std::ostream& out, int depth)const{
-    for(int i=0;i<depth;i++)out << TAB;
-    out << name.toStdString().c_str() << std::endl;
-    for(int i=0;i<depth;i++)out << TAB;
-    out << "(\n" << std::endl;
-    for(typename std::initializer_list<T>::iterator it = this->array.begin();it != array.begin();it++){
-        it->Inline(out,depth++);
-    }
-    for(int i=0;i<depth;i++)out << TAB;
-    out << ");" << std::endl;
-}
-template<class T>
-void FoamFileArray<T>::Inline(std::ostream& out, int depth)const{
-    for(int i=0;i<depth;i++)out << TAB;
-    out << name.toStdString().c_str() << std::endl;
-    for(int i=0;i<depth;i++)out << TAB;
-    out << "{\n" << std::endl;
-    for(typename std::initializer_list<T>::iterator it = this->array.begin();it != array.begin();it++){
-        it->Inline(out,depth++);
-    }
-    for(int i=0;i<depth;i++)out << TAB;
-    out << "}" << std::endl;
+//タブ出力
+void FoamFile::TabOut(){
+    for(int i=0;i<this->defs.size();i++)ofs << TAB;
 }
 
-//辞書追加
-void FoamFile::AddToken(FoamFileToken* token){
-     seqence.push_back(token);
+void FoamFile::StartDictionaryDifinition(QString title){
+    ofs << title.toStdString().c_str() << std::endl;
+    ofs << "{"                         << std::endl;
+    this->defs.push_back(DEFINITON::DICTIONARY);
+}
+void FoamFile::StartListDifinition(QString title){
+    ofs << title.toStdString().c_str() << std::endl;
+    ofs << "("                         << std::endl;
+    this->defs.push_back(DEFINITON::LIST);
 }
 
-//出力
-void FoamFile::Export(QString filepath)const{
-    std::ofstream out(filepath.toStdString().c_str());
-    for(int i =0;i<this->seqence.size();i++){
-        this->seqence[i]->Inline(out,0);
-        out << std::endl;
-    }
+template<T>
+void FoamFile::OutVector(QVector<T> vector){
+    this->TabOut();
+    ofs << VectorToString(vector) << std::endl;
 }
+void FoamFile::OutValue(QString name,QString value){
+    this->TabOut();
+    ofs << name << " " << value << std::endl;
+}
+
+void FoamFile::OutString(QString str){
+    ofs << str << std::endl;
+}
+void FoamFile::EndScope(){
+    if(defs.empty()){
+        qDebug() << "Error. FoamFile used EndScope() when defs.empty()";
+        return;
+    }
+    for(int i=0;i<this->defs.size() - 1;i++) ofs << TAB;
+    if(defs[defs.size()-1] == DEFINITON::DICTIONARY) ofs << "}" << std::endl;
+    if(defs[defs.size()-1] == DEFINITON::LIST      ) ofs << ")"  << std::endl;
+}
+
+
+template<T>
+void FoamFile::VectorToString(QVector<T> vector){
+    QString ans;
+    ans += "(";
+    for(int i=0;i<vector.size();i++){
+        ans += QString::number(vector[i]);
+        if(i==vector.size() - 1)ans += ")";
+        else                    ans += " ";
+    }
+    return ans;
+}
+
+void Open(QString filepath);
+void Close(QString filepath);
+
 
 FoamFile::FoamFile()
 {
