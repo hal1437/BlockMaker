@@ -92,16 +92,17 @@ void ExportDialog::Export(QString filename)const{
     //contacts.empty();   // empty existing contacts
 
     FoamFile file;
+    file.Open(filename.toStdString().c_str());
 
     //単位変換設定
-    file.AddToken(new FoamFileValue("convertToMeters",QString::number(ui->Scale->value())));
+    file.OutValue("convertToMeters",QString::number(ui->Scale->value()));
 
     // 頂点登録
-    QVector<FoamFileVector<double>> vectors;
+    file.StartListDifinition("vertices");
     for(VPos p:this->GetVerticesPos()){
-        vectors.push_back(FoamFileVector<double>({p.x , p.y , p.z}));
+        QVector<double> vec = {p.x,p.y,p.z};
+        file.OutVector(vec);
     }
-    file.AddToken(FoamFileList<FoamFileVector<double>>("vertices",vectors));
 
     //
     // ブロック出力

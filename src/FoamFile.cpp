@@ -15,18 +15,13 @@ void FoamFile::StartListDifinition(QString title){
     this->defs.push_back(DEFINITON::LIST);
 }
 
-template<T>
-void FoamFile::OutVector(QVector<T> vector){
-    this->TabOut();
-    ofs << VectorToString(vector) << std::endl;
-}
+
 void FoamFile::OutValue(QString name,QString value){
     this->TabOut();
-    ofs << name << " " << value << std::endl;
+    ofs << name.toStdString().c_str() << " " << value.toStdString().c_str() << std::endl;
 }
-
 void FoamFile::OutString(QString str){
-    ofs << str << std::endl;
+    ofs << str.toStdString().c_str() << std::endl;
 }
 void FoamFile::EndScope(){
     if(defs.empty()){
@@ -39,20 +34,13 @@ void FoamFile::EndScope(){
 }
 
 
-template<T>
-void FoamFile::VectorToString(QVector<T> vector){
-    QString ans;
-    ans += "(";
-    for(int i=0;i<vector.size();i++){
-        ans += QString::number(vector[i]);
-        if(i==vector.size() - 1)ans += ")";
-        else                    ans += " ";
-    }
-    return ans;
+void FoamFile::Open(QString filepath){
+    ofs = std::ofstream(filepath.toStdString().c_str());
 }
 
-void Open(QString filepath);
-void Close(QString filepath);
+void FoamFile::Close(QString filepath){
+    ofs.close();
+}
 
 
 FoamFile::FoamFile()
