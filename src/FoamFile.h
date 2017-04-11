@@ -33,7 +33,7 @@ public:
     template<class T>
     void OutVector(QVector<T> vector){
         this->TabOut();
-        ofs << VectorToString(vector) << std::endl;
+        ofs << VectorToString(vector).toStdString() << std::endl;
     }
     void OutValue(QString name,QString value);     //値出力
     void OutString(QString str);    //文字列出力

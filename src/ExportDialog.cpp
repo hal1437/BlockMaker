@@ -103,63 +103,59 @@ void ExportDialog::Export(QString filename)const{
         QVector<double> vec = {p.x,p.y,p.z};
         file.OutVector(vec);
     }
+    file.EndScope();
 
     //
     // ブロック出力
     //
-    out << "blocks" << "\n";
-    out << "("      << "\n";
+    file.StartListDifinition("blocks");
     for(CBlock block:this->blocks){
+        file.OutString(TAB);
+        file.OutString("hex");
 
-        out << TAB   << "hex (";
         //頂点番号出力
-
+        QVector<int> pos_indices;
         for(int i=0;i<4;i++){
             Pos p = block.GetClockworksPos(i);
-            out << this->GetPosIndex(VPos{p.x,p.y,0})     << " ";
-        }for(int i=0;i<4;i++){
+            pos_indices.push_back(this->GetPosIndex(VPos{p.x,p.y,0}));
+        }
+        for(int i=0;i<4;i++){
             Pos p = block.GetClockworksPos(i);
-            out << this->GetPosIndex(VPos{p.x,p.y,block.depth})     << " ";
-            if(i!=3)out << " ";
+            pos_indices.push_back(this->GetPosIndex(VPos{p.x,p.y,block.depth}));
         };
-        out << ") ";
+        file.OutVector(pos_indices);
 
         //分割数出力
+        QVector<int> div_indices;
         for(int i=0;i<3;i++){
-            if(i == 0) out << "(";
-            else       out << " ";
-            out << QString::number(block.div[i]);
+            div_indices.push_back(block.div[i]);
         }
-        out << ") ";
+        file.OutVector(div_indices);
 
         //分割パラメータ出力
+        QVector<int> grading_args;
         if(block.grading == GradingType::SimpleGrading){
-            out << "simpleGrading ";
+            file.OutString("simpleGrading ");
             for(int i=0;i<3;i++){
-                if(i == 0) out << "(";
-                else       out << " ";
-                out << QString::number(block.grading_args[i]);
+                grading_args.push_back(block.grading_args[i]);
             }
-            out << ")\n";
+            file.OutVector(grading_args);
         }else if(block.grading == GradingType::EdgeGrading){
-            out << "edgeGrading";
+            file.OutString("edgeGrading ");
             for(int i=0;i<12;i++){
-                if(i == 0) out << "(";
-                else       out << " ";
-                out << QString::number(block.grading_args[i]);
+                grading_args.push_back(block.grading_args[i]);
             }
-            out << ")\n";
+            file.OutVector(grading_args);
         }
+        file.OutString("\n");
     }    
-    out << ");" << "\n";
-    out         << "\n";
+    file.EndScope();
 
     //
     // エッジ定義
     //
-    out << "edges" << "\n";
-    out << "("     << "\n";
-    out << ");"    << "\n";
+    file.StartListDifinition("edges");
+    file.EndScope();
 
 
     //
@@ -179,8 +175,7 @@ void ExportDialog::Export(QString filename)const{
         }
     }
 
-    out << "boundary" << "\n";
-    out << "("        << "\n";
+    file.StartListDifinition("edges");
     QMap<QString,std::pair<BoundaryType,QVector<int>>>::const_iterator it = boundary_list.constBegin();
     while (it != boundary_list.constEnd()) {
         //境界名
@@ -215,15 +210,12 @@ void ExportDialog::Export(QString filename)const{
         out << TAB  << "}\n";
         it++;
     }
-
-    out << ");"       << "\n";
-
+    file.EndScope();
 
 
-    out << "mergePatchPairs\n";
-    out << "(\n";
-
-    out << ");\n";
+    //
+    file.StartListDifinition("edges");
+    file.EndScope();
 
 }
 void ExportDialog::AcceptDialog(){
