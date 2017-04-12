@@ -26,7 +26,8 @@ bool CArc::Create(CPoint* pos, int index){
     if(index == 0 || index == 1){
         this->pos[index+1] = pos;
         if(index==1){
-            Refresh();   //円形修正
+            //中心を二点の中点に修正
+            *this->pos[0] = (*this->pos[1] - *this->pos[2]) / 2 + *this->pos[2];
             return true; //終了
         }
     }
