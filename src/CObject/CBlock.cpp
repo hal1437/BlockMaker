@@ -45,64 +45,36 @@ CObject* CBlock::GetNode(int index)const{
 void CBlock::Draw(QPainter& painter)const{
     //描画範囲算出
     double top,bottom,left,right;
-    QVector<Pos> pp = this->GetVerticesPos();
+    QVector<Pos> pp;
+    for(int i=0;i<4;i++){
+        pp.push_back(this->GetClockworksPos(i));
+    }
     top    = std::min_element(pp.begin(),pp.end(),[](const Pos& lhs,const Pos& rhs){return lhs.y < rhs.y;})->y;
     bottom = std::max_element(pp.begin(),pp.end(),[](const Pos& lhs,const Pos& rhs){return lhs.y < rhs.y;})->y;
     left   = std::min_element(pp.begin(),pp.end(),[](const Pos& lhs,const Pos& rhs){return lhs.x < rhs.x;})->x;
     right  = std::max_element(pp.begin(),pp.end(),[](const Pos& lhs,const Pos& rhs){return lhs.x < rhs.x;})->x;
 
-    //パスの作成
-    QPainterPath myPath;
-    myPath.moveTo(pp[pp.size()-1].x- left,pp[pp.size()-1].y -top);
-    for(int i=0;i<pp.size();i++){
-        myPath.lineTo(pp[i].x - left,pp[i].y-top);
+    //多角形の描画
+    QPointF vertex[4];
+    for(int i=0;i<4;i++){
+        vertex[i] = QPointF(pp[i].x,pp[i].y);
     }
-    myPath.closeSubpath();
+    painter.drawPolygon(vertex,4);
 
-    //マスクを作成
-    double width  = right  - left;
-    double height = bottom - top;
-    QImage mask(QSize(width,height), QImage::Format_ARGB32);
-    QPainter paint;// = new QPainter(mask);
-    mask.fill(0);
-    paint.begin(&mask);
-    paint.setRenderHint(QPainter::Antialiasing, true);//アンチエイリアスセット
-    paint.setCompositionMode(QPainter::CompositionMode_SourceOver);
-    paint.setPen  (painter.pen());
-    paint.setBrush(painter.brush());
-    paint.drawPath(myPath);
-    paint.setCompositionMode(QPainter::CompositionMode_SourceAtop);
+    //分割線の描画
 
-
-    //並行線の描画
     for(int i =0;i<=this->div[0];i++){
-        paint.drawLine(width*i/this->div[0],0,
-                       width*i/this->div[0],height);
+        painter.drawLine((pp[1].x - pp[0].x)*(double(i)/this->div[0]) + pp[0].x,
+                         (pp[1].y - pp[0].y)*(double(i)/this->div[0]) + pp[0].y,
+                         (pp[2].x - pp[3].x)*(double(i)/this->div[0]) + pp[3].x,
+                         (pp[2].y - pp[3].y)*(double(i)/this->div[0]) + pp[3].y);//height);
     }
-    for(int i =0;i<=this->div[1];i++){
-        paint.drawLine(0    ,height*i/this->div[1],
-                       width,height*i/this->div[1]);
+    for(int i =0;i<=this->div[0];i++){
+        painter.drawLine((pp[2].x - pp[1].x)*(double(i)/this->div[0]) + pp[1].x,
+                         (pp[2].y - pp[1].y)*(double(i)/this->div[0]) + pp[1].y,
+                         (pp[3].x - pp[0].x)*(double(i)/this->div[0]) + pp[0].x,
+                         (pp[3].y - pp[0].y)*(double(i)/this->div[0]) + pp[0].y);//height);
     }
-    paint.end();
-
-    painter.drawImage(QPoint(left,top),mask);
-    /*
-
-    //マクス適用
-    painter.setCompositionMode(QPainter::CompositionMode_DestinationIn);
-
-
-    //分割して線を描画
-    //X軸に並行
-    for(int i =0;i<this->grading_args[0]-1;i++){
-        painter.drawLine(left ,top+(bottom-top)* i   /this->grading_args[0],
-                         right,top+(bottom-top)*(i+1)/this->grading_args[0]);
-    }
-    //Y軸に並行
-    for(int i =0;i<this->grading_args[1]-1;i++){
-        painter.drawLine(left+(right-left)* i   /this->grading_args[1],top,
-                         left+(right-left)*(i+1)/this->grading_args[1],bottom);
-    }*/
 }
 
 
@@ -129,7 +101,7 @@ QVector<Pos> CBlock::GetVerticesPos()const{
 
     return pp;
 }
-Pos CBlock::GetClockworksPos(int index){
+Pos CBlock::GetClockworksPos(int index)const{
     QVector<Pos> pp;
     //点を集結
     for(CObject* line:lines){

@@ -60,7 +60,7 @@ public:
     void SetNode(int index,CObject* line);
     CObject* GetNode(int index)const;
     QVector<Pos> GetVerticesPos()const;
-    Pos GetClockworksPos(int index);//時計回り番号取得
+    Pos GetClockworksPos(int index) const;//時計回り番号取得
 
 
     CBlock();

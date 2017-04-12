@@ -47,8 +47,8 @@ public:
     void AddObject(CObject* obj);           //オブジェクト追加
     void RemoveObject(CObject* obj);        //オブジェクト削除
     void CompleteObject(CObject* make_obj); //非端点を追加
-    double GetScale()const;                 //スケール
-    Pos    GetTranslate()const;             //平行移動
+    double GetScale()const;                 //スケール取得
+    Pos    GetTranslate()const;             //平行移動量取得
 
     void paintEvent    (QPaintEvent*  event); //描画イベントハンドラ
     void mouseMoveEvent(QMouseEvent*  event); //マウス移動イベントハンドラ
