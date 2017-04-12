@@ -53,13 +53,10 @@ bool CArc::Draw(QPainter& painter)const{
     double angle1 = std::atan2(-dir1.y,dir1.x) * 180 / PI;
     double angle2 = 360 - angle1 + (std::atan2(-dir2.y,dir2.x)) * 180 / PI;
 
-    painter.drawArc (GetCenter().x-round,
-                     GetCenter().y-round,
-                     round*2,
-                     round*2,
-                     angle1*16,
-                     Mod(angle2,(360))*16);
-
+    QRectF rect(GetCenter().x-round,
+                GetCenter().y-round,
+                round*2,round*2);
+    painter.drawArc (rect,angle1*16,Mod(angle2,(360))*16);
 
     return true;
 }
@@ -68,8 +65,6 @@ bool CArc::isSelectable()const{
     Pos dir1 = GetJointPos(1) - GetCenter();
     Pos dir2 = GetJointPos(2) - GetCenter();
     Pos dir3 = CObject::mouse_pos - GetCenter();
-
-    qDebug() << Pos::Angle(dir2,dir3) << "," <<  Pos::Angle(dir2,dir1);
 
     float d = dir3.Length();
     if((std::abs(d-round) < COLLISION_SIZE / drawing_scale) &&
