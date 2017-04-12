@@ -76,23 +76,11 @@ void ExportDialog::ChangeDirctory(){
 }
 void ExportDialog::Export(QString filename)const{
 
-    //出力
-    /*
-    QFile file(filename + "/blockMeshDict");
-    if (!file.open(QIODevice::WriteOnly)) {
-        QMessageBox::information(nullptr, tr("ファイルが開けません"),file.errorString());
-        return;
-    }*/
+    //BlockMeshDict出力
+    FoamFile file(filename+"/blockMeshDict");
 
-    //文字コードUTF8
-    QTextStream out;//(&file);
-    out.setCodec(QTextCodec::codecForName("UTF8"));
-
-    //out.setVersion(QDataStream::Qt_4_5);
-    //contacts.empty();   // empty existing contacts
-
-    FoamFile file;
-    file.Open(filename.toStdString().c_str());
+    //ヘッダー出力
+    file.OutHeader();
 
     //単位変換設定
     file.OutValue("convertToMeters",QString::number(ui->Scale->value()));
@@ -105,15 +93,13 @@ void ExportDialog::Export(QString filename)const{
     }
     file.EndScope();
 
-    //
     // ブロック出力
-    //
     file.StartListDifinition("blocks");
     for(CBlock block:this->blocks){
-        file.OutString(TAB);
-        file.OutString("hex");
+        file.TabOut();
+        file.OutStringInline("hex");
 
-        //頂点番号出力
+        //頂点番号
         QVector<int> pos_indices;
         for(int i=0;i<4;i++){
             Pos p = block.GetClockworksPos(i);
@@ -123,45 +109,41 @@ void ExportDialog::Export(QString filename)const{
             Pos p = block.GetClockworksPos(i);
             pos_indices.push_back(this->GetPosIndex(VPos{p.x,p.y,block.depth}));
         };
-        file.OutVector(pos_indices);
+        file.OutVectorInline(pos_indices);
 
-        //分割数出力
+        //分割数
         QVector<int> div_indices;
         for(int i=0;i<3;i++){
             div_indices.push_back(block.div[i]);
         }
-        file.OutVector(div_indices);
+        file.OutVectorInline(div_indices);
 
-        //分割パラメータ出力
+        //分割パラメータ
         QVector<int> grading_args;
         if(block.grading == GradingType::SimpleGrading){
-            file.OutString("simpleGrading ");
+            file.OutStringInline("simpleGrading");
             for(int i=0;i<3;i++){
                 grading_args.push_back(block.grading_args[i]);
             }
-            file.OutVector(grading_args);
+            file.OutVectorInline(grading_args);
         }else if(block.grading == GradingType::EdgeGrading){
-            file.OutString("edgeGrading ");
+            file.OutStringInline("edgeGrading");
             for(int i=0;i<12;i++){
                 grading_args.push_back(block.grading_args[i]);
             }
-            file.OutVector(grading_args);
+            file.OutVectorInline(grading_args);
         }
-        file.OutString("\n");
+        file.OutStringInline(NEWLINE);
     }    
     file.EndScope();
 
-    //
     // エッジ定義
-    //
     file.StartListDifinition("edges");
     file.EndScope();
 
 
-    //
     // 境界定義
-    //
-
+    file.StartListDifinition("boundary");
     //境界追加
     QMap<QString,std::pair<BoundaryType,QVector<int>>> boundary_list; //(name ,[[index]])
     for(CBlock block:this->blocks){
@@ -174,47 +156,36 @@ void ExportDialog::Export(QString filename)const{
             }
         }
     }
-
-    file.StartListDifinition("edges");
     QMap<QString,std::pair<BoundaryType,QVector<int>>>::const_iterator it = boundary_list.constBegin();
     while (it != boundary_list.constEnd()) {
         //境界名
-        out << TAB   << it.key() << "\n";
-        out << TAB  <<"{\n";
+        file.StartDictionaryDifinition(it.key());
 
         //境界タイプ
-        if(it.value().first == BoundaryType::Patch        ) out << TAB  << TAB  << "type patch;\n";
-        if(it.value().first == BoundaryType::Wall         ) out << TAB  << TAB  << "type wall;\n";
-        if(it.value().first == BoundaryType::SymmetryPlane) out << TAB  << TAB  << "type symmetryPlane;\n";
-        if(it.value().first == BoundaryType::Cyclic       ) out << TAB  << TAB  << "type cyclic;\n";
-        if(it.value().first == BoundaryType::CyclicAMI    ) out << TAB  << TAB  << "type cyclicAMI;\n";
-        if(it.value().first == BoundaryType::Wedge        ) out << TAB  << TAB  << "type wedge;\n";
-        if(it.value().first == BoundaryType::Empty        ) out << TAB  << TAB  << "type empty;\n";
+        if(it.value().first == BoundaryType::Patch        ) file.OutValue("type","patch");
+        if(it.value().first == BoundaryType::Wall         ) file.OutValue("type","wall");
+        if(it.value().first == BoundaryType::SymmetryPlane) file.OutValue("type","symmetryPlane");
+        if(it.value().first == BoundaryType::Cyclic       ) file.OutValue("type","cyclic");
+        if(it.value().first == BoundaryType::CyclicAMI    ) file.OutValue("type","cyclicAMI");
+        if(it.value().first == BoundaryType::Wedge        ) file.OutValue("type","wedge");
+        if(it.value().first == BoundaryType::Empty        ) file.OutValue("type","empty");
 
         //頂点定義
-        out << TAB  << TAB  << "faces\n";
-        out << TAB  << TAB  << "(\n";
+        file.StartListDifinition("faces");
+        QVector<int>indices;
         for(int i=0;i<it.value().second.size();i++){
-            if(i % 4 == 0){
-                out << TAB  << TAB  << TAB  << "("; //先端文字列
-            }else{
-                out << " ";       //中間文字列
-            }
-            out << it.value().second[i]; //インデックス出力
-
-            if((i+1) % 4 == 0){
-                out << ")\n";     //終端文字列
-            }
+            indices.push_back(it.value().second[i]); //インデックス出力
         }
-        out << TAB  << TAB  << ");\n";
-        out << TAB  << "}\n";
+        file.OutVector(indices);
+        file.EndScope();
+        file.EndScope();
         it++;
     }
     file.EndScope();
 
 
-    //
-    file.StartListDifinition("edges");
+    //結合境界定義
+    file.StartListDifinition("mergePatchPairs");
     file.EndScope();
 
 }

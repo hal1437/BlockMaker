@@ -5,23 +5,35 @@ void FoamFile::TabOut(){
 }
 
 void FoamFile::StartDictionaryDifinition(QString title){
-    ofs << title.toStdString().c_str() << std::endl;
-    ofs << "{"                         << std::endl;
+    this->TabOut();
+    ofs << title << NEWLINE;
+    this->TabOut();
+    ofs << "{"   << NEWLINE;
     this->defs.push_back(DEFINITON::DICTIONARY);
 }
 void FoamFile::StartListDifinition(QString title){
-    ofs << title.toStdString().c_str() << std::endl;
-    ofs << "("                         << std::endl;
+    this->TabOut();
+    ofs << title << NEWLINE;
+    this->TabOut();
+    ofs << "("   << NEWLINE;
     this->defs.push_back(DEFINITON::LIST);
 }
 
 
 void FoamFile::OutValue(QString name,QString value){
     this->TabOut();
-    ofs << name.toStdString().c_str() << " " << value.toStdString().c_str() << std::endl;
+    ofs << name << " " << value << ";" << NEWLINE;
+    if(defs.size()==0)ofs << NEWLINE;
 }
 void FoamFile::OutString(QString str){
-    ofs << str.toStdString().c_str() << std::endl;
+    this->TabOut();
+    ofs << str << NEWLINE;
+}
+void FoamFile::OutValueInline(QString name,QString value){
+    ofs << name << " " << value << " ";
+}
+void FoamFile::OutStringInline(QString str){
+    ofs << str << " ";
 }
 void FoamFile::EndScope(){
     if(defs.empty()){
@@ -29,24 +41,30 @@ void FoamFile::EndScope(){
         return;
     }
     for(int i=0;i<this->defs.size() - 1;i++) ofs << TAB;
-    if(defs[defs.size()-1] == DEFINITON::DICTIONARY) ofs << "}" << std::endl;
-    if(defs[defs.size()-1] == DEFINITON::LIST      ) ofs << ")"  << std::endl;
+    if(defs[defs.size()-1] == DEFINITON::DICTIONARY) ofs << "}"  << NEWLINE;
+    if(defs[defs.size()-1] == DEFINITON::LIST      ) ofs << ");"  << NEWLINE;
+    defs.pop_back();
+    if(defs.size()==0)ofs << NEWLINE;
+}
+void FoamFile::OutHeader(){
+    this->StartDictionaryDifinition("FoamFile");
+    this->OutValue("version" ,"2.0");
+    this->OutValue("format " ,"ascii");
+    this->OutValue("class  " ,"dictionary");
+    this->OutValue("object " ,obj_name);
+
+    this->EndScope();
 }
 
-
-void FoamFile::Open(QString filepath){
-    ofs = std::ofstream(filepath.toStdString().c_str());
-}
-
-void FoamFile::Close(QString filepath){
-    ofs.close();
-}
-
-
-FoamFile::FoamFile()
+FoamFile::FoamFile(QString str):
+    file(str),ofs(&file)
 {
+    if (!file.open(QIODevice::WriteOnly)) {
+        QMessageBox::information(nullptr, "ファイルが開けません",file.errorString());
+        return;
+    }
+    obj_name = str.split('/').back();
 }
-
 FoamFile::~FoamFile()
 {
 }

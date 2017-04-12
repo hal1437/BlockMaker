@@ -3,7 +3,9 @@
 #include <QVector>
 #include <QDebug>
 #include <QMap>
-#include <fstream>
+#include <QFile>
+#include <QTextStream>
+#include <QMessageBox>
 #include "Utils.h"
 
 
@@ -19,44 +21,66 @@ private:
         LIST ,
     };
 
-    QVector<DEFINITON> defs;
-    std::ofstream ofs;
+    QVector<DEFINITON> defs; //スコープ深さ
+    QFile file;              //ファイル
+    QTextStream ofs;         //出力ストリーム
+    QString obj_name;        //オブジェクトネーム
+
+public:
+    //ベクトルを文字列に変換
+    template<class T>
+    static QString VectorToString(QVector<T> vector);
+
+public:
 
     //タブ出力
     void TabOut();
-public:
 
     //定義開始
     void StartDictionaryDifinition(QString title); //辞書{}
     void StartListDifinition(QString title);       //リスト()
+
     //各出力
     template<class T>
-    void OutVector(QVector<T> vector){
-        this->TabOut();
-        ofs << VectorToString(vector).toStdString() << std::endl;
-    }
-    void OutValue(QString name,QString value);     //値出力
-    void OutString(QString str);    //文字列出力
-    void EndScope();//閉じかっこ出力
+    void OutVector(QVector<T> vector);         //ベクトル出力
+    void OutValue(QString name,QString value); //値出力
+    void OutString(QString str);               //文字列出力
+    void EndScope();                           //閉じかっこ出力
+    void OutHeader();                          //ヘッダー出力
 
-    //ベクトルを文字列に変換
+    //改行&タブなし出力
     template<class T>
-    QString VectorToString(QVector<T> vector){
-        QString ans;
-        ans += "(";
-        for(int i=0;i<vector.size();i++){
-            ans += QString::number(vector[i]);
-            if(i==vector.size() - 1)ans += ")";
-            else                    ans += " ";
-        }
-        return ans;
-    }
-    //ファイル操作
-    void Open(QString filepath);
-    void Close(QString filepath);
+    void OutVectorInline(QVector<T> vector);         //ベクトル出力
+    void OutValueInline(QString name,QString value); //値出力
+    void OutStringInline(QString str);               //文字列出力
 
-    FoamFile();
+
+
+    FoamFile(QString str);
     ~FoamFile();
 };
+
+template<class T>
+void FoamFile::OutVector(QVector<T> vector){
+    this->TabOut();
+    ofs << VectorToString(vector) << NEWLINE;
+}
+template<class T>
+void FoamFile::OutVectorInline(QVector<T> vector){
+    ofs << VectorToString(vector) << " ";
+}
+
+template<class T>
+QString FoamFile::VectorToString(QVector<T> vector){
+    QString ans;
+    ans += "(";
+    for(int i=0;i<vector.size();i++){
+        ans += QString::number(vector[i]);
+        if(i==vector.size() - 1)ans += ")";
+        else                    ans += " ";
+    }
+    return ans;
+}
+
 
 #endif // FOAMFILE_H
