@@ -160,14 +160,14 @@ Pos CadEditForm::ConvertLocalPos(Pos pos)const{
     trans.translate(-translate.x,-translate.y);
     trans.scale(scale,-scale);
     trans = trans.inverted();//逆行列化
-    QPoint ans = trans.map(QPoint(pos.x,pos.y));
+    QPointF ans = trans.map(QPointF(pos.x,pos.y));
     return Pos(ans.x(),ans.y());
 }
 Pos CadEditForm::ConvertWorldPos(Pos pos)const{
     QTransform trans;
     trans.translate(-translate.x,-translate.y);
     trans.scale(scale,-scale);
-    QPoint ans = trans.map(QPoint(pos.x,pos.y));
+    QPointF ans = trans.map(QPointF(pos.x,pos.y));
     return Pos(ans.x(),ans.y());
 }
 

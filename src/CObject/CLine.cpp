@@ -23,7 +23,7 @@ bool CLine::Draw(QPainter& painter)const{
     Pos pos2 = GetJointPos(1);
 
     //描画
-    painter.drawLine(pos1.x,pos1.y,pos2.x,pos2.y);
+    painter.drawLine(QPointF(pos1.x,pos1.y),QPointF(pos2.x,pos2.y));
 
     //ロックマーク描画
     //if(this->isLock()){
