@@ -71,7 +71,7 @@ QVector<VPos> ExportDialog::GetBoundaryPos(CBlock block,BoundaryDir dir)const{
 
 void ExportDialog::ChangeDirctory(){
     //ファイルパス変更ダイアログ
-    QString filename = QFileDialog::getExistingDirectory(this,tr("Export"));
+    QString filename = QFileDialog::getExistingDirectory(this,tr("Export"),this->ui->ExportPath->text());
     if(filename != "")this->ui->ExportPath->setText(filename);
 }
 void ExportDialog::Export(QString filename)const{
@@ -194,6 +194,8 @@ void ExportDialog::AcceptDialog(){
         Export(ui->ExportPath->text());
         accept();
     }
+    QSettings settings("settings.ini", QSettings::IniFormat, this);
+    settings.setValue("LAST_PATH",this->ui->ExportPath->text());
 }
 
 ExportDialog::ExportDialog(QWidget *parent) :
@@ -201,13 +203,10 @@ ExportDialog::ExportDialog(QWidget *parent) :
     ui(new Ui::ExportDialog)
 {
     ui->setupUi(this);
-}
-ExportDialog::ExportDialog(QVector<CObject *> objects, QWidget *parent) :
-    QDialog(parent),
-    objects(objects),
-    ui(new Ui::ExportDialog)
-{
-    ui->setupUi(this);
+    //前回の保存先を復元
+    QSettings settings("settings.ini", QSettings::IniFormat, this);
+    QString str = settings.value("LAST_PATH", true).toString();
+    this->ui->ExportPath->setText(str);
 }
 
 ExportDialog::~ExportDialog()

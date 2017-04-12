@@ -12,6 +12,7 @@
 #include <QFile>
 #include <QMessageBox>
 #include <QTextCodec>
+#include <QSettings>
 #include "FoamFile.h"
 
 struct VPos{
@@ -46,7 +47,6 @@ public:
     void SetBlocks(QVector<CBlock> blocks);
 
     explicit ExportDialog(QWidget *parent = 0);
-    ExportDialog(QVector<CObject *> objects, QWidget *parent = 0);
     ~ExportDialog();
 
 public slots:
