@@ -14,14 +14,12 @@ void CadEditForm::AddObject(CObject* obj){
 
 
 void CadEditForm::RemoveObject(CObject* obj){
-    if(obj == nullptr)return;
-
     //点ならばその点を含むObjectを全てnullptrにする。
     if(obj->is<CPoint>()){
-        for(QVector<CObject*>::Iterator it = objects.begin();it != objects.end();it++){
-            for(int i=0;i < (*it)->GetJointNum();i++){
-                if((*it)->GetJointPos(i) == *dynamic_cast<CPoint*>(obj) && (*it) != obj){
-                    *it = nullptr;
+        for(CObject*& it : objects){
+            for(int i=0;i < it->GetJointNum();i++){
+                if(it->GetJoint(i) == dynamic_cast<CPoint*>(obj) && it != obj){
+                    it = nullptr;
                     break;
                 }
             }
@@ -88,14 +86,14 @@ void CadEditForm::paintEvent(QPaintEvent*){
     paint.setTransform(trans); // 変換行列を以降の描画に適応
 
     //CBox描画
-    paint.setPen(QPen(Qt::darkGray, CObject::DRAWING_LINE_SIZE/2 / this->scale));
+    paint.setPen(QPen(Qt::darkGray, CObject::DRAWING_LINE_SIZE/2 / this->scale,Qt::SolidLine,Qt::RoundCap));
     paint.setBrush(QBrush(Qt::lightGray));   //背景設定
     for(int i=0;i<this->blocks.size();i++){ //エリア描画
         this->blocks[i].Draw(paint);
     }
 
     //寸法を描画
-    paint.setPen(QPen(Qt::blue, 1));
+    paint.setPen(QPen(Qt::blue, 1,Qt::SolidLine,Qt::RoundCap));
     for(SmartDimension* dim:dimensions){
         dim->Draw(paint);
     }
@@ -107,17 +105,17 @@ void CadEditForm::paintEvent(QPaintEvent*){
     paint.drawLine(-5,+5,-5,-5);
 */
     //普通のオブジェクト
-    paint.setPen(QPen(Qt::blue, CObject::DRAWING_LINE_SIZE / this->scale));
+    paint.setPen(QPen(Qt::blue, CObject::DRAWING_LINE_SIZE / this->scale,Qt::SolidLine,Qt::RoundCap));
     for(CObject* obj:objects){
         if(obj->Refresh())obj->Draw(paint);
     }
     //選択されたオブジェクト
-    paint.setPen(QPen(Qt::cyan, CObject::DRAWING_LINE_SIZE / this->scale));
+    paint.setPen(QPen(Qt::cyan, CObject::DRAWING_LINE_SIZE / this->scale,Qt::SolidLine,Qt::RoundCap));
     for(CObject* obj:CObject::selected){
         if(obj->Refresh())obj->Draw(paint);
     }
     //メイン選択中
-    paint.setPen(QPen(Qt::red , CObject::DRAWING_LINE_SIZE / this->scale));
+    paint.setPen(QPen(Qt::red , CObject::DRAWING_LINE_SIZE / this->scale,Qt::SolidLine,Qt::RoundCap));
     if(CObject::hanged!=nullptr){
         if(CObject::hanged->Refresh())CObject::hanged->Draw(paint);
     }

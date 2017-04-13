@@ -149,8 +149,10 @@ Pos CBlock::GetClockworksPos(int index)const{
             }else{
                 ans = candidate[1];
             }
-        }else{
+        }else if(candidate.size() == 1){
             ans = candidate[0];
+        }else{
+            ans = this->GetVerticesPos()[0];
         }
         candidate.clear();
     }
