@@ -6,27 +6,15 @@
 #include <QListWidget>
 #include <limits>
 #include "SmartDimensionDialog.h"
-#include "CObject/CPoint.h"
-#include "CObject/CLine.h"
-#include "CObject/CRect.h"
-#include "CObject/CSpline.h"
-#include "CObject/CBlock.h"
 #include "CBoxDefineDialog.h"
 #include "MoveTransformDialog.h"
 #include "ExportDialog.h"
+#include "CadEditForm.h"
 
 namespace Ui {
 class MainWindow;
 }
 
-enum CEnum{
-    Edit,
-    Dot,
-    Line,
-    Arc,
-    Rect,
-    Spline,
-};
 
 class MainWindow : public QMainWindow
 {
@@ -34,32 +22,16 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
-protected:
-    void mousePressEvent  (QMouseEvent* event);
-    void mouseReleaseEvent(QMouseEvent* event);
-    void wheelEvent       (QWheelEvent * e);
-    void keyPressEvent    (QKeyEvent* event);
-    void keyReleaseEvent  (QKeyEvent* event);
-    void paintEvent       (QPaintEvent* event);
-
 private:
     Ui::MainWindow *ui;
-    CEnum state = Edit;
-    CObject* make_obj = nullptr;
-    CPoint*  origin   = nullptr;
-    int creating_count=0;
-    bool release_flag = false;
-    bool move_flag    = false;
-    QVector<CObject*> log;
 
-    bool shift_pressed = false;
-    bool ctrl_pressed  = false;
+signals:
+    void ToggleChanged(CEnum state);
 
 public slots:
     void CtrlZ();
     void Delete();
     void Escape();
-    void MovedMouse(QMouseEvent* event,CObject* under_object);
     void ConnectSignals();
     void DisconnectSignals();
     void ClearButton();
@@ -73,10 +45,8 @@ public slots:
     void ResetAllExpantion(); //拡大、移動リセット
     void MoveTransform();     //移動
 
-    void MakeObject();                      //オブジェクト作成
-    bool MakeJoint(CObject *obj);           //ジョイント作成
     void MakeRestraint();   //拘束作成
-    void MakeBlock();                      //ブロック作成
+    void MakeBlock();       //ブロック作成
 
     void ReciveObjectListChanged(); //オブジェクトリスト更新
     void ReciveBlockListChanged (); //ブロックリスト更新

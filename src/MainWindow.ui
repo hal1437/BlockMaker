@@ -137,7 +137,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QDoubleSpinBox" name="SizeRateSpinBox">
+           <widget class="QDoubleSpinBox" name="ScaleSpin">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
               <horstretch>0</horstretch>

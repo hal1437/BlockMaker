@@ -1,6 +1,65 @@
 #include "CadEditForm.h"
 #include "ui_CadEditForm.h"
 
+void CadEditForm::mousePressEvent  (QMouseEvent*){
+    release_flag = false;
+    if(state==Edit)move_flag = true;
+    MakeObject();
+}
+
+void CadEditForm::mouseReleaseEvent(QMouseEvent*){
+    //編集
+    move_flag = false;
+    if(release_flag==true)MakeObject();
+}
+
+void CadEditForm::keyPressEvent(QKeyEvent* event){
+    shift_pressed = event->modifiers() & Qt::ShiftModifier;
+    ctrl_pressed  = event->modifiers() & Qt::ControlModifier;
+}
+void CadEditForm::keyReleaseEvent(QKeyEvent* event){
+    shift_pressed = event->modifiers() & Qt::ShiftModifier;
+    ctrl_pressed  = event->modifiers() & Qt::ControlModifier;
+}
+
+void CadEditForm::wheelEvent(QWheelEvent * event){
+    //拡大
+    double delta = (event->angleDelta().y())/MOUSE_ZOOM_RATE;//差分値
+    double next_scale = std::exp(std::log(this->GetScale()) + delta);//次の拡大値
+
+    //拡大値は負にならない
+    if(next_scale > 0){
+        //適応
+        if(CObject::hanged == nullptr){
+            //マウス座標中心に拡大
+            this->Zoom(next_scale,CObject::mouse_pos);
+        }else{
+            //選択点があればそれを中心に拡大
+            this->Zoom(next_scale,CObject::hanged->GetNear(CObject::mouse_pos));
+        }
+        emit ScaleChanged(next_scale);
+        CObject::drawing_scale = next_scale;
+    }
+    repaint();
+}
+void CadEditForm::mouseMoveEvent   (QMouseEvent* event){
+    //マウス移動を監視
+    CObject::mouse_pos = ConvertLocalPos(Pos(event->pos().x(),event->pos().y()));
+    //選択オブジェクトの選定
+    CObject* answer = this->getHanged();
+    //ズーム支点リセット
+    zoom_piv = Pos(0,0);
+
+    //UI更新
+    repaint();
+    emit MovedMouse(event,answer);
+}
+void CadEditForm::resizeEvent(QResizeEvent*){
+    //原点を中心に来るように上書き
+    this->translate.x = -this->width()  / 2;
+    this->translate.y = -this->height() / 2;
+}
+
 void CadEditForm::AddObject(CObject* obj){
     if(!exist(objects,obj)){
         objects.push_back(obj);
@@ -66,6 +125,43 @@ Pos    CadEditForm::GetTranslate()const{
     return translate;
 }
 
+void CadEditForm::MovedMouse(QMouseEvent *event, CObject *under_object){
+
+    static Pos past;
+    static Pos piv; //画面移動支点
+    const  Pos null_pos = Pos(std::numeric_limits<double>::lowest(),std::numeric_limits<double>::lowest()); //無効な点
+
+    //選択
+    if(!(event->buttons() & Qt::LeftButton) || !move_flag){
+        CObject::hanged = under_object;
+        piv = null_pos;//移動支点を解除
+    }
+    //画面移動
+    if((event->buttons() & Qt::LeftButton) && CObject::hanged == nullptr && this->state == Edit){
+        //支点登録
+        if(piv == null_pos){
+            piv = this->ConvertWorldPos(CObject::mouse_pos);
+        }
+        Pos hand = this->ConvertWorldPos(CObject::mouse_pos);
+        Pos diff = (piv - hand);
+
+        this->SetTranslate(this->GetTranslate() + diff);
+        piv = hand;
+    }
+
+    //編集
+    if(move_flag == true){
+        for(CObject* p : CObject::selected){
+            p->Move(CObject::mouse_pos - past);
+        }
+    }
+
+    //拘束更新
+    this->RefreshRestraints();
+
+    past = CObject::mouse_pos;
+    release_flag=true;
+}
 
 void CadEditForm::paintEvent(QPaintEvent*){
     QPainter paint(this);
@@ -74,10 +170,6 @@ void CadEditForm::paintEvent(QPaintEvent*){
 
     //状態を保存
     paint.save();
-
-    //マウス座標を描画
-//    paint.setPen(QPen(Qt::blue , (CObject::DRAWING_LINE_SIZE/2 / this->scale)));    //太さ設定
-//    paint.drawText(0,12,QString("(") + QString::number(CObject::mouse_pos.x) + "," + QString::number(CObject::mouse_pos.y) + ")");
 
     //変換行列を作成
     QTransform trans;
@@ -134,24 +226,6 @@ void CadEditForm::paintEvent(QPaintEvent*){
 }
 
 
-void CadEditForm::mouseMoveEvent   (QMouseEvent* event){
-    //マウス移動を監視
-    CObject::mouse_pos = ConvertLocalPos(Pos(event->pos().x(),event->pos().y()));
-
-    //選択オブジェクトの選定
-    CObject* answer = this->getHanged();
-
-    //UI更新
-    repaint();
-    emit MovedMouse(event,answer);
-
-    //ズーム支点リセット
-    zoom_piv = Pos(0,0);
-}
-void CadEditForm::resizeEvent(QResizeEvent*){
-    this->translate.x = -this->width()  / 2;
-    this->translate.y = -this->height() / 2;
-}
 
 Pos CadEditForm::ConvertLocalPos(Pos pos)const{
     QTransform trans;
@@ -164,23 +238,20 @@ Pos CadEditForm::ConvertLocalPos(Pos pos)const{
 Pos CadEditForm::ConvertWorldPos(Pos pos)const{
     QTransform trans;
     trans.translate(-translate.x,-translate.y);
-    trans.scale(scale,-scale);
+    trans.scale(scale,-scale);//逆行列化
     QPointF ans = trans.map(QPointF(pos.x,pos.y));
     return Pos(ans.x(),ans.y());
 }
 
 
 void CadEditForm::Zoom(double scale,Pos local_piv){
-
     //ズーム支点保存
     if(zoom_piv == Pos(0,0)){
           zoom_piv = this->ConvertWorldPos(local_piv);
     }
-
     //ズーム適用
     this->translate += (zoom_piv + this->translate) * ((scale / this->scale) - 1);
     this->scale = scale;
-
     //マウス座標復元
     CObject::mouse_pos = this->ConvertLocalPos(zoom_piv);
 }
@@ -188,15 +259,19 @@ void CadEditForm::Move(Pos local_diff){
     this->translate += local_diff;
 }
 
-
-
 CadEditForm::CadEditForm(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::CadEditForm)
 {
     ui->setupUi(this);
+
+    //マウストラッキング対象
     setMouseTracking(true);
 
+    //原点追加
+    origin = new CPoint();
+    origin->ControlPoint(true);
+    this->AddObject(origin);
 }
 
 CadEditForm::~CadEditForm()
@@ -221,6 +296,83 @@ void CadEditForm::SetScale(double scale){
 void CadEditForm::SetTranslate(Pos trans){
     this->translate = trans;
     repaint();
+}
+void CadEditForm::MakeObject(){
+
+    Pos local_pos = CObject::mouse_pos;
+    if(CObject::hanged != nullptr)local_pos = CObject::hanged->GetNear(local_pos);
+
+    release_flag=false;
+
+    //編集
+    if(state == Edit){
+        //シフト状態
+        if(!shift_pressed)CObject::selected.clear();
+
+        //選択状態をトグル
+        if(exist(CObject::selected,CObject::hanged))erase(CObject::selected,CObject::hanged);
+        else if(CObject::hanged != nullptr)CObject::selected.push_back(CObject::hanged);
+
+    }else{
+        //新規オブジェクト
+        if(creating_count == 0){
+            if     (state == Dot   )make_obj = new CPoint();
+            else if(state == Line  )make_obj = new CLine();
+            else if(state == Arc   )make_obj = new CArc();
+            else if(state == Rect  )make_obj = new CRect();
+            else if(state == Spline)make_obj = new CSpline();
+            this->AddObject(make_obj);
+            log.push_back(make_obj);
+            CObject::createing = make_obj;
+        }
+        //作成
+        if(MakeJoint(make_obj) == true){
+            //生成完了
+            CObject::createing = nullptr;
+            creating_count = 0;
+
+            //ジョイントを追加
+            for(int i=0;i<make_obj->GetJointNum();i++){
+                this->AddObject(make_obj->GetJoint(i));
+            }
+            //CRectならば構成線も追加
+            if(make_obj->is<CRect>()){
+                for(int i=0;i<4;i++){
+                    this->AddObject(dynamic_cast<CRect*>(make_obj)->GetLines(i));
+                }
+            }
+        }else {
+            //生成継続
+            creating_count++;
+        }
+    }
+    this->RefreshRestraints();
+    repaint();
+    emit RquireRefreshUI();
+}
+bool CadEditForm::MakeJoint(CObject* obj){
+    Pos local_pos = CObject::mouse_pos;
+    if(CObject::hanged != nullptr)local_pos = CObject::hanged->GetNear(local_pos);
+
+    //端点に点を作成
+    if(CObject::hanged == nullptr){
+        //端点に点を作成
+        CPoint* new_point = new CPoint(CObject::mouse_pos);
+        new_point->Create(new_point,0);
+        log.push_back(new_point);
+        return obj->Create(new_point,creating_count);
+    }else if(CObject::hanged->is<CPoint>()){
+        //点をマージ
+        return obj->Create(dynamic_cast<CPoint*>(CObject::hanged),creating_count);
+    }else{
+        //点をオブジェクト上に追加
+        CPoint* new_point = new CPoint(CObject::hanged->GetNear(CObject::mouse_pos));
+        new_point->Create(new_point,0);
+        log.push_back(new_point);
+
+        //一致の幾何拘束を付与
+        return  obj->Create(new_point,creating_count);
+    }
 }
 
 void CadEditForm::MakeSmartDimension(){
@@ -250,61 +402,6 @@ void CadEditForm::MakeSmartDimension(){
                 }
             }
         }
-/*
-        //XY軸成分指定
-        if(CObject::selected.size()==2 && CObject::selected[0]->is<CPoint>() && CObject::selected[1]->is<CPoint>()){
-            diag->UseRadioLayout(true);
-            if(diag->exec()){
-                double value = diag->GetValue();
-                SmartDimension* dim = new SmartDimension();
-                dim->SetXYType(diag->GetCurrentRadio()==2,diag->GetCurrentRadio()==1);
-                if(dim->SetTarget(CObject::selected[0],CObject::selected[1])){
-                    dim->SetValue(value);
-                    this->dimensions.push_back(dim);
-                }else{
-                    delete dim;
-                }
-                for(SmartDimension* dim:dimensions){
-                    Restraint* rs;
-                    if(diag->GetCurrentRadio()==0)rs = new MatchRestraint();
-                    if(diag->GetCurrentRadio()==1)rs = new MatchHRestraint();
-                    if(diag->GetCurrentRadio()==2)rs = new MatchVRestraint();
-                    rs->value = value;
-                    rs->nodes.push_back(CObject::selected[0]);
-                    rs->nodes.push_back(CObject::selected[1]);
-                    restraints.push_back(rs);
-                }
-
-            }
-        }else{
-            //直線距離指定
-            diag->UseRadioLayout(false);
-            if(diag->exec()){
-                double value = diag->GetValue();
-                SmartDimension* dim = new SmartDimension();
-
-                //有効寸法であれば
-                CObject* sel[2];
-                sel[0] = CObject::selected[0];
-                if(CObject::selected.size()==1)sel[1] = nullptr;
-                else                           sel[1] = CObject::selected[1];
-
-                //ターゲット設定
-                if(dim->SetTarget(sel[0],sel[1])){
-                    dim->SetValue(value);
-                    this->dimensions.push_back(dim);
-                }else{
-                    //ターゲット生成不可
-                    delete dim;
-                }
-                //restraints.clear();
-                std::vector<Restraint*> rs = dim->MakeRestraint();
-                for(Restraint* r : rs){
-                    restraints.push_back(r);
-                }
-            }
-        }
-        */
     }
     RefreshRestraints();
 }
@@ -526,6 +623,12 @@ void CadEditForm::ConfigureBlock(QListWidgetItem*){
         this->blocks[selecting_block].SetNodeAll(ll);
     }
 }
+
+
+void CadEditForm::SetState(CEnum state){
+    this->state = state;
+}
+
 void CadEditForm::ResetAllExpantion(){
     //原点を中心に
     this->translate.x = -this->width()  / 2;

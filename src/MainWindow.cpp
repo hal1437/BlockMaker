@@ -7,30 +7,29 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     setMouseTracking(true);
-    connect(ui->CadEdit              ,SIGNAL(MovedMouse(QMouseEvent*,CObject*))  ,this       ,SLOT(MovedMouse(QMouseEvent*,CObject*)));
     //connect(ui->actionCtrlZ          ,SIGNAL(triggered())                        ,this       ,SLOT(CtrlZ()));
     connect(ui->actionDelete         ,SIGNAL(triggered())                        ,this       ,SLOT(Delete()));
     connect(ui->actionEsc            ,SIGNAL(triggered())                        ,this       ,SLOT(Escape()));
     connect(ui->actionMove           ,SIGNAL(triggered())                        ,this       ,SLOT(MoveTransform()));
     connect(ui->actionResetExpantion ,SIGNAL(triggered())                        ,this       ,SLOT(ResetAllExpantion()));
-    connect(ui->SizeRateSpinBox      ,SIGNAL(valueChanged(double))               ,ui->CadEdit,SLOT(SetScale(double)));
     connect(ui->ToolDimension        ,SIGNAL(triggered())                        ,ui->CadEdit,SLOT(MakeSmartDimension()));
     connect(ui->ToolBlocks           ,SIGNAL(triggered())                        ,this       ,SLOT(MakeBlock()));
     connect(ui->BlockList            ,SIGNAL(itemDoubleClicked(QListWidgetItem*)),ui->CadEdit,SLOT(ConfigureBlock(QListWidgetItem*)));
     connect(ui->CadEdit              ,SIGNAL(ToggleConflict(bool))               ,this       ,SLOT(ToggleConflict(bool)));
     connect(ui->ExportButton         ,SIGNAL(pressed())                          ,ui->CadEdit,SLOT(Export()));
-    connect(ui->CadEdit              ,SIGNAL(MovedMouse(QMouseEvent*,CObject*))  ,this       ,SLOT(RefreshStatusBar(QMouseEvent*,CObject*)));
 
-    //原点追加
-    origin = new CPoint();
-    origin->ControlPoint(true);
-    ui->CadEdit->AddObject(origin);
+    //CadEditFoam関連
+    connect(this        ,SIGNAL(ToggleChanged(CEnum)),this->ui->CadEdit  ,SLOT(SetState(CEnum)));
+    connect(ui->CadEdit ,SIGNAL(ScaleChanged(double)),this->ui->ScaleSpin,SLOT(setValue(double)));
+    connect(ui->CadEdit ,SIGNAL(RquireRefreshUI())   ,this,SLOT(RefreshUI()));
 
     //リスト変更系
     connect(ui->RestraintList        ,SIGNAL(itemSelectionChanged())      ,this       ,SLOT(MakeRestraint()));
     connect(ui->ObjectList           ,SIGNAL(itemSelectionChanged())      ,this       ,SLOT(ReciveObjectListChanged()));
     connect(ui->BlockList            ,SIGNAL(itemSelectionChanged())      ,this       ,SLOT(ReciveBlockListChanged ()));
 
+    //CadEditFoamにイベントフィルター導入
+    this->installEventFilter(ui->CadEdit);
     RefreshUI();
     ConnectSignals();
     ui->ToolBlocks->setEnabled(false);
@@ -44,63 +43,14 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::mousePressEvent  (QMouseEvent*){
-    release_flag = false;
-    if(state==Edit)move_flag = true;
-    MakeObject();
-}
-
-void MainWindow::mouseReleaseEvent(QMouseEvent*){
-    //編集
-    move_flag = false;
-    if(release_flag==true)MakeObject();
-}
-void MainWindow::wheelEvent(QWheelEvent * e){
-    Pos world_pos = this->ui->CadEdit->ConvertWorldPos(CObject::mouse_pos);
-
-    //範囲内ならば
-    if(world_pos.x > 0 &&
-       world_pos.y > 0 &&
-       world_pos.x < ui->CadEdit->width()  &&
-       world_pos.y < ui->CadEdit->height() ){
-
-        //拡大
-        double delta = (e->angleDelta().y())/10000.0;//差分値
-        double next_scale = std::exp(std::log(ui->CadEdit->GetScale()) + delta);//次の拡大値
-
-        //拡大値は負にならない
-        if(next_scale > 0){
-            //適応
-            if(CObject::hanged == nullptr){
-                this->ui->CadEdit->Zoom(next_scale,CObject::mouse_pos);
-            }else{
-                this->ui->CadEdit->Zoom(next_scale,CObject::hanged->GetNear(CObject::mouse_pos));
-            }
-            ui->SizeRateSpinBox->setValue(next_scale);
-            CObject::drawing_scale = next_scale;
-        }
-    }
-
-}
-
-void MainWindow::keyPressEvent(QKeyEvent* event){
-    shift_pressed = event->modifiers() & Qt::ShiftModifier;
-    ctrl_pressed  = event->modifiers() & Qt::ControlModifier;
-}
-void MainWindow::keyReleaseEvent(QKeyEvent* event){
-    shift_pressed = event->modifiers() & Qt::ShiftModifier;
-    ctrl_pressed  = event->modifiers() & Qt::ControlModifier;
-}
-
-void MainWindow::paintEvent(QPaintEvent*){
-}
 
 void MainWindow::CtrlZ(){
+    /*
     if(!log.empty()){
         ui->CadEdit->RemoveObject(log.back());
         log.erase(log.end()-1);
         creating_count=0;
-    }
+    }*/
 }
 void MainWindow::Delete(){
     for(int i =0;i<CObject::selected.size();i++){
@@ -111,6 +61,7 @@ void MainWindow::Delete(){
     RefreshUI();
 }
 void MainWindow::Escape(){
+    /*
     if(CObject::createing != nullptr){
         ui->CadEdit->RemoveObject(make_obj);
     }
@@ -118,47 +69,8 @@ void MainWindow::Escape(){
     ClearButton();
     RefreshUI();
 
+    */
 }
-
-void MainWindow::MovedMouse(QMouseEvent *event, CObject *under_object){
-    static Pos past;
-    static Pos piv; //画面移動支点
-    const  Pos null_pos = Pos(std::numeric_limits<double>::lowest(),std::numeric_limits<double>::lowest()); //無効な点
-
-    //選択
-    if(!(event->buttons() & Qt::LeftButton) || !move_flag){
-        CObject::hanged = under_object;
-        piv = null_pos;//移動支点を解除
-    }
-    //画面移動
-    if((event->buttons() & Qt::LeftButton) && CObject::hanged == nullptr && this->state == Edit){
-        //支点登録
-        if(piv == null_pos){
-            piv = this->ui->CadEdit->ConvertWorldPos(CObject::mouse_pos);
-        }
-        Pos hand = this->ui->CadEdit->ConvertWorldPos(CObject::mouse_pos);
-        Pos diff = (piv - hand);
-
-        this->ui->CadEdit->SetTranslate(this->ui->CadEdit->GetTranslate() + diff);
-        piv = hand;
-    }
-
-    //編集
-    if(move_flag == true){
-        for(CObject* p : CObject::selected){
-            p->Move(CObject::mouse_pos - past);
-        }
-    }
-
-    //拘束更新
-    ui->CadEdit->RefreshRestraints();
-
-    past = CObject::mouse_pos;
-    release_flag=true;
-
-}
-
-
 
 void MainWindow::ConnectSignals(){
     connect(ui->ToolDot   ,SIGNAL(toggled(bool)),this,SLOT(ToggledDot(bool)));
@@ -177,7 +89,7 @@ void MainWindow::DisconnectSignals(){
 }
 
 void MainWindow::ClearButton(){
-    if(make_obj != nullptr && make_obj->isCreating())make_obj->Create(nullptr,-1);
+    //if(make_obj != nullptr && make_obj->isCreating())make_obj->Create(nullptr,-1);
     if(ui->ToolDot   ->isChecked())ui->ToolDot   ->setChecked(false);
     if(ui->ToolLine  ->isChecked())ui->ToolLine  ->setChecked(false);
     if(ui->ToolArc   ->isChecked())ui->ToolArc   ->setChecked(false);
@@ -225,15 +137,10 @@ void MainWindow::Toggled##TYPE (bool checked){  \
     if(TYPE != Edit)DisconnectSignals();        \
     if(checked){                                \
         ClearButton();                          \
-        state = TYPE;                           \
+        emit ToggleChanged(TYPE);               \
         ui->Tool##TYPE->setChecked(true);       \
     }else{                                      \
-        if(make_obj != nullptr && make_obj->isCreating()){\
-            make_obj->Create(nullptr,-1);       \
-            creating_count=0;                   \
-        }                                       \
-        make_obj = nullptr;                     \
-        state = Edit;                           \
+        emit ToggleChanged(Edit);               \
     }                                           \
     ConnectSignals();                           \
 }                                               \
@@ -253,7 +160,7 @@ void MainWindow::ToggleConflict(bool conflict){
 }
 void MainWindow::ResetAllExpantion(){
     CObject::drawing_scale = 1.0;
-    this->ui->SizeRateSpinBox->setValue(1.0);
+    this->ui->ScaleSpin->setValue(1.0);
     this->ui->CadEdit->ResetAllExpantion();
 }
 
@@ -282,83 +189,6 @@ void MainWindow::MakeRestraint(){
     }
 }
 
-void MainWindow::MakeObject(){
-
-    Pos local_pos = CObject::mouse_pos;
-    if(CObject::hanged != nullptr)local_pos = CObject::hanged->GetNear(local_pos);
-
-    release_flag=false;
-
-    //編集
-    if(state == Edit){
-        //シフト状態
-        if(!shift_pressed)CObject::selected.clear();
-
-        //選択状態をトグル
-        if(exist(CObject::selected,CObject::hanged))erase(CObject::selected,CObject::hanged);
-        else if(CObject::hanged != nullptr)CObject::selected.push_back(CObject::hanged);
-
-    }else{
-        //新規オブジェクト
-        if(creating_count == 0){
-            if     (state == Dot   )make_obj = new CPoint();
-            else if(state == Line  )make_obj = new CLine();
-            else if(state == Arc   )make_obj = new CArc();
-            else if(state == Rect  )make_obj = new CRect();
-            else if(state == Spline)make_obj = new CSpline();
-            ui->CadEdit->AddObject(make_obj);
-            log.push_back(make_obj);
-            CObject::createing = make_obj;
-        }
-        //作成
-        if(MakeJoint(make_obj) == true){
-            //生成完了
-            CObject::createing = nullptr;
-            creating_count = 0;
-
-            //ジョイントを追加
-            for(int i=0;i<make_obj->GetJointNum();i++){
-                ui->CadEdit->AddObject(make_obj->GetJoint(i));
-            }
-            //CRectならば構成線も追加
-            if(make_obj->is<CRect>()){
-                for(int i=0;i<4;i++){
-                    ui->CadEdit->AddObject(dynamic_cast<CRect*>(make_obj)->GetLines(i));
-                }
-            }
-        }else {
-            //生成継続
-            creating_count++;
-        }
-    }
-    ui->CadEdit->RefreshRestraints();
-    RefreshUI();
-}
-
-bool MainWindow::MakeJoint(CObject* obj){
-    Pos local_pos = CObject::mouse_pos;
-    if(CObject::hanged != nullptr)local_pos = CObject::hanged->GetNear(local_pos);
-
-    //端点に点を作成
-    if(CObject::hanged == nullptr){
-        //端点に点を作成
-        CPoint* new_point = new CPoint(CObject::mouse_pos);
-        new_point->Create(new_point,0);
-        log.push_back(new_point);
-        return obj->Create(new_point,creating_count);
-    }else if(CObject::hanged->is<CPoint>()){
-        //点をマージ
-        return obj->Create(dynamic_cast<CPoint*>(CObject::hanged),creating_count);
-    }else{
-        //点をオブジェクト上に追加
-        CPoint* new_point = new CPoint(CObject::hanged->GetNear(CObject::mouse_pos));
-        new_point->Create(new_point,0);
-        log.push_back(new_point);
-
-        //一致の幾何拘束を付与
-        return  obj->Create(new_point,creating_count);
-    }
-}
 void MainWindow::MakeBlock(){
     this->ui->CadEdit->MakeBlock();
     RefreshUI();

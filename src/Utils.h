@@ -8,6 +8,7 @@
 #define PI 3.1415926535897932384626433832795
 #define TAB "    "
 #define NEWLINE "\n"
+#define MOUSE_ZOOM_RATE 10000.0
 
 template<class T>
 bool exist(std::iterator<std::forward_iterator_tag,T> begin ,std::iterator<std::forward_iterator_tag,T> end,const T& value){
