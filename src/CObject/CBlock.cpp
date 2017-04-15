@@ -62,7 +62,6 @@ void CBlock::Draw(QPainter& painter)const{
     painter.drawPolygon(vertex,4);
 
     //分割線の描画
-
     for(int i =0;i<=this->div[0];i++){
         painter.drawLine(QPointF((pp[1].x - pp[0].x)*(double(i)/this->div[0]) + pp[0].x,(pp[1].y - pp[0].y)*(double(i)/this->div[0]) + pp[0].y),
                          QPointF((pp[2].x - pp[3].x)*(double(i)/this->div[0]) + pp[3].x,(pp[2].y - pp[3].y)*(double(i)/this->div[0]) + pp[3].y));

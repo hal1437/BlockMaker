@@ -175,8 +175,11 @@ void ExportDialog::Export(QString filename)const{
         QVector<int>indices;
         for(int i=0;i<it.value().second.size();i++){
             indices.push_back(it.value().second[i]); //インデックス出力
+            if((i+1) % 4 == 0){
+                file.OutVector(indices);
+                indices.clear();
+            }
         }
-        file.OutVector(indices);
         file.EndScope();
         file.EndScope();
         it++;
