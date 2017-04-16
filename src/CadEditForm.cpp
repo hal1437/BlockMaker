@@ -538,14 +538,14 @@ void CadEditForm::RefreshRestraints(){
 }
 
 
-void CadEditForm::ApplyObjectList(QListWidget* list){
+void CadEditForm::ApplyObjectList(QTreeWidget* list){
     //CObject::selectedを更新する。
     //ポインタを保持していないため、添字でカウント
     CObject::selected.clear();
     QMap<QString,int>map;
-    for(int i=0;i<list->count();i++){
-        QListWidgetItem* item = list->item(i);
-        QString text = item->text();
+    for(int i=0;i<list->topLevelItemCount();i++){
+        QTreeWidgetItem* item = list->topLevelItem(i);
+        QString text = item->text(0);
         if(text == "Origin") text = "CPoint";
 
         //カウント
@@ -569,8 +569,8 @@ void CadEditForm::ApplyObjectList(QListWidget* list){
         }
     }
 }
-void CadEditForm::DrawObjectList(QListWidget* list){
-    if(list->count() != this->objects.size()){
+void CadEditForm::DrawObjectList(QTreeWidget* list){
+    if(list->topLevelItemCount() != this->objects.size()){
         list->clear();
         for(int i=0;i<this->objects.size();i++){
             std::pair<std::string,std::string> p;
@@ -580,9 +580,10 @@ void CadEditForm::DrawObjectList(QListWidget* list){
             if(objects[i]->is<CRect>  ())p = std::make_pair("CRect"  ,":/ToolImages/Rect.png");
             if(objects[i]->is<CArc>   ())p = std::make_pair("CArc"   ,":/ToolImages/Arc.png");
             if(objects[i]->is<CSpline>())p = std::make_pair("CSpline",":/ToolImages/Spline.png");
-            list->addItem(new QListWidgetItem(p.first.c_str()));
-            list->item(list->count()-1)->setIcon(QIcon(p.second.c_str()));
-            list->item(i)->setSelected(exist(CObject::selected,objects[i]));
+            list->addTopLevelItem(new QTreeWidgetItem());
+            list->topLevelItem(list->topLevelItemCount()-1)->setText(0,p.first.c_str());
+            list->topLevelItem(list->topLevelItemCount()-1)->setIcon(0,QIcon(p.second.c_str()));
+            list->topLevelItem(i)->setSelected(exist(CObject::selected,objects[i]));
         }
     }
 }

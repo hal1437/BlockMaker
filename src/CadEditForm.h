@@ -5,7 +5,9 @@
 #include <QDebug>
 #include <QMouseEvent>
 #include <QListWidget>
+#include <QTreeWidget>
 #include <QListWidgetItem>
+#include <QTreeWidgetItem>
 #include <iostream>
 #include <random>
 #include <queue>
@@ -104,8 +106,8 @@ public slots:
     bool MakeBlock();                       //物体生成
     void RefreshRestraints();               //拘束更新
 
-    void ApplyObjectList(QListWidget *list); //オブジェクトリスト選択
-    void DrawObjectList (QListWidget *list); //オブジェクトリスト描画
+    void ApplyObjectList(QTreeWidget *list); //オブジェクトリスト選択
+    void DrawObjectList (QTreeWidget *list); //オブジェクトリスト描画
     void ApplyCBoxList  (QListWidget *list); //ブロックリスト選択
     void DrawCBoxList   (QListWidget *list); //ブロックリスト描画
     void ConfigureBlock (QListWidgetItem*);  //ブロック再編集
