@@ -48,6 +48,15 @@ public:
     double depth;             //深さ
     GradingType grading;          // 分割間隔タイプ
     QVector<double> grading_args; // 分割パラメータ
+
+    //分割点取得(辺の番号)
+    Pos GetDivisionPoint(int edge_index, int count_index)const;
+
+    //幅取得
+    double GetWidth();
+    //高さ取得
+    double GetHeight();
+
 public:
 
     static bool Creatable(QVector<CObject*> values);//BOX定義可能か

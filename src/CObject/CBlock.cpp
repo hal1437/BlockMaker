@@ -1,5 +1,61 @@
 #include "CBlock.h"
 
+//分割点取得
+Pos CBlock::GetDivisionPoint(int edge_index,int count_index)const{
+    double A,B,sum=0,p,d,L;
+    Pos start,end;
+
+    //各パラメータ取得
+    if(edge_index == 0 || edge_index == 2 || edge_index == 4  || edge_index == 6 ){ //X
+        p = this->grading_args[0];
+        d = this->div[0];
+    }
+    if(edge_index == 1 || edge_index == 3 || edge_index == 5  || edge_index == 7 ){ //Y
+        p = this->grading_args[1];
+        d = this->div[1];
+    }
+    //EdgeGradingならばpを上書き
+    if(grading == GradingType::EdgeGrading){
+        p = this->grading_args[edge_index];
+    }
+    //始点と終点を取得
+    if((edge_index % 4) == 0)start = this->GetClockworksPos(0),end = this->GetClockworksPos(1);
+    if((edge_index % 4) == 1)start = this->GetClockworksPos(1),end = this->GetClockworksPos(2);
+    if((edge_index % 4) == 2)start = this->GetClockworksPos(3),end = this->GetClockworksPos(2);
+    if((edge_index % 4) == 3)start = this->GetClockworksPos(0),end = this->GetClockworksPos(3);
+    L = (end-start).Length();
+
+    //指数関数パラメータ計算
+    B = log(p) / (d-1);
+    for(int i=1;i<=d;i++)sum += exp(B*i);
+    A = L / sum;
+
+    //指定番号までの総和
+    double sum_rate=0;
+    for(int i=1;i<=count_index;i++){
+        sum_rate += A*exp(B*i);
+    }
+    Pos ans = (end-start).GetNormalize() * sum_rate;
+    return ans + start;
+}
+
+double CBlock::GetWidth(){
+    QVector<Pos> pp;
+    pp = this->GetVerticesPos();
+    double left   = std::min_element(pp.begin(),pp.end(),[](const Pos& lhs,const Pos& rhs){return lhs.x < rhs.x;})->x;
+    double right  = std::max_element(pp.begin(),pp.end(),[](const Pos& lhs,const Pos& rhs){return lhs.x < rhs.x;})->x;
+    return right-left;
+}
+
+double CBlock::GetHeight(){
+    QVector<Pos> pp;
+    pp = this->GetVerticesPos();
+    double top    = std::min_element(pp.begin(),pp.end(),[](const Pos& lhs,const Pos& rhs){return lhs.y < rhs.y;})->y;
+    double bottom = std::max_element(pp.begin(),pp.end(),[](const Pos& lhs,const Pos& rhs){return lhs.y < rhs.y;})->y;
+    return top-bottom;
+}
+
+
 bool CBlock::Creatable(QVector<CObject*> values){
     //まず点以外が4つ
     if(std::count_if(values.begin(),values.end(),[](CObject* p){return !p->is<CPoint>();}) == 4){
@@ -63,12 +119,12 @@ void CBlock::Draw(QPainter& painter)const{
 
     //分割線の描画
     for(int i =0;i<=this->div[0];i++){
-        painter.drawLine(QPointF((pp[1].x - pp[0].x)*(double(i)/this->div[0]) + pp[0].x,(pp[1].y - pp[0].y)*(double(i)/this->div[0]) + pp[0].y),
-                         QPointF((pp[2].x - pp[3].x)*(double(i)/this->div[0]) + pp[3].x,(pp[2].y - pp[3].y)*(double(i)/this->div[0]) + pp[3].y));
+        painter.drawLine(QPointF(this->GetDivisionPoint(0,i).x,this->GetDivisionPoint(0,i).y),
+                         QPointF(this->GetDivisionPoint(2,i).x,this->GetDivisionPoint(2,i).y));
     }
     for(int i =0;i<=this->div[0];i++){
-        painter.drawLine(QPointF((pp[2].x - pp[1].x)*(double(i)/this->div[0]) + pp[1].x,(pp[2].y - pp[1].y)*(double(i)/this->div[0]) + pp[1].y),
-                         QPointF((pp[3].x - pp[0].x)*(double(i)/this->div[0]) + pp[0].x,(pp[3].y - pp[0].y)*(double(i)/this->div[0]) + pp[0].y));
+        painter.drawLine(QPointF(this->GetDivisionPoint(1,i).x,this->GetDivisionPoint(1,i).y),
+                         QPointF(this->GetDivisionPoint(3,i).x,this->GetDivisionPoint(3,i).y));
     }
 }
 
