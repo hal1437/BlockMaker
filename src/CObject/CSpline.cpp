@@ -146,4 +146,7 @@ Pos CSpline::GetJointPos(int index)const{
 CPoint* CSpline::GetJoint(int index){
     return pos[index];
 }
+void    CSpline::SetJoint(int index,CPoint* ptr){
+    this->pos[index] = ptr;
+}
 

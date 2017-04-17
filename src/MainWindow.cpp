@@ -188,6 +188,7 @@ void MainWindow::MakeRestraint(){
     }
 
     if(ui->RestraintList->currentItem()->text() == "マージ"){
+        ui->CadEdit->MargePoints();
     }
 }
 
@@ -209,10 +210,10 @@ void MainWindow::RefreshStatusBar(QMouseEvent*,CObject* under){
     Pos out;
     if(under == nullptr){
         //マウス位置のローカル座標
-        out = CObject::mouse_pos;
+        //out = CObject::mouse_pos;
     }else{
         //選択オブジェクトの最近点
-        out = under->GetNear(CObject::mouse_pos);
+        //out = under->GetNear(CObject::mouse_pos);
     }
     this->ui->statusBar->showMessage(QString("(") + QString::number(out.x) + "," + QString::number(out.y) + ")");
 

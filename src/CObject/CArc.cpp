@@ -104,6 +104,9 @@ Pos CArc::GetJointPos(int index)const{
 CPoint* CArc::GetJoint(int index){
     return pos[index];
 }
+void    CArc::SetJoint   (int index,CPoint* ptr){
+    this->pos[index] = ptr;
+}
 
 CArc::CArc()
 {

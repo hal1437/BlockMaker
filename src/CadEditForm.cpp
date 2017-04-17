@@ -266,6 +266,34 @@ void CadEditForm::Move(Pos local_diff){
     this->translate += local_diff;
 }
 
+void CadEditForm::MargePoints(){
+    //原点が存在する場合は先頭に出す
+    for(int i=0;i<CObject::selected.size();i++){
+        if(dynamic_cast<CPoint*>(CObject::selected[i])->isControlPoint()){
+            std::swap(CObject::selected[0],CObject::selected[i]);
+            break;
+        }
+    }
+
+    //先頭以外の点を破棄し、統合する。
+    for(int j=1;j<CObject::selected.size();j++){
+        for(int i=1;i<CObject::selected.size();i++){
+            for(CObject* p : this->objects){
+                for(int i=0;i<p->GetJointNum();i++){
+                    //posが含まれる
+                    if(p->GetJoint(i) == CObject::selected[j]){
+                        p->SetJoint(i,dynamic_cast<CPoint*>(CObject::selected[0]));
+                    }
+                }
+            }
+        }
+        this->objects.removeAll(CObject::selected[j]);
+    }
+    CObject::selected.clear();
+    repaint();
+}
+
+
 CadEditForm::CadEditForm(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::CadEditForm)

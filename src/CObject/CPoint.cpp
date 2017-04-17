@@ -58,7 +58,7 @@ bool CPoint::Move(const Pos& diff){
 }
 
 int CPoint::GetJointNum()const{
-    return 1;
+    return 0;
 }
 Pos CPoint::GetJointPos(int index)const{
     if(index == 0)return *this;
@@ -66,6 +66,9 @@ Pos CPoint::GetJointPos(int index)const{
 }
 CPoint* CPoint::GetJoint(int){
     return this;
+}
+void CPoint::SetJoint(int,CPoint* ){
+    qDebug() << "You try to Call CPoint::SetJoint";
 }
 
 bool CPoint::isControlPoint()const{

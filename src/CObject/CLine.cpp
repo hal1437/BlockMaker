@@ -82,6 +82,10 @@ Pos CLine::GetJointPos(int index)const{
 CPoint* CLine::GetJoint(int index){
     return pos[index];
 }
+void    CLine::SetJoint   (int index, CPoint* ptr){
+    this->pos[index] = ptr;
+}
+
 double CLine::DistanceToPoint(const Pos& pos)const{
     Pos AP = pos - this ->GetJointPos(0);
     Pos AB = pos - this ->GetJointPos(1);

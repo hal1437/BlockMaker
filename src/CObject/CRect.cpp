@@ -96,6 +96,9 @@ Pos CRect::GetJointPos(int index)const{
 CPoint* CRect::GetJoint(int index){
     return pos[index];
 }
+void    CRect::SetJoint   (int index,CPoint* ptr){
+    this->pos[index]= ptr;
+}
 
 CRect::CRect()
 {

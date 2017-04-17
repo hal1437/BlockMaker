@@ -16,11 +16,10 @@ public:
     static constexpr double DRAWING_LINE_SIZE = 3; //描画線幅
     static constexpr double SAME_POINT_EPS = 0.001;    //同一点誤差
 
-    static double drawing_scale;           //同一点誤差
+    static double drawing_scale;           //描画スケール
     static CObject* hanged;                //マウス直下のオブジェクト
     static CObject* createing;             //作成中オブジェクト
     static QVector<CObject*> selected;     //選択オブジェクト
-    static QVector<CObject*> all_objects;  //全てのオブジェクト
     static Pos mouse_pos;                  //マウス位置
 
 protected:
@@ -56,7 +55,9 @@ public:
     //ジョイント関係
     virtual int     GetJointNum()         const = 0;
     virtual Pos     GetJointPos(int index)const = 0;
-    virtual CPoint* GetJoint   (int index) = 0;
+    virtual CPoint* GetJoint   (int index)      = 0;
+    virtual void    SetJoint   (int index,CPoint* p) = 0;
+
 
     //コンストラクタ
     CObject();
