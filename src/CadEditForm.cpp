@@ -60,6 +60,13 @@ void CadEditForm::resizeEvent(QResizeEvent*){
     this->translate.y = -this->height() / 2;
 }
 
+void CadEditForm::Escape(){
+    if(CObject::createing != nullptr){
+        this->RemoveObject(make_obj);
+    }
+    creating_count=0;
+}
+
 void CadEditForm::AddObject(CObject* obj){
     if(!exist(objects,obj)){
         objects.push_back(obj);

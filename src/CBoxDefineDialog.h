@@ -16,7 +16,7 @@ class CBoxDefineDialog : public QDialog
 {
     Q_OBJECT
 private:
-    QVector<QSpinBox*> grading_args;
+    QVector<QDoubleSpinBox*> grading_args;
 
 protected:
     void paintEvent    (QPaintEvent* event); //描画イベントハンドラ

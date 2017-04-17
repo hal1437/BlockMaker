@@ -25,13 +25,16 @@ public:
 private:
     Ui::MainWindow *ui;
 
+protected:
+    void keyPressEvent  (QKeyEvent* event);
+    void keyReleaseEvent(QKeyEvent* event);
+
 signals:
     void ToggleChanged(CEnum state);
 
 public slots:
     void CtrlZ();
     void Delete();
-    void Escape();
     void ConnectSignals();
     void DisconnectSignals();
     void ClearButton();

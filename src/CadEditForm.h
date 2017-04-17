@@ -65,14 +65,16 @@ private:
 protected:
     void mousePressEvent  (QMouseEvent* event);
     void mouseReleaseEvent(QMouseEvent* event);
-    void keyPressEvent    (QKeyEvent* event);
-    void keyReleaseEvent  (QKeyEvent* event);
     void paintEvent       (QPaintEvent* event);
     void wheelEvent       (QWheelEvent * event);
     void mouseMoveEvent   (QMouseEvent*  event); //マウス移動イベントハンドラ
     void resizeEvent      (QResizeEvent* event); //リサイズイベントハンドラ
 
 public:
+    void keyPressEvent    (QKeyEvent* event);
+    void keyReleaseEvent  (QKeyEvent* event);
+
+    void Escape();//作成破棄
 
     void AddObject     (CObject* obj);      //オブジェクト追加
     void RemoveObject  (CObject* obj);      //オブジェクト削除

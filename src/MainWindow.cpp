@@ -6,10 +6,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    setMouseTracking(true);
     //connect(ui->actionCtrlZ          ,SIGNAL(triggered())                        ,this       ,SLOT(CtrlZ()));
     connect(ui->actionDelete         ,SIGNAL(triggered())                        ,this       ,SLOT(Delete()));
-    connect(ui->actionEsc            ,SIGNAL(triggered())                        ,this       ,SLOT(Escape()));
     connect(ui->actionMove           ,SIGNAL(triggered())                        ,this       ,SLOT(MoveTransform()));
     connect(ui->actionResetExpantion ,SIGNAL(triggered())                        ,this       ,SLOT(ResetAllExpantion()));
     connect(ui->ToolDimension        ,SIGNAL(triggered())                        ,ui->CadEdit,SLOT(MakeSmartDimension()));
@@ -43,6 +41,21 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+void MainWindow::keyPressEvent  (QKeyEvent* event){
+    this->ui->CadEdit->keyPressEvent(event);
+
+    //ESC押下時
+    if(event->key() == Qt::Key_Escape){
+        this->ui->CadEdit->Escape();
+        ClearButton();
+        RefreshUI();
+    }
+}
+
+void MainWindow::keyReleaseEvent(QKeyEvent* event){
+    this->ui->CadEdit->keyReleaseEvent(event);
+}
+
 
 void MainWindow::CtrlZ(){
     /*
@@ -59,17 +72,6 @@ void MainWindow::Delete(){
     CObject::selected.clear();
     repaint();
     RefreshUI();
-}
-void MainWindow::Escape(){
-    /*
-    if(CObject::createing != nullptr){
-        ui->CadEdit->RemoveObject(make_obj);
-    }
-    creating_count=0;
-    ClearButton();
-    RefreshUI();
-
-    */
 }
 
 void MainWindow::ConnectSignals(){

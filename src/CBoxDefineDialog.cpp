@@ -213,9 +213,10 @@ CBoxDefineDialog::CBoxDefineDialog(QWidget *parent) :
     connect(this->ui->BottomTypecombo,SIGNAL(currentIndexChanged(int)),this,SLOT(SyncOtherCombo(int)));
 
     for(int i=0;i<12;i++){
-        QSpinBox* p = new QSpinBox();
+        QDoubleSpinBox* p = new QDoubleSpinBox();
         p->setValue(1.0);
         p->setMaximumSize(100,40);
+        p->setDecimals(5);
         this->grading_args.push_back(p);
         this->ui->GradingArgsLayout->addWidget(this->grading_args[i],i/4,i%4);
         if(i >= 3)this->grading_args[i]->hide();
