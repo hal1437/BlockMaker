@@ -148,6 +148,7 @@ void CBoxDefineDialog::ImportCBlock(const CBlock &block){
     for(int i = 0;i<6;i++){
         this->ConvertDirToNameEdit(static_cast<BoundaryDir>(i))->setText(block.name[i]);
         this->ConvertDirToCombo   (static_cast<BoundaryDir>(i))->setCurrentText(this->ConvertBoundaryToString(block.boundery[i]));
+        types_log[i] = block.boundery[i];
     }
     this->ui->XspinBox->setValue(block.div[0]);
     this->ui->YspinBox->setValue(block.div[1]);
@@ -181,17 +182,22 @@ void CBoxDefineDialog::SyncOtherCombo(int){
 
     //すべての境界で
     for(int i=0;i<6;i++){
-        QString name = this->GetBoundaryName(static_cast<BoundaryDir>(i));
+        if(types_log[i] != this->GetBoundaryType(static_cast<BoundaryDir>(i))){
+            QString name = this->GetBoundaryName(static_cast<BoundaryDir>(i));
 
-        //他の方向に対して
-        for(int j=0;j<6;j++){
-            if(i==j)continue;
-            //名前が一致すれば
-            if(name == this->GetBoundaryName(static_cast<BoundaryDir>(j))){
-                //コンボボックスを書き換える
-                this->SetBoundaryType(static_cast<BoundaryDir>(j),this->GetBoundaryType(static_cast<BoundaryDir>(i)));
+            //他の方向に対して
+            for(int j=0;j<6;j++){
+                if(i==j)continue;
+                //名前が一致すれば
+                if(name == this->GetBoundaryName(static_cast<BoundaryDir>(j))){
+                    //コンボボックスを書き換える
+                    this->SetBoundaryType(static_cast<BoundaryDir>(j),this->GetBoundaryType(static_cast<BoundaryDir>(i)));
+                }
             }
         }
+    }
+    for(int i=0;i<6;i++){
+        this->types_log[i] = this->GetBoundaryType(static_cast<BoundaryDir>(i));
     }
     //全てのコネクトを連結
     for(int i=0;i<6;i++){
@@ -220,6 +226,9 @@ CBoxDefineDialog::CBoxDefineDialog(QWidget *parent) :
         this->grading_args.push_back(p);
         this->ui->GradingArgsLayout->addWidget(this->grading_args[i],i/4,i%4);
         if(i >= 3)this->grading_args[i]->hide();
+    }
+    for(int i=0;i<6;i++){
+        types_log[i] = static_cast<BoundaryType>(0);
     }
 }
 
