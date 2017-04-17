@@ -101,17 +101,11 @@ void CBoxDefineDialog::SetBoundaryName(BoundaryDir dir,QString name){
 void CBoxDefineDialog::SetBoundaryType(BoundaryDir dir,BoundaryType type){
     this->ConvertDirToCombo(dir)->setCurrentText(ConvertBoundaryToString(type));
 }
-QString CBoxDefineDialog::GetGradigngArgs()const{
-    return ui->GradingEdit->text();
-}
 
 //エラー判定
 QString CBoxDefineDialog::FormatError()const{
     //引数の数があっているかな判定
     QString failed = "";
-
-    int args_num = (GetGradigngType() == SimpleGrading) ? 2 : 11;
-    if(GetGradigngArgs().split(' ').size() == args_num)failed = "Gradigngの引数が一致しません";
 
     //名前とタイプは全て一致
     QMap<QString,BoundaryType> map;
@@ -144,9 +138,8 @@ CBlock CBoxDefineDialog::ExportCBlock()const{
     blocks.div[2] = this->ui->ZspinBox->value();
     blocks.depth  = this->ui->DepthSpinBox->value();
     blocks.grading   = this->GetGradigngType();
-    QStringList list = ui->GradingEdit->text().split(' ');
-    for(int i=0;i<list.size();i++){
-        blocks.grading_args.push_back(list[i].toDouble());
+    for(int i=0;i<(this->GetGradigngType() == GradingType::SimpleGrading ? 3 : 12);i++){
+        blocks.grading_args.push_back(this->grading_args[i]->value());
     }
     return blocks;
 }
@@ -161,21 +154,23 @@ void CBoxDefineDialog::ImportCBlock(const CBlock &block){
     this->ui->ZspinBox->setValue(block.div[2]);
     this->ui->DepthSpinBox->setValue(block.depth);
     this->SetGradigngType(block.grading);
-    //全体設定
-    QStringList list;
-    for(double d :block.grading_args)list.push_back(QString::number(d));
-    this->ui->GradingCombo->setCurrentText(this->ConvertGradingToString(block.grading));
-    this->ui->GradingEdit ->setText(list.join(" "));
+    for(int i=0;i<(this->GetGradigngType() == GradingType::SimpleGrading ? 3 : 12);i++){
+        this->grading_args[i]->setValue(block.grading_args[i]);
+    }
 }
 
 void CBoxDefineDialog::GradigngComboChanged(QString text){
     if(text == "simpleGrading"){
-        ui->GradingEdit->setText("1 1 1");
         this->SetGradigngType(SimpleGrading);
+        for(int i=3;i<12;i++){
+            this->grading_args[i]->hide();
+        }
     }
     if(text == "edgeGrading"  ){
-        ui->GradingEdit->setText("1 1 1 1 1 1 1 1 1 1 1 1");
         this->SetGradigngType(EdgeGrading);
+        for(int i=3;i<12;i++){
+            this->grading_args[i]->show();
+        }
     }
 }
 void CBoxDefineDialog::SyncOtherCombo(int){
@@ -209,7 +204,6 @@ CBoxDefineDialog::CBoxDefineDialog(QWidget *parent) :
     ui(new Ui::CBoxDefineDialog)
 {
     ui->setupUi(this);
-    ui->GradingEdit->setText("1 1 1");
     connect(this->ui->GradingCombo,SIGNAL(currentIndexChanged(QString)),this,SLOT(GradigngComboChanged(QString)));
     connect(this->ui->BackTypecombo  ,SIGNAL(currentIndexChanged(int)),this,SLOT(SyncOtherCombo(int)));
     connect(this->ui->FrontTypecombo ,SIGNAL(currentIndexChanged(int)),this,SLOT(SyncOtherCombo(int)));
@@ -217,6 +211,15 @@ CBoxDefineDialog::CBoxDefineDialog(QWidget *parent) :
     connect(this->ui->RightTypecombo ,SIGNAL(currentIndexChanged(int)),this,SLOT(SyncOtherCombo(int)));
     connect(this->ui->LeftTypecombo  ,SIGNAL(currentIndexChanged(int)),this,SLOT(SyncOtherCombo(int)));
     connect(this->ui->BottomTypecombo,SIGNAL(currentIndexChanged(int)),this,SLOT(SyncOtherCombo(int)));
+
+    for(int i=0;i<12;i++){
+        QSpinBox* p = new QSpinBox();
+        p->setValue(1.0);
+        p->setMaximumSize(100,40);
+        this->grading_args.push_back(p);
+        this->ui->GradingArgsLayout->addWidget(this->grading_args[i],i/4,i%4);
+        if(i >= 3)this->grading_args[i]->hide();
+    }
 }
 
 CBoxDefineDialog::~CBoxDefineDialog()

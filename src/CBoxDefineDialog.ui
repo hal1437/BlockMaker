@@ -7,17 +7,17 @@
     <x>0</x>
     <y>0</y>
     <width>843</width>
-    <height>377</height>
+    <height>429</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
-   <item>
+  <layout class="QGridLayout" name="gridLayout_9">
+   <item row="0" column="0">
     <layout class="QGridLayout" name="gridLayout">
-     <item row="1" column="0">
-      <widget class="QGroupBox" name="LeftGroup">
+     <item row="2" column="0" rowspan="4">
+      <widget class="QGroupBox" name="FrontGroup">
        <property name="maximumSize">
         <size>
          <width>260</width>
@@ -25,25 +25,18 @@
         </size>
        </property>
        <property name="title">
-        <string>Left</string>
+        <string>Front</string>
        </property>
-       <layout class="QGridLayout" name="gridLayout_5">
+       <layout class="QGridLayout" name="gridLayout_7">
         <item row="0" column="0">
-         <widget class="QLabel" name="LeftNameLabel">
+         <widget class="QLabel" name="FrontNameLabel">
           <property name="text">
            <string>Name</string>
           </property>
          </widget>
         </item>
-        <item row="0" column="1" colspan="2">
-         <widget class="QLineEdit" name="LeftNameEdit">
-          <property name="placeholderText">
-           <string>Left</string>
-          </property>
-         </widget>
-        </item>
         <item row="1" column="2">
-         <widget class="QComboBox" name="LeftTypecombo">
+         <widget class="QComboBox" name="FrontTypecombo">
           <item>
            <property name="text">
             <string>empty (2次元)</string>
@@ -81,8 +74,15 @@
           </item>
          </widget>
         </item>
+        <item row="0" column="1" colspan="2">
+         <widget class="QLineEdit" name="FrontNameEdit">
+          <property name="placeholderText">
+           <string>Front</string>
+          </property>
+         </widget>
+        </item>
         <item row="1" column="0" colspan="2">
-         <widget class="QLabel" name="LeftTypeLabel">
+         <widget class="QLabel" name="FrontTypeLabel">
           <property name="text">
            <string>Type</string>
           </property>
@@ -90,6 +90,54 @@
         </item>
        </layout>
       </widget>
+     </item>
+     <item row="3" column="2" rowspan="2">
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <item>
+        <widget class="QComboBox" name="GradingCombo">
+         <item>
+          <property name="text">
+           <string>simpleGrading</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>edgeGrading</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item>
+        <layout class="QGridLayout" name="GradingArgsLayout"/>
+       </item>
+      </layout>
+     </item>
+     <item row="2" column="2">
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <widget class="QLabel" name="label_2">
+         <property name="text">
+          <string>Z軸方向長さ</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QDoubleSpinBox" name="DepthSpinBox">
+         <property name="decimals">
+          <number>3</number>
+         </property>
+         <property name="minimum">
+          <double>0.001000000000000</double>
+         </property>
+         <property name="maximum">
+          <double>99999999999.000000000000000</double>
+         </property>
+         <property name="value">
+          <double>1.000000000000000</double>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </item>
      <item row="0" column="2">
       <widget class="QGroupBox" name="BackGroup">
@@ -166,30 +214,90 @@
        </layout>
       </widget>
      </item>
-     <item row="3" column="2" rowspan="2">
-      <layout class="QVBoxLayout" name="verticalLayout_3">
-       <item>
-        <widget class="QComboBox" name="GradingCombo">
-         <item>
+     <item row="1" column="0">
+      <widget class="QGroupBox" name="LeftGroup">
+       <property name="maximumSize">
+        <size>
+         <width>260</width>
+         <height>130</height>
+        </size>
+       </property>
+       <property name="title">
+        <string>Left</string>
+       </property>
+       <layout class="QGridLayout" name="gridLayout_5">
+        <item row="0" column="0">
+         <widget class="QLabel" name="LeftNameLabel">
           <property name="text">
-           <string>simpleGrading</string>
+           <string>Name</string>
           </property>
-         </item>
-         <item>
+         </widget>
+        </item>
+        <item row="0" column="1" colspan="2">
+         <widget class="QLineEdit" name="LeftNameEdit">
+          <property name="placeholderText">
+           <string>Left</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="2">
+         <widget class="QComboBox" name="LeftTypecombo">
+          <item>
+           <property name="text">
+            <string>empty (2次元)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>patch (パッチ)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>wall (壁)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>symmetryPlane (対称面)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>cyclic (周期境界)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>cyclicAMI (不整合周期境界)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>wedge (2次元軸対称)</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item row="1" column="0" colspan="2">
+         <widget class="QLabel" name="LeftTypeLabel">
           <property name="text">
-           <string>edgeGrading</string>
+           <string>Type</string>
           </property>
-         </item>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="GradingEdit">
-         <property name="placeholderText">
-          <string>(g0 g1 g2...)</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item row="5" column="2">
+      <widget class="QDialogButtonBox" name="buttonBox">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="standardButtons">
+        <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+       </property>
+      </widget>
      </item>
      <item row="1" column="1">
       <widget class="QFrame" name="frame">
@@ -368,163 +476,6 @@
        </layout>
       </widget>
      </item>
-     <item row="0" column="0">
-      <widget class="QGroupBox" name="groupBox">
-       <property name="maximumSize">
-        <size>
-         <width>260</width>
-         <height>130</height>
-        </size>
-       </property>
-       <property name="title">
-        <string>分割数</string>
-       </property>
-       <layout class="QGridLayout" name="gridLayout_8">
-        <property name="leftMargin">
-         <number>12</number>
-        </property>
-        <property name="topMargin">
-         <number>0</number>
-        </property>
-        <property name="rightMargin">
-         <number>12</number>
-        </property>
-        <property name="bottomMargin">
-         <number>0</number>
-        </property>
-        <property name="horizontalSpacing">
-         <number>12</number>
-        </property>
-        <property name="verticalSpacing">
-         <number>0</number>
-        </property>
-        <item row="0" column="1">
-         <widget class="QSpinBox" name="XspinBox">
-          <property name="minimum">
-           <number>1</number>
-          </property>
-          <property name="maximum">
-           <number>1000000</number>
-          </property>
-          <property name="value">
-           <number>10</number>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="label_4">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="text">
-           <string>Y軸方向：</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="1">
-         <widget class="QSpinBox" name="YspinBox">
-          <property name="minimum">
-           <number>1</number>
-          </property>
-          <property name="maximum">
-           <number>1000000</number>
-          </property>
-          <property name="value">
-           <number>10</number>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="0">
-         <widget class="QLabel" name="label">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="text">
-           <string>Z軸方向：</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="1">
-         <widget class="QSpinBox" name="ZspinBox">
-          <property name="minimum">
-           <number>1</number>
-          </property>
-          <property name="maximum">
-           <number>1000000</number>
-          </property>
-          <property name="value">
-           <number>10</number>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="0">
-         <widget class="QLabel" name="label_3">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="text">
-           <string>X軸方向：</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-     </item>
-     <item row="5" column="2">
-      <widget class="QDialogButtonBox" name="buttonBox">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="standardButtons">
-        <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="2">
-      <layout class="QHBoxLayout" name="horizontalLayout">
-       <item>
-        <widget class="QLabel" name="label_2">
-         <property name="text">
-          <string>Z軸方向長さ</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QDoubleSpinBox" name="DepthSpinBox">
-         <property name="decimals">
-          <number>3</number>
-         </property>
-         <property name="minimum">
-          <double>0.001000000000000</double>
-         </property>
-         <property name="maximum">
-          <double>99999999999.000000000000000</double>
-         </property>
-         <property name="value">
-          <double>1.000000000000000</double>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
      <item row="2" column="1" rowspan="4">
       <widget class="QGroupBox" name="BottomGroup">
        <property name="maximumSize">
@@ -600,79 +551,253 @@
        </layout>
       </widget>
      </item>
-     <item row="2" column="0" rowspan="4">
-      <widget class="QGroupBox" name="FrontGroup">
+     <item row="0" column="0">
+      <widget class="QTabWidget" name="tabWidget">
        <property name="maximumSize">
         <size>
          <width>260</width>
          <height>130</height>
         </size>
        </property>
-       <property name="title">
-        <string>Front</string>
+       <property name="currentIndex">
+        <number>0</number>
        </property>
-       <layout class="QGridLayout" name="gridLayout_7">
-        <item row="0" column="0">
-         <widget class="QLabel" name="FrontNameLabel">
-          <property name="text">
-           <string>Name</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="2">
-         <widget class="QComboBox" name="FrontTypecombo">
-          <item>
-           <property name="text">
-            <string>empty (2次元)</string>
+       <widget class="QWidget" name="tabWidgetPage1">
+        <attribute name="title">
+         <string>分割数指定</string>
+        </attribute>
+        <layout class="QGridLayout" name="gridLayout_8">
+         <property name="leftMargin">
+          <number>12</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>12</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <property name="horizontalSpacing">
+          <number>12</number>
+         </property>
+         <property name="verticalSpacing">
+          <number>0</number>
+         </property>
+         <item row="0" column="1">
+          <widget class="QSpinBox" name="XspinBox">
+           <property name="minimum">
+            <number>1</number>
            </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>patch (パッチ)</string>
+           <property name="maximum">
+            <number>1000000</number>
            </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>wall (壁)</string>
+           <property name="value">
+            <number>10</number>
            </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>symmetryPlane (対称面)</string>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_4">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
            </property>
-          </item>
-          <item>
            <property name="text">
-            <string>cyclic (周期境界)</string>
+            <string>Y軸方向：</string>
            </property>
-          </item>
-          <item>
+           <property name="alignment">
+            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QSpinBox" name="YspinBox">
+           <property name="minimum">
+            <number>1</number>
+           </property>
+           <property name="maximum">
+            <number>1000000</number>
+           </property>
+           <property name="value">
+            <number>10</number>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="label">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <property name="text">
-            <string>cyclicAMI (不整合周期境界)</string>
+            <string>Z軸方向：</string>
            </property>
-          </item>
-          <item>
+           <property name="alignment">
+            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QSpinBox" name="ZspinBox">
+           <property name="minimum">
+            <number>1</number>
+           </property>
+           <property name="maximum">
+            <number>1000000</number>
+           </property>
+           <property name="value">
+            <number>10</number>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_3">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <property name="text">
-            <string>wedge (2次元軸対称)</string>
+            <string>X軸方向：</string>
            </property>
-          </item>
-         </widget>
-        </item>
-        <item row="0" column="1" colspan="2">
-         <widget class="QLineEdit" name="FrontNameEdit">
-          <property name="placeholderText">
-           <string>Front</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0" colspan="2">
-         <widget class="QLabel" name="FrontTypeLabel">
-          <property name="text">
-           <string>Type</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
+           <property name="alignment">
+            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="tab">
+        <attribute name="title">
+         <string>最小格子幅指定</string>
+        </attribute>
+        <layout class="QGridLayout" name="gridLayout_10">
+         <property name="leftMargin">
+          <number>12</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>12</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <property name="horizontalSpacing">
+          <number>12</number>
+         </property>
+         <property name="verticalSpacing">
+          <number>0</number>
+         </property>
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_7">
+           <property name="text">
+            <string>X軸方向：</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QDoubleSpinBox" name="doubleSpinBox">
+           <property name="value">
+            <double>1.000000000000000</double>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="2">
+          <widget class="QComboBox" name="comboBox">
+           <item>
+            <property name="text">
+             <string>Disable</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Right</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Left</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_5">
+           <property name="text">
+            <string>Y軸方向：</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QDoubleSpinBox" name="doubleSpinBox_2">
+           <property name="value">
+            <double>1.000000000000000</double>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="2">
+          <widget class="QComboBox" name="comboBox_2">
+           <item>
+            <property name="text">
+             <string>Disable</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Top</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Bottom</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="label_6">
+           <property name="text">
+            <string>Z軸方向：</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QDoubleSpinBox" name="doubleSpinBox_3">
+           <property name="value">
+            <double>1.000000000000000</double>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="2">
+          <widget class="QComboBox" name="comboBox_3">
+           <item>
+            <property name="text">
+             <string>Disable</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Front</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Back</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+        </layout>
+       </widget>
       </widget>
      </item>
     </layout>

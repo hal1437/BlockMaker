@@ -4,6 +4,7 @@
 #include <QDialog>
 #include <QComboBox>
 #include <QLineEdit>
+#include <QSpinBox>
 #include "CObject/CBlock.h"
 
 namespace Ui {
@@ -14,6 +15,9 @@ class CBoxDefineDialog;
 class CBoxDefineDialog : public QDialog
 {
     Q_OBJECT
+private:
+    QVector<QSpinBox*> grading_args;
+
 protected:
     void paintEvent    (QPaintEvent* event); //描画イベントハンドラ
     QComboBox*   ConvertDirToCombo      (BoundaryDir  dir)const;
@@ -29,12 +33,11 @@ public:
     QString      GetBoundaryName(BoundaryDir dir)const;
     BoundaryType GetBoundaryType(BoundaryDir dir)const;
     GradingType  GetGradigngType()const;
-    QString      GetGradigngArgs()const;
 
     void SetGradigngType(GradingType type);
     void SetBoundaryName(BoundaryDir dir,QString name     );
     void SetBoundaryType(BoundaryDir dir,BoundaryType type);
-    QString      GetVertices    (BoundaryDir dir)const;
+    QString GetVertices (BoundaryDir dir)const;
 
     //エラー判定
     QString FormatError()const;
@@ -49,6 +52,7 @@ public:
 public slots:
     void AcceptProxy();
     void GradigngComboChanged(QString text);
+
 
     //境界名と境界タイプを一致させる
     void SyncOtherCombo(int);
