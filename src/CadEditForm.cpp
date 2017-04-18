@@ -166,6 +166,8 @@ void CadEditForm::MovedMouse(QMouseEvent *event, CObject *under_object){
     //拘束更新
     this->RefreshRestraints();
 
+    emit MouseMoved(CObject::mouse_pos);
+
     past = CObject::mouse_pos;
     release_flag=true;
 }

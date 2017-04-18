@@ -95,6 +95,7 @@ signals:
     void ToggleConflict(bool conflict); //競合シグナル変更
     void ScaleChanged(double value);    //拡大倍率変更
     void RquireRefreshUI();             //UI更新
+    void MouseMoved(Pos pos);            //マウス移動
 
 
 public slots:

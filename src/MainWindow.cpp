@@ -20,6 +20,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(this        ,SIGNAL(ToggleChanged(CEnum)),this->ui->CadEdit  ,SLOT(SetState(CEnum)));
     connect(ui->CadEdit ,SIGNAL(ScaleChanged(double)),this->ui->ScaleSpin,SLOT(setValue(double)));
     connect(ui->CadEdit ,SIGNAL(RquireRefreshUI())   ,this,SLOT(RefreshUI()));
+    connect(ui->CadEdit ,SIGNAL(MouseMoved(Pos))     ,this               ,SLOT(RefreshStatusBar(Pos)));
 
     //リスト変更系
     connect(ui->RestraintList        ,SIGNAL(itemSelectionChanged())      ,this       ,SLOT(MakeRestraint()));
@@ -130,7 +131,6 @@ void MainWindow::RefreshUI(){
     //リスト要素数で出力ボタンの無効化を決定
     ui->ExportButton->setEnabled(this->ui->BlockList->count() > 0);
 
-
     this->repaint();
 }
 
@@ -206,14 +206,14 @@ void MainWindow::ReciveBlockListChanged(){
     this->ui->CadEdit->ApplyCBoxList  (this->ui->BlockList);
     RefreshUI();
 }
-void MainWindow::RefreshStatusBar(QMouseEvent*,CObject* under){
+void MainWindow::RefreshStatusBar(Pos pos){
     Pos out;
-    if(under == nullptr){
+    if(CObject::hanged == nullptr){
         //マウス位置のローカル座標
-        //out = CObject::mouse_pos;
+        out = CObject::mouse_pos;
     }else{
         //選択オブジェクトの最近点
-        //out = under->GetNear(CObject::mouse_pos);
+        out = CObject::hanged->GetNear(CObject::mouse_pos);
     }
     this->ui->statusBar->showMessage(QString("(") + QString::number(out.x) + "," + QString::number(out.y) + ")");
 

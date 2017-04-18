@@ -53,7 +53,7 @@ public slots:
 
     void ReciveObjectListChanged(); //オブジェクトリスト更新
     void ReciveBlockListChanged (); //ブロックリスト更新
-    void RefreshStatusBar(QMouseEvent*, CObject*under);        //ステータスバー更新
+    void RefreshStatusBar(Pos pos);        //ステータスバー更新
 };
 
 #endif // MAINWINDOW_H
