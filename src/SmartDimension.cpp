@@ -37,16 +37,16 @@ double SmartDimension::currentValue()const{
 
 void SmartDimension::DrawString(QPainter& painter,const Pos& pos,const QString& str,double angle)const{
     QFontMetrics fm = painter.fontMetrics();
-    int bit = (90 <= angle && angle < 270) ? 1 : 0;
+    int bit = (90 <= angle && angle < 270) ? 0 : 1;
     QTransform trans;
 
     painter.save();//状態を保存
 
     //拡大無効化+平行移動+回転
     trans = painter.transform();
-    trans.scale(1/CObject::drawing_scale,1/CObject::drawing_scale);
-    trans.translate(pos.x*CObject::drawing_scale,pos.y*CObject::drawing_scale);
-    trans.rotate(angle + 180*bit);
+    trans.scale(-1/CObject::drawing_scale,1/CObject::drawing_scale);
+    trans.translate(-pos.x*CObject::drawing_scale,pos.y*CObject::drawing_scale);
+    trans.rotate(-angle + 180*bit);
     painter.setTransform(trans);
 
     //文字を描画
