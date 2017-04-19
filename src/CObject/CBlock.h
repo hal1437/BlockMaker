@@ -39,7 +39,7 @@ enum GradingType{
 
 class CBlock{
 private:
-    QVector<CObject*> lines;
+    QVector<CEdge*> lines;
 public:
     BoundaryType boundery[6]; // 境界タイプ
     QString name[6];          // 境界名
@@ -59,21 +59,21 @@ public:
 
 public:
 
-    static bool Creatable(QVector<CObject*> values);//BOX定義可能か
+    static bool Creatable(QVector<CObject* > values);//BOX定義可能か
     bool isParadox()const;//矛盾確認
 
     //描画
     void Draw(QPainter& painter)const;
 
-    void SetNodeAll(QVector<CObject*> lines);
-    void SetNode(int index,CObject* line);
+    void SetNodeAll(QVector<CEdge*> lines);
+    void SetNode(int index, CEdge *line);
     CObject* GetNode(int index)const;
     QVector<Pos> GetVerticesPos()const;
     Pos GetClockworksPos(int index) const;//時計回り番号取得
 
 
     CBlock();
-    CBlock(QVector<CObject*> lines);
+    CBlock(QVector<CEdge *> lines);
     ~CBlock();
 };
 

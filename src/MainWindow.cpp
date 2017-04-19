@@ -206,7 +206,7 @@ void MainWindow::ReciveBlockListChanged(){
     this->ui->CadEdit->ApplyCBoxList  (this->ui->BlockList);
     RefreshUI();
 }
-void MainWindow::RefreshStatusBar(Pos pos){
+void MainWindow::RefreshStatusBar(Pos){
     Pos out;
     if(CObject::hanged == nullptr){
         //マウス位置のローカル座標

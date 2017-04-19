@@ -30,7 +30,8 @@ SOURCES += src/main.cpp\
     src/CObject/CSpline.cpp \
     src/CObject/CBlock.cpp \
     src/MoveTransformDialog.cpp \
-    src/FoamFile.cpp
+    src/FoamFile.cpp \
+    src/CObject/CEdge.cpp
 
 HEADERS  += src/MainWindow.h \
     src/Point.h \
@@ -50,7 +51,8 @@ HEADERS  += src/MainWindow.h \
     src/CObject/CSpline.h \
     src/CObject/CBlock.h \
     src/MoveTransformDialog.h \
-    src/FoamFile.h
+    src/FoamFile.h \
+    src/CObject/CEdge.h
 
 FORMS    += src/MainWindow.ui \
     src/CadEditForm.ui \

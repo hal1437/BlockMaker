@@ -58,12 +58,13 @@ double CBlock::GetHeight(){
 
 bool CBlock::Creatable(QVector<CObject*> values){
     //まず点以外が4つ
-    if(std::count_if(values.begin(),values.end(),[](CObject* p){return !p->is<CPoint>();}) == 4){
+    if(std::count_if(values.begin(),values.end(),[](CObject* p){return p->is<CEdge>();}) == 4){
         //構成点カウント
         std::map<Pos,int> map;
         for(CObject* p:values){
-            map[p->GetJointPos(0)]++;
-            map[p->GetJointPos(p->GetJointNum()-1)]++;
+            CEdge* e= dynamic_cast<CEdge*>(p);
+            map[*e->start]++;
+            map[*e->end]++;
         }
         //構成点合計が2であれば
         return std::all_of(map.begin(),map.end(),[](std::pair<Pos,int> v){
@@ -79,7 +80,7 @@ bool CBlock::Creatable(QVector<CObject*> values){
     return false;
 }
 
-void CBlock::SetNodeAll(QVector<CObject*> lines){
+void CBlock::SetNodeAll(QVector<CEdge*> lines){
     //CRect一つでも可
     if(lines.size() == 1 && lines[0]->is<CRect>()){
         for(int i=0;i<4;i++){
@@ -90,7 +91,7 @@ void CBlock::SetNodeAll(QVector<CObject*> lines){
     }
 }
 
-void CBlock::SetNode(int index,CObject* line){
+void CBlock::SetNode(int index,CEdge* line){
     this->lines[index] = line;
 }
 
@@ -134,18 +135,18 @@ QVector<Pos> CBlock::GetVerticesPos()const{
 
     QVector<Pos> pp;
     Pos old;
-    pp.push_back(lines[0]->GetJointPos(0)); //先頭
-    old = lines[0]->GetJointPos(0);
+    pp.push_back(*lines[0]->start); //先頭
+    old = *lines[0]->start;
 
     //oldの相方を含むlineを探す
     for(int i=0;i<4;i++){
-        if(lines[i]->GetJointPos(0) == old && !exist(pp,lines[i]->GetJointPos(1))){
-            pp.push_back(lines[i]->GetJointPos(1));
-            old = lines[i]->GetJointPos(1);
+        if(*lines[i]->start == old && !exist(pp,*lines[i]->end)){
+            pp.push_back(*lines[i]->end);
+            old = *lines[i]->end;
             i = 0;
-        }else if(lines[i]->GetJointPos(1) == old && !exist(pp,lines[i]->GetJointPos(0))){
-            pp.push_back(lines[i]->GetJointPos(0));
-            old = lines[i]->GetJointPos(0);
+        }else if(*lines[i]->end == old && !exist(pp,*lines[i]->start)){
+            pp.push_back(*lines[i]->start);
+            old = *lines[i]->start;
             i = 0;
         }
     }
@@ -155,9 +156,9 @@ QVector<Pos> CBlock::GetVerticesPos()const{
 Pos CBlock::GetClockworksPos(int index)const{
     QVector<Pos> pp;
     //点を集結
-    for(CObject* line:lines){
-        if(!exist(pp,dynamic_cast<CLine*>(line)->GetJointPos(0)))pp.push_back(dynamic_cast<CLine*>(line)->GetJointPos(0));
-        if(!exist(pp,dynamic_cast<CLine*>(line)->GetJointPos(1)))pp.push_back(dynamic_cast<CLine*>(line)->GetJointPos(1));
+    for(CEdge* line:lines){
+        if(!exist(pp,*line->start))pp.push_back(*line->start);
+        if(!exist(pp,*line->end  ))pp.push_back(*line->end);
     }
 
     //左下の探索
@@ -188,11 +189,11 @@ Pos CBlock::GetClockworksPos(int index)const{
     QVector<Pos> candidate;//連鎖候補
     for(int i=0;i<index%4;i++){
         //ansを含むlineを探す
-        for(CObject* line:lines){
-            if(ans == dynamic_cast<CLine*>(line)->GetJointPos(0) && old != dynamic_cast<CLine*>(line)->GetJointPos(1)){
-                candidate.push_back(dynamic_cast<CLine*>(line)->GetJointPos(1));
-            }else if(ans == dynamic_cast<CLine*>(line)->GetJointPos(1) && old != dynamic_cast<CLine*>(line)->GetJointPos(0)){
-                candidate.push_back(dynamic_cast<CLine*>(line)->GetJointPos(0));
+        for(CEdge* line:lines){
+            if(ans == *line->start && old != *line->end){
+                candidate.push_back(*line->end);
+            }else if(ans == *line->end && old != *line->end){
+                candidate.push_back(*line->start);
             }
         }
         //選定
@@ -218,7 +219,7 @@ Pos CBlock::GetClockworksPos(int index)const{
 CBlock::CBlock()
 {
 }
-CBlock::CBlock(QVector<CObject*> lines):
+CBlock::CBlock(QVector<CEdge*> lines):
     lines(lines)
 {
 }

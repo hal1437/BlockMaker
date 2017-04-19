@@ -3,10 +3,10 @@
 
 double SmartDimension::currentValue()const{
     double answer;
-
+/*
     //線の長さ
     if(type == SmartDimension::length){
-        answer = (this->target[0]->GetJointPos(1) - this->target[0]->GetJointPos(0)).Length();
+        answer = (this->target[0]-> - this->target[0]->GetJointPos(0)).Length();
     }
     //点と直線
     if(type == SmartDimension::distanceLine){
@@ -30,7 +30,7 @@ double SmartDimension::currentValue()const{
     //並行
     if(type == SmartDimension::concurrent){
         answer = 0;
-    }
+    }*/
     return answer;
 
 }
@@ -117,7 +117,7 @@ CObject* SmartDimension::GetTarget(int index)const{
 bool SmartDimension::Draw(QPainter& painter)const{
     //無効
     if (this->type == none)return true;
-
+/*
     //線の長さ
     if (this->type == length){
         //矢印
@@ -269,13 +269,13 @@ bool SmartDimension::Draw(QPainter& painter)const{
         DrawString(painter,line_center,QString::number(value),Pos::Angle(dir,Pos(1,0)));
         return true;
     }
-
+*/
     return false;
 }
 
 std::vector<Restraint*> SmartDimension::MakeRestraint(){
     std::vector<Restraint*> answer;
-
+/*
     //点と直線
     if(type == SmartDimension::distanceLine){
         answer.push_back(new MatchRestraint({target[0],target[1]},value));
@@ -305,6 +305,7 @@ std::vector<Restraint*> SmartDimension::MakeRestraint(){
         answer.push_back(new MatchRestraint({target[0],target[1]->GetJoint(0)},value));
         answer.push_back(new MatchRestraint({target[0],target[1]->GetJoint(1)},value));
     }
+    */
     return answer;
 }
 

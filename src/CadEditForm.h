@@ -81,7 +81,7 @@ public:
     void CompleteObject(CObject* make_obj); //非端点を追加
     double GetScale()const;                 //スケール取得
     Pos    GetTranslate()const;             //平行移動量取得
-    void    MovedMouse(QMouseEvent *event, CObject *under_object); //マウス移動シグナル
+    void    MovedMouse(QMouseEvent *event, CObject* under_object); //マウス移動シグナル
 
     void Zoom(double scale,Pos local_piv); //ズーム
     void Move(Pos local_diff);             //平行移動
@@ -104,7 +104,7 @@ public slots:
     void SetTranslate(Pos trans); //並行移動セット
 
     void MakeObject();
-    bool MakeJoint(CObject *obj);           //ジョイント作成
+    bool MakeJoint(CObject* obj);           //ジョイント作成
 
     void MakeRestraint(RestraintType type); //拘束作成
     void MakeSmartDimension();              //寸法設定

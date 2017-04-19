@@ -1,107 +1,55 @@
 #include "CLine.h"
 
 bool CLine::Create(CPoint *pos, int index){
-    if(index == 0 || index == 1){
-        this->pos[index] = pos;
-        if(index==0){
-            return false;//継続
-        }
-        if(index==1){
-            return true; //終了
-        }
+    if(index==0){
+        this->start = pos;
+        return false;//継続
+    }else if(index==1){
+        this->end = pos;
+        return true; //終了
     }
     return false;
 }
-
-Pos CLine::GetNear(const Pos& hand)const{
-    //点と直線の最近点
-    return Pos::LineNearPoint(GetJointPos(0),GetJointPos(1),hand);
-}
-
 bool CLine::Draw(QPainter& painter)const{
-    Pos pos1 = GetJointPos(0);
-    Pos pos2 = GetJointPos(1);
-
     //描画
-    painter.drawLine(QPointF(pos1.x,pos1.y),QPointF(pos2.x,pos2.y));
-
-    //ロックマーク描画
-    //if(this->isLock()){
-    //    Pos p = (GetJointPos(0) - GetJointPos(1))/2 + GetJointPos(1);
-    //    p.Transform(trans);
-    //    painter.drawImage(p.x+10,p.y-10,QImage(":/Restraint/LockRestraint.png"));
-    //}
-
+    painter.drawLine(*this->start,*this->end);
     return true;
 }
-bool CLine::isSelectable()const{
-    //直線と点の距離のアルゴリズムによって選択を決定
-    float d;
-    Pos v1,v2,near;
-    v1   = GetJointPos(1) - GetJointPos(0);
-    v2   = CObject::mouse_pos  - GetJointPos(0);
-    near = Pos::LineNearPoint(Pos(),v1,v2);
-    d    = (near - v2).Length();
-
-    //あたり判定処理
-    if(d < COLLISION_SIZE / drawing_scale &&
-       (std::min(GetJointPos(0).x,GetJointPos(1).x) - COLLISION_SIZE <= CObject::mouse_pos.x &&
-        std::max(GetJointPos(0).x,GetJointPos(1).x) + COLLISION_SIZE >= CObject::mouse_pos.x &&
-        std::min(GetJointPos(0).y,GetJointPos(1).y) - COLLISION_SIZE <= CObject::mouse_pos.y &&
-        std::max(GetJointPos(0).y,GetJointPos(1).y) + COLLISION_SIZE >= CObject::mouse_pos.y)){
-        return true;
-    }else{
-        return false;
-    }
+bool CLine::Move(const Pos& diff){
+    //ジョイントそれぞれを動かす
+    if(!this->start->isLock())this->start->Move(diff);
+    if(!this->end  ->isLock())this->end  ->Move(diff);
+    return true;
 }
-
 void CLine::Lock(bool lock){
     //それぞれロック
-    pos[0]->Lock(lock);
-    pos[1]->Lock(lock);
-    //両方ロックされていれば自分もロック
+    this->start->Lock(lock);
+    this->end  ->Lock(lock);
+    //自分もロック
     CObject::Lock(lock);
 }
 
-bool CLine::Move(const Pos& diff){
-    //ジョイントそれぞれを動かす
-    for(int i = 0;i<2;i++){
-        pos[i]->Move(diff);
-    }
-    return true;
+
+//中間点操作
+int CLine::GetMiddleCount()const{
+    return 0;
+}
+CPoint* CLine::GetMiddle(int){
+    return nullptr;
 }
 
 
-int CLine::GetJointNum()const{
-    return 2;
-}
-Pos CLine::GetJointPos(int index)const{
-    if(index == 1 && this->isCreating())return CObject::CObject::mouse_pos;
-    return *pos[index];
-}
-CPoint* CLine::GetJoint(int index){
-    return pos[index];
-}
-void    CLine::SetJoint   (int index, CPoint* ptr){
-    this->pos[index] = ptr;
+Pos CLine::GetNear(const Pos& hand)const{
+    //点と直線の最近点
+    return Pos::LineNearPoint(*this->start,*this->end,hand);
 }
 
-double CLine::DistanceToPoint(const Pos& pos)const{
-    Pos AP = pos - this ->GetJointPos(0);
-    Pos AB = pos - this ->GetJointPos(1);
-    double AB_l = AB.Length() * AB.Length();
-    Pos I = this->GetJointPos(0) + AB * (AP.Dot(AB) / AB_l);
-    return (I - pos).Length();
-}
-
-
-CLine::CLine()
+CLine::CLine(QObject *parent):
+    CEdge(parent)
 {
-    pos[0] = pos[1] = nullptr;
 }
 
 CLine::~CLine()
 {
-
 }
 

@@ -24,7 +24,7 @@ void MoveTransformDialog::Accept(){
     }
     if(this->ui->AbsoluteRadio->isChecked()){
         for(CObject* obj : CObject::selected){
-            obj->Move(Pos(this->ui->XSpinBox->value(),this->ui->YSpinBox->value()) - obj->GetJointPos(0));
+            obj->Move(Pos(this->ui->XSpinBox->value(),this->ui->YSpinBox->value()));
         }
     }
     emit RepaintRequest();

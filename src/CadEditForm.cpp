@@ -80,22 +80,23 @@ void CadEditForm::AddObject(CObject* obj){
 
 
 void CadEditForm::RemoveObject(CObject* obj){
+    //objを消す
+    QVector<CObject*>::Iterator it = std::find(objects.begin(),objects.end(),obj);
+    if(it != objects.end()){
+        objects.erase(it);
+    }
+
     //点ならばその点を含むObjectを全てnullptrにする。
     if(obj->is<CPoint>()){
         for(CObject*& it : objects){
-            for(int i=0;i < it->GetJointNum();i++){
-                if(it->GetJoint(i) == dynamic_cast<CPoint*>(obj) && it != obj){
+            if(it->is<CEdge>() && it != obj){
+                if(dynamic_cast<CEdge*>(it)->start == obj ||
+                   dynamic_cast<CEdge*>(it)->end   == obj ){
                     it = nullptr;
                     break;
                 }
             }
         }
-    }
-
-    //objを消す
-    QVector<CObject*>::Iterator it = std::find(objects.begin(),objects.end(),obj);
-    if(it != objects.end()){
-        objects.erase(it);
     }
 
     //nullptrを消す
@@ -108,6 +109,7 @@ void CadEditForm::RemoveObject(CObject* obj){
 }
 
 void CadEditForm::CompleteObject(CObject* make_obj){
+    /*
     for(int i=0;i<make_obj->GetJointNum();i++){
         bool is_known_pos=false;
         //すでに点がなければ
@@ -122,7 +124,7 @@ void CadEditForm::CompleteObject(CObject* make_obj){
             CPoint* new_point = make_obj->GetJoint(i);
             new_point->Create(new_point,0);
         }
-    }
+    }*/
 }
 
 double CadEditForm::GetScale()const{
@@ -208,17 +210,17 @@ void CadEditForm::paintEvent(QPaintEvent*){
     //普通のオブジェクト
     paint.setPen(QPen(Qt::blue, CObject::DRAWING_LINE_SIZE / this->scale,Qt::SolidLine,Qt::RoundCap));
     for(CObject* obj:objects){
-        if(obj->Refresh())obj->Draw(paint);
+        obj->Draw(paint);
     }
     //選択されたオブジェクト
     paint.setPen(QPen(Qt::cyan, CObject::DRAWING_LINE_SIZE / this->scale,Qt::SolidLine,Qt::RoundCap));
     for(CObject* obj:CObject::selected){
-        if(obj->Refresh())obj->Draw(paint);
+        obj->Draw(paint);
     }
     //メイン選択中
     paint.setPen(QPen(Qt::red , CObject::DRAWING_LINE_SIZE / this->scale,Qt::SolidLine,Qt::RoundCap));
     if(CObject::hanged!=nullptr){
-        if(CObject::hanged->Refresh())CObject::hanged->Draw(paint);
+        CObject::hanged->Draw(paint);
     }
 
     //描画復元
@@ -280,6 +282,7 @@ void CadEditForm::MargePoints(){
     //先頭以外の点を破棄し、統合する。
     for(int j=1;j<CObject::selected.size();j++){
         for(int i=1;i<CObject::selected.size();i++){
+            /*
             for(CObject* p : this->objects){
                 for(int i=0;i<p->GetJointNum();i++){
                     //posが含まれる
@@ -287,7 +290,7 @@ void CadEditForm::MargePoints(){
                         p->SetJoint(i,dynamic_cast<CPoint*>(CObject::selected[0]));
                     }
                 }
-            }
+            }*/
         }
         this->objects.removeAll(CObject::selected[j]);
     }
@@ -318,7 +321,7 @@ CadEditForm::~CadEditForm()
 
 CObject* CadEditForm::getHanged(){
     for(CObject* obj:objects){
-        if(obj->isSelectable() && !obj->isCreating()){
+        if(obj->isSelectable(CObject::mouse_pos) && !obj->isCreating()){
             return obj;
         }
     }
@@ -353,13 +356,13 @@ void CadEditForm::MakeObject(){
     }else{
         //新規オブジェクト
         if(creating_count == 0){
-            if     (state == Dot   )make_obj = new CPoint();
-            else if(state == Line  )make_obj = new CLine();
-            else if(state == Arc   )make_obj = new CArc();
-            else if(state == Rect  )make_obj = new CRect();
-            else if(state == Spline)make_obj = new CSpline();
+            if     (state == Dot   )make_obj = new CPoint(this);
+            else if(state == Line  )make_obj = new CLine(this);
+            else if(state == Arc   )make_obj = new CArc(this);
+            else if(state == Rect  )make_obj = new CRect(this);
+            else if(state == Spline)make_obj = new CSpline(this);
             this->AddObject(make_obj);
-            log.push_back(make_obj);
+            //log.push_back(make_obj);
             CObject::createing = make_obj;
         }
         //作成
@@ -369,13 +372,13 @@ void CadEditForm::MakeObject(){
             creating_count = 0;
 
             //ジョイントを追加
-            for(int i=0;i<make_obj->GetJointNum();i++){
+            /*for(int i=0;i<make_obj->GetJointNum();i++){
                 this->AddObject(make_obj->GetJoint(i));
-            }
+            }*/
             //CRectならば構成線も追加
             if(make_obj->is<CRect>()){
                 for(int i=0;i<4;i++){
-                    this->AddObject(dynamic_cast<CRect*>(make_obj)->GetLines(i));
+                    //this->AddObject(std::dynamic_pointer_cast<CRect>(make_obj)-(i));
                 }
             }
         }else {
@@ -394,18 +397,17 @@ bool CadEditForm::MakeJoint(CObject* obj){
     //端点に点を作成
     if(CObject::hanged == nullptr){
         //端点に点を作成
-        CPoint* new_point = new CPoint(CObject::mouse_pos);
+        CPoint* new_point = new CPoint(CObject::mouse_pos,this);
         new_point->Create(new_point,0);
-        log.push_back(new_point);
+        //log.push_back(new_point);
         return obj->Create(new_point,creating_count);
     }else if(CObject::hanged->is<CPoint>()){
         //点をマージ
         return obj->Create(dynamic_cast<CPoint*>(CObject::hanged),creating_count);
     }else{
         //点をオブジェクト上に追加
-        CPoint* new_point = new CPoint(CObject::hanged->GetNear(CObject::mouse_pos));
-        new_point->Create(new_point,0);
-        log.push_back(new_point);
+        CPoint* new_point = new CPoint(CObject::hanged->GetNear(CObject::mouse_pos),this);
+        //new_point->Create(new_point,0);
 
         //一致の幾何拘束を付与
         return  obj->Create(new_point,creating_count);
@@ -416,7 +418,7 @@ void CadEditForm::MakeSmartDimension(){
     if(CObject::selected.size() > 0 && CObject::selected.size() < 3){
         //スマート寸法ダイアログ生成
         SmartDimensionDialog* diag = new SmartDimensionDialog(this);
-        SmartDimension* dim = new SmartDimension();
+        SmartDimension* dim (new SmartDimension());
 
         //ターゲット設定
         CObject* target[2];
@@ -467,8 +469,12 @@ void CadEditForm::MakeRestraint(RestraintType type){
 bool CadEditForm::MakeBlock(){
     CBoxDefineDialog* diag = new CBoxDefineDialog();
     if(diag->exec()){
+        //QVector<CObject*>からQVector<CEdge*>に変換
+        QVector<CEdge*> edges;
+        for(CObject* obj:CObject::selected)edges.push_back(dynamic_cast<CEdge*>(obj));
+
         CBlock block = diag->ExportCBlock();
-        block.SetNodeAll(CObject::selected);
+        block.SetNodeAll(edges);
         this->blocks.push_back(block);
         CObject::selected.clear();
     }
@@ -655,8 +661,8 @@ void CadEditForm::ConfigureBlock(QListWidgetItem*){
     CBoxDefineDialog* diag = new CBoxDefineDialog(this);
     diag->ImportCBlock(this->blocks[selecting_block]);
     if(diag->exec()){
-        QVector<CObject*> ll;
-        for(int i =0;i<4;i++)ll.push_back(this->blocks[selecting_block].GetNode(i));
+        QVector<CEdge*> ll;
+        for(int i =0;i<4;i++)ll.push_back(dynamic_cast<CEdge*>(this->blocks[selecting_block].GetNode(i)));
         this->blocks[selecting_block] = diag->ExportCBlock();
         this->blocks[selecting_block].SetNodeAll(ll);
     }

@@ -105,6 +105,9 @@ public:
             return (this->y < rhs.y);
         }else return (this->x < rhs.x);
     }
+    operator QPointF(){
+        return QPointF(this->x,this->y);
+    }
 };
 
 template<class T>

@@ -54,37 +54,13 @@ double Spline::culc(double t)const
     return a[j] + ( b[j] + (c[j] + d[j] * dt) * dt ) * dt;
 }
 
-CSpline::CSpline()
-{
 
-}
-
-CSpline::~CSpline()
-{
-
-}
-
-bool CSpline::Refresh(){
-    std::vector<double> x,y;
-    for(int i=0;i<static_cast<int>(this->pos.size());i++){
-        x.push_back(GetJointPos(i).x);
-        y.push_back(GetJointPos(i).y);
-    }
-    xs.init(x);
-    ys.init(y);
-    return true;
-}
-bool CSpline::Create(CPoint* pos, int index){
+bool CSpline::Create(CPoint *pos, int index){
     if(0 <= index){
         this->pos.push_back(pos);
-        Refresh();
         return false;
     }
     return true;
-}
-
-Pos CSpline::GetNear(const Pos& )const{
-    return Pos();// ちょっと解決策が浮かばない
 }
 
 void CSpline::Lock(bool lock){
@@ -100,7 +76,7 @@ bool CSpline::Draw(QPainter& painter)const{
         double t, m;
         m = (double)(pos.size()-1);
 
-        path.moveTo(GetJointPos(0).x,GetJointPos(0).y);
+        path.moveTo(this->start->x,this->end->y);
         const double dt = 1.0/DIVISION;
         for(t=0; t<=m; t += dt){
             if(t + dt > m)t=m;
@@ -111,23 +87,10 @@ bool CSpline::Draw(QPainter& painter)const{
         painter.drawPath(path);
 
     }
-    for(int i=0;i<this->GetJointNum();i++){
+    for(int i=0;i<this->pos.size();i++){
         this->pos[i]->Draw(painter);
     }
     return true;
-}
-bool CSpline::isSelectable()const{
-    double t, m;
-    m = (double)(pos.size()-1);
-
-    const double dt = 1.0/(DIVISION);
-    for(t=0; t<=m; t += dt){
-        if(t + dt > m)t=m;
-        if((Pos(xs.culc(t),ys.culc(t)) - CObject::mouse_pos).Length() < COLLISION_SIZE){
-            return true;
-        }
-    }
-    return false;
 }
 
 bool CSpline::Move(const Pos& diff){
@@ -137,16 +100,25 @@ bool CSpline::Move(const Pos& diff){
     return true;
 }
 
-int CSpline::GetJointNum()const{
+//中間点操作
+int CSpline::GetMiddleCount()const{
     return this->pos.size();
 }
-Pos CSpline::GetJointPos(int index)const{
-    return *pos[index];
-}
-CPoint* CSpline::GetJoint(int index){
+CPoint *CSpline::GetMiddle(int index){
     return pos[index];
 }
-void    CSpline::SetJoint(int index,CPoint* ptr){
-    this->pos[index] = ptr;
+
+Pos CSpline::GetNear(const Pos& )const{
+    return Pos();// ちょっと解決策が浮かばない
 }
 
+CSpline::CSpline(QObject *parent):
+    CEdge(parent)
+{
+
+}
+
+CSpline::~CSpline()
+{
+
+}

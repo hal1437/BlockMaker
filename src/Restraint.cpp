@@ -1,6 +1,6 @@
 #include "Restraint.h"
 
-QVector<RestraintType> Restraint::Restraintable(const QVector<CObject *> &values){
+QVector<RestraintType> Restraint::Restraintable(const QVector<CObject*> &values){
     QVector<RestraintType> answer;
     //等値
     if(values.size()>=2 && !values[0]->is<CPoint>() && std::all_of(values.begin(),values.end(),[&](CObject* v){return typeid(values[0])==typeid(v);}))answer.push_back(EQUAL);
@@ -24,6 +24,7 @@ QVector<RestraintType> Restraint::Restraintable(const QVector<CObject *> &values
 
 
 bool EqualRestraint::Complete(){
+    /*
     std::sort(nodes.begin(),nodes.end(),[](CObject* lhs,CObject* rhs){
         return lhs->GetJointNum() > rhs->GetJointNum();
     });
@@ -43,13 +44,14 @@ bool EqualRestraint::Complete(){
             nodes[i]->GetJoint(1)->Move(next2-nodes[i]->GetJointPos(1));
         }
     }
-
+*/
     return true;
 }
 bool EqualRestraint::isComplete(){
     return true;
 }
 bool VerticalRestraint::Complete(){
+    /*
     //矛盾な点が存在
     if(std::count_if(nodes.begin(),nodes.end(),[](CObject* obj){
         for(int i=0;i<obj->GetJointNum();i++){
@@ -91,7 +93,7 @@ bool VerticalRestraint::Complete(){
                 nodes[i]->GetJoint(j)->Move(Pos((*nodes[0]->GetJoint(index)).x - (*nodes[i]->GetJoint(j)).x,0));
             }
         }
-    }
+    }*/
     return true;
 }
 bool VerticalRestraint::isComplete(){
@@ -99,7 +101,7 @@ bool VerticalRestraint::isComplete(){
 }
 
 bool HorizontalRestraint::Complete(){
-
+/*
     //矛盾な点が存在
     if(std::count_if(nodes.begin(),nodes.end(),[](CObject* obj){
         for(int i=0;i<obj->GetJointNum();i++){
@@ -139,7 +141,7 @@ bool HorizontalRestraint::Complete(){
         for(int j=0;j<nodes[i]->GetJointNum();j++){
             if(!(i==0 && j==index))nodes[i]->GetJoint(j)->Move(Pos(0,nodes[0]->GetJoint(index)->y-nodes[i]->GetJoint(j)->y));
         }
-    }
+    }*/
     return true;
 }
 bool HorizontalRestraint::isComplete(){
@@ -148,6 +150,7 @@ bool HorizontalRestraint::isComplete(){
 
 
 bool MatchRestraint::Complete(){
+    /*
     if(nodes[0]->isLock() && nodes[1]->isLock())return false;
     QVector<CObject*> cc = CObject::selected;
 
@@ -177,11 +180,11 @@ bool MatchRestraint::Complete(){
             near = line->GetNear(pos->GetJointPos(0));
             line->Move((pp-near)-(pp-near).GetNormalize()*value);
         }
-    }
+    }*/
     return true;
 }
 bool MatchRestraint::isComplete(){
-
+/*
     const float EPS = 0.0001;
     //点と線の距離
     float length = std::abs((this->nodes[0]->GetJointPos(0) - this->nodes[1]->GetJointPos(0)).Length() - this->value);
@@ -190,9 +193,11 @@ bool MatchRestraint::isComplete(){
     }else{
         return false;
     }
+    */
 }
 
 bool MatchHRestraint::Complete(){
+    /*
     if(nodes[0]->isLock() && nodes[1]->isLock())return false;
     if(nodes[1]->isLock() || exist(CObject::selected,nodes[1]))std::swap(nodes[0],nodes[1]);
     //0へ1を近づける(CPoint,CPoint)
@@ -206,7 +211,7 @@ bool MatchHRestraint::Complete(){
     Pos next_pos = Pos(current_pos.x,  near.y + rot.y*value);
     if(!(current_pos == near)){
         nodes[1]->Move(next_pos - current_pos);
-    }
+    }*/
     return true;
 }
 bool MatchHRestraint::isComplete(){
@@ -214,7 +219,7 @@ bool MatchHRestraint::isComplete(){
 }
 
 
-bool MatchVRestraint::Complete(){
+bool MatchVRestraint::Complete(){/*
     if(nodes[0]->isLock() && nodes[1]->isLock())return false;
     if(nodes[1]->isLock() || exist(CObject::selected,nodes[1]))std::swap(nodes[0],nodes[1]);
     //0へ1を近づける(CPoint,CPoint)
@@ -229,7 +234,7 @@ bool MatchVRestraint::Complete(){
 
     if(!(current_pos == near)){
         nodes[1]->Move(next_pos - current_pos);
-    }
+    }*/
     return true;
 }
 bool MatchVRestraint::isComplete(){
@@ -238,9 +243,10 @@ bool MatchVRestraint::isComplete(){
 
 bool FixRestraint::Complete(){
     for(int i=0;i<nodes.size();i++){
-        for(int j=0;j<nodes[i]->GetJointNum();j++){
+        /*
+         * for(int j=0;j<nodes[i]->GetJointNum();j++){
             nodes[i]->Lock(true);
-        }
+        }*/
     }
     return true;
 }
@@ -249,7 +255,7 @@ bool FixRestraint::isComplete(){
 }
 
 
-bool ConcurrentRestraint::Complete(){
+bool ConcurrentRestraint::Complete(){/*
     Pos base_line[2] = {nodes[0]->GetJointPos(0),nodes[0]->GetJointPos(1)};
     //矛盾な点が存在
     if(nodes[0]->GetJoint(0)->isLock()&&
@@ -277,14 +283,14 @@ bool ConcurrentRestraint::Complete(){
                 //nodes[i]->GetJoint(1)->setDifferent(line_near2 - (nodes[i]->GetJointPos(1) - line_near2).GetNormalize()*length);
             }
         }
-    }
+    }*/
     return true;
 }
 bool ConcurrentRestraint::isComplete(){
     return true;
 }
 bool CrossRestraint::Complete(){
-
+/*
     //矛盾な点が存在
     if(nodes[0]->GetJoint(0)->isLock()&&
        nodes[0]->GetJoint(1)->isLock()&&
@@ -311,7 +317,7 @@ bool CrossRestraint::Complete(){
                 //nodes[i]->GetJoint(1)->setDifferent(line_near2 - (nodes[i]->GetJointPos(1) - line_near2).GetNormalize()*length);
             }
         }
-    }
+    }*/
     return true;
 }
 bool CrossRestraint::isComplete(){

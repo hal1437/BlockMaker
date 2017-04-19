@@ -35,7 +35,7 @@ public:
     //virtual bool isSelected()  const;  //選択済
     //virtual bool isCreating()  const;  //作成中
     //virtual bool isLock()      const;  //固定中
-    virtual bool isSelectable()const;  //mouse_posの位置で選択可能か
+    //virtual bool isSelectable()const;  //mouse_posの位置で選択可能か
 
     //近接点
     virtual Pos GetNear(const Pos& hand)const;
@@ -43,13 +43,7 @@ public:
     //線の取得
     CLine *GetLines(int index);
 
-    //ジョイント関係
-    virtual int     GetJointNum()         const;
-    virtual Pos     GetJointPos(int index)const;
-    virtual CPoint* GetJoint   (int index);
-    virtual void    SetJoint   (int index,CPoint* ptr);
-
-    CRect();
+    CRect(QObject* parent=nullptr);
     ~CRect();
 };
 

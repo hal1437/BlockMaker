@@ -1,7 +1,8 @@
 #include "CPoint.h"
 
-bool CPoint::Create(CPoint* pos,int ){
-    (*this) = *pos;
+bool CPoint::Create(CPoint *pos, int ){
+    this->x = pos->x;
+    this->y = pos->y;
     return true;//生成終了
 }
 
@@ -43,32 +44,16 @@ bool CPoint::Draw(QPainter& painter)const{
 
     return true;
 }
-bool CPoint::isSelectable()const{
-    //当たり判定式
-    return ((*this - CPoint::mouse_pos).Length() < COLLISION_SIZE / CObject::drawing_scale);
-}
 
 
 bool CPoint::Move(const Pos& diff){
+    //シグナル
+    emit PosChanged(*this + diff,*this);
     //ロックされていなければ
     if(isLock() == false && !isControlPoint()){
-        (*this) += diff;//単純な平行移動
+        *this += diff;//単純な平行移動
     }
     return true;
-}
-
-int CPoint::GetJointNum()const{
-    return 0;
-}
-Pos CPoint::GetJointPos(int index)const{
-    if(index == 0)return *this;
-    else return Pos();
-}
-CPoint* CPoint::GetJoint(int){
-    return this;
-}
-void CPoint::SetJoint(int,CPoint* ){
-    qDebug() << "You try to Call CPoint::SetJoint";
 }
 
 bool CPoint::isControlPoint()const{
@@ -84,17 +69,21 @@ Pos CPoint::GetNear(const Pos&)const{
     return *this;
 }
 
-
-
-CPoint::CPoint(){
+CPoint::CPoint(QObject* parent):
+    CObject(parent){
 }
-
-CPoint::CPoint(const Pos &pos):
+CPoint::CPoint(const Pos& origin){
+    this->x = origin.x;
+    this->x = origin.x;
+}
+CPoint::CPoint(const Pos &pos,QObject* parent):
+    CObject(parent),
     Pos(pos){
 
 }
 
-CPoint::CPoint(double x,double y):
+CPoint::CPoint(double x, double y, QObject *parent):
+    CObject(parent),
     Pos(Pos(x,y)){
 
 }
@@ -104,3 +93,7 @@ CPoint::~CPoint()
 
 }
 
+CPoint& CPoint::operator=(const Pos& rhs){
+    this->x = rhs.x;
+    this->y = rhs.y;
+}
