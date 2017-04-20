@@ -1,14 +1,9 @@
 #include "CLine.h"
 
-bool CLine::Create(CPoint *pos, int index){
-    if(index==0){
-        this->start = pos;
-        return false;//継続
-    }else if(index==1){
-        this->end = pos;
-        return true; //終了
-    }
-    return false;
+bool CLine::Create(CPoint *start, CPoint *end){
+    this->start = start;
+    this->end   = end;
+    return true;//完結
 }
 bool CLine::Draw(QPainter& painter)const{
     //描画
@@ -27,6 +22,19 @@ void CLine::Lock(bool lock){
     this->end  ->Lock(lock);
     //自分もロック
     CObject::Lock(lock);
+}
+
+
+bool CLine::isSelectable(Pos pos)const{
+    //追加条件
+    if(CObject::isSelectable(pos) &&
+       std::min(this->start->x,this->end->x) - COLLISION_SIZE <= pos.x &&
+       std::max(this->start->x,this->end->x) + COLLISION_SIZE >= pos.x &&
+       std::min(this->start->y,this->end->y) - COLLISION_SIZE <= pos.y &&
+       std::max(this->start->y,this->end->y) + COLLISION_SIZE >= pos.y){
+        return true;
+    }
+    return false;
 }
 
 

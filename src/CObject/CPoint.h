@@ -14,7 +14,7 @@ private:
     bool control_point = false; //作用点
 
 public:
-    bool Create(CPoint* pos,int index); //作成関数
+    virtual bool Create(CPoint* pos,CPoint* end=nullptr); //作成関数
 
     virtual bool Draw(QPainter& painter)const ;//描画関数
     virtual bool Move(const Pos& diff);//移動関数
@@ -28,7 +28,7 @@ public:
     //コンストラクタ
     CPoint(QObject* parent=nullptr);
     CPoint(const Pos& origin);
-    CPoint(const Pos& pos,QObject* parent=nullptr);
+    CPoint(const Pos& pos,QObject* parent);
     CPoint(double x,double y,QObject* parent=nullptr);//初期Create済みスターターセット
     ~CPoint();
 

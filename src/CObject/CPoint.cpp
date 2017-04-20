@@ -1,6 +1,6 @@
 #include "CPoint.h"
 
-bool CPoint::Create(CPoint *pos, int ){
+bool CPoint::Create(CPoint *pos, CPoint *){
     this->x = pos->x;
     this->y = pos->y;
     return true;//生成終了
@@ -74,7 +74,7 @@ CPoint::CPoint(QObject* parent):
 }
 CPoint::CPoint(const Pos& origin){
     this->x = origin.x;
-    this->x = origin.x;
+    this->y = origin.y;
 }
 CPoint::CPoint(const Pos &pos,QObject* parent):
     CObject(parent),

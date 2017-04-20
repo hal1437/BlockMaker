@@ -55,12 +55,16 @@ double Spline::culc(double t)const
 }
 
 
-bool CSpline::Create(CPoint *pos, int index){
-    if(0 <= index){
-        this->pos.push_back(pos);
-        return false;
+bool CSpline::Create(CPoint *start, CPoint *end){
+    if(this->start == nullptr || this->end == nullptr){
+        this->start = start;
+        this->end   = end;
+        return false;//継続
+    }else{
+        if(start != nullptr)this->pos.push_back(start);
+        if(end   != nullptr)this->pos.push_back(end);
+        return true;//完結
     }
-    return true;
 }
 
 void CSpline::Lock(bool lock){

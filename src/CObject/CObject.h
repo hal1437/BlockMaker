@@ -19,7 +19,7 @@ public:
 
     static double drawing_scale;           //描画スケール
     static CObject* hanged;                //マウス直下のオブジェクト
-    static CObject*  createing;             //作成中オブジェクト
+    static CObject*  creating;             //作成中オブジェクト
     static QVector<CObject*> selected;     //選択オブジェクト
     static Pos mouse_pos;                  //マウス位置
 
@@ -35,7 +35,7 @@ public:
     }
 
     //作成関数(完了時:true , 継続時:false)
-    virtual bool Create(CPoint* pos,int index) = 0;
+    virtual bool Create(CPoint* start,CPoint* end) = 0;
 
     virtual bool Draw(QPainter& painter)const = 0;//描画関数
     virtual bool Move(const Pos& diff) = 0;//移動関数

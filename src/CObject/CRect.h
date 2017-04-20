@@ -25,7 +25,7 @@ protected:
 public:
 
     //作成関数(完了時:true , 継続時:false)
-    virtual bool Create(CPoint* pos,int index);
+    virtual bool Create(CPoint* start,CPoint* end);
 
     virtual bool Draw(QPainter& painter)const;//描画関数
     virtual bool Move(const Pos& diff);//移動関数

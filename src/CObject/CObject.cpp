@@ -2,7 +2,7 @@
 
 double   CObject::drawing_scale;
 CObject* CObject::hanged;
-CObject* CObject::createing;
+CObject* CObject::creating;
 QVector<CObject*> CObject::selected;
 Pos CObject::mouse_pos;
 
@@ -10,7 +10,7 @@ bool CObject::isSelecting()const{
     return (hanged == this);
 }
 bool CObject::isCreating()const{
-    return (createing == this);
+    return (creating == this);
 }
 bool CObject::isSelected()const{
     return exist(selected,this);
@@ -24,7 +24,8 @@ bool CObject::isLock()const{
     return this->lock;
 }
 bool CObject::isSelectable(Pos pos)const{
-    return (this->GetNear(pos)-pos).Length() < CObject::COLLISION_SIZE;
+    if(this->isCreating())return false;
+    return (this->GetNear(pos) - pos).Length() < CObject::COLLISION_SIZE;
 }
 
 CObject::CObject(QObject* parent):QObject(parent)

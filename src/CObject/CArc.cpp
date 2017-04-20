@@ -6,17 +6,11 @@ double CArc::GetRound()const{
 }
 
 
-bool CArc::Create(CPoint *pos, int index){
-    if(index == 0){
-        this->start = pos;
-    }
-    if(index==1){
-        //中心を二点の中点に修正
-        this->end = pos;
-        this->center = new CPoint((*this->start - *this->end) / 2 + *this->end,this->parent());
-        return true; //終了
-    }
-    return false;
+bool CArc::Create(CPoint *start, CPoint *end){
+    this->start  = start;
+    this->end    = end;
+    this->center = new CPoint((*this->start - *this->end) / 2 + *this->end,this->parent());
+    return true; //終了
 }
 bool CArc::Draw(QPainter& painter)const{
     Pos dir1 = (*this->end   - *this->center);
@@ -70,13 +64,18 @@ CArc::~CArc()
 }
 
 void CArc::ChangePosCallback(const Pos& new_pos,const Pos& old_pos){
-    round = (new_pos-*this->center).Length();
 
-    if(old_pos == *this->start){
-        *this->start = (*this->end - *center).GetNormalize() * round;
-    }
-    if(old_pos == *this->end){
-        *this->end = (*this->start - *center).GetNormalize() * round;
+    if(this->isCreating()){
+        *this->center = (*this->start - *this->end) / 2 + *this->end;
+    }else{
+        round = (new_pos-*this->center).Length();
+
+        if(old_pos == *this->start){
+            *this->start = (*this->end - *center).GetNormalize() * round;
+        }
+        if(old_pos == *this->end){
+            *this->end = (*this->start - *center).GetNormalize() * round;
+        }
     }
 }
 

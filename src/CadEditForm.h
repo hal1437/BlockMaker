@@ -57,8 +57,9 @@ private:
     bool shift_pressed = false;  //シフトフラグ
     bool ctrl_pressed  = false;  //コントロールフラグ
     CEnum state       = Edit;    //生成種類
-    CObject* make_obj = nullptr;
-    CPoint*  origin   = nullptr;
+    CObject* make_obj   = nullptr;
+    CPoint*  origin     = nullptr;
+    CPoint*  hang_point = nullptr;
     int creating_count=0;
     QVector<CObject*> log;
 

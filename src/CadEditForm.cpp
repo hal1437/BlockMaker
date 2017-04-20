@@ -50,6 +50,11 @@ void CadEditForm::mouseMoveEvent   (QMouseEvent* event){
     //ズーム支点リセット
     zoom_piv = Pos(0,0);
 
+    //生成点を更新
+    if(hang_point != nullptr){
+        *hang_point = CObject::mouse_pos;
+    }
+
     //UI更新
     repaint();
     emit MovedMouse(event,answer);
@@ -61,7 +66,7 @@ void CadEditForm::resizeEvent(QResizeEvent*){
 }
 
 void CadEditForm::Escape(){
-    if(CObject::createing != nullptr){
+    if(CObject::creating != nullptr){
         this->RemoveObject(make_obj);
     }
     creating_count=0;
@@ -321,7 +326,7 @@ CadEditForm::~CadEditForm()
 
 CObject* CadEditForm::getHanged(){
     for(CObject* obj:objects){
-        if(obj->isSelectable(CObject::mouse_pos) && !obj->isCreating()){
+        if(obj->isSelectable(CObject::mouse_pos) && obj != this->hang_point){
             return obj;
         }
     }
@@ -362,31 +367,39 @@ void CadEditForm::MakeObject(){
             else if(state == Rect  )make_obj = new CRect(this);
             else if(state == Spline)make_obj = new CSpline(this);
             this->AddObject(make_obj);
-            //log.push_back(make_obj);
-            CObject::createing = make_obj;
-        }
-        //作成
-        if(MakeJoint(make_obj) == true){
-            //生成完了
-            CObject::createing = nullptr;
-            creating_count = 0;
+            CObject::creating = make_obj;
+            //作成
+            if(MakeJoint(make_obj) == true){
+                //生成完了
+                creating_count = -1;//切り離し過程へ
 
-            //ジョイントを追加
-            /*for(int i=0;i<make_obj->GetJointNum();i++){
-                this->AddObject(make_obj->GetJoint(i));
-            }*/
-            //CRectならば構成線も追加
-            if(make_obj->is<CRect>()){
-                for(int i=0;i<4;i++){
-                    //this->AddObject(std::dynamic_pointer_cast<CRect>(make_obj)-(i));
-                }
+                //端点をオブジェクトリストに追加
+                this->AddObject(dynamic_cast<CEdge*>(make_obj)->start);
+                this->AddObject(dynamic_cast<CEdge*>(make_obj)->end);
+
+                /*
+                //CRectならば構成線もオブジェクトリストに追加
+                if(make_obj->is<CRect>()){
+                    for(int i=0;i<4;i++){
+                        this->AddObject(std::dynamic_pointer_cast<CRect>(make_obj)-(i));
+                    }
+                }*/
+            }else {
+                //生成継続
+                creating_count++;
             }
-        }else {
-            //生成継続
-            creating_count++;
+        }else if(creating_count == -1){
+            //切り離し過程
+            if(CObject::hanged != nullptr && dynamic_cast<CPoint*>(CObject::hanged) != nullptr){
+                dynamic_cast<CEdge*>(make_obj)->end = dynamic_cast<CPoint*>(CObject::hanged);
+                this->RemoveObject(hang_point);
+            }
+            CObject::creating = nullptr;
+            this->hang_point = nullptr;
+            creating_count = 0;
         }
     }
-    this->RefreshRestraints();
+    RefreshRestraints();
     repaint();
     emit RquireRefreshUI();
 }
@@ -396,21 +409,29 @@ bool CadEditForm::MakeJoint(CObject* obj){
 
     //端点に点を作成
     if(CObject::hanged == nullptr){
+        //始点を作成
+        CPoint* start_point = new CPoint(CObject::mouse_pos);
+
         //端点に点を作成
-        CPoint* new_point = new CPoint(CObject::mouse_pos,this);
-        new_point->Create(new_point,0);
-        //log.push_back(new_point);
-        return obj->Create(new_point,creating_count);
+        hang_point = new CPoint(CObject::mouse_pos);
+        return obj->Create(start_point,hang_point);
+
     }else if(CObject::hanged->is<CPoint>()){
-        //点をマージ
-        return obj->Create(dynamic_cast<CPoint*>(CObject::hanged),creating_count);
+        if(CObject::creating != nullptr){
+            //点をマージ(始点)
+            hang_point = new CPoint(CObject::mouse_pos);
+            return obj->Create(dynamic_cast<CPoint*>(CObject::hanged),hang_point);
+        }else{
+            //点をマージ(終点)
+            hang_point = new CPoint(CObject::mouse_pos);
+            return obj->Create(hang_point,dynamic_cast<CPoint*>(CObject::hanged));
+        }
     }else{
         //点をオブジェクト上に追加
-        CPoint* new_point = new CPoint(CObject::hanged->GetNear(CObject::mouse_pos),this);
-        //new_point->Create(new_point,0);
+        CPoint* new_point = new CPoint(CObject::hanged->GetNear(CObject::mouse_pos));
 
         //一致の幾何拘束を付与
-        return  obj->Create(new_point,creating_count);
+        return  obj->Create(new_point,hang_point);
     }
 }
 

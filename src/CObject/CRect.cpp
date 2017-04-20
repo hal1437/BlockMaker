@@ -4,31 +4,19 @@
 
 #include <iostream>
 
-bool CRect::Create(CPoint *hand, int index){
-    if(0 <= index && index < 2){
-        if(index==0){
-            pos[0] = hand;
-            return false;
-        }
-        if(index==1){
-            //構築
-            for(int i=0;i<4;i++)lines[i] = new CLine();
-            pos[1] = new CPoint();
-            pos[2] = new CPoint();
-            pos[3] = hand;
-            *pos[1] = Pos(pos[0]->x,pos[3]->y);
-            *pos[2] = Pos(pos[3]->x,pos[0]->y);
-            lines[0]->Create(pos[0],0);
-            lines[0]->Create(pos[1],1);
-            lines[1]->Create(pos[0],0);
-            lines[1]->Create(pos[2],1);
-            lines[2]->Create(pos[2],0);
-            lines[2]->Create(pos[3],1);
-            lines[3]->Create(pos[1],0);
-            lines[3]->Create(pos[3],1);
-            return true;
-        }
-    }
+bool CRect::Create(CPoint *start, CPoint *end){
+    pos[0] = start;
+    pos[1] = new CPoint();
+    pos[2] = new CPoint();
+    pos[3] = end;
+    //構築
+    for(int i=0;i<4;i++)lines[i] = new CLine();
+    *pos[1] = Pos(pos[0]->x,pos[3]->y);
+    *pos[2] = Pos(pos[3]->x,pos[0]->y);
+    lines[0]->Create(pos[0],pos[1]);
+    lines[1]->Create(pos[0],pos[2]);
+    lines[2]->Create(pos[2],pos[3]);
+    lines[3]->Create(pos[1],pos[3]);
     return false;
 }
 
