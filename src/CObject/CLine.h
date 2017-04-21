@@ -7,7 +7,7 @@ class CLine : public CEdge
 {
 public:
     //作成関数(完了時:true , 継続時:false)
-    virtual bool Create(CPoint* start,CPoint* end);
+    virtual CREATE_RESULT Create(CPoint* pos);
     virtual bool Draw(QPainter& painter)const;//描画関数
     virtual bool Move(const Pos& move);//移動関数
     virtual void Lock(bool lock);//ロック

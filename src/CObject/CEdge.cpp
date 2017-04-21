@@ -16,12 +16,11 @@ void CEdge::SetEndPos(CPoint* pos){
 CEdge::CEdge(QObject* parent):
     CObject(parent)
 {
-
+    this->start = this->end = nullptr;
 }
 
 CEdge::~CEdge()
 {
-
 }
 
 //点移動コールバック

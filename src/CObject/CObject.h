@@ -9,6 +9,13 @@
 
 class CPoint;
 
+enum CREATE_RESULT{
+    ONESHOT,//一回で終了
+    TWOSHOT,//二回で終了
+    ENDLESS,//何回でも可能
+};
+
+
 //CADオブジェクト
 class CObject:public QObject
 {
@@ -35,7 +42,7 @@ public:
     }
 
     //作成関数(完了時:true , 継続時:false)
-    virtual bool Create(CPoint* start,CPoint* end) = 0;
+    virtual CREATE_RESULT Create(CPoint* pos) = 0;
 
     virtual bool Draw(QPainter& painter)const = 0;//描画関数
     virtual bool Move(const Pos& diff) = 0;//移動関数

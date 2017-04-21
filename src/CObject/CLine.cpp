@@ -1,9 +1,12 @@
 #include "CLine.h"
 
-bool CLine::Create(CPoint *start, CPoint *end){
-    this->start = start;
-    this->end   = end;
-    return true;//完結
+CREATE_RESULT CLine::Create(CPoint *pos){
+    if(this->start == nullptr){
+        this->start = pos;
+    }else{
+        this->end   = pos;
+    }
+    return CREATE_RESULT::TWOSHOT;//完結
 }
 bool CLine::Draw(QPainter& painter)const{
     //描画

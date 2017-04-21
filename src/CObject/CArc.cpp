@@ -6,11 +6,14 @@ double CArc::GetRound()const{
 }
 
 
-bool CArc::Create(CPoint *start, CPoint *end){
-    this->start  = start;
-    this->end    = end;
-    this->center = new CPoint((*this->start - *this->end) / 2 + *this->end,this->parent());
-    return true; //終了
+CREATE_RESULT CArc::Create(CPoint *start){
+    if(this->start == nullptr){
+        this->start  = start;
+    }else{
+        this->end    = end;
+        this->center = new CPoint((*this->start - *this->end) / 2 + *this->end,this->parent());
+    }
+    return CREATE_RESULT::TWOSHOT; //終了
 }
 bool CArc::Draw(QPainter& painter)const{
     Pos dir1 = (*this->end   - *this->center);

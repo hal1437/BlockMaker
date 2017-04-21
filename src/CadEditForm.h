@@ -15,7 +15,6 @@
 #include "CObject/CObject.h"
 #include "CObject/CPoint.h"
 #include "CObject/CLine.h"
-#include "CObject/CRect.h"
 #include "CObject/CBlock.h"
 #include "CBoxDefineDialog.h"
 #include "SmartDimension.h"
@@ -60,7 +59,7 @@ private:
     CObject* make_obj   = nullptr;
     CPoint*  origin     = nullptr;
     CPoint*  hang_point = nullptr;
-    int creating_count=0;
+    bool eject_step=0; //切り離し工程
     QVector<CObject*> log;
 
 protected:
@@ -105,7 +104,7 @@ public slots:
     void SetTranslate(Pos trans); //並行移動セット
 
     void MakeObject();
-    bool MakeJoint(CObject* obj);           //ジョイント作成
+    CREATE_RESULT MakeJoint(CObject* obj);           //ジョイント作成
 
     void MakeRestraint(RestraintType type); //拘束作成
     void MakeSmartDimension();              //寸法設定

@@ -1,9 +1,9 @@
 #include "CPoint.h"
 
-bool CPoint::Create(CPoint *pos, CPoint *){
+CREATE_RESULT CPoint::Create(CPoint *pos){
     this->x = pos->x;
     this->y = pos->y;
-    return true;//生成終了
+    return CREATE_RESULT::ONESHOT;//生成終了
 }
 
 bool CPoint::Draw(QPainter& painter)const{

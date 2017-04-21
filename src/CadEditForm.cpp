@@ -69,7 +69,7 @@ void CadEditForm::Escape(){
     if(CObject::creating != nullptr){
         this->RemoveObject(make_obj);
     }
-    creating_count=0;
+
 }
 
 void CadEditForm::AddObject(CObject* obj){
@@ -360,78 +360,71 @@ void CadEditForm::MakeObject(){
 
     }else{
         //新規オブジェクト
-        if(creating_count == 0){
-            if     (state == Dot   )make_obj = new CPoint(this);
-            else if(state == Line  )make_obj = new CLine(this);
-            else if(state == Arc   )make_obj = new CArc(this);
-            else if(state == Rect  )make_obj = new CRect(this);
-            else if(state == Spline)make_obj = new CSpline(this);
+        if(eject_step == false){
+            //新規作成CEdge
+            if(state == Dot   )make_obj = new CPoint(this);
+            if(state == Line  )make_obj = new CLine(this);
+            if(state == Line  )make_obj = new CLine(this);
+            if(state == Arc   )make_obj = new CArc(this);
+            if(state == Spline)make_obj = new CSpline(this);
+
+            //追加
             this->AddObject(make_obj);
             CObject::creating = make_obj;
-            //作成
-            if(MakeJoint(make_obj) == true){
-                //生成完了
-                creating_count = -1;//切り離し過程へ
+
+            //新規作成
+            CREATE_RESULT result = MakeJoint(make_obj);
+
+            //一回だけ
+            if(result == ONESHOT){
+                //おわり
+            }
+            //二回必要
+            if(result == TWOSHOT){
+                //選択解除
+                CObject::hanged = nullptr;
+                //同一の点を作成
+                MakeJoint(make_obj);
+                //切り離し過程へ
+                eject_step = true;
 
                 //端点をオブジェクトリストに追加
                 this->AddObject(dynamic_cast<CEdge*>(make_obj)->start);
                 this->AddObject(dynamic_cast<CEdge*>(make_obj)->end);
-
-                /*
-                //CRectならば構成線もオブジェクトリストに追加
-                if(make_obj->is<CRect>()){
-                    for(int i=0;i<4;i++){
-                        this->AddObject(std::dynamic_pointer_cast<CRect>(make_obj)-(i));
-                    }
-                }*/
-            }else {
-                //生成継続
-                creating_count++;
+                //終端を持つ
+                this->hang_point = dynamic_cast<CEdge*>(make_obj)->end;
             }
-        }else if(creating_count == -1){
-            //切り離し過程
-            if(CObject::hanged != nullptr && dynamic_cast<CPoint*>(CObject::hanged) != nullptr){
-                dynamic_cast<CEdge*>(make_obj)->end = dynamic_cast<CPoint*>(CObject::hanged);
-                this->RemoveObject(hang_point);
+        }else if(eject_step == true){
+
+            //hangedが存在した場合
+            if(CObject::hanged != nullptr && CObject::hanged->is<CPoint>()){
+                dynamic_cast<CEdge*>(CObject::creating)->SetEndPos(dynamic_cast<CPoint*>(CObject::hanged));
+                this->RemoveObject(this->hang_point);
             }
             CObject::creating = nullptr;
             this->hang_point = nullptr;
-            creating_count = 0;
+            eject_step = false;
         }
     }
     RefreshRestraints();
     repaint();
     emit RquireRefreshUI();
 }
-bool CadEditForm::MakeJoint(CObject* obj){
+CREATE_RESULT CadEditForm::MakeJoint(CObject* obj){
     Pos local_pos = CObject::mouse_pos;
     if(CObject::hanged != nullptr)local_pos = CObject::hanged->GetNear(local_pos);
 
-    //端点に点を作成
     if(CObject::hanged == nullptr){
         //始点を作成
-        CPoint* start_point = new CPoint(CObject::mouse_pos);
-
-        //端点に点を作成
-        hang_point = new CPoint(CObject::mouse_pos);
-        return obj->Create(start_point,hang_point);
-
+        CPoint* new_point = new CPoint(CObject::mouse_pos);
+        return obj->Create(new_point);
     }else if(CObject::hanged->is<CPoint>()){
-        if(CObject::creating != nullptr){
-            //点をマージ(始点)
-            hang_point = new CPoint(CObject::mouse_pos);
-            return obj->Create(dynamic_cast<CPoint*>(CObject::hanged),hang_point);
-        }else{
-            //点をマージ(終点)
-            hang_point = new CPoint(CObject::mouse_pos);
-            return obj->Create(hang_point,dynamic_cast<CPoint*>(CObject::hanged));
-        }
+        //既存の点を使用
+        return obj->Create(dynamic_cast<CPoint*>(CObject::hanged));
     }else{
-        //点をオブジェクト上に追加
-        CPoint* new_point = new CPoint(CObject::hanged->GetNear(CObject::mouse_pos));
-
-        //一致の幾何拘束を付与
-        return  obj->Create(new_point,hang_point);
+        //始点を作成
+        CPoint* new_point = new CPoint(CObject::mouse_pos);
+        return obj->Create(new_point);
     }
 }
 
@@ -625,7 +618,7 @@ void CadEditForm::ApplyObjectList(QTreeWidget* list){
             for(j = 0;count < map[text];j++){
                 if(this->objects[j]->is<CPoint >() && text=="CPoint" )count++;
                 if(this->objects[j]->is<CLine  >() && text=="CLine"  )count++;
-                if(this->objects[j]->is<CRect  >() && text=="CRect"  )count++;
+                //if(this->objects[j]->is<CRect  >() && text=="CRect"  )count++;
                 if(this->objects[j]->is<CArc   >() && text=="CArc"   )count++;
                 if(this->objects[j]->is<CSpline>() && text=="CSpline")count++;
             }
@@ -641,7 +634,7 @@ void CadEditForm::DrawObjectList(QTreeWidget* list){
             if(objects[i]->is<CPoint> () && !dynamic_cast<CPoint*>(this->objects[i])->isControlPoint())p = std::make_pair("CPoint" ,":/ToolImages/Dot.png");
             if(objects[i]->is<CPoint> () &&  dynamic_cast<CPoint*>(this->objects[i])->isControlPoint())p = std::make_pair("Origin" ,":/ToolImages/Dot.png");
             if(objects[i]->is<CLine>  ())p = std::make_pair("CLine"  ,":/ToolImages/Line.png");
-            if(objects[i]->is<CRect>  ())p = std::make_pair("CRect"  ,":/ToolImages/Rect.png");
+            //if(objects[i]->is<CRect>  ())p = std::make_pair("CRect"  ,":/ToolImages/Rect.png");
             if(objects[i]->is<CArc>   ())p = std::make_pair("CArc"   ,":/ToolImages/Arc.png");
             if(objects[i]->is<CSpline>())p = std::make_pair("CSpline",":/ToolImages/Spline.png");
             list->addTopLevelItem(new QTreeWidgetItem());

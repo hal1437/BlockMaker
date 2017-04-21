@@ -26,7 +26,6 @@ SOURCES += src/main.cpp\
     src/CObject/CLine.cpp \
     src/CObject/CObject.cpp \
     src/CObject/CPoint.cpp \
-    src/CObject/CRect.cpp \
     src/CObject/CSpline.cpp \
     src/CObject/CBlock.cpp \
     src/MoveTransformDialog.cpp \
@@ -47,7 +46,6 @@ HEADERS  += src/MainWindow.h \
     src/CObject/CLine.h \
     src/CObject/CObject.h \
     src/CObject/CPoint.h \
-    src/CObject/CRect.h \
     src/CObject/CSpline.h \
     src/CObject/CBlock.h \
     src/MoveTransformDialog.h \
