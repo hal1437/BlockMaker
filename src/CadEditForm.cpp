@@ -397,11 +397,14 @@ void CadEditForm::MakeObject(){
         }else if(eject_step == true){
 
             //hangedが存在した場合
-            if(CObject::hanged != nullptr && CObject::hanged->is<CPoint>()){
-                dynamic_cast<CEdge*>(CObject::creating)->SetEndPos(dynamic_cast<CPoint*>(CObject::hanged));
-                this->RemoveObject(this->hang_point);
-            }
-            CObject::creating = nullptr;
+            if(CObject::hanged != nullptr ){
+                if(CObject::hanged->is<CPoint>()){
+                    dynamic_cast<CEdge*>(CObject::creating)->SetEndPos(dynamic_cast<CPoint*>(CObject::hanged));
+                    this->RemoveObject(this->hang_point);
+                }else{
+                    *this->hang_point = CObject::hanged->GetNear(*this->hang_point);
+                }
+            }CObject::creating = nullptr;
             this->hang_point = nullptr;
             eject_step = false;
         }
@@ -422,8 +425,8 @@ CREATE_RESULT CadEditForm::MakeJoint(CObject* obj){
         //既存の点を使用
         return obj->Create(dynamic_cast<CPoint*>(CObject::hanged));
     }else{
-        //始点を作成
-        CPoint* new_point = new CPoint(CObject::mouse_pos);
+        //近接点を作成
+        CPoint* new_point = new CPoint(CObject::hanged->GetNear(CObject::mouse_pos));
         return obj->Create(new_point);
     }
 }
