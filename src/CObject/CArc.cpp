@@ -6,12 +6,15 @@ double CArc::GetRound()const{
 }
 
 
-CREATE_RESULT CArc::Create(CPoint *start){
+CREATE_RESULT CArc::Create(CPoint *pos){
     if(this->start == nullptr){
-        this->start  = start;
+        this->start  = pos;
     }else{
-        this->end    = end;
+        this->end    = pos;
         this->center = new CPoint((*this->start - *this->end) / 2 + *this->end,this->parent());
+        connect(this->start ,SIGNAL(PosChanged(Pos,Pos)),this,SLOT(ChangePosCallback(Pos,Pos)));
+        connect(this->end   ,SIGNAL(PosChanged(Pos,Pos)),this,SLOT(ChangePosCallback(Pos,Pos)));
+        connect(this->center,SIGNAL(PosChanged(Pos,Pos)),this,SLOT(ChangePosCallback(Pos,Pos)));
     }
     return CREATE_RESULT::TWOSHOT; //終了
 }
@@ -70,14 +73,20 @@ void CArc::ChangePosCallback(const Pos& new_pos,const Pos& old_pos){
 
     if(this->isCreating()){
         *this->center = (*this->start - *this->end) / 2 + *this->end;
+        round = (*this->end - *this->center).Length();
     }else{
-        round = (new_pos-*this->center).Length();
 
+        if(old_pos == *this->center){
+            *this->end   = (*this->end   - *this->center).GetNormalize() * round + *this->center;
+            *this->start = (*this->start - *this->center).GetNormalize() * round + *this->center;
+        }else{
+            round = (new_pos-*this->center).Length();
+        }
         if(old_pos == *this->start){
-            *this->start = (*this->end - *center).GetNormalize() * round;
+            *this->end   = (*this->end   - *this->center).GetNormalize() * round + *this->center;
         }
         if(old_pos == *this->end){
-            *this->end = (*this->start - *center).GetNormalize() * round;
+            *this->start = (*this->start - *this->center).GetNormalize() * round + *this->center;
         }
     }
 }

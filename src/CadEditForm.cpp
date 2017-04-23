@@ -52,7 +52,7 @@ void CadEditForm::mouseMoveEvent   (QMouseEvent* event){
 
     //生成点を更新
     if(hang_point != nullptr){
-        *hang_point = CObject::mouse_pos;
+        hang_point->Move(CObject::mouse_pos-*hang_point);
     }
 
     //UI更新
@@ -391,6 +391,10 @@ void CadEditForm::MakeObject(){
                 //端点をオブジェクトリストに追加
                 this->AddObject(dynamic_cast<CEdge*>(make_obj)->start);
                 this->AddObject(dynamic_cast<CEdge*>(make_obj)->end);
+
+                for(int i =0;i<dynamic_cast<CEdge*>(make_obj)->GetMiddleCount();i++){
+                    this->AddObject(dynamic_cast<CEdge*>(make_obj)->GetMiddle(i));
+                }
                 //終端を持つ
                 this->hang_point = dynamic_cast<CEdge*>(make_obj)->end;
             }

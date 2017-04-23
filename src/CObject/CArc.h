@@ -19,7 +19,7 @@ public:
 public:
 
     //作成関数(完了時:true , 継続時:false)
-    virtual CREATE_RESULT Create(CPoint* start);
+    virtual CREATE_RESULT Create(CPoint* pos);
     virtual bool Draw(QPainter& painter)const;
     virtual bool Move(const Pos& diff);
     virtual void Lock(bool lock);
