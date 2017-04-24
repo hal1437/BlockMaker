@@ -10,7 +10,7 @@
 class CPoint;
 
 enum CREATE_RESULT{
-    ONESHOT,//一回で終了
+    COMPLETE,//一回で終了
     TWOSHOT,//二回で終了
     ENDLESS,//何回でも可能
 };

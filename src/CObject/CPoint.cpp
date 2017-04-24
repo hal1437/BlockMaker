@@ -3,7 +3,7 @@
 CREATE_RESULT CPoint::Create(CPoint *pos){
     this->x = pos->x;
     this->y = pos->y;
-    return CREATE_RESULT::ONESHOT;//生成終了
+    return CREATE_RESULT::COMPLETE;//生成終了
 }
 
 bool CPoint::Draw(QPainter& painter)const{
@@ -51,9 +51,9 @@ bool CPoint::Move(const Pos& diff){
     if(isLock() == false && !isControlPoint()){
         if(diff != Pos(0,0) && moving == false){
             //シグナル
-            moving = true;
+            moving = true;  //再帰呼び出し制限
             emit PosChanged(*this + diff,*this);
-            moving = false;
+            moving = false; //再帰呼び出し制限
             *this += diff;//単純な平行移動
         }
     }

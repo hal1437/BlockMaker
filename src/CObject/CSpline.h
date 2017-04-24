@@ -35,16 +35,27 @@ public:
     virtual bool Move(const Pos& move);//移動関数
     virtual void Lock(bool lock);//ロック
 
+    //始点終点操作オーバーライド
+    virtual void SetStartPos(CPoint* pos);
+    virtual void SetEndPos(CPoint* pos);
+
     //中間点操作
     virtual int GetMiddleCount()const;
     virtual CPoint* GetMiddle(int index);
     virtual void    SetMiddle(CPoint*,int index);
 
     //近接点
-    virtual Pos GetNear(const Pos& hand)const;
+    virtual Pos GetNear(const Pos& pos)const;
+
+    void RefreshNodes();
 
     CSpline(QObject* parent = nullptr);
     ~CSpline();
+
+public slots:
+    //点移動コールバックオーバーライド
+    virtual void ChangePosCallback(const Pos& new_pos,const Pos& old_pos);
+
 };
 
 #endif // CSPLINE_H

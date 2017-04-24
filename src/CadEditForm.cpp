@@ -30,13 +30,10 @@ void CadEditForm::wheelEvent(QWheelEvent * event){
     //拡大値は負にならない
     if(next_scale > 0){
         //適応
-        if(CObject::hanged == nullptr){
-            //マウス座標中心に拡大
-            this->Zoom(next_scale,CObject::mouse_pos);
-        }else{
-            //選択点があればそれを中心に拡大
-            this->Zoom(next_scale,CObject::hanged->GetNear(CObject::mouse_pos));
-        }
+        if(CObject::hanged == nullptr)this->Zoom(next_scale,CObject::mouse_pos); //マウス座標中心に拡大
+        else                          this->Zoom(next_scale,CObject::hanged->GetNear(CObject::mouse_pos));//選択点があればそれを中心に拡大
+
+        //シグナル発生
         emit ScaleChanged(next_scale);
         CObject::drawing_scale = next_scale;
     }
@@ -49,12 +46,10 @@ void CadEditForm::mouseMoveEvent   (QMouseEvent* event){
     CObject* answer = this->getHanged();
     //ズーム支点リセット
     zoom_piv = Pos(0,0);
-
-    //生成点を更新
+    //生成点座標を更新
     if(hang_point != nullptr){
         hang_point->Move(CObject::mouse_pos-*hang_point);
     }
-
     //UI更新
     repaint();
     emit MovedMouse(event,answer);
@@ -66,10 +61,15 @@ void CadEditForm::resizeEvent(QResizeEvent*){
 }
 
 void CadEditForm::Escape(){
+    //作成解除
     if(CObject::creating != nullptr){
-        this->RemoveObject(make_obj);
+        if(make_result == TWOSHOT){
+            this->RemoveObject(make_obj->end);
+            this->RemoveObject(make_obj);
+        }
+        this->hang_point = nullptr;
+        this->make_result = COMPLETE;
     }
-
 }
 
 void CadEditForm::AddObject(CObject* obj){
@@ -113,23 +113,8 @@ void CadEditForm::RemoveObject(CObject* obj){
     repaint();
 }
 
-void CadEditForm::CompleteObject(CObject* make_obj){
-    /*
-    for(int i=0;i<make_obj->GetJointNum();i++){
-        bool is_known_pos=false;
-        //すでに点がなければ
-        for(CObject* obj : objects){
-            if(obj->is<CPoint>() && *dynamic_cast<CPoint*>(obj) == make_obj->GetJointPos(i)){
-                is_known_pos=true;
-                break;
-            }
-        }
-        //追加
-        if(!is_known_pos){
-            CPoint* new_point = make_obj->GetJoint(i);
-            new_point->Create(new_point,0);
-        }
-    }*/
+void CadEditForm::CompleteObject(CObject*){
+
 }
 
 double CadEditForm::GetScale()const{
@@ -364,57 +349,97 @@ void CadEditForm::MakeObject(){
 
     }else{
         //新規オブジェクト
-        if(eject_step == false){
+        if(make_result == COMPLETE){
             //新規作成CEdge
-            if(state == Dot   )make_obj = new CPoint(this);
-            if(state == Line  )make_obj = new CLine(this);
-            if(state == Line  )make_obj = new CLine(this);
-            if(state == Arc   )make_obj = new CArc(this);
-            if(state == Spline)make_obj = new CSpline(this);
+            CObject* new_obj;
+            if(state == Dot   )new_obj = new CPoint(this);
+            if(state == Line  )new_obj = new CLine(this);
+            if(state == Arc   )new_obj = new CArc(this);
+            if(state == Spline)new_obj = new CSpline(this);
+            if(state == Rect  ){
+                new_obj = new CLine(this);
+            }
 
             //追加
-            this->AddObject(make_obj);
-            CObject::creating = make_obj;
+            CObject::creating = new_obj;
 
             //新規作成
-            CREATE_RESULT result = MakeJoint(make_obj);
+            this->AddObject(new_obj);
+            make_result = MakeJoint(new_obj);
+            //選択解除
+            CObject::hanged = nullptr;
 
             //一回だけ
-            if(result == ONESHOT){
+            if(make_result == COMPLETE){
                 //おわり
             }
             //二回必要
-            if(result == TWOSHOT){
-                //選択解除
-                CObject::hanged = nullptr;
+            if(make_result == TWOSHOT){
+                //保持
+                make_obj = dynamic_cast<CEdge*>(new_obj);
                 //同一の点を作成
                 MakeJoint(make_obj);
-                //切り離し過程へ
-                eject_step = true;
 
                 //端点をオブジェクトリストに追加
-                this->AddObject(dynamic_cast<CEdge*>(make_obj)->start);
-                this->AddObject(dynamic_cast<CEdge*>(make_obj)->end);
-
-                for(int i =0;i<dynamic_cast<CEdge*>(make_obj)->GetMiddleCount();i++){
-                    this->AddObject(dynamic_cast<CEdge*>(make_obj)->GetMiddle(i));
+                this->AddObject(make_obj->start);
+                this->AddObject(make_obj->end);
+                //中継点をオブジェクトリストに追加
+                for(int i =0;i<make_obj->GetMiddleCount();i++){
+                    this->AddObject(make_obj->GetMiddle(i));
                 }
                 //終端を持つ
-                this->hang_point = dynamic_cast<CEdge*>(make_obj)->end;
+                this->hang_point = make_obj->end;
             }
-        }else if(eject_step == true){
-
+            //無限回指定
+            if(make_result == ENDLESS){
+                //保持
+                make_obj = dynamic_cast<CEdge*>(new_obj);
+                //同一の点を作成
+                MakeJoint(make_obj);
+                //端点をオブジェクトリストに追加
+                this->AddObject(make_obj->start);
+                this->AddObject(make_obj->end);
+                //終端を持つ
+                this->hang_point = make_obj->end;
+            }
+        }else if(make_result == TWOSHOT){
             //hangedが存在した場合
             if(CObject::hanged != nullptr ){
                 if(CObject::hanged->is<CPoint>()){
+                    //すり替え
                     dynamic_cast<CEdge*>(CObject::creating)->SetEndPos(dynamic_cast<CPoint*>(CObject::hanged));
                     this->RemoveObject(this->hang_point);
                 }else{
+                    //近接点へ移動
                     *this->hang_point = CObject::hanged->GetNear(*this->hang_point);
                 }
-            }CObject::creating = nullptr;
+            }
+            CObject::creating = nullptr;
             this->hang_point = nullptr;
-            eject_step = false;
+            make_result = COMPLETE;
+
+        }else if(make_result == ENDLESS){
+            //hangedが存在した場合
+            if(CObject::hanged != nullptr){
+                if(CObject::hanged->is<CPoint>()){
+                    //すり替えて終了
+                    dynamic_cast<CEdge*>(CObject::creating)->SetEndPos(dynamic_cast<CPoint*>(CObject::hanged));
+                    this->RemoveObject(this->hang_point);
+                }else{
+                    //近接点へ移動して終了
+                    *this->hang_point = CObject::hanged->GetNear(*this->hang_point);
+                }
+                CObject::creating = nullptr;
+                this->hang_point = nullptr;
+                make_result = COMPLETE;
+            }else{
+                //同一の点を作成
+                MakeJoint(make_obj);
+
+                //終端を持つ
+                this->hang_point = make_obj->end;
+                this->AddObject(make_obj->end);
+            }
         }
     }
     RefreshRestraints();

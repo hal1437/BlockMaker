@@ -56,6 +56,7 @@ double Spline::culc(double t)const
 
 
 CREATE_RESULT CSpline::Create(CPoint *pos){
+    connect(pos,SIGNAL(PosChanged(Pos,Pos)),this,SLOT(ChangePosCallback(Pos,Pos)));
     if(this->start == nullptr){
         this->start = pos;
     }else if(this->end == nullptr){
@@ -64,6 +65,8 @@ CREATE_RESULT CSpline::Create(CPoint *pos){
         //endを更新
         this->pos.push_back(end);
         this->end = pos;
+        RefreshNodes();
+
     }
     return CREATE_RESULT::ENDLESS;
 }
@@ -76,12 +79,12 @@ void CSpline::Lock(bool lock){
 }
 
 bool CSpline::Draw(QPainter& painter)const{
-    if(pos.size() > 1){
+    if(pos.size() >= 1){
         QPainterPath path;
         double t, m;
-        m = (double)(pos.size()-1);
+        m = (double)(pos.size()+1);
 
-        path.moveTo(this->start->x,this->end->y);
+        path.moveTo(this->start->x,this->start->y);
         const double dt = 1.0/DIVISION;
         for(t=0; t<=m; t += dt){
             if(t + dt > m)t=m;
@@ -90,19 +93,30 @@ bool CSpline::Draw(QPainter& painter)const{
         }
         painter.setBrush(QColor(0,0,0,0));
         painter.drawPath(path);
-
-    }
-    for(int i=0;i<this->pos.size();i++){
-        this->pos[i]->Draw(painter);
+    }else{
+        painter.drawLine(QPointF(this->start->x,this->start->y),QPointF(this->end->x,this->end->y));
     }
     return true;
 }
 
 bool CSpline::Move(const Pos& diff){
+    this->start->Move(diff);
+    this->end  ->Move(diff);
     for(int i=0;i<static_cast<int>(pos.size());i++){
         pos[i]->Move(diff);
     }
     return true;
+}
+
+//始点終点操作オーバーライド
+void CSpline::SetStartPos(CPoint* pos){
+    CEdge::SetStartPos(pos);
+    RefreshNodes();
+}
+
+void CSpline::SetEndPos(CPoint* pos){
+    CEdge::SetEndPos(pos);
+    RefreshNodes();
 }
 
 //中間点操作
@@ -116,8 +130,38 @@ void CSpline::SetMiddle(CPoint* pos,int index){
     this->pos[index] = pos;
 }
 
-Pos CSpline::GetNear(const Pos& )const{
-    return Pos();// ちょっと解決策が浮かばない
+Pos CSpline::GetNear(const Pos& pos)const{
+    if(this->pos.size() >= 1){
+        QVector<Pos> pp;
+        const double dt = 1.0/DIVISION;
+        double t, m;
+        m = (double)(this->pos.size()+1);
+        for(t=0; t<=m; t += dt){
+            if(t + dt > m)t=m;
+            pp.push_back(Pos(xs.culc(t), ys.culc(t)));
+        }
+        //もっとも近いもの
+        return *std::min_element(pp.begin(),pp.end(),[&](Pos lhs,Pos rhs){
+            return ((pos-lhs).Length() < (pos-rhs).Length());
+        });
+    }else{
+        //いつもの直線のアレ
+        return Pos::LineNearPoint(*this->start,*this->end,pos);
+    }
+}
+
+void CSpline::RefreshNodes(){
+    std::vector<double> x,y;
+    x.push_back(this->start->x);
+    y.push_back(this->start->y);
+    for(CPoint* p : this->pos){
+        x.push_back(p->x);
+        y.push_back(p->y);
+    }
+    x.push_back(this->end->x);
+    y.push_back(this->end->y);
+    xs.init(x);
+    ys.init(y);
 }
 
 CSpline::CSpline(QObject *parent):
@@ -130,3 +174,9 @@ CSpline::~CSpline()
 {
 
 }
+//点移動コールバックオーバーライド
+void CSpline::ChangePosCallback(const Pos& new_pos,const Pos& old_pos){
+    RefreshNodes();
+}
+
+

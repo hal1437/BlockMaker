@@ -56,10 +56,10 @@ private:
     bool shift_pressed = false;  //シフトフラグ
     bool ctrl_pressed  = false;  //コントロールフラグ
     CEnum state       = Edit;    //生成種類
-    CObject* make_obj   = nullptr;
+    CEdge* make_obj    = nullptr;
     CPoint*  origin     = nullptr;
     CPoint*  hang_point = nullptr;
-    bool eject_step=0; //切り離し工程
+    CREATE_RESULT make_result = COMPLETE; //生成管理フラグ
     QVector<CObject*> log;
 
 protected:
