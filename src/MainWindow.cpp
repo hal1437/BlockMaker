@@ -191,6 +191,7 @@ void MainWindow::MakeRestraint(){
         ui->CadEdit->MergePoints();
     }
     ui->RestraintList->clear();
+    this->RefreshUI();
 }
 
 void MainWindow::MakeBlock(){

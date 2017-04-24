@@ -12,6 +12,7 @@ private:
     const static int COLLISION_SIZE = 8;      //当たり判定半径
 
     bool control_point = false; //作用点
+    bool moving = false;
 
 public:
     virtual CREATE_RESULT Create(CPoint* pos); //作成関数

@@ -107,10 +107,10 @@ void CArc::ChangePosCallback(const Pos& new_pos,const Pos& old_pos){
             round = (new_pos-*this->center).Length();
         }
         if(old_pos == *this->start){
-            *this->end   = (*this->end   - *this->center).GetNormalize() * round + *this->center;
+            this->end  ->Move((*this->end   - *this->center).GetNormalize() * round + *this->center - *this->end);
         }
         if(old_pos == *this->end){
-            *this->start = (*this->start - *this->center).GetNormalize() * round + *this->center;
+            this->start->Move((*this->start - *this->center).GetNormalize() * round + *this->center - *this->start);
         }
     }
 }
