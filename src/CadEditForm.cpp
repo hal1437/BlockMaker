@@ -275,7 +275,7 @@ void CadEditForm::Move(Pos local_diff){
     this->translate += local_diff;
 }
 
-void CadEditForm::MargePoints(){
+void CadEditForm::MergePoints(){
     //原点が存在する場合は先頭に出す
     for(int i=0;i<CObject::selected.size();i++){
         if(dynamic_cast<CPoint*>(CObject::selected[i])->isControlPoint()){
@@ -285,19 +285,23 @@ void CadEditForm::MargePoints(){
     }
 
     //先頭以外の点を破棄し、統合する。
-    for(int j=1;j<CObject::selected.size();j++){
-        for(int i=1;i<CObject::selected.size();i++){
-            /*
-            for(CObject* p : this->objects){
-                for(int i=0;i<p->GetJointNum();i++){
-                    //posが含まれる
-                    if(p->GetJoint(i) == CObject::selected[j]){
-                        p->SetJoint(i,dynamic_cast<CPoint*>(CObject::selected[0]));
+    for(int i=1;i<CObject::selected.size();i++){
+        for(CObject* p : this->objects){
+            if(p->is<CEdge>()){
+                if(dynamic_cast<CEdge*>(p)->start == CObject::selected[i]){
+                    dynamic_cast<CEdge*>(p)->SetStartPos(dynamic_cast<CPoint*>(CObject::selected[0]));
+                }
+                if(dynamic_cast<CEdge*>(p)->end == CObject::selected[i]){
+                    dynamic_cast<CEdge*>(p)->SetEndPos(dynamic_cast<CPoint*>(CObject::selected[0]));
+                }
+                for(int j=0;j<dynamic_cast<CEdge*>(p)->GetMiddleCount();j++){
+                    if(dynamic_cast<CEdge*>(p)->GetMiddle(j) == CObject::selected[i]){
+                        dynamic_cast<CEdge*>(p)->SetMiddle(dynamic_cast<CPoint*>(CObject::selected[0]),j);
                     }
                 }
-            }*/
+            }
         }
-        this->objects.removeAll(CObject::selected[j]);
+        this->objects.removeAll(CObject::selected[i]);
     }
     CObject::selected.clear();
     repaint();

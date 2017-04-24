@@ -48,6 +48,8 @@ int CLine::GetMiddleCount()const{
 CPoint* CLine::GetMiddle(int){
     return nullptr;
 }
+void CLine::SetMiddle(CPoint*,int){
+}
 
 
 Pos CLine::GetNear(const Pos& hand)const{

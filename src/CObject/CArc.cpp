@@ -32,8 +32,6 @@ bool CArc::Draw(QPainter& painter)const{
     return true;
 }
 bool CArc::Move(const Pos& diff){
-    this->start ->Move(diff);
-    this->end   ->Move(diff);
     this->center->Move(diff);
     return true;
 }
@@ -44,6 +42,25 @@ void CArc::Lock(bool lock){
     this->center->Lock(lock);
     CObject::Lock(lock);
 }
+bool CArc::isSelectable(Pos pos) const{
+    //角度判定、半径判定、作成判定
+    return (Pos::Angle(*this->start - *this->center,*this->end - *this->center) <
+            Pos::Angle(*this->start - *this->center,pos        - *this->center)) &&
+           (std::abs((pos - *this->center).Length() - this->round) < COLLISION_SIZE) &&
+           !this->isCreating();
+}
+
+//始点終点操作オーバーライド
+void CArc::SetStartPos(CPoint* pos){
+    ChangePosCallback(*pos,*this->start);
+    CEdge::SetStartPos(pos);
+}
+
+void CArc::SetEndPos(CPoint* pos){
+    ChangePosCallback(*pos,*this->end);
+    CEdge::SetEndPos(pos);
+}
+
 int CArc::GetMiddleCount()const{
     return 1;
 }
@@ -52,6 +69,14 @@ CPoint* CArc::GetMiddle(int index){
         return this->center;
     }else{
         return nullptr;
+    }
+}
+void CArc::SetMiddle(CPoint* pos,int index){
+    if(index == 0){
+        ChangePosCallback(*pos,*this->center);
+        disconnect(this->center,SIGNAL(PosChanged(Pos,Pos)),this,SLOT(ChangePosCallback(Pos,Pos)));
+        this->center = pos;
+        connect(this->center,SIGNAL(PosChanged(Pos,Pos)),this,SLOT(ChangePosCallback(Pos,Pos)));
     }
 }
 
@@ -75,10 +100,9 @@ void CArc::ChangePosCallback(const Pos& new_pos,const Pos& old_pos){
         *this->center = (*this->start - *this->end) / 2 + *this->end;
         round = (*this->end - *this->center).Length();
     }else{
-
         if(old_pos == *this->center){
-            *this->end   = (*this->end   - *this->center).GetNormalize() * round + *this->center;
-            *this->start = (*this->start - *this->center).GetNormalize() * round + *this->center;
+            *this->end   = (*this->end   - new_pos).GetNormalize() * round + new_pos;
+            *this->start = (*this->start - new_pos).GetNormalize() * round + new_pos;
         }else{
             round = (new_pos-*this->center).Length();
         }

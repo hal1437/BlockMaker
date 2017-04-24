@@ -89,7 +89,7 @@ public:
     Pos ConvertLocalPos(Pos pos)const; //仮想座標へ変換
     Pos ConvertWorldPos(Pos pos)const; //表示座標へ変換
 
-    void MargePoints();//幾何拘束:マージ
+    void MergePoints();//幾何拘束:マージ
 
 signals:
     void ToggleConflict(bool conflict); //競合シグナル変更

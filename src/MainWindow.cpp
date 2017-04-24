@@ -188,8 +188,9 @@ void MainWindow::MakeRestraint(){
     }
 
     if(ui->RestraintList->currentItem()->text() == "マージ"){
-        ui->CadEdit->MargePoints();
+        ui->CadEdit->MergePoints();
     }
+    ui->RestraintList->clear();
 }
 
 void MainWindow::MakeBlock(){

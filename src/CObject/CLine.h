@@ -17,6 +17,7 @@ public:
     //中間点操作
     virtual int GetMiddleCount()const;
     virtual CPoint* GetMiddle(int index);
+    virtual void    SetMiddle(CPoint*,int index);
 
     //近接点
     virtual Pos GetNear(const Pos& hand)const;

@@ -23,10 +23,16 @@ public:
     virtual bool Draw(QPainter& painter)const;
     virtual bool Move(const Pos& diff);
     virtual void Lock(bool lock);
+    virtual bool isSelectable(Pos pos) const;//選択可能オーバーライド
+
+    //始点終点操作オーバーライド
+    virtual void SetStartPos(CPoint* pos);
+    virtual void SetEndPos(CPoint* pos);
 
     //中間点操作
     virtual int GetMiddleCount()const;
     virtual CPoint* GetMiddle(int index);
+    virtual void    SetMiddle(CPoint*,int index);
 
     //近接点
     virtual Pos GetNear(const Pos& hand)const;

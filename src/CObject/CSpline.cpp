@@ -109,8 +109,11 @@ bool CSpline::Move(const Pos& diff){
 int CSpline::GetMiddleCount()const{
     return this->pos.size();
 }
-CPoint *CSpline::GetMiddle(int index){
+CPoint* CSpline::GetMiddle(int index){
     return pos[index];
+}
+void CSpline::SetMiddle(CPoint* pos,int index){
+    this->pos[index] = pos;
 }
 
 Pos CSpline::GetNear(const Pos& )const{

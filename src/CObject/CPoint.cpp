@@ -47,10 +47,10 @@ bool CPoint::Draw(QPainter& painter)const{
 
 
 bool CPoint::Move(const Pos& diff){
-    //シグナル
-    emit PosChanged(*this + diff,*this);
     //ロックされていなければ
     if(isLock() == false && !isControlPoint()){
+        //シグナル
+        emit PosChanged(*this + diff,*this);
         *this += diff;//単純な平行移動
     }
     return true;
