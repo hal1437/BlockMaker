@@ -115,6 +115,14 @@ std::ostream& operator<<(std::ostream& ost,Point<T> pos){
     ost << "(" << pos.x << "," << pos.y << ")";
     return ost;
 }
+template<class T>
+std::istream& operator>>(std::istream& ost,Point<T>& pos){
+    std::string str;
+    ost >> str;
+    pos.x = QString(str.c_str()).replace('(',"").replace(')',"").split(',')[0].toDouble();
+    pos.y = QString(str.c_str()).replace('(',"").replace(')',"").split(',')[1].toDouble();
+    return ost;
+}
 
 namespace std {
     template<class T>

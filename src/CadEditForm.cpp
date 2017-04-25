@@ -736,5 +736,136 @@ void CadEditForm::Export(){
     diag->exec();
 }
 
+void CadEditForm::Save(){
+
+    QString filename = QFileDialog::getSaveFileName( this, "Save");
+    if(filename == "")return;
+
+    QVector<Pos> points;
+    //全ての頂点を保存
+    for(int i =0;i<this->objects.size();i++){
+        if(this->objects[i]->is<CPoint>()){//CPointなら
+            points.push_back(*dynamic_cast<CPoint*>(this->objects[i]));
+        }
+        if(this->objects[i]->is<CEdge>()){//CEdgeなら
+            points.push_back(*dynamic_cast<CEdge*>(this->objects[i])->start);
+            points.push_back(*dynamic_cast<CEdge*>(this->objects[i])->end);
+            for(int j=0;j<dynamic_cast<CEdge*>(this->objects[i])->GetMiddleCount();j++){
+                points.push_back(*dynamic_cast<CEdge*>(this->objects[i])->GetMiddle(j));
+            }
+        }
+    }
+    //並び替え&同一排除
+    std::sort(points.begin(),points.end());
+    points.erase(std::unique(points.begin(),points.end()),points.end());
+
+
+    //オブジェクト追加
+    QVector<std::pair<QString,QVector<int>>> pairs;//(名前,頂点番号)
+    for(int i =0;i<this->objects.size();i++){
+        QString name = "Unknown";
+        QVector<int> vertex;
+        if(this->objects[i]->is<CPoint>()){
+            vertex.push_back(IndexOf(points,*dynamic_cast<CPoint*>(this->objects[i])));
+            name = "CPoint";
+        }
+        if(this->objects[i]->is<CEdge>()){
+            if(this->objects[i]->is<CLine>  ())name = "CLine";
+            if(this->objects[i]->is<CArc>   ())name = "CArc";
+            if(this->objects[i]->is<CSpline>())name = "CSPline";
+
+            //始点終点を追加
+            vertex.push_back(IndexOf(points,*dynamic_cast<CEdge*>(this->objects[i])->start));
+            vertex.push_back(IndexOf(points,*dynamic_cast<CEdge*>(this->objects[i])->end));
+            //中継点を追加
+            for(int j=0;j<dynamic_cast<CEdge*>(this->objects[i])->GetMiddleCount();j++){
+                vertex.push_back(IndexOf(points,*dynamic_cast<CEdge*>(this->objects[i])->GetMiddle(j)));
+            }
+        }
+        //登録
+        pairs.push_back(std::make_pair(name,vertex));
+    }
+
+    //出力
+    std::ofstream out(filename.toStdString().c_str());
+    if(!out)return;
+
+    //頂点数
+    out << points.size() << std::endl;
+    for(Pos p : points){
+        out << p << std::endl;
+    }
+    //オブジェクト数
+    out << pairs.size() << std::endl;
+    for(std::pair<QString,QVector<int>> p : pairs){
+        out << p.first.toStdString();
+        for(int i=0;i<p.second.size();i++){
+            out << "," << p.second[i];
+        }
+        out << std::endl;
+    }
+}
+
+void CadEditForm::Load(){
+    //オブジェクトをクリア
+    this->objects.clear();
+
+    QString filename = QFileDialog::getOpenFileName(this, "Load");
+    std::ifstream in(filename.toStdString().c_str());
+    if(!in)return ;
+
+    //頂点数取得
+    int vertex_num;
+    in >> vertex_num;
+
+    //頂点取得
+    QVector<CPoint*> points;
+    for(int i=0;i<vertex_num;i++){
+        Pos p;
+        in >> p;
+        points.push_back(new CPoint(p));
+        this->objects.push_back(points.back());
+    }
+
+    //オブジェクト数取得
+    int object_num;
+    in >> object_num;
+
+    //オブジェクト復元
+    for(int i=0;i<object_num;i++){
+        std::string str;
+        in >> str;
+
+        //オブジェクト判定
+        CObject* make = nullptr;
+        QStringList sl = QString(str.c_str()).split(',');
+
+        //if(sl[0] == "CPoint" )make = new CPoint();
+        if(sl[0] == "CLine"  )make = new CLine();
+        if(sl[0] == "CArc"   )make = new CArc();
+        if(sl[0] == "CSpline")make = new CSpline();
+        //オブジェクト生成
+        if(make != nullptr){
+            for(int j=1;j<sl.size();j++){
+                make->Create(points[sl[j].toInt()]);
+            }
+            this->objects.push_back(make);
+        }
+    }
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

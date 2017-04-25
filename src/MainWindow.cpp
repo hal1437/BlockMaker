@@ -17,10 +17,12 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->ExportButton         ,SIGNAL(pressed())                          ,ui->CadEdit,SLOT(Export()));
 
     //CadEditFoam関連
-    connect(this        ,SIGNAL(ToggleChanged(CEnum)),this->ui->CadEdit  ,SLOT(SetState(CEnum)));
-    connect(ui->CadEdit ,SIGNAL(ScaleChanged(double)),this->ui->ScaleSpin,SLOT(setValue(double)));
-    connect(ui->CadEdit ,SIGNAL(RquireRefreshUI())   ,this,SLOT(RefreshUI()));
-    connect(ui->CadEdit ,SIGNAL(MouseMoved(Pos))     ,this               ,SLOT(RefreshStatusBar(Pos)));
+    connect(this          ,SIGNAL(ToggleChanged(CEnum)),ui->CadEdit   ,SLOT(SetState(CEnum)));
+    connect(ui->CadEdit   ,SIGNAL(ScaleChanged(double)),ui->ScaleSpin ,SLOT(setValue(double)));
+    connect(ui->CadEdit   ,SIGNAL(RquireRefreshUI())   ,this          ,SLOT(RefreshUI()));
+    connect(ui->CadEdit   ,SIGNAL(MouseMoved(Pos))     ,this          ,SLOT(RefreshStatusBar(Pos)));
+    connect(ui->actionSave,SIGNAL(triggered())         ,ui->CadEdit   ,SLOT(Save()));
+    connect(ui->actionLoad,SIGNAL(triggered())         ,ui->CadEdit   ,SLOT(Load()));
 
     //リスト変更系
     connect(ui->RestraintList        ,SIGNAL(itemSelectionChanged())      ,this       ,SLOT(MakeRestraint()));

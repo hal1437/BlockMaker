@@ -10,15 +10,18 @@
 #define NEWLINE "\n"
 #define MOUSE_ZOOM_RATE 10000.0
 
-template<class T>
-bool exist(std::iterator<std::forward_iterator_tag,T> begin ,std::iterator<std::forward_iterator_tag,T> end,const T& value){
-    return std::find(begin,end,value);
-}
-
 template<class C,class V>
 bool exist(const C& array,const V& value){
     return std::find(std::begin(array),std::end(array),value) != std::end(array);
 }
+
+template<class C,class V>
+int IndexOf(const C& array,const V& value){
+    typename C::const_iterator result = std::find(std::begin(array),std::end(array),value);
+    if(result == std::end(array))return -1;
+    else                           return std::distance(std::begin(array),result);
+}
+
 
 template<class C,class V>
 void erase(C array,const V& value){

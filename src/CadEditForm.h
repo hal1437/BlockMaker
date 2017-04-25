@@ -9,6 +9,7 @@
 #include <QListWidgetItem>
 #include <QTreeWidgetItem>
 #include <iostream>
+#include <fstream>
 #include <random>
 #include <queue>
 #include <utility>
@@ -121,10 +122,13 @@ public slots:
 
     void ResetAllExpantion();//拡大、移動リセット
     void Export(); //出力
+    void Save();//保存
+    void Load();//読み込み
 
 public:
     explicit CadEditForm(QWidget *parent = 0);
     ~CadEditForm();
+
 
 };
 
