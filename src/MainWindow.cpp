@@ -19,7 +19,7 @@ MainWindow::MainWindow(QWidget *parent) :
     //CadEditFoam関連
     connect(this          ,SIGNAL(ToggleChanged(CEnum)),ui->CadEdit   ,SLOT(SetState(CEnum)));
     connect(ui->CadEdit   ,SIGNAL(ScaleChanged(double)),ui->ScaleSpin ,SLOT(setValue(double)));
-    connect(ui->CadEdit   ,SIGNAL(RquireRefreshUI())   ,this          ,SLOT(RefreshUI()));
+    connect(ui->CadEdit   ,SIGNAL(RequireRefreshUI())  ,this          ,SLOT(RefreshUI()));
     connect(ui->CadEdit   ,SIGNAL(MouseMoved(Pos))     ,this          ,SLOT(RefreshStatusBar(Pos)));
     connect(ui->actionSave,SIGNAL(triggered())         ,ui->CadEdit   ,SLOT(Save()));
     connect(ui->actionLoad,SIGNAL(triggered())         ,ui->CadEdit   ,SLOT(Load()));

@@ -444,7 +444,7 @@ void CadEditForm::MakeObject(){
     }
     RefreshRestraints();
     repaint();
-    emit RquireRefreshUI();
+    emit RequireRefreshUI();
 }
 CREATE_RESULT CadEditForm::MakeJoint(CObject* obj){
     Pos local_pos = CObject::mouse_pos;
@@ -823,8 +823,13 @@ void CadEditForm::Load(){
     for(int i=0;i<vertex_num;i++){
         Pos p;
         in >> p;
-        points.push_back(new CPoint(p));
-        this->objects.push_back(points.back());
+        if(p != Pos(0,0)){
+            points.push_back(new CPoint(p));
+            this->objects.push_back(points.back());
+        }else{
+            points.push_back(this->origin);
+            this->objects.push_back(this->origin);
+        }
     }
 
     //オブジェクト数取得
@@ -852,6 +857,7 @@ void CadEditForm::Load(){
             this->objects.push_back(make);
         }
     }
+    emit RequireRefreshUI();
 
 }
 
