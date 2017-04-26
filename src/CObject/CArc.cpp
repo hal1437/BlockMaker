@@ -15,6 +15,7 @@ CREATE_RESULT CArc::Create(CPoint *pos){
         connect(this->start ,SIGNAL(PosChanged(Pos,Pos)),this,SLOT(ChangePosCallback(Pos,Pos)));
         connect(this->end   ,SIGNAL(PosChanged(Pos,Pos)),this,SLOT(ChangePosCallback(Pos,Pos)));
         connect(this->center,SIGNAL(PosChanged(Pos,Pos)),this,SLOT(ChangePosCallback(Pos,Pos)));
+
     }else{
         disconnect(this->start ,SIGNAL(PosChanged(Pos,Pos)),this,SLOT(ChangePosCallback(Pos,Pos)));
         disconnect(this->end   ,SIGNAL(PosChanged(Pos,Pos)),this,SLOT(ChangePosCallback(Pos,Pos)));
@@ -109,17 +110,26 @@ void CArc::ChangePosCallback(const Pos& new_pos,const Pos& old_pos){
         *this->center = (*this->start - *this->end) / 2 + *this->end;
         round = (*this->end - *this->center).Length();
     }else{
+
         if(old_pos == *this->center){
-            *this->end   = (*this->end   - new_pos).GetNormalize() * round + new_pos;
-            *this->start = (*this->start - new_pos).GetNormalize() * round + new_pos;
+            this->end  ->Move((*this->end   - new_pos).GetNormalize() * round + new_pos - *this->end);
+            this->start->Move((*this->start - new_pos).GetNormalize() * round + new_pos - *this->start);
         }else{
             round = (new_pos-*this->center).Length();
         }
         if(old_pos == *this->start){
-            this->end  ->Move((*this->end   - *this->center).GetNormalize() * round + *this->center - *this->end);
+            if(this->end->isControlPoint() || this->end->isLock()){
+                *this->center = (*this->start - *this->end) / 2 + *this->end;
+            }else{
+                this->end  ->Move((*this->end   - *this->center).GetNormalize() * round + *this->center - *this->end);
+            }
         }
         if(old_pos == *this->end){
-            this->start->Move((*this->start - *this->center).GetNormalize() * round + *this->center - *this->start);
+            if(this->start->isControlPoint() || this->start->isLock()){
+                *this->center = (*this->start - *this->end) / 2 + *this->end;
+            }else{
+                this->start->Move((*this->start - *this->center).GetNormalize() * round + *this->center - *this->start);
+            }
         }
     }
 }

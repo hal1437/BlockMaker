@@ -807,12 +807,12 @@ void CadEditForm::Save(){
 }
 
 void CadEditForm::Load(){
-    //オブジェクトをクリア
-    this->objects.clear();
 
     QString filename = QFileDialog::getOpenFileName(this, "Load");
     std::ifstream in(filename.toStdString().c_str());
     if(!in)return ;
+    //オブジェクトをクリア
+    this->objects.clear();
 
     //頂点数取得
     int vertex_num;
