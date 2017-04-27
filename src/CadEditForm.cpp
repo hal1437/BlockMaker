@@ -666,17 +666,34 @@ void CadEditForm::DrawObjectList(QTreeWidget* list){
     if(list->topLevelItemCount() != this->objects.size()){
         list->clear();
         for(int i=0;i<this->objects.size();i++){
+            if(this->objects[i]->is<CPoint>())continue;
             std::pair<std::string,std::string> p;
-            if(objects[i]->is<CPoint> () && !dynamic_cast<CPoint*>(this->objects[i])->isControlPoint())p = std::make_pair("CPoint" ,":/ToolImages/Dot.png");
-            if(objects[i]->is<CPoint> () &&  dynamic_cast<CPoint*>(this->objects[i])->isControlPoint())p = std::make_pair("Origin" ,":/ToolImages/Dot.png");
+            //if(objects[i]->is<CPoint> () && !dynamic_cast<CPoint*>(this->objects[i])->isControlPoint())p = std::make_pair("CPoint" ,":/ToolImages/Dot.png");
+            //if(objects[i]->is<CPoint> () &&  dynamic_cast<CPoint*>(this->objects[i])->isControlPoint())p = std::make_pair("Origin" ,":/ToolImages/Dot.png");
             if(objects[i]->is<CLine>  ())p = std::make_pair("CLine"  ,":/ToolImages/Line.png");
-            //if(objects[i]->is<CRect>  ())p = std::make_pair("CRect"  ,":/ToolImages/Rect.png");
             if(objects[i]->is<CArc>   ())p = std::make_pair("CArc"   ,":/ToolImages/Arc.png");
             if(objects[i]->is<CSpline>())p = std::make_pair("CSpline",":/ToolImages/Spline.png");
+
             list->addTopLevelItem(new QTreeWidgetItem());
             list->topLevelItem(list->topLevelItemCount()-1)->setText(0,p.first.c_str());
             list->topLevelItem(list->topLevelItemCount()-1)->setIcon(0,QIcon(p.second.c_str()));
-            list->topLevelItem(i)->setSelected(exist(CObject::selected,objects[i]));
+            for(int j=0;j<dynamic_cast<CEdge*>(this->objects[i])->GetMiddleCount()+2;j++){
+                QTreeWidgetItem* child = new QTreeWidgetItem();
+                child->setIcon(0,QIcon(":/ToolImages/Dot.png"));
+                if(j == 0){
+                    child->setText(0,"CPoint(Start)");
+                }
+                else if(j == dynamic_cast<CEdge*>(this->objects[i])->GetMiddleCount()+1){
+                    child->setText(0,"CPoint(End)");
+                }
+                else{
+                    child->setText(0,QString("CPoint(Middle_") + QString::number(j) + ")");
+                }
+                list->topLevelItem(list->topLevelItemCount()-1)->addChild(child);
+
+            }
+
+            //list->topLevelItem(list->topLevelItemCount()-1)->setSelected(exist(CObject::selected,objects[i]));
         }
     }
 }
