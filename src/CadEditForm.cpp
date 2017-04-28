@@ -201,6 +201,13 @@ void CadEditForm::paintEvent(QPaintEvent*){
     paint.setPen(QPen(Qt::blue, CObject::DRAWING_LINE_SIZE / this->scale,Qt::SolidLine,Qt::RoundCap));
     for(CObject* obj:objects){
         obj->Draw(paint);
+        if(obj->is<CEdge>()){
+            dynamic_cast<CEdge*>(obj)->start->Draw(paint);
+            dynamic_cast<CEdge*>(obj)->end  ->Draw(paint);
+            for(int i=0;i<dynamic_cast<CEdge*>(obj)->GetMiddleCount();i++){
+                dynamic_cast<CEdge*>(obj)->GetMiddle(i)->Draw(paint);
+            }
+        }
     }
     //選択されたオブジェクト
     paint.setPen(QPen(Qt::cyan, CObject::DRAWING_LINE_SIZE / this->scale,Qt::SolidLine,Qt::RoundCap));
@@ -381,11 +388,11 @@ void CadEditForm::MakeObject(){
                 MakeJoint(make_obj);
 
                 //端点をオブジェクトリストに追加
-                this->AddObject(make_obj->start);
-                this->AddObject(make_obj->end);
+                //this->AddObject(make_obj->start);
+                //this->AddObject(make_obj->end);
                 //中継点をオブジェクトリストに追加
                 for(int i =0;i<make_obj->GetMiddleCount();i++){
-                    this->AddObject(make_obj->GetMiddle(i));
+                    //this->AddObject(make_obj->GetMiddle(i));
                 }
                 //終端を持つ
                 this->hang_point = make_obj->end;
@@ -639,26 +646,43 @@ void CadEditForm::ApplyObjectList(QTreeWidget* list){
     for(int i=0;i<list->topLevelItemCount();i++){
         QTreeWidgetItem* item = list->topLevelItem(i);
         QString text = item->text(0);
-        if(text == "Origin") text = "CPoint";
-
         //カウント
         if(map.find(text) != map.end()){
             map[text]++;
         }else map.insert(text,1);
 
 
-        if(item->isSelected()){
+        if(text == "Origin"){
+            if(item->isSelected()){
+                CObject::selected.push_back(this->origin);
+            }
+        }else{
             //CObject::selected内をループ
             int count = 0;
             int j;
             for(j = 0;count < map[text];j++){
                 if(this->objects[j]->is<CPoint >() && text=="CPoint" )count++;
                 if(this->objects[j]->is<CLine  >() && text=="CLine"  )count++;
-                //if(this->objects[j]->is<CRect  >() && text=="CRect"  )count++;
                 if(this->objects[j]->is<CArc   >() && text=="CArc"   )count++;
                 if(this->objects[j]->is<CSpline>() && text=="CSpline")count++;
             }
-            CObject::selected.push_back(this->objects[j-1]);
+            if(item->isSelected()){
+                CObject::selected.push_back(this->objects[j-1]);
+            }
+            //子が選択されているか
+            for(int k=0;k<item->childCount();k++){
+                if(item->child(k)->isSelected()){
+                    if(k==0){
+                        CObject::selected.push_back(dynamic_cast<CEdge*>(this->objects[j-1])->start);
+                    }
+                    else if(k == dynamic_cast<CEdge*>(this->objects[i])->GetMiddleCount()+1){
+                        CObject::selected.push_back(dynamic_cast<CEdge*>(this->objects[j-1])->end);
+                    }else{
+                        CObject::selected.push_back(dynamic_cast<CEdge*>(this->objects[j-1])->GetMiddle(k-1));
+                    }
+
+                }
+            }
         }
     }
 }
@@ -666,10 +690,15 @@ void CadEditForm::DrawObjectList(QTreeWidget* list){
     if(list->topLevelItemCount() != this->objects.size()){
         list->clear();
         for(int i=0;i<this->objects.size();i++){
-            if(this->objects[i]->is<CPoint>())continue;
+            if(this->objects[i]->is<CPoint>() && !dynamic_cast<CPoint*>(this->objects[i])->isControlPoint())continue;
+
             std::pair<std::string,std::string> p;
-            //if(objects[i]->is<CPoint> () && !dynamic_cast<CPoint*>(this->objects[i])->isControlPoint())p = std::make_pair("CPoint" ,":/ToolImages/Dot.png");
-            //if(objects[i]->is<CPoint> () &&  dynamic_cast<CPoint*>(this->objects[i])->isControlPoint())p = std::make_pair("Origin" ,":/ToolImages/Dot.png");
+            if(objects[i]->is<CPoint> ()){
+                list->addTopLevelItem(new QTreeWidgetItem());
+                list->topLevelItem(list->topLevelItemCount()-1)->setText(0,"Origin");
+                list->topLevelItem(list->topLevelItemCount()-1)->setIcon(0,QIcon(":/ToolImages/Dot.png"));
+                continue;
+            }
             if(objects[i]->is<CLine>  ())p = std::make_pair("CLine"  ,":/ToolImages/Line.png");
             if(objects[i]->is<CArc>   ())p = std::make_pair("CArc"   ,":/ToolImages/Arc.png");
             if(objects[i]->is<CSpline>())p = std::make_pair("CSpline",":/ToolImages/Spline.png");

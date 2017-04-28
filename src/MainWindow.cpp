@@ -25,9 +25,9 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionLoad,SIGNAL(triggered())         ,ui->CadEdit   ,SLOT(Load()));
 
     //リスト変更系
-    connect(ui->RestraintList        ,SIGNAL(itemSelectionChanged())      ,this       ,SLOT(MakeRestraint()));
-    connect(ui->ObjectList           ,SIGNAL(itemSelectionChanged())      ,this       ,SLOT(ReciveObjectListChanged()));
-    connect(ui->BlockList            ,SIGNAL(itemSelectionChanged())      ,this       ,SLOT(ReciveBlockListChanged ()));
+    connect(ui->RestraintList ,SIGNAL(itemSelectionChanged()) ,this ,SLOT(MakeRestraint()));
+    connect(ui->ObjectList    ,SIGNAL(itemSelectionChanged()) ,this ,SLOT(ReciveObjectListChanged()));
+    connect(ui->BlockList     ,SIGNAL(itemSelectionChanged()) ,this ,SLOT(ReciveBlockListChanged ()));
 
     //CadEditFoamにイベントフィルター導入
     this->installEventFilter(ui->CadEdit);
@@ -204,6 +204,7 @@ void MainWindow::MakeBlock(){
 
 void MainWindow::ReciveObjectListChanged(){
     this->ui->CadEdit->ApplyObjectList(this->ui->ObjectList);
+    this->ui->ObjectList->repaint();
     RefreshUI();
 }
 void MainWindow::ReciveBlockListChanged(){
