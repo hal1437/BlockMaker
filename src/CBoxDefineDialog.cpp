@@ -31,10 +31,11 @@ QString      CBoxDefineDialog::ConvertBoundaryToString(BoundaryType type)const{
     else if(type == BoundaryType::CyclicAMI    )return QString("cyclicAMI (不整合周期境界)");
     else if(type == BoundaryType::Wedge        )return QString("wedge (2次元軸対称)");
     else if(type == BoundaryType::Empty        )return QString("empty (2次元)");
+    else if(type == BoundaryType::None         )return QString("None(連続)");
     else return QString("Unknown");
 }
 BoundaryType CBoxDefineDialog::ConvertStringToBoundary(QString str)const{
-    for(int i=0;i<7;i++){
+    for(int i=0;i<8;i++){
         if(str == ConvertBoundaryToString(static_cast<BoundaryType>(i))){
             return static_cast<BoundaryType>(i);
         }

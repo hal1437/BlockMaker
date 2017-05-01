@@ -42,28 +42,35 @@ QVector<VPos> ExportDialog::GetVerticesPos() const{
 }
 
 QVector<VPos> ExportDialog::GetBoundaryPos(CBlock block,BoundaryDir dir)const{
-    QVector<Pos> vertices = block.GetVerticesPos();
+    QVector<VPos> vertices;
     QVector<VPos> ans;
+    vertices.resize(8);
+    for(int i=0;i<4;i++){
+        vertices[i]   = VPos{block.GetVerticesPos()[i].x,block.GetVerticesPos()[i].y,0};
+        vertices[i+4] = VPos{block.GetVerticesPos()[i].x,block.GetVerticesPos()[i].y,block.depth};
+    }
 
     if(dir == BoundaryDir::Front){    //前面
-        for(Pos p:vertices){
-            ans.push_back(VPos{p.x,p.y,0});
-        }
+        ans.push_back(vertices[0]);
+        ans.push_back(vertices[3]);
+        ans.push_back(vertices[2]);
+        ans.push_back(vertices[1]);
     }else if(dir == BoundaryDir::Back){    //背面
-        for(Pos p:vertices){
-            ans.push_back(VPos{p.x,p.y,block.depth});
-        }
+        ans.push_back(vertices[4]);
+        ans.push_back(vertices[5]);
+        ans.push_back(vertices[6]);
+        ans.push_back(vertices[7]);
     }else{
-        if(dir == BoundaryDir::Top   )std::sort(vertices.begin(),vertices.end(),[](Pos lhs,Pos rhs){return lhs.y > rhs.y;}); //上面
-        if(dir == BoundaryDir::Bottom)std::sort(vertices.begin(),vertices.end(),[](Pos lhs,Pos rhs){return lhs.y < rhs.y;}); //下面
-        if(dir == BoundaryDir::Right )std::sort(vertices.begin(),vertices.end(),[](Pos lhs,Pos rhs){return lhs.x > rhs.x;}); //右面
-        if(dir == BoundaryDir::Left  )std::sort(vertices.begin(),vertices.end(),[](Pos lhs,Pos rhs){return lhs.x < rhs.x;}); //左面
+        int index;
+        if(dir == BoundaryDir::Top   )index = 2; //上面
+        if(dir == BoundaryDir::Bottom)index = 0; //下面
+        if(dir == BoundaryDir::Right )index = 1; //右面
+        if(dir == BoundaryDir::Left  )index = 3; //左面
 
-        //ソート結果の1番2番のみ抽出
-        ans.push_back(VPos{vertices[0].x,vertices[0].y,0});
-        ans.push_back(VPos{vertices[0].x,vertices[0].y,block.depth});
-        ans.push_back(VPos{vertices[1].x,vertices[1].y,block.depth});
-        ans.push_back(VPos{vertices[1].x,vertices[1].y,0});
+        ans.push_back(vertices[(index+1)%4]);
+        ans.push_back(vertices[(index+1)%4+4]);
+        ans.push_back(vertices[index+4]);
+        ans.push_back(vertices[index]);
     }
 
     return ans;
@@ -133,7 +140,7 @@ void ExportDialog::Export(QString filename)const{
             }
             file.OutVectorInline(grading_args);
         }
-        file.OutStringInline(NEWLINE);
+        file.OutNewline();
     }    
     file.EndScope();
 
@@ -158,6 +165,10 @@ void ExportDialog::Export(QString filename)const{
     }
     QMap<QString,std::pair<BoundaryType,QVector<int>>>::const_iterator it = boundary_list.constBegin();
     while (it != boundary_list.constEnd()) {
+        if(it.value().first == BoundaryType::None){
+            it++;
+            continue;
+        }
         //境界名
         file.StartDictionaryDifinition(it.key());
 

@@ -127,25 +127,10 @@ void CBlock::Draw(QPainter& painter)const{
 
 QVector<Pos> CBlock::GetVerticesPos()const{
     //0~4で巡回するように
-
     QVector<Pos> pp;
-    Pos old;
-    pp.push_back(*lines[0]->start); //先頭
-    old = *lines[0]->start;
-
-    //oldの相方を含むlineを探す
     for(int i=0;i<4;i++){
-        if(*lines[i]->start == old && !exist(pp,*lines[i]->end)){
-            pp.push_back(*lines[i]->end);
-            old = *lines[i]->end;
-            i = 0;
-        }else if(*lines[i]->end == old && !exist(pp,*lines[i]->start)){
-            pp.push_back(*lines[i]->start);
-            old = *lines[i]->start;
-            i = 0;
-        }
+        pp.push_back(this->GetClockworksPos(i));
     }
-
     return pp;
 }
 Pos CBlock::GetClockworksPos(int index)const{

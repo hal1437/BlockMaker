@@ -72,6 +72,11 @@
             <string>wedge (2次元軸対称)</string>
            </property>
           </item>
+          <item>
+           <property name="text">
+            <string>連続</string>
+           </property>
+          </item>
          </widget>
         </item>
         <item row="0" column="1" colspan="2">
@@ -195,6 +200,11 @@
             <string>wedge (2次元軸対称)</string>
            </property>
           </item>
+          <item>
+           <property name="text">
+            <string>連続</string>
+           </property>
+          </item>
          </widget>
         </item>
         <item row="0" column="0">
@@ -275,6 +285,11 @@
           <item>
            <property name="text">
             <string>wedge (2次元軸対称)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>None(連続)</string>
            </property>
           </item>
          </widget>
@@ -396,6 +411,11 @@
             <string>wedge (2次元軸対称)</string>
            </property>
           </item>
+          <item>
+           <property name="text">
+            <string>None(連続)</string>
+           </property>
+          </item>
          </widget>
         </item>
        </layout>
@@ -448,6 +468,11 @@
           <item>
            <property name="text">
             <string>wedge (2次元軸対称)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>None(連続)</string>
            </property>
           </item>
          </widget>
@@ -530,6 +555,11 @@
           <item>
            <property name="text">
             <string>wedge (2次元軸対称)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>None(連続)</string>
            </property>
           </item>
          </widget>

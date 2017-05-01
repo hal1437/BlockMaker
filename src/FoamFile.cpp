@@ -55,6 +55,9 @@ void FoamFile::OutHeader(){
 
     this->EndScope();
 }
+void FoamFile::OutNewline(){
+    ofs << NEWLINE;
+}
 
 FoamFile::FoamFile(QString str):
     file(str),ofs(&file)

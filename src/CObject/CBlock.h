@@ -27,6 +27,7 @@ enum BoundaryType{
     Cyclic,
     CyclicAMI,
     Wedge,
+    None,//連続
 };
 //格子点間隔の種類
 enum GradingType{

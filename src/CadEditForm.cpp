@@ -184,13 +184,7 @@ void CadEditForm::paintEvent(QPaintEvent*){
     for(SmartDimension* dim:dimensions){
         dim->Draw(paint);
     }
-/*
-    //原点を描画
-    paint.drawLine(-5,-5,+5,-5);
-    paint.drawLine(+5,-5,+5,+5);
-    paint.drawLine(+5,+5,-5,+5);
-    paint.drawLine(-5,+5,-5,-5);
-*/
+
     //普通のオブジェクト
     paint.setPen(QPen(Qt::blue, CObject::DRAWING_LINE_SIZE / this->scale,Qt::SolidLine,Qt::RoundCap));
     for(CEdge* obj:this->edges){

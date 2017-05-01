@@ -47,6 +47,8 @@ public:
     void OutString(QString str);               //文字列出力
     void EndScope();                           //閉じかっこ出力
     void OutHeader();                          //ヘッダー出力
+    void OutNewline();                         //改行出力
+
 
     //改行&タブなし出力
     template<class T>
