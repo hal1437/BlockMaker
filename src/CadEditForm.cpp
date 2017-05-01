@@ -201,6 +201,7 @@ void CadEditForm::paintEvent(QPaintEvent*){
             dynamic_cast<CEdge*>(obj)->GetMiddle(i)->Draw(paint);
         }
     }
+    this->origin->Draw(paint);
     //選択されたオブジェクト
     paint.setPen(QPen(Qt::cyan, CObject::DRAWING_LINE_SIZE / this->scale,Qt::SolidLine,Qt::RoundCap));
     for(CObject* obj:CObject::selected){
@@ -311,6 +312,7 @@ CadEditForm::~CadEditForm()
 }
 
 CObject* CadEditForm::getHanged(){
+    if(this->origin->isSelectable(CObject::mouse_pos))return this->origin;
     for(CEdge* obj:this->edges){
         if(obj->isCreating())continue;
 
@@ -644,7 +646,7 @@ void CadEditForm::RefreshRestraints(){
 }
 
 
-void CadEditForm::ApplyObjectList(QTreeWidget* list){
+void CadEditForm::ImportObjectList(QTreeWidget* list){
     //CObject::selectedを更新する。
     //ポインタを保持していないため、添字でカウント
     CObject::selected.clear();
@@ -692,19 +694,17 @@ void CadEditForm::ApplyObjectList(QTreeWidget* list){
         }
     }
 }
-void CadEditForm::DrawObjectList(QTreeWidget* list){
-    if(list->topLevelItemCount() != this->edges.size()){
+void CadEditForm::ExportObjectList(QTreeWidget* list){
+    if(list->topLevelItemCount() != this->edges.size()+1){
         list->clear();
-        for(int i=0;i<this->edges.size();i++){
-            if(this->edges[i]->is<CPoint>() && !dynamic_cast<CPoint*>(this->edges[i])->isControlPoint())continue;
 
+        //原点を追加
+        list->addTopLevelItem(new QTreeWidgetItem());
+        list->topLevelItem(list->topLevelItemCount()-1)->setText(0,"Origin");
+        list->topLevelItem(list->topLevelItemCount()-1)->setIcon(0,QIcon(":/ToolImages/Dot.png"));
+
+        for(int i=0;i<this->edges.size();i++){
             std::pair<std::string,std::string> p;
-            if(this->edges[i]->is<CPoint> ()){
-                list->addTopLevelItem(new QTreeWidgetItem());
-                list->topLevelItem(list->topLevelItemCount()-1)->setText(0,"Origin");
-                list->topLevelItem(list->topLevelItemCount()-1)->setIcon(0,QIcon(":/ToolImages/Dot.png"));
-                continue;
-            }
             if(this->edges[i]->is<CLine>  ())p = std::make_pair("CLine"  ,":/ToolImages/Line.png");
             if(this->edges[i]->is<CArc>   ())p = std::make_pair("CArc"   ,":/ToolImages/Arc.png");
             if(this->edges[i]->is<CSpline>())p = std::make_pair("CSpline",":/ToolImages/Spline.png");
@@ -728,11 +728,10 @@ void CadEditForm::DrawObjectList(QTreeWidget* list){
 
             }
 
-            //list->topLevelItem(list->topLevelItemCount()-1)->setSelected(exist(CObject::selected,objects[i]));
         }
     }
 }
-void CadEditForm::ApplyCBoxList  (QListWidget *list){
+void CadEditForm::ImportCBoxList  (QListWidget *list){
     //selecting_blockを更新する
     this->selecting_block = -1;
     for(int i=0;i<list->count();i++){
@@ -742,7 +741,7 @@ void CadEditForm::ApplyCBoxList  (QListWidget *list){
         }
     }
 }
-void CadEditForm::DrawCBoxList   (QListWidget *list){
+void CadEditForm::ExportCBoxList   (QListWidget *list){
     //数が一致しなければ、全て削除し再度代入する
     if(list->count() != this->blocks.size()){
         list->clear();

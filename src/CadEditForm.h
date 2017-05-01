@@ -115,10 +115,10 @@ public slots:
     bool MakeBlock();                       //物体生成
     void RefreshRestraints();               //拘束更新
 
-    void ApplyObjectList(QTreeWidget *list); //オブジェクトリスト選択
-    void DrawObjectList (QTreeWidget *list); //オブジェクトリスト描画
-    void ApplyCBoxList  (QListWidget *list); //ブロックリスト選択
-    void DrawCBoxList   (QListWidget *list); //ブロックリスト描画
+    void ImportObjectList(QTreeWidget *list); //オブジェクトリスト選択
+    void ExportObjectList (QTreeWidget *list); //オブジェクトリスト描画
+    void ImportCBoxList  (QListWidget *list); //ブロックリスト選択
+    void ExportCBoxList   (QListWidget *list); //ブロックリスト描画
     void ConfigureBlock (QListWidgetItem*);  //ブロック再編集
 
     void SetState(CEnum state); //生成種類設定

@@ -32,6 +32,8 @@ MainWindow::MainWindow(QWidget *parent) :
     //CadEditFoamにイベントフィルター導入
     this->installEventFilter(ui->CadEdit);
     RefreshUI();
+    ReciveObjectListChanged();
+    ReciveBlockListChanged();
     ConnectSignals();
     ui->ToolBlocks->setEnabled(false);
     ui->ObjectList->setSelectionMode(QAbstractItemView::ExtendedSelection);
@@ -121,8 +123,8 @@ void MainWindow::RefreshUI(){
         ui->RestraintList->addItem(new QListWidgetItem(p.first.c_str()));
         ui->RestraintList->item(ui->RestraintList->count()-1)->setIcon(QIcon(p.second.c_str()));
     }
-    this->ui->CadEdit->DrawObjectList(this->ui->ObjectList);
-    this->ui->CadEdit->DrawCBoxList  (this->ui->BlockList);
+    this->ui->CadEdit->ExportObjectList(this->ui->ObjectList);
+    this->ui->CadEdit->ExportCBoxList  (this->ui->BlockList);
 
     //拘束更新
     ui->CadEdit->RefreshRestraints();
@@ -204,12 +206,12 @@ void MainWindow::MakeBlock(){
 
 
 void MainWindow::ReciveObjectListChanged(){
-    this->ui->CadEdit->ApplyObjectList(this->ui->ObjectList);
+    this->ui->CadEdit->ImportObjectList(this->ui->ObjectList);
     this->ui->ObjectList->repaint();
     RefreshUI();
 }
 void MainWindow::ReciveBlockListChanged(){
-    this->ui->CadEdit->ApplyCBoxList  (this->ui->BlockList);
+    this->ui->CadEdit->ImportCBoxList  (this->ui->BlockList);
     RefreshUI();
 }
 void MainWindow::RefreshStatusBar(Pos){
