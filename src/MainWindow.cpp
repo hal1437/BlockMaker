@@ -169,8 +169,9 @@ void MainWindow::ResetAllExpantion(){
 }
 
 void MainWindow::MoveTransform(){
-    MoveTransformDialog* diag = new MoveTransformDialog(this);
+    static MoveTransformDialog* diag = new MoveTransformDialog(this);
     connect(diag,SIGNAL(RepaintRequest()),this,SLOT(repaint()));
+    diag->setWindowFlags(Qt::Dialog | Qt::WindowStaysOnTopHint);
     diag->show();
 }
 

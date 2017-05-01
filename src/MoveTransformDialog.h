@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include "CObject/CObject.h"
+#include "CObject/CPoint.h"
 
 namespace Ui {
 class MoveTransformDialog;
