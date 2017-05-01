@@ -187,7 +187,7 @@ Pos CBlock::GetClockworksPos(int index)const{
         for(CEdge* line:lines){
             if(ans == *line->start && old != *line->end){
                 candidate.push_back(*line->end);
-            }else if(ans == *line->end && old != *line->end){
+            }else if(ans == *line->end && old != *line->start){
                 candidate.push_back(*line->start);
             }
         }
