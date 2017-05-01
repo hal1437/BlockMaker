@@ -312,9 +312,25 @@ CadEditForm::~CadEditForm()
 
 CObject* CadEditForm::getHanged(){
     for(CEdge* obj:this->edges){
-        if(obj->isSelectable(CObject::mouse_pos)/* && obj != this->hang_point*/){
+        if(obj->isCreating())continue;
+
+        //端点
+        if(obj->start->isSelectable(CObject::mouse_pos)){
+            return obj->start;
+        }
+        if(obj->end  ->isSelectable(CObject::mouse_pos)){
+            return obj->end;
+        }
+        for(int i=0;i<obj->GetMiddleCount();i++){
+            if(obj->GetMiddle(i)->isSelectable(CObject::mouse_pos)){
+                return obj->GetMiddle(i);
+            }
+        }
+        //エッジ自身
+        if(obj->isSelectable(CObject::mouse_pos)){
             return obj;
         }
+
     }
     return nullptr;
 }
