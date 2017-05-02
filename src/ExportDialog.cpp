@@ -126,7 +126,7 @@ void ExportDialog::Export(QString filename)const{
         file.OutVectorInline(div_indices);
 
         //分割パラメータ
-        QVector<int> grading_args;
+        QVector<double> grading_args;
         if(block.grading == GradingType::SimpleGrading){
             file.OutStringInline("simpleGrading");
             for(int i=0;i<3;i++){
