@@ -118,7 +118,7 @@ void CBlock::Draw(QPainter& painter)const{
         painter.drawLine(QPointF(this->GetDivisionPoint(0,i).x,this->GetDivisionPoint(0,i).y),
                          QPointF(this->GetDivisionPoint(2,i).x,this->GetDivisionPoint(2,i).y));
     }
-    for(int i =0;i<=this->div[0];i++){
+    for(int i =0;i<=this->div[1];i++){
         painter.drawLine(QPointF(this->GetDivisionPoint(1,i).x,this->GetDivisionPoint(1,i).y),
                          QPointF(this->GetDivisionPoint(3,i).x,this->GetDivisionPoint(3,i).y));
     }
