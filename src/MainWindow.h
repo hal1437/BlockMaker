@@ -48,11 +48,11 @@ public slots:
     void ResetAllExpantion(); //拡大、移動リセット
     void MoveTransform();     //移動
 
-    void MakeRestraint();   //拘束作成
+    void MakeRestraint(QModelIndex);   //拘束作成
     void MakeBlock();       //ブロック作成
 
-    void ReciveObjectListChanged(); //オブジェクトリスト更新
-    void ReciveBlockListChanged (); //ブロックリスト更新
+    void ReciveObjectListChanged(QModelIndex); //オブジェクトリスト更新
+    void ReciveBlockListChanged (QModelIndex); //ブロックリスト更新
     void RefreshStatusBar(Pos);        //ステータスバー更新
 };
 

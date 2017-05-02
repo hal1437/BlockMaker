@@ -426,6 +426,7 @@ void CadEditForm::MakeObject(){
             CObject::creating = nullptr;
             this->hang_point = nullptr;
             make_result = COMPLETE;
+            CObject::hanged = this->getHanged();
 
         }else if(make_result == ENDLESS){
             //hangedが存在した場合
@@ -645,15 +646,12 @@ void CadEditForm::ImportObjectList(QTreeWidget* list){
     //CObject::selectedを更新する。
     //ポインタを保持していないため、添字でカウント
     CObject::selected.clear();
-    QMap<QString,int>map;
+
     for(int i=0;i<list->topLevelItemCount();i++){
         QTreeWidgetItem* item = list->topLevelItem(i);
-        QString text = item->text(0);
-        //カウント
-        if(map.find(text) != map.end()){
-            map[text]++;
-        }else map.insert(text,1);
+        QString          text = item->text(0);
 
+        if(i > this->edges.size())continue;
 
         if(text == "Origin"){
             if(item->isSelected()){
@@ -661,29 +659,21 @@ void CadEditForm::ImportObjectList(QTreeWidget* list){
             }
         }else{
             //CObject::selected内をループ
-            int count = 0;
-            int j;
-            for(j = 0;count < map[text];j++){
-                if(this->edges[j]->is<CPoint >() && text=="CPoint" )count++;
-                if(this->edges[j]->is<CLine  >() && text=="CLine"  )count++;
-                if(this->edges[j]->is<CArc   >() && text=="CArc"   )count++;
-                if(this->edges[j]->is<CSpline>() && text=="CSpline")count++;
-            }
             if(item->isSelected()){
-                CObject::selected.push_back(this->edges[j-1]);
+                CObject::selected.push_back(this->edges[i-1]);
             }
             //子が選択されているか
             for(int k=0;k<item->childCount();k++){
                 if(item->child(k)->isSelected()){
                     if(k==0){
-                        CObject::selected.push_back(this->edges[j-1]->start);
+                        CObject::selected.push_back(this->edges[i-1]->start);
                     }
-                    else if(k == this->edges[i]->GetMiddleCount()+1){
-                        CObject::selected.push_back(this->edges[j-1]->end);
-                    }else{
-                        CObject::selected.push_back(this->edges[j-1]->GetMiddle(k-1));
+                    else if(k == this->edges[i-1]->GetMiddleCount()+1){
+                        CObject::selected.push_back(this->edges[i-1]->end);
                     }
-
+                    else{
+                        CObject::selected.push_back(this->edges[i-1]->GetMiddle(k-1));
+                    }
                 }
             }
         }
@@ -704,9 +694,16 @@ void CadEditForm::ExportObjectList(QTreeWidget* list){
             if(this->edges[i]->is<CArc>   ())p = std::make_pair("CArc"   ,":/ToolImages/Arc.png");
             if(this->edges[i]->is<CSpline>())p = std::make_pair("CSpline",":/ToolImages/Spline.png");
 
+            //オブジェクト追加
             list->addTopLevelItem(new QTreeWidgetItem());
             list->topLevelItem(list->topLevelItemCount()-1)->setText(0,p.first.c_str());
             list->topLevelItem(list->topLevelItemCount()-1)->setIcon(0,QIcon(p.second.c_str()));
+
+            if(!list->topLevelItem(list->topLevelItemCount()-1)->isSelected()){
+                list->topLevelItem(list->topLevelItemCount()-1)->setSelected(this->edges[i]->isSelected());
+            }
+
+            //子の設定
             for(int j=0;j<this->edges[i]->GetMiddleCount()+2;j++){
                 QTreeWidgetItem* child = new QTreeWidgetItem();
                 child->setIcon(0,QIcon(":/ToolImages/Dot.png"));
@@ -720,11 +717,29 @@ void CadEditForm::ExportObjectList(QTreeWidget* list){
                     child->setText(0,QString("CPoint(Middle_") + QString::number(j) + ")");
                 }
                 list->topLevelItem(list->topLevelItemCount()-1)->addChild(child);
-
             }
-
         }
     }
+
+    //選択状態の反映
+    for(int i=0;i<list->topLevelItemCount();i++){
+        if(i == 0){
+            //原点
+            list->topLevelItem(0)->setSelected(this->origin->isSelected());
+        }else{
+            //Edge自身
+            list->topLevelItem(i)->setSelected(this->edges[i-1]->isSelected());
+
+            //端点
+            list->topLevelItem(i)->child(0)->setSelected(this->edges[i-1]->start->isSelected());
+            list->topLevelItem(i)->child(1)->setSelected(this->edges[i-1]->end->isSelected());
+            for(int j=0;j<this->edges[i-1]->GetMiddleCount();j++){
+                list->topLevelItem(i)->child(j+2)->setSelected(this->edges[i-1]->GetMiddle(j)->isSelected());
+            }
+        }
+    }
+
+
 }
 void CadEditForm::ImportCBoxList  (QListWidget *list){
     //selecting_blockを更新する
@@ -745,10 +760,6 @@ void CadEditForm::ExportCBoxList   (QListWidget *list){
             list->item(list->count()-1)->setIcon(QIcon(":/ToolImages/Blocks.png"));
             list->item(list->count()-1)->setSelected(selecting_block == i);
         }
-    }
-    //選択情報を更新
-    for(int i=0;i<this->blocks.size();i++){
-        //list->item(i)->setSelected(exist(this->selecting_block,&blocks[i]));
     }
 }
 void CadEditForm::ConfigureBlock(QListWidgetItem*){
