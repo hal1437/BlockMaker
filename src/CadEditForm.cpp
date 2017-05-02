@@ -527,13 +527,14 @@ void CadEditForm::MakeRestraint(RestraintType type){
 }
 bool CadEditForm::MakeBlock(){
     CBoxDefineDialog* diag = new CBoxDefineDialog();
+
     if(diag->exec()){
         //QVector<CObject*>からQVector<CEdge*>に変換
         QVector<CEdge*> edges;
         for(CObject* obj:CObject::selected)edges.push_back(dynamic_cast<CEdge*>(obj));
 
         CBlock block = diag->ExportCBlock();
-        block.SetNodeAll(edges);
+        block.SetEdgeAll(edges);
         this->blocks.push_back(block);
         CObject::selected.clear();
     }
@@ -757,9 +758,9 @@ void CadEditForm::ConfigureBlock(QListWidgetItem*){
     diag->ImportCBlock(this->blocks[selecting_block]);
     if(diag->exec()){
         QVector<CEdge*> ll;
-        for(int i =0;i<4;i++)ll.push_back(dynamic_cast<CEdge*>(this->blocks[selecting_block].GetNode(i)));
+        for(int i =0;i<4;i++)ll.push_back(dynamic_cast<CEdge*>(this->blocks[selecting_block].GetEdge(i)));
         this->blocks[selecting_block] = diag->ExportCBlock();
-        this->blocks[selecting_block].SetNodeAll(ll);
+        this->blocks[selecting_block].SetEdgeAll(ll);
     }
 }
 

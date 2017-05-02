@@ -158,6 +158,7 @@ void ExportDialog::Export(QString filename)const{
             //頂点番号リスト出力
             QVector<VPos> vp = this->GetBoundaryPos(block,static_cast<BoundaryDir>(i));
             for(VPos v:vp){
+                if(block.boundery[i] == BoundaryType::None)continue;//連続は登録しない
                 boundary_list[block.name[i]].first = block.boundery[i];
                 boundary_list[block.name[i]].second.push_back(GetPosIndex(v));
             }
@@ -165,10 +166,7 @@ void ExportDialog::Export(QString filename)const{
     }
     QMap<QString,std::pair<BoundaryType,QVector<int>>>::const_iterator it = boundary_list.constBegin();
     while (it != boundary_list.constEnd()) {
-        if(it.value().first == BoundaryType::None){
-            it++;
-            continue;
-        }
+
         //境界名
         file.StartDictionaryDifinition(it.key());
 

@@ -2,9 +2,6 @@
 #include "ui_CBoxDefineDialog.h"
 #include <QMessageBox>
 
-
-void CBoxDefineDialog::paintEvent    (QPaintEvent* ){
-}
 QComboBox* CBoxDefineDialog::ConvertDirToCombo   (BoundaryDir dir)const{
     if     (dir == Top   )return ui->TopTypecombo;
     else if(dir == Right )return ui->RightTypecombo;
@@ -101,6 +98,16 @@ void CBoxDefineDialog::SetBoundaryName(BoundaryDir dir,QString name){
 }
 void CBoxDefineDialog::SetBoundaryType(BoundaryDir dir,BoundaryType type){
     this->ConvertDirToCombo(dir)->setCurrentText(ConvertBoundaryToString(type));
+}
+
+void CBoxDefineDialog::ConnectionLock(BoundaryDir dir,bool lock){
+    //ロック
+    if(lock == true){
+        this->ConvertDirToCombo(dir)->setCurrentText(ConvertBoundaryToString(BoundaryType::None));
+        this->ConvertDirToCombo(dir)->setEnabled(true);
+    }else{
+        this->ConvertDirToCombo(dir)->setEnabled(false);
+    }
 }
 
 //エラー判定

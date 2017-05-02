@@ -81,16 +81,16 @@ bool CBlock::Creatable(QVector<CObject*> values){
     return false;
 }
 
-void CBlock::SetNodeAll(QVector<CEdge*> lines){
+void CBlock::SetEdgeAll(QVector<CEdge*> lines){
     //CRect一つでも可
     this->lines = lines;
 }
 
-void CBlock::SetNode(int index,CEdge* line){
+void CBlock::SetEdge(int index,CEdge* line){
     this->lines[index] = line;
 }
 
-CObject* CBlock::GetNode(int index)const{
+CObject* CBlock::GetEdge(int index)const{
     return this->lines[index];
 }
 
@@ -180,7 +180,7 @@ Pos CBlock::GetClockworksPos(int index)const{
         old = ans;
         if(candidate.size() == 2){
             //二択
-            if(Pos::Angle(candidate[0]-corner,candidate[1]-corner) < Pos::Angle(candidate[0]-corner,candidate[1]-corner)){
+            if(Pos::Angle(candidate[0]-corner,candidate[1]-corner) > Pos::Angle(candidate[1]-corner,candidate[0]-corner)){
                 ans = candidate[0];
             }else{
                 ans = candidate[1];

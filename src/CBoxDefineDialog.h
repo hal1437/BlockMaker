@@ -20,7 +20,6 @@ private:
     BoundaryType types_log[6];
 
 protected:
-    void paintEvent    (QPaintEvent* event); //描画イベントハンドラ
     QComboBox*   ConvertDirToCombo      (BoundaryDir  dir)const;
     QLineEdit*   ConvertDirToNameEdit   (BoundaryDir  dir)const;
     QString      ConvertBoundaryToString(BoundaryType type)const;
@@ -39,6 +38,9 @@ public:
     void SetBoundaryName(BoundaryDir dir,QString name     );
     void SetBoundaryType(BoundaryDir dir,BoundaryType type);
     QString GetVertices (BoundaryDir dir)const;
+
+    //接続モード
+    void ConnectionLock(BoundaryDir dir,bool lock);
 
     //エラー判定
     QString FormatError()const;

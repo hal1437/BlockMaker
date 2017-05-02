@@ -65,9 +65,9 @@ public:
     //描画
     void Draw(QPainter& painter)const;
 
-    void SetNodeAll(QVector<CEdge*> lines);
-    void SetNode(int index, CEdge *line);
-    CObject* GetNode(int index)const;
+    void SetEdgeAll(QVector<CEdge*> lines);
+    void SetEdge(int index, CEdge *line);
+    CObject* GetEdge(int index)const;
     QVector<Pos> GetVerticesPos()const;
     Pos GetClockworksPos(int index) const;//時計回り番号取得
 
