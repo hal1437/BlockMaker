@@ -25,16 +25,16 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionLoad,SIGNAL(triggered())         ,ui->CadEdit   ,SLOT(Load()));
 
     //リスト変更系
-    connect(ui->RestraintList ,SIGNAL(clicked(QModelIndex)) ,this ,SLOT(MakeRestraint(QModelIndex)));
-    connect(ui->ObjectList    ,SIGNAL(clicked(QModelIndex)) ,this ,SLOT(ReciveObjectListChanged(QModelIndex)));
-    connect(ui->BlockList     ,SIGNAL(clicked(QModelIndex)) ,this ,SLOT(ReciveBlockListChanged (QModelIndex)));
+    connect(ui->RestraintList ,SIGNAL(itemSelectionChanged()) ,this ,SLOT(MakeRestraint()));
+    connect(ui->ObjectList    ,SIGNAL(itemSelectionChanged()) ,this ,SLOT(ReciveObjectListChanged()));
+    connect(ui->BlockList     ,SIGNAL(itemSelectionChanged()) ,this ,SLOT(ReciveBlockListChanged ()));
 
     //CadEditFoamにイベントフィルター導入
     this->installEventFilter(ui->CadEdit);
 
     RefreshUI();
-    ReciveObjectListChanged(QModelIndex());
-    ReciveBlockListChanged(QModelIndex());
+    ReciveObjectListChanged();
+    ReciveBlockListChanged();
     ConnectSignals();
     ui->ToolBlocks->setEnabled(false);
     ui->ObjectList->setSelectionMode(QAbstractItemView::ExtendedSelection);
@@ -124,8 +124,15 @@ void MainWindow::RefreshUI(){
         ui->RestraintList->addItem(new QListWidgetItem(p.first.c_str()));
         ui->RestraintList->item(ui->RestraintList->count()-1)->setIcon(QIcon(p.second.c_str()));
     }
+
+    disconnect(ui->RestraintList ,SIGNAL(itemSelectionChanged()) ,this ,SLOT(MakeRestraint()));
+    disconnect(ui->ObjectList    ,SIGNAL(itemSelectionChanged()) ,this ,SLOT(ReciveObjectListChanged()));
+    disconnect(ui->BlockList     ,SIGNAL(itemSelectionChanged()) ,this ,SLOT(ReciveBlockListChanged ()));
     this->ui->CadEdit->ExportObjectList(this->ui->ObjectList);
     this->ui->CadEdit->ExportCBoxList  (this->ui->BlockList);
+    connect(ui->RestraintList ,SIGNAL(itemSelectionChanged()) ,this ,SLOT(MakeRestraint()));
+    connect(ui->ObjectList    ,SIGNAL(itemSelectionChanged()) ,this ,SLOT(ReciveObjectListChanged()));
+    connect(ui->BlockList     ,SIGNAL(itemSelectionChanged()) ,this ,SLOT(ReciveBlockListChanged ()));
 
     //拘束更新
     ui->CadEdit->RefreshRestraints();
@@ -179,7 +186,7 @@ void MainWindow::MoveTransform(){
 }
 
 
-void MainWindow::MakeRestraint(QModelIndex){
+void MainWindow::MakeRestraint(){
     //qDebug() << text;
     RestraintType type = Paradox;
     if(ui->RestraintList->currentItem()->text() == "一致")type = MATCH;
@@ -192,7 +199,6 @@ void MainWindow::MakeRestraint(QModelIndex){
     if(type != Paradox){
         ui->CadEdit->MakeRestraint(type);
     }
-
     if(ui->RestraintList->currentItem()->text() == "マージ"){
         ui->CadEdit->MergePoints();
     }
@@ -205,12 +211,12 @@ void MainWindow::MakeBlock(){
     RefreshUI();
 }
 
-
-void MainWindow::ReciveObjectListChanged(QModelIndex){
+void MainWindow::ReciveObjectListChanged(){
     this->ui->CadEdit->ImportObjectList(this->ui->ObjectList);
     this->ui->CadEdit->repaint();
+    RefreshUI();
 }
-void MainWindow::ReciveBlockListChanged(QModelIndex ){
+void MainWindow::ReciveBlockListChanged(){
     this->ui->CadEdit->ImportCBoxList  (this->ui->BlockList);
     RefreshUI();
 }

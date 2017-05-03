@@ -178,6 +178,10 @@ void CadEditForm::paintEvent(QPaintEvent*){
     for(int i=0;i<this->blocks.size();i++){ //エリア描画
         this->blocks[i].Draw(paint);
     }
+    if(this->selecting_block >= 0 && this->selecting_block < this->blocks.size()){
+        paint.setPen(QPen(Qt::cyan, CObject::DRAWING_LINE_SIZE/2 / this->scale,Qt::SolidLine,Qt::RoundCap));
+        this->blocks[this->selecting_block].Draw(paint);
+    }
 
     //寸法を描画
     paint.setPen(QPen(Qt::blue, 1,Qt::SolidLine,Qt::RoundCap));
