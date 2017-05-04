@@ -274,14 +274,21 @@
        </property>
        <item>
         <widget class="QListWidget" name="BlockList">
+         <property name="showDropIndicator" stdset="0">
+          <bool>true</bool>
+         </property>
+         <property name="selectionMode">
+          <enum>QAbstractItemView::SingleSelection</enum>
+         </property>
+         <property name="selectionBehavior">
+          <enum>QAbstractItemView::SelectItems</enum>
+         </property>
+         <property name="isWrapping" stdset="0">
+          <bool>false</bool>
+         </property>
          <property name="spacing">
           <number>0</number>
          </property>
-         <item>
-          <property name="text">
-           <string>1</string>
-          </property>
-         </item>
         </widget>
        </item>
       </layout>
