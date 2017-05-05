@@ -672,11 +672,11 @@ void CadEditForm::ImportObjectList(QTreeWidget* list){
                     if(k==0){
                         CObject::selected.push_back(this->edges[i-1]->start);
                     }
-                    else if(k == this->edges[i-1]->GetMiddleCount()+1){
+                    else if(k == 1){
                         CObject::selected.push_back(this->edges[i-1]->end);
                     }
                     else{
-                        CObject::selected.push_back(this->edges[i-1]->GetMiddle(k-1));
+                        CObject::selected.push_back(this->edges[i-1]->GetMiddle(k-2));
                     }
                 }
             }
@@ -706,21 +706,27 @@ void CadEditForm::ExportObjectList(QTreeWidget* list){
             if(!list->topLevelItem(list->topLevelItemCount()-1)->isSelected()){
                 list->topLevelItem(list->topLevelItemCount()-1)->setSelected(this->edges[i]->isSelected());
             }
+        }
+    }
 
-            //子の設定
-            for(int j=0;j<this->edges[i]->GetMiddleCount()+2;j++){
+    //子の設定
+    for(int i=0;i<this->edges.size();i++){
+        if(this->edges[i]->GetMiddleCount() != list->topLevelItem(i+1)->childCount()+2){
+            for(int j=list->topLevelItem(i+1)->childCount();j<this->edges[i]->GetMiddleCount()+2;j++){
                 QTreeWidgetItem* child = new QTreeWidgetItem();
                 child->setIcon(0,QIcon(":/ToolImages/Dot.png"));
                 if(j == 0){
                     child->setText(0,"CPoint(Start)");
+                    list->topLevelItem(i+1)->addChild(child);
                 }
                 else if(j == this->edges[i]->GetMiddleCount()+1){
                     child->setText(0,"CPoint(End)");
+                    list->topLevelItem(i+1)->addChild(child);
                 }
                 else{
                     child->setText(0,QString("CPoint(Middle_") + QString::number(j) + ")");
+                    list->topLevelItem(i+1)->insertChild(1,child);
                 }
-                list->topLevelItem(list->topLevelItemCount()-1)->addChild(child);
             }
         }
     }
@@ -737,7 +743,7 @@ void CadEditForm::ExportObjectList(QTreeWidget* list){
             //端点
             list->topLevelItem(i)->child(0)->setSelected(this->edges[i-1]->start->isSelected());
             list->topLevelItem(i)->child(1)->setSelected(this->edges[i-1]->end->isSelected());
-            for(int j=0;j<this->edges[i-1]->GetMiddleCount();j++){
+            for(int j=0;j<this->edges[i-1]->GetMiddleCount() && j<list->topLevelItem(i)->childCount()-2;j++){
                 list->topLevelItem(i)->child(j+2)->setSelected(this->edges[i-1]->GetMiddle(j)->isSelected());
             }
         }
