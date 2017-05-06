@@ -113,8 +113,16 @@ void CArc::ChangePosCallback(const Pos& new_pos,const Pos& old_pos){
         //中心の移動
         if(old_pos == *this->center){
             *this->center = new_pos; //中心座標を一時的に次位置へ
-            this->start->Move(this->GetNear(*this->start) - *this->start);
-            this->end  ->Move(this->GetNear(*this->end)   - *this->end);
+            if(this->start->isLock()){
+                round = (*this->start - *this->center).Length();
+                this->end->Move((*this->end - *this->center).GetNormalize() * round + *this->center - *this->end);
+            }else if(this->end->isLock()){
+                round = (*this->end - *this->center).Length();
+                this->start->Move((*this->start - *this->center).GetNormalize() * round + *this->center - *this->start);
+            }else{
+                this->start->Move(this->GetNear(*this->start) - *this->start);
+                this->end  ->Move(this->GetNear(*this->end)   - *this->end);
+            }
             *this->center = old_pos; //中心座標を復元
         }else{
             round = (new_pos-*this->center).Length();

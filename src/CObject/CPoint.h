@@ -20,6 +20,8 @@ public:
     virtual bool Draw(QPainter& painter)const ;//描画関数
     virtual bool Move(const Pos& diff);//移動関数
 
+
+    virtual bool isLock()const;  //固定点
     virtual bool isControlPoint()const;  //作用点
     virtual bool ControlPoint(bool f);   //作用点設定
 

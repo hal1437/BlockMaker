@@ -35,7 +35,7 @@ bool CPoint::Draw(QPainter& painter)const{
         painter.drawArc(rect,0,360*16);
     }
     //ロック時
-    if(this->isLock()){
+    if(this->isLock() && !this->isControlPoint()){
         painter.drawImage(center.x+10,center.y-10,QImage(":/Restraint/LockRestraint.png"));
     }
 
@@ -58,6 +58,10 @@ bool CPoint::Move(const Pos& diff){
         }
     }
     return true;
+}
+
+bool CPoint::isLock()const{
+    return (this->lock || this->isControlPoint());
 }
 
 bool CPoint::isControlPoint()const{
