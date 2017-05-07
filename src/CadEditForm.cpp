@@ -627,7 +627,6 @@ void CadEditForm::RefreshRestraints(){
             //解決順が小さい順にソート
             std::sort(solver.begin(),solver.end());
 
-
             //拘束を解決
             for(std::pair<int,Restraint *> rest:solver){
                 if(!rest.second->Complete()){
@@ -711,21 +710,32 @@ void CadEditForm::ExportObjectList(QTreeWidget* list){
 
     //子の設定
     for(int i=0;i<this->edges.size();i++){
-        if(this->edges[i]->GetMiddleCount() != list->topLevelItem(i+1)->childCount()+2){
-            for(int j=list->topLevelItem(i+1)->childCount();j<this->edges[i]->GetMiddleCount()+2;j++){
-                QTreeWidgetItem* child = new QTreeWidgetItem();
+        if(this->edges[i]->GetMiddleCount()+2 != list->topLevelItem(i+1)->childCount()){
+            for(int j=0;j<this->edges[i]->GetMiddleCount()+2;j++){
+                QTreeWidgetItem* child;
+                if(j < list->topLevelItem(i+1)->childCount()){
+                    child = list->topLevelItem(i+1)->child(j);
+                }else{
+                    child = new QTreeWidgetItem();
+                }
+
                 child->setIcon(0,QIcon(":/ToolImages/Dot.png"));
                 if(j == 0){
-                    child->setText(0,"CPoint(Start)");
-                    list->topLevelItem(i+1)->addChild(child);
+                    child->setText(0,"Start");
                 }
-                else if(j == this->edges[i]->GetMiddleCount()+1){
-                    child->setText(0,"CPoint(End)");
-                    list->topLevelItem(i+1)->addChild(child);
+                else if(j == 1){
+                    child->setText(0,"End");
                 }
                 else{
-                    child->setText(0,QString("CPoint(Middle_") + QString::number(j) + ")");
-                    list->topLevelItem(i+1)->insertChild(1,child);
+                    child->setText(0,QString("Middle_") + QString::number(j) + ")");
+                }
+
+                if(j >= list->topLevelItem(i+1)->childCount()){
+                    if(j==0 || j == this->edges[i]->GetMiddleCount()+1){
+                        list->topLevelItem(i+1)->addChild(child);
+                    }else{
+                        list->topLevelItem(i+1)->insertChild(1,child);
+                    }
                 }
             }
         }
