@@ -83,6 +83,7 @@ CPoint::CPoint(QObject* parent):
 CPoint::CPoint(const Pos& origin){
     this->x = origin.x;
     this->y = origin.y;
+    this->z = origin.z;
 }
 CPoint::CPoint(const Pos &pos,QObject* parent):
     CObject(parent),
@@ -92,7 +93,7 @@ CPoint::CPoint(const Pos &pos,QObject* parent):
 
 CPoint::CPoint(double x, double y, QObject *parent):
     CObject(parent),
-    Pos(Pos(x,y)){
+    Pos(Pos(x,y,z)){
 
 }
 
@@ -104,4 +105,5 @@ CPoint::~CPoint()
 CPoint& CPoint::operator=(const Pos& rhs){
     this->x = rhs.x;
     this->y = rhs.y;
+    this->z = rhs.z;
 }

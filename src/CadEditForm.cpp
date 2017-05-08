@@ -181,9 +181,9 @@ void CadEditForm::paintEvent(QPaintEvent*){
     paint.setTransform(trans); // 変換行列を以降の描画に適応
 
     //CBox描画
-    paint.setPen(QPen(Qt::darkGray, CObject::DRAWING_LINE_SIZE/2 / this->scale,Qt::SolidLine,Qt::RoundCap));
-    paint.setBrush(QBrush(Qt::lightGray));   //背景設定
     for(int i=0;i<this->blocks.size();i++){ //エリア描画
+        paint.setPen(QPen(Qt::darkGray, CObject::DRAWING_LINE_SIZE/2 / this->scale,Qt::SolidLine,Qt::RoundCap));
+        paint.setBrush(QBrush(Qt::lightGray));   //背景設定
         this->blocks[i].Draw(paint);
     }
     if(this->selecting_block >= 0 && this->selecting_block < this->blocks.size()){
@@ -939,7 +939,7 @@ void CadEditForm::Load(){
     for(int i=0;i<vertex_num;i++){
         Pos p;
         in >> p;
-        if(p != Pos(0,0)){
+        if(p != Pos()){
             points.push_back(new CPoint(p));
             //this->edges.push_back(points.back());
         }else{
