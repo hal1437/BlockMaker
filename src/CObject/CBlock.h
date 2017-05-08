@@ -20,20 +20,20 @@ enum BoundaryDir{
 
 //面の種類
 enum BoundaryType{
-    Empty,
-    Patch,
-    Wall,
-    SymmetryPlane,
-    Cyclic,
-    CyclicAMI,
-    Wedge,
-    None,//連続
+    Empty         = 0,
+    Patch         = 1,
+    Wall          = 2,
+    SymmetryPlane = 3,
+    Cyclic        = 4,
+    CyclicAMI     = 5,
+    Wedge         = 6,
+    None          = 7,//連続
 };
 //格子点間隔の種類
 enum GradingType{
-    EmptyGrading,
-    SimpleGrading,
-    EdgeGrading,
+    EmptyGrading = 0,
+    SimpleGrading = 1,
+    EdgeGrading = 2,
 };
 
 

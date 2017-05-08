@@ -890,7 +890,7 @@ void CadEditForm::Save(){
     points.erase(std::unique(points.begin(),points.end()),points.end());
 
 
-    //オブジェクト追加
+    //オブジェクトリスト作成
     QVector<std::pair<QString,QVector<int>>> pairs;//(名前,頂点番号)
     for(int i =0;i<this->edges.size();i++){
         QString name = "Unknown";
@@ -922,11 +922,14 @@ void CadEditForm::Save(){
 
     //頂点数
     out << points.size() << std::endl;
+    //頂点
     for(Pos p : points){
         out << p << std::endl;
     }
+
     //オブジェクト数
     out << pairs.size() << std::endl;
+    //オブジェクト
     for(std::pair<QString,QVector<int>> p : pairs){
         out << p.first.toStdString();
         for(int i=0;i<p.second.size();i++){
@@ -934,6 +937,32 @@ void CadEditForm::Save(){
         }
         out << std::endl;
     }
+
+    //ブロック
+    out << this->blocks.size() << std::endl;
+    for(CBlock b : this->blocks){
+        out << b.depth << std::endl;
+        out << b.grading << std::endl;
+
+        for(double d : b.grading_args)out << d << " ";
+        out << std::endl;
+        for(BoundaryType t : b.boundery)out << t << " ";
+        out << std::endl;
+        for(QString n : b.name)out << n.toStdString() << " ";
+        out << std::endl;
+        for(int d : b.div)out << d << " ";
+        out << std::endl;
+
+        for(int i=0;i<4;i++){
+            for(int j=0;j<this->edges.size();j++){
+                if(this->edges[j] == b.GetEdge(i)){
+                    out << j << " ";
+                    break;
+                }
+            }
+        }
+    }
+
 }
 
 void CadEditForm::Load(){
@@ -985,22 +1014,44 @@ void CadEditForm::Load(){
             this->edges.push_back(make);
         }
     }
+
+    int block_num;
+    in >> block_num;
+    for(int i=0;i<block_num;i++){
+        CBlock block;
+        int g;
+        in >> block.depth;
+        in >> g;
+        block.grading = static_cast<GradingType>(g);
+
+        if(block.grading == GradingType::SimpleGrading)block.grading_args.resize(3);
+        else                                           block.grading_args.resize(12);
+
+        for(int j=0;j<block.grading_args.size();j++){
+            in >> block.grading_args[j];
+        }
+        for(int j=0;j<6;j++){
+            int b;
+            in >> b;
+            block.boundery[j] = static_cast<BoundaryType>(b);
+        }
+        for(int j=0;j<6;j++){
+            std::string str;
+            in >> str;
+            block.name[j] = str.c_str();
+        }
+        for(int j=0;j<3;j++){
+            in >> block.div[j];
+        }
+        QVector<CEdge*> ed;
+        for(int i=0;i<4;i++){
+            int j;
+            in >> j;
+            ed.push_back(this->edges[j]);
+        }
+        block.SetEdgeAll(ed);
+        this->blocks.push_back(block);
+    }
     emit RequireRefreshUI();
     emit RequireRefreshSolidUI(this->edges,this->blocks);
-
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
