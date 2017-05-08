@@ -23,25 +23,33 @@ void CadEditForm::keyReleaseEvent(QKeyEvent* event){
 }
 
 void CadEditForm::wheelEvent(QWheelEvent * event){
-    //拡大
     double delta = (event->angleDelta().y())/MOUSE_ZOOM_RATE;//差分値
-    double next_scale = std::exp(std::log(this->scale) + delta);//次の拡大値
+    if(!this->shift_pressed){
+        //拡大
+        double next_scale = std::exp(std::log(this->scale) + delta);//次の拡大値
 
-    //拡大値は負にならない
-    if(next_scale > 0){
-        //適応
-        if(CObject::hanged == nullptr)this->Zoom(next_scale,CObject::mouse_pos); //マウス座標中心に拡大
-        else                          this->Zoom(next_scale,CObject::hanged->GetNear(CObject::mouse_pos));//選択点があればそれを中心に拡大
+        //拡大値は負にならない
+        if(next_scale > 0){
+            //適応
+            if(CObject::hanged == nullptr)this->Zoom(next_scale,CObject::mouse_pos); //マウス座標中心に拡大
+            else                          this->Zoom(next_scale,CObject::hanged->GetNear(CObject::mouse_pos));//選択点があればそれを中心に拡大
 
-        //シグナル発生
-        emit ScaleChanged(next_scale);
-        CObject::drawing_scale = next_scale;
+            //シグナル発生
+            emit ScaleChanged(next_scale);
+            CObject::drawing_scale = next_scale;
+        }
+    }else{
+        //深さ変更
+        if(delta>0) this->depth++;
+        if(delta<0) this->depth--;
+        emit DepthChanged(this->depth);
     }
     repaint();
 }
 void CadEditForm::mouseMoveEvent   (QMouseEvent* event){
     //マウス移動を監視
-    CObject::mouse_pos = ConvertLocalPos(Pos(event->pos().x(),event->pos().y()));
+    CObject::mouse_pos = ConvertLocalPos(Pos(event->pos().x(),event->pos().y())) + Pos(0,0,this->depth);
+    if(this->hang_point != nullptr)this->hang_point->z = this->depth;
     //選択オブジェクトの選定
     CObject* answer = this->getHanged();
     //ズーム支点リセット
@@ -189,9 +197,15 @@ void CadEditForm::paintEvent(QPaintEvent*){
         dim->Draw(paint);
     }
 
-    //普通のオブジェクト
-    paint.setPen(QPen(Qt::blue, CObject::DRAWING_LINE_SIZE / this->scale,Qt::SolidLine,Qt::RoundCap));
+    //エッジ描画
     for(CEdge* obj:this->edges){
+        if(obj->start->z > this->depth){
+            paint.setPen(QPen(QColor(200,200,200), CObject::DRAWING_LINE_SIZE / this->scale,Qt::SolidLine,Qt::RoundCap));
+        }else if(obj->start->z < this->depth){
+            paint.setPen(QPen(QColor(100,100,100), CObject::DRAWING_LINE_SIZE / this->scale,Qt::SolidLine,Qt::RoundCap));
+        }else{
+            paint.setPen(QPen(Qt::blue, CObject::DRAWING_LINE_SIZE / this->scale,Qt::SolidLine,Qt::RoundCap));
+        }
         obj->Draw(paint);
         obj->start->Draw(paint);
         obj->end  ->Draw(paint);
@@ -199,7 +213,11 @@ void CadEditForm::paintEvent(QPaintEvent*){
             dynamic_cast<CEdge*>(obj)->GetMiddle(i)->Draw(paint);
         }
     }
+
+    //原点
+    paint.setPen(QPen(Qt::darkGreen, CObject::DRAWING_LINE_SIZE / this->scale,Qt::SolidLine,Qt::RoundCap));
     this->origin->Draw(paint);
+
     //選択されたオブジェクト
     paint.setPen(QPen(Qt::cyan, CObject::DRAWING_LINE_SIZE / this->scale,Qt::SolidLine,Qt::RoundCap));
     for(CObject* obj:CObject::selected){
@@ -310,29 +328,45 @@ CadEditForm::~CadEditForm()
 }
 
 CObject* CadEditForm::getHanged(){
-    if(this->origin->isSelectable(CObject::mouse_pos))return this->origin;
+    CObject* final = nullptr;
+
+    if(this->origin->isSelectable(CObject::mouse_pos)){
+        if(this->origin->z == this->depth)return this->origin;
+        else final = this->origin;
+    }
+
     for(CEdge* obj:this->edges){
         if(obj->isCreating())continue;
 
         //端点
         if(obj->start->isSelectable(CObject::mouse_pos)){
-            return obj->start;
+            if(obj->start->z == this->depth)return obj->start;
+            else final = obj->start;
         }
         if(obj->end  ->isSelectable(CObject::mouse_pos)){
-            return obj->end;
+            if(obj->end->z == this->depth)return obj->end;
+            else final = obj->end;
         }
         for(int i=0;i<obj->GetMiddleCount();i++){
             if(obj->GetMiddle(i)->isSelectable(CObject::mouse_pos)){
-                return obj->GetMiddle(i);
+                if(obj->GetMiddle(i)->z == this->depth)return obj->GetMiddle(i);
+                else final = obj->GetMiddle(i);
             }
         }
         //エッジ自身
         if(obj->isSelectable(CObject::mouse_pos)){
-            return obj;
+            if(obj->start->z == this->depth && obj->end->z == this->depth)return obj;
+            else if(final == nullptr) final = obj;
         }
 
     }
-    return nullptr;
+
+    return final;
+}
+
+void CadEditForm::SetDepth(double depth){
+    this->depth = depth;
+    repaint();
 }
 
 void CadEditForm::SetScale(double scale){
@@ -418,7 +452,7 @@ void CadEditForm::MakeObject(){
         }else if(make_result == TWOSHOT){
             //hangedが存在した場合
             if(CObject::hanged != nullptr ){
-                if(CObject::hanged->is<CPoint>()){
+                if(CObject::hanged->is<CPoint>() && dynamic_cast<CPoint*>(CObject::hanged)->z == this->depth){
                     //すり替え
                     dynamic_cast<CEdge*>(CObject::creating)->SetEndPos(dynamic_cast<CPoint*>(CObject::hanged));
                     this->RemoveObject(this->hang_point);
@@ -461,19 +495,18 @@ void CadEditForm::MakeObject(){
     emit RequireRefreshUI();
 }
 CREATE_RESULT CadEditForm::MakeJoint(CObject* obj){
-    Pos local_pos = CObject::mouse_pos;
-    if(CObject::hanged != nullptr)local_pos = CObject::hanged->GetNear(local_pos);
 
     if(CObject::hanged == nullptr){
         //始点を作成
         CPoint* new_point = new CPoint(CObject::mouse_pos);
         return obj->Create(new_point);
-    }else if(CObject::hanged->is<CPoint>()){
+    }else if(CObject::hanged->is<CPoint>() && dynamic_cast<CPoint*>(CObject::hanged)->z == this->depth){
         //既存の点を使用
         return obj->Create(dynamic_cast<CPoint*>(CObject::hanged));
     }else{
         //近接点を作成
         CPoint* new_point = new CPoint(CObject::hanged->GetNear(CObject::mouse_pos));
+        new_point->z = this->depth;
         return obj->Create(new_point);
     }
 }

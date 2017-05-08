@@ -13,13 +13,15 @@ template<class T>
 struct Point{
     T x;
     T y;
+    T z;
 public:
     typedef Point<T> current;
     typedef const Point<T>& cr_current;
 public:
-    Point():x(0),y(0){}
-    Point(const T& X,const T& Y):x(X),y(Y){}
-    Point(const QPoint& p):x(p.x()),y(p.y()){}
+    Point():x(0),y(0),z(0){}
+    Point(const T& X,const T& Y):x(X),y(Y),z(0){}
+    Point(const T& X,const T& Y,const T& Z):x(X),y(Y),z(Z){}
+    Point(const QPoint& p):x(p.x()),y(p.y()),z(0){}
 
     //直線と点の最近点を求める
     static current LineNearPoint(cr_current pos1,cr_current pos2,cr_current hand){
@@ -63,17 +65,33 @@ public:
     }
 
     double Length()const{
-        return std::sqrt(x*x+y*y);
+        return std::sqrt(x*x+y*y+z*z);
     }
     double Length(cr_current rhs)const{
+        return std::sqrt(std::pow(x - rhs.x,2)+std::pow(y - rhs.y,2)+std::pow(z - rhs.z,2));
+    }
+    double Length2D()const{
+        return std::sqrt(x*x+y*y);
+    }
+    double Length2D(cr_current rhs)const{
         return std::sqrt(std::pow(x - rhs.x,2)+std::pow(y - rhs.y,2));
     }
     double Dot(cr_current rhs)const{
+        return x * rhs.x + y * rhs.y + z * rhs.z;
+    }
+    double Dot2D(cr_current rhs)const{
         return x * rhs.x + y * rhs.y;
     }
     current GetNormalize()const{
-        return current(x/Length(),y/Length());
+        return current(x/Length(),y/Length(),z/Length());
     }
+    current GetNormalize2D()const{
+        return current(x/Length2D(),y/Length2D(),0);
+    }
+    current convert2D()const{
+        return current(x,y,0);
+    }
+
     current& Transform(QTransform rhs){
         QPointF p(x,y);
         p = p * rhs;
@@ -83,26 +101,28 @@ public:
     }
 
 
-    current operator-()const{return Point(-x,-y);}
-    current operator+(cr_current rhs)const{return Point(x + rhs.x,y + rhs.y);}
-    current operator-(cr_current rhs)const{return Point(x - rhs.x,y - rhs.y);}
-    template<class V> current operator*(V rhs)const{return Point(x * rhs,y * rhs);}
-    template<class V> current operator/(V rhs)const{return Point(x / rhs,y / rhs);}
+    current operator-()const{return Point(-x,-y,-z);}
+    current operator+(cr_current rhs)const{return Point(x + rhs.x,y + rhs.y,z + rhs.z);}
+    current operator-(cr_current rhs)const{return Point(x - rhs.x,y - rhs.y,z - rhs.z);}
+    template<class V> current operator*(V rhs)const{return Point(x * rhs,y * rhs,z * rhs);}
+    template<class V> current operator/(V rhs)const{return Point(x / rhs,y / rhs,z / rhs);}
 
-    current& operator+=(cr_current rhs){x += rhs.x;y += rhs.y;return (*this);}
-    current& operator-=(cr_current rhs){x -= rhs.x;y -= rhs.y;return (*this);}
-    template<class V> current operator*=(V rhs){x *= rhs;y *= rhs;return (*this);}
-    template<class V> current operator/=(V rhs){x /= rhs;y /= rhs;return (*this);}
+    current& operator+=(cr_current rhs){x += rhs.x;y += rhs.y;z += rhs.z;return (*this);}
+    current& operator-=(cr_current rhs){x -= rhs.x;y -= rhs.y;z -= rhs.z;return (*this);}
+    template<class V> current operator*=(V rhs){x *= rhs;y *= rhs;z *= rhs;return (*this);}
+    template<class V> current operator/=(V rhs){x /= rhs;y /= rhs;z /= rhs;return (*this);}
 
     bool operator==(cr_current rhs)const{
-        return (this->x == rhs.x && this->y == rhs.y);
+        return (this->x == rhs.x && this->y == rhs.y && this->z == rhs.z);
     }
     bool operator!=(cr_current rhs)const{
         return !(*this == rhs);
     }
     bool operator<(cr_current rhs)const{
         if(this->x == rhs.x){
-            return (this->y < rhs.y);
+            if(this->y == rhs.y){
+                return (this->z < rhs.z);
+            }else return (this->y < rhs.y);
         }else return (this->x < rhs.x);
     }
     operator QPointF(){
@@ -112,15 +132,22 @@ public:
 
 template<class T>
 std::ostream& operator<<(std::ostream& ost,Point<T> pos){
-    ost << "(" << pos.x << "," << pos.y << ")";
+    ost << "(" << pos.x << "," << pos.y << "," << pos.z << ")";
     return ost;
 }
 template<class T>
 std::istream& operator>>(std::istream& ost,Point<T>& pos){
     std::string str;
+    QStringList list;
     ost >> str;
-    pos.x = QString(str.c_str()).replace('(',"").replace(')',"").split(',')[0].toDouble();
-    pos.y = QString(str.c_str()).replace('(',"").replace(')',"").split(',')[1].toDouble();
+    list = QString(str.c_str()).replace('(',"").replace(')',"").split(',');
+    pos.x = list[0].toDouble();
+    pos.y = list[1].toDouble();
+    if(list.size()>2){
+        pos.z = list[2].toDouble();
+    }else{
+        pos.z = 0;
+    }
     return ost;
 }
 

@@ -54,9 +54,10 @@ private:
     CPoint* hang_point = nullptr; //生成支点
     CREATE_RESULT make_result = COMPLETE; //生成管理フラグ
 
+    double depth  = 0.0f;     //視点の深さ
     double scale  = 1.0f;     //拡大率
-    Pos zoom_piv  = Pos(0,0); //拡大支点
-    Pos translate = Pos(0,0); //平行移動量
+    Pos zoom_piv  = Pos(0,0,0); //拡大支点
+    Pos translate = Pos(0,0,0); //平行移動量
 
     bool release_flag  = false;  //クリックトグル化フラグ
     bool move_flag     = false;  //移動フラグ
@@ -97,6 +98,7 @@ public:
 signals:
     void ToggleConflict(bool conflict); //競合シグナル変更
     void ScaleChanged(double value);    //拡大倍率変更
+    void DepthChanged(double value);    //深さ変更
     void RequireRefreshUI();             //UI更新
     void MouseMoved(Pos pos);            //マウス移動
 
@@ -104,6 +106,7 @@ signals:
 
 public slots:
     CObject* getHanged(); //直下オブジェクト選定
+    void SetDepth(double depth);  //深さ視点セット
     void SetScale(double scale);  //スケールセット
     void SetTranslate(Pos trans); //並行移動セット
 

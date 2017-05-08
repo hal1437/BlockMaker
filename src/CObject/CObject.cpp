@@ -25,7 +25,7 @@ bool CObject::isLock()const{
 }
 bool CObject::isSelectable(Pos pos)const{
     if(this->isCreating())return false;
-    return (this->GetNear(pos) - pos).Length() < CObject::COLLISION_SIZE;
+    return (this->GetNear(pos) - pos).Length2D() < CObject::COLLISION_SIZE;
 }
 
 CObject::CObject(QObject* parent):QObject(parent)
