@@ -22,16 +22,18 @@ SOURCES += src/main.cpp\
     src/Restraint.cpp \
     src/ExportDialog.cpp \
     src/CBoxDefineDialog.cpp \
-    src/CObject/CArc.cpp \
-    src/CObject/CLine.cpp \
-    src/CObject/CObject.cpp \
     src/CObject/CPoint.cpp \
+    src/CObject/CObject.cpp \
+    src/CObject/CEdge.cpp \
+    src/CObject/CLine.cpp \
+    src/CObject/CArc.cpp \
     src/CObject/CSpline.cpp \
     src/CObject/CBlock.cpp \
     src/MoveTransformDialog.cpp \
     src/FoamFile.cpp \
-    src/CObject/CEdge.cpp \
-    src/SolidView.cpp
+    src/SolidView.cpp \
+    src/GridFilter/GridFilter.cpp \
+    src/GridFilter/GridFilterDialog.cpp
 
 HEADERS  += src/MainWindow.h \
     src/Point.h \
@@ -42,24 +44,27 @@ HEADERS  += src/MainWindow.h \
     src/Restraint.h \
     src/ExportDialog.h \
     src/CBoxDefineDialog.h \
-    src/CObject/CArc.h \
-    src/CObject/CBoxDefineDialog.h \
-    src/CObject/CLine.h \
-    src/CObject/CObject.h \
     src/CObject/CPoint.h \
+    src/CObject/CObject.h \
+    src/CObject/CEdge.h \
+    src/CObject/CLine.h \
+    src/CObject/CArc.h \
     src/CObject/CSpline.h \
     src/CObject/CBlock.h \
+    src/CObject/CBoxDefineDialog.h \
     src/MoveTransformDialog.h \
     src/FoamFile.h \
-    src/CObject/CEdge.h \
-    src/SolidView.h
+    src/SolidView.h \
+    src/GridFilter/GridFilter.h \
+    src/GridFilter/GridFilterDialog.h
 
 FORMS    += src/MainWindow.ui \
     src/CadEditForm.ui \
     src/SmartDimensionDialog.ui \
     src/ExportDialog.ui \
     src/CBoxDefineDialog.ui \
-    src/MoveTransformDialog.ui
+    src/MoveTransformDialog.ui \
+    src/GridFilter/GridFilterDialog.ui
 
 RESOURCES += \
     Resource/images.qrc

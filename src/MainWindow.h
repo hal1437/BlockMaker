@@ -11,6 +11,8 @@
 #include "MoveTransformDialog.h"
 #include "ExportDialog.h"
 #include "CadEditForm.h"
+#include "GridFilter/GridFilter.h"
+#include "GridFilter/GridFilterDialog.h"
 
 namespace Ui {
 class MainWindow;
@@ -46,9 +48,10 @@ public slots:
     void ToggledRect   (bool checked);
     void ToggledSpline (bool checked);
     void ToggleConflict(bool conflict);
-    void ResetAllExpantion(); //拡大、移動リセット
+    void ResetAllExpantion();     //拡大、移動リセット
     void ShowMoveTransform();     //移動
     void ShowSolidView();         //立体表示
+    void ShowGridFilter();        //グリッドフィルター
 
     void MakeRestraint();   //拘束作成
     void MakeBlock();       //ブロック作成

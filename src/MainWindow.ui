@@ -386,6 +386,7 @@
    <addaction name="actionDelete"/>
    <addaction name="actionCheckConflict"/>
    <addaction name="actionSolidView"/>
+   <addaction name="actionGridFilter"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="ToolDot">
@@ -565,6 +566,14 @@
   <action name="actionSolidView">
    <property name="text">
     <string>SolidView</string>
+   </property>
+  </action>
+  <action name="actionGridFilter">
+   <property name="text">
+    <string>GridFilter</string>
+   </property>
+   <property name="toolTip">
+    <string>GridFilter</string>
    </property>
   </action>
  </widget>

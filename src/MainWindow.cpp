@@ -10,6 +10,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionDelete         ,SIGNAL(triggered())                        ,this       ,SLOT(Delete()));
     connect(ui->actionMove           ,SIGNAL(triggered())                        ,this       ,SLOT(ShowMoveTransform()));
     connect(ui->actionSolidView      ,SIGNAL(triggered())                        ,this       ,SLOT(ShowSolidView()));
+    connect(ui->actionGridFilter     ,SIGNAL(triggered())                        ,this       ,SLOT(ShowGridFilter()));
     connect(ui->actionResetExpantion ,SIGNAL(triggered())                        ,this       ,SLOT(ResetAllExpantion()));
     connect(ui->ToolDimension        ,SIGNAL(triggered())                        ,ui->CadEdit,SLOT(MakeSmartDimension()));
     connect(ui->ToolBlocks           ,SIGNAL(triggered())                        ,this       ,SLOT(MakeBlock()));
@@ -184,6 +185,7 @@ void MainWindow::ResetAllExpantion(){
 void MainWindow::ShowMoveTransform(){
     static MoveTransformDialog* diag = new MoveTransformDialog(this);
     connect(diag,SIGNAL(RepaintRequest()),this,SLOT(repaint()));
+    diag->setWindowTitle("MoveTransform");
     diag->setWindowFlags(Qt::Dialog | Qt::WindowStaysOnTopHint);
     diag->show();
 }
@@ -194,10 +196,17 @@ void MainWindow::ShowSolidView(){
         connect(this->ui->CadEdit,SIGNAL(RequireRefreshSolidUI(QVector<CEdge*>,QVector<CBlock>)),
                 s                ,SLOT  (RefreshUI            (QVector<CEdge*>,QVector<CBlock>)));
     }
-    s->setWindowFlags(Qt::Dialog);
+    s->setWindowTitle("SolidView");
+    s->setWindowFlags(Qt::Dialog | Qt::WindowStaysOnTopHint);
     s->setMinimumSize(300,300);
     s->show();
-
+}
+void MainWindow::ShowGridFilter(){
+    static GridFilterDialog* diag = new GridFilterDialog(this);
+    connect(diag,SIGNAL(ChangeGridStatus(double,double)),ui->CadEdit,SLOT(SetGridFilterStatus(double,double)));
+    diag->setWindowTitle("GridFilter");
+    diag->setWindowFlags(Qt::Dialog | Qt::WindowStaysOnTopHint);
+    diag->show();
 }
 
 void MainWindow::MakeRestraint(){

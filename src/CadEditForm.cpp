@@ -49,6 +49,10 @@ void CadEditForm::wheelEvent(QWheelEvent * event){
 void CadEditForm::mouseMoveEvent   (QMouseEvent* event){
     //マウス移動を監視
     CObject::mouse_pos = ConvertLocalPos(Pos(event->pos().x(),event->pos().y())) + Pos(0,0,this->depth);
+
+    //フィルター適用
+    CObject::mouse_pos = filter.Filtering(CObject::mouse_pos);
+
     if(this->hang_point != nullptr)this->hang_point->z = this->depth;
     //選択オブジェクトの選定
     CObject* answer = this->getHanged();
@@ -179,6 +183,10 @@ void CadEditForm::paintEvent(QPaintEvent*){
     trans.translate(-translate.x,-translate.y);
     trans.scale(scale,-scale);
     paint.setTransform(trans); // 変換行列を以降の描画に適応
+
+    //グリッド描画
+    this->filter.DrawGrid(paint,this->translate.x/this->scale,(-this->height()-this->translate.y)/this->scale,
+                          this->width()/this->scale,this->height()/this->scale);
 
     //CBox描画
     for(int i=0;i<this->blocks.size();i++){ //エリア描画
@@ -382,6 +390,11 @@ void CadEditForm::SetScale(double scale){
 
 void CadEditForm::SetTranslate(Pos trans){
     this->translate = trans;
+    repaint();
+}
+void CadEditForm::SetGridFilterStatus(double x,double y){
+    this->filter.setXGrid(x);
+    this->filter.setYGrid(y);
     repaint();
 }
 void CadEditForm::MakeObject(){
@@ -942,10 +955,8 @@ void CadEditForm::Load(){
         in >> p;
         if(p != Pos()){
             points.push_back(new CPoint(p));
-            //this->edges.push_back(points.back());
         }else{
             points.push_back(this->origin);
-            //this->edges.push_back(this->origin);
         }
     }
 

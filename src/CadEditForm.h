@@ -22,6 +22,7 @@
 #include "SmartDimensionDialog.h"
 #include "Restraint.h"
 #include "ExportDialog.h"
+#include "GridFilter/GridFilter.h"
 
 namespace Ui {
 class CadEditForm;
@@ -64,6 +65,7 @@ private:
     bool shift_pressed = false;  //シフトボタンフラグ
     bool ctrl_pressed  = false;  //コントロールフラグ
 
+    GridFilter filter; //フィルター
     QVector<CObject*> log; //ログ
 
 protected:
@@ -110,6 +112,8 @@ public slots:
     void SetDepth(double depth);  //深さ視点セット
     void SetScale(double scale);  //スケールセット
     void SetTranslate(Pos trans); //並行移動セット
+    void SetGridFilterStatus(double x,double y); //フィルターグリッドセット
+
 
     void MakeObject();
     CREATE_RESULT MakeJoint(CObject* obj);           //ジョイント作成

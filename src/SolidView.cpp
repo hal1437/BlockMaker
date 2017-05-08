@@ -79,8 +79,6 @@ void SolidView::paintGL(){
     glVertex3f(0,0,100);
     glEnd();
 
-
-
     glFlush();
 }
 
