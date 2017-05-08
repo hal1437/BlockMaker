@@ -499,6 +499,7 @@ void CadEditForm::MakeObject(){
     RefreshRestraints();
     repaint();
     emit RequireRefreshUI();
+    emit RequireRefreshSolidUI(this->edges,this->blocks);
 }
 CREATE_RESULT CadEditForm::MakeJoint(CObject* obj){
 
@@ -974,6 +975,7 @@ void CadEditForm::Load(){
         }
     }
     emit RequireRefreshUI();
+    emit RequireRefreshSolidUI(this->edges,this->blocks);
 
 }
 

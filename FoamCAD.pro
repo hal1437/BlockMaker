@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui opengl
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -30,7 +30,8 @@ SOURCES += src/main.cpp\
     src/CObject/CBlock.cpp \
     src/MoveTransformDialog.cpp \
     src/FoamFile.cpp \
-    src/CObject/CEdge.cpp
+    src/CObject/CEdge.cpp \
+    src/SolidView.cpp
 
 HEADERS  += src/MainWindow.h \
     src/Point.h \
@@ -50,7 +51,8 @@ HEADERS  += src/MainWindow.h \
     src/CObject/CBlock.h \
     src/MoveTransformDialog.h \
     src/FoamFile.h \
-    src/CObject/CEdge.h
+    src/CObject/CEdge.h \
+    src/SolidView.h
 
 FORMS    += src/MainWindow.ui \
     src/CadEditForm.ui \

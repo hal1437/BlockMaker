@@ -385,6 +385,7 @@
    <addaction name="separator"/>
    <addaction name="actionDelete"/>
    <addaction name="actionCheckConflict"/>
+   <addaction name="actionSolidView"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="ToolDot">
@@ -559,6 +560,11 @@
    </property>
    <property name="text">
     <string>Move</string>
+   </property>
+  </action>
+  <action name="actionSolidView">
+   <property name="text">
+    <string>SolidView</string>
    </property>
   </action>
  </widget>

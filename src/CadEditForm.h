@@ -101,6 +101,7 @@ signals:
     void DepthChanged(double value);    //深さ変更
     void RequireRefreshUI();             //UI更新
     void MouseMoved(Pos pos);            //マウス移動
+    void RequireRefreshSolidUI(QVector<CEdge*> edges,QVector<CBlock> blocks);
 
 
 

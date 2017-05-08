@@ -8,7 +8,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     //connect(ui->actionCtrlZ          ,SIGNAL(triggered())                        ,this       ,SLOT(CtrlZ()));
     connect(ui->actionDelete         ,SIGNAL(triggered())                        ,this       ,SLOT(Delete()));
-    connect(ui->actionMove           ,SIGNAL(triggered())                        ,this       ,SLOT(MoveTransform()));
+    connect(ui->actionMove           ,SIGNAL(triggered())                        ,this       ,SLOT(ShowMoveTransform()));
+    connect(ui->actionSolidView      ,SIGNAL(triggered())                        ,this       ,SLOT(ShowSolidView()));
     connect(ui->actionResetExpantion ,SIGNAL(triggered())                        ,this       ,SLOT(ResetAllExpantion()));
     connect(ui->ToolDimension        ,SIGNAL(triggered())                        ,ui->CadEdit,SLOT(MakeSmartDimension()));
     connect(ui->ToolBlocks           ,SIGNAL(triggered())                        ,this       ,SLOT(MakeBlock()));
@@ -180,13 +181,24 @@ void MainWindow::ResetAllExpantion(){
     this->ui->CadEdit->ResetAllExpantion();
 }
 
-void MainWindow::MoveTransform(){
+void MainWindow::ShowMoveTransform(){
     static MoveTransformDialog* diag = new MoveTransformDialog(this);
     connect(diag,SIGNAL(RepaintRequest()),this,SLOT(repaint()));
     diag->setWindowFlags(Qt::Dialog | Qt::WindowStaysOnTopHint);
     diag->show();
 }
+void MainWindow::ShowSolidView(){
+    static SolidView* s = nullptr;
+    if(s == nullptr){
+        s = new SolidView(this);
+        connect(this->ui->CadEdit,SIGNAL(RequireRefreshSolidUI(QVector<CEdge*>,QVector<CBlock>)),
+                s                ,SLOT  (RefreshUI            (QVector<CEdge*>,QVector<CBlock>)));
+    }
+    s->setWindowFlags(Qt::Dialog);
+    s->setMinimumSize(300,300);
+    s->show();
 
+}
 
 void MainWindow::MakeRestraint(){
     //qDebug() << text;

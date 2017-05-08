@@ -5,6 +5,7 @@
 #include <QMouseEvent>
 #include <QListWidget>
 #include <limits>
+#include <SolidView.h>
 #include "SmartDimensionDialog.h"
 #include "CBoxDefineDialog.h"
 #include "MoveTransformDialog.h"
@@ -46,7 +47,8 @@ public slots:
     void ToggledSpline (bool checked);
     void ToggleConflict(bool conflict);
     void ResetAllExpantion(); //拡大、移動リセット
-    void MoveTransform();     //移動
+    void ShowMoveTransform();     //移動
+    void ShowSolidView();         //立体表示
 
     void MakeRestraint();   //拘束作成
     void MakeBlock();       //ブロック作成
