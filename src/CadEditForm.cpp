@@ -215,7 +215,13 @@ void CadEditForm::paintEvent(QPaintEvent*){
     }
 
     //原点
-    paint.setPen(QPen(Qt::darkGreen, CObject::DRAWING_LINE_SIZE / this->scale,Qt::SolidLine,Qt::RoundCap));
+    if(this->origin->z > this->depth){
+        paint.setPen(QPen(QColor(200,200,200), CObject::DRAWING_LINE_SIZE / this->scale,Qt::SolidLine,Qt::RoundCap));
+    }else if(this->origin->z < this->depth){
+        paint.setPen(QPen(QColor(100,100,100), CObject::DRAWING_LINE_SIZE / this->scale,Qt::SolidLine,Qt::RoundCap));
+    }else{
+        paint.setPen(QPen(Qt::blue, CObject::DRAWING_LINE_SIZE / this->scale,Qt::SolidLine,Qt::RoundCap));
+    }
     this->origin->Draw(paint);
 
     //選択されたオブジェクト
