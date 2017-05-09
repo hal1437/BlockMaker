@@ -50,12 +50,13 @@ void CadEditForm::mouseMoveEvent   (QMouseEvent* event){
     //マウス移動を監視
     CObject::mouse_pos = ConvertLocalPos(Pos(event->pos().x(),event->pos().y())) + Pos(0,0,this->depth);
 
-    //フィルター適用
-    CObject::mouse_pos = filter.Filtering(CObject::mouse_pos);
-
-    if(this->hang_point != nullptr)this->hang_point->z = this->depth;
     //選択オブジェクトの選定
     CObject* answer = this->getHanged();
+    //フィルター適用
+    CObject::mouse_pos = filter.Filtering(CObject::mouse_pos);
+    //Z座標設定
+    if(this->hang_point != nullptr)this->hang_point->z = this->depth;
+
     //ズーム支点リセット
     zoom_piv = Pos(0,0);
     //生成点座標を更新
