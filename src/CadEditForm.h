@@ -17,12 +17,12 @@
 #include "CObject/CPoint.h"
 #include "CObject/CLine.h"
 #include "CObject/CBlock.h"
-#include "CBoxDefineDialog.h"
-#include "SmartDimension.h"
-#include "SmartDimensionDialog.h"
+#include "Dialog/CBoxDefineDialog.h"
+#include "Dialog/SmartDimension.h"
+#include "Dialog/SmartDimensionDialog.h"
+#include "Dialog/ExportDialog.h"
+#include "Dialog/GridFilter.h"
 #include "Restraint.h"
-#include "ExportDialog.h"
-#include "GridFilter/GridFilter.h"
 
 namespace Ui {
 class CadEditForm;

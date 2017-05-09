@@ -5,14 +5,14 @@
 #include <QMouseEvent>
 #include <QListWidget>
 #include <limits>
-#include <SolidView.h>
-#include "SmartDimensionDialog.h"
-#include "CBoxDefineDialog.h"
-#include "MoveTransformDialog.h"
-#include "ExportDialog.h"
+#include "Dialog/SolidView.h"
+#include "Dialog/SmartDimensionDialog.h"
+#include "Dialog/CBoxDefineDialog.h"
+#include "Dialog/MoveTransformDialog.h"
+#include "Dialog/ExportDialog.h"
 #include "CadEditForm.h"
-#include "GridFilter/GridFilter.h"
-#include "GridFilter/GridFilterDialog.h"
+#include "Dialog/GridFilter.h"
+#include "Dialog/GridFilterDialog.h"
 
 namespace Ui {
 class MainWindow;

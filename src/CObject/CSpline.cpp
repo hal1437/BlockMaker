@@ -176,7 +176,18 @@ CSpline::~CSpline()
 }
 //点移動コールバックオーバーライド
 void CSpline::ChangePosCallback(const Pos& new_pos,const Pos& old_pos){
+    CPoint* p;
+    if(*this->start == old_pos) p = this->start;
+    if(*this->end   == old_pos) p = this->end;
+    for(int i = 0;i < this->GetMiddleCount();i++){
+        if(*this->GetMiddle(i) == old_pos){
+            p = this->GetMiddle(i);
+        }
+    }
+    //一時的にnew_posを適用
+    *p = new_pos;
     RefreshNodes();
+    *p = old_pos;
 }
 
 

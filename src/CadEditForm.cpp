@@ -80,6 +80,7 @@ void CadEditForm::Escape(){
             this->RemoveObject(make_obj->end);
             this->RemoveEdge(make_obj);
         }
+        CObject::creating = nullptr;
         this->hang_point = nullptr;
         this->make_result = COMPLETE;
     }
@@ -158,6 +159,11 @@ void CadEditForm::MovedMouse(QMouseEvent *event, CObject *under_object){
     //編集
     if(move_flag == true){
         for(CObject* p : CObject::selected){
+            //フィルタリング
+            if(p->is<CPoint>()){
+                p->Move(this->filter.Filtering(*dynamic_cast<CPoint*>(p)) - *dynamic_cast<CPoint*>(p));
+            }
+            //移動量適用
             p->Move(CObject::mouse_pos - past);
         }
     }

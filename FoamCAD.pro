@@ -17,11 +17,8 @@ INCLUDEPATH += ./src/
 SOURCES += src/main.cpp\
         src/MainWindow.cpp \
     src/CadEditForm.cpp \
-    src/SmartDimension.cpp \
-    src/SmartDimensionDialog.cpp \
     src/Restraint.cpp \
-    src/ExportDialog.cpp \
-    src/CBoxDefineDialog.cpp \
+    src/FoamFile.cpp \
     src/CObject/CPoint.cpp \
     src/CObject/CObject.cpp \
     src/CObject/CEdge.cpp \
@@ -29,21 +26,21 @@ SOURCES += src/main.cpp\
     src/CObject/CArc.cpp \
     src/CObject/CSpline.cpp \
     src/CObject/CBlock.cpp \
-    src/MoveTransformDialog.cpp \
-    src/FoamFile.cpp \
-    src/SolidView.cpp \
-    src/GridFilter/GridFilter.cpp \
-    src/GridFilter/GridFilterDialog.cpp
+    src/Dialog/CBoxDefineDialog.cpp \
+    src/Dialog/ExportDialog.cpp \
+    src/Dialog/GridFilter.cpp \
+    src/Dialog/GridFilterDialog.cpp \
+    src/Dialog/MoveTransformDialog.cpp \
+    src/Dialog/SmartDimension.cpp \
+    src/Dialog/SmartDimensionDialog.cpp \
+    src/Dialog/SolidView.cpp
 
 HEADERS  += src/MainWindow.h \
     src/Point.h \
     src/CadEditForm.h \
     src/Utils.h \
-    src/SmartDimension.h \
-    src/SmartDimensionDialog.h \
     src/Restraint.h \
-    src/ExportDialog.h \
-    src/CBoxDefineDialog.h \
+    src/FoamFile.h \
     src/CObject/CPoint.h \
     src/CObject/CObject.h \
     src/CObject/CEdge.h \
@@ -52,19 +49,24 @@ HEADERS  += src/MainWindow.h \
     src/CObject/CSpline.h \
     src/CObject/CBlock.h \
     src/CObject/CBoxDefineDialog.h \
-    src/MoveTransformDialog.h \
-    src/FoamFile.h \
-    src/SolidView.h \
     src/GridFilter/GridFilter.h \
-    src/GridFilter/GridFilterDialog.h
+    src/GridFilter/GridFilterDialog.h \
+    src/Dialog/CBoxDefineDialog.h \
+    src/Dialog/ExportDialog.h \
+    src/Dialog/GridFilter.h \
+    src/Dialog/GridFilterDialog.h \
+    src/Dialog/MoveTransformDialog.h \
+    src/Dialog/SmartDimension.h \
+    src/Dialog/SmartDimensionDialog.h \
+    src/Dialog/SolidView.h
 
 FORMS    += src/MainWindow.ui \
     src/CadEditForm.ui \
-    src/SmartDimensionDialog.ui \
-    src/ExportDialog.ui \
-    src/CBoxDefineDialog.ui \
-    src/MoveTransformDialog.ui \
-    src/GridFilter/GridFilterDialog.ui
+    src/Dialog/SmartDimensionDialog.ui \
+    src/Dialog/ExportDialog.ui \
+    src/Dialog/CBoxDefineDialog.ui \
+    src/Dialog/MoveTransformDialog.ui \
+    src/Dialog/GridFilterDialog.ui
 
 RESOURCES += \
     Resource/images.qrc

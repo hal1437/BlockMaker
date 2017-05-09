@@ -21,7 +21,7 @@ void GridFilter::DrawGrid(QPainter &p, int x, int y, int w, int h)const{
     pen.setStyle(Qt::DashLine);
     p.setPen(pen);
 
-    const double over = 5;
+    const double over = 100;
 
     //過剰すぎなければ描画
     if((h / this->y_grid) < 200){
