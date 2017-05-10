@@ -188,7 +188,7 @@ Pos CBlock::GetClockworksPos(int index)const{
         }else if(candidate.size() == 1){
             ans = candidate[0];
         }else{
-            ans = this->GetVerticesPos()[0];
+            ans = corner;
         }
         candidate.clear();
     }

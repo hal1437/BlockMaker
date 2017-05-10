@@ -909,7 +909,7 @@ void CadEditForm::Save(){
         if(this->edges[i]->is<CEdge>()){
             if(this->edges[i]->is<CLine>  ())name = "CLine";
             if(this->edges[i]->is<CArc>   ())name = "CArc";
-            if(this->edges[i]->is<CSpline>())name = "CSPline";
+            if(this->edges[i]->is<CSpline>())name = "CSpline";
 
             //始点終点を追加
             vertex.push_back(IndexOf(points,*this->edges[i]->start));
@@ -1015,8 +1015,18 @@ void CadEditForm::Load(){
         if(sl[0] == "CSpline")make = new CSpline();
         //オブジェクト生成
         if(make != nullptr){
-            for(int j=1;j<sl.size();j++){
-                make->Create(points[sl[j].toInt()]);
+
+            CREATE_RESULT res = make->Create(points[sl[1].toInt()]);
+
+            if(res == CREATE_RESULT::ENDLESS){
+                for(int j=3;j<sl.size();j++){
+                    make->Create(points[sl[j].toInt()]);
+                }
+                make->Create(points[sl[2].toInt()]);
+            }else{
+                for(int j=2;j<sl.size();j++){
+                    make->Create(points[sl[j].toInt()]);
+                }
             }
             this->edges.push_back(make);
         }
