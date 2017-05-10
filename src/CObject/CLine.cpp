@@ -45,7 +45,7 @@ bool CLine::isSelectable(Pos pos)const{
 int CLine::GetMiddleCount()const{
     return 0;
 }
-CPoint* CLine::GetMiddle(int){
+CPoint* CLine::GetMiddle(int)const{
     return nullptr;
 }
 void CLine::SetMiddle(CPoint*,int){
@@ -56,11 +56,18 @@ Pos CLine::GetNear(const Pos& hand)const{
     //点と直線の最近点
     return Pos::LineNearPoint(*this->start,*this->end,hand);
 }
+CEdge* CLine::Clone()const{
+    CLine* ptr = new CLine(this->parent());
+    ptr->start = new CPoint(*this->start,ptr);
+    ptr->end   = new CPoint(*this->end  ,ptr);
+    return ptr;
+}
 
 CLine::CLine(QObject *parent):
     CEdge(parent)
 {
 }
+
 
 CLine::~CLine()
 {

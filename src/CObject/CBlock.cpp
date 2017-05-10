@@ -90,7 +90,7 @@ void CBlock::SetEdge(int index,CEdge* line){
     this->lines[index] = line;
 }
 
-CObject* CBlock::GetEdge(int index)const{
+CEdge* CBlock::GetEdge(int index)const{
     return this->lines[index];
 }
 

@@ -6,9 +6,9 @@ void ExportDialog::SetBlocks(QVector<CBlock> blocks){
     this->blocks = blocks;
 }
 
-int ExportDialog::GetPosIndex(VPos p) const{
+int ExportDialog::GetPosIndex(Pos p) const{
     int ans;
-    QVector<VPos> pp = this->GetVerticesPos();
+    QVector<Pos> pp = this->GetVerticesPos();
     //検索
     ans = std::distance(pp.begin(),std::find(pp.begin(),pp.end(),p));
     if(ans == pp.size()){
@@ -17,14 +17,14 @@ int ExportDialog::GetPosIndex(VPos p) const{
         return ans;//pが存在する
     }
 }
-QVector<VPos> ExportDialog::GetVerticesPos() const{
+QVector<Pos> ExportDialog::GetVerticesPos() const{
     //全頂点リスト作成(重複無し)
-    QVector<VPos> ans;
+    QVector<Pos> ans;
     for(CBlock block:blocks){
         for(Pos pos:block.GetVerticesPos()){
             //配列内に存在していなければ
-            if(!exist(ans,VPos{pos.x,pos.y,0})){
-                ans.push_back(VPos{pos.x,pos.y,0});
+            if(!exist(ans,pos)){
+                ans.push_back(pos);
             }
         }
     }
@@ -32,8 +32,9 @@ QVector<VPos> ExportDialog::GetVerticesPos() const{
     for(CBlock block:blocks){
         for(Pos pos:block.GetVerticesPos()){
             //配列内に存在していなければ
-            if(!exist(ans,VPos{pos.x,pos.y,block.depth})){
-                ans.push_back(VPos{pos.x,pos.y,block.depth});
+            Pos next = pos + Pos(0,0,block.depth);
+            if(!exist(ans,next)){
+                ans.push_back(next);
             }
         }
     }
@@ -41,13 +42,13 @@ QVector<VPos> ExportDialog::GetVerticesPos() const{
     return ans;
 }
 
-QVector<VPos> ExportDialog::GetBoundaryPos(CBlock block,BoundaryDir dir)const{
-    QVector<VPos> vertices;
-    QVector<VPos> ans;
+QVector<Pos> ExportDialog::GetBoundaryPos(CBlock block,BoundaryDir dir)const{
+    QVector<Pos> vertices;
+    QVector<Pos> ans;
     vertices.resize(8);
     for(int i=0;i<4;i++){
-        vertices[i]   = VPos{block.GetVerticesPos()[i].x,block.GetVerticesPos()[i].y,0};
-        vertices[i+4] = VPos{block.GetVerticesPos()[i].x,block.GetVerticesPos()[i].y,block.depth};
+        vertices[i]   = block.GetVerticesPos()[i];
+        vertices[i+4] = block.GetVerticesPos()[i] + Pos(0,0,block.depth);
     }
 
     if(dir == BoundaryDir::Front){    //前面
@@ -83,6 +84,21 @@ void ExportDialog::ChangeDirctory(){
 }
 void ExportDialog::Export(QString filename)const{
 
+    QVector<CEdge*> edges;
+
+    //全ての辺を抽出
+    for(CBlock block : this->blocks){
+        for(int i=0;i<4;i++){
+            edges.push_back(block.GetEdge(i));
+            edges.push_back(block.GetEdge(i)->Clone());//複製
+            *edges.back()->start += Pos(0,0,block.depth);
+            *edges.back()->end   += Pos(0,0,block.depth);
+            for(int j=0;j<edges.back()->GetMiddleCount();j++){
+                *edges.back()->GetMiddle(j) += Pos(0,0,block.depth);
+            }
+        }
+    }
+
     //BlockMeshDict出力
     FoamFile file(filename+"/blockMeshDict");
 
@@ -94,9 +110,8 @@ void ExportDialog::Export(QString filename)const{
 
     // 頂点登録
     file.StartListDifinition("vertices");
-    for(VPos p:this->GetVerticesPos()){
-        QVector<double> vec = {p.x,p.y,p.z};
-        file.OutVector(vec);
+    for(Pos p:this->GetVerticesPos()){
+        file.OutVector(p);
     }
     file.EndScope();
 
@@ -110,11 +125,11 @@ void ExportDialog::Export(QString filename)const{
         QVector<int> pos_indices;
         for(int i=0;i<4;i++){
             Pos p = block.GetClockworksPos(i);
-            pos_indices.push_back(this->GetPosIndex(VPos{p.x,p.y,0}));
+            pos_indices.push_back(this->GetPosIndex(p));
         }
         for(int i=0;i<4;i++){
             Pos p = block.GetClockworksPos(i);
-            pos_indices.push_back(this->GetPosIndex(VPos{p.x,p.y,block.depth}));
+            pos_indices.push_back(this->GetPosIndex(p + Pos(0,0,block.depth)));
         };
         file.OutVectorInline(pos_indices);
 
@@ -146,6 +161,33 @@ void ExportDialog::Export(QString filename)const{
 
     // エッジ定義
     file.StartListDifinition("edges");
+    //出力
+    for(CEdge* edge:edges){
+        file.TabOut();
+        if(edge->is<CLine>()  ){
+            file.OutStringInline("line");
+            file.OutStringInline(QString::number(this->GetPosIndex(*edge->start)));
+            file.OutStringInline(QString::number(this->GetPosIndex(*edge->end  )));
+        }
+        if(edge->is<CArc>()   ){
+            file.OutStringInline("arc");
+            file.OutStringInline(QString::number(this->GetPosIndex(*edge->start)));
+            file.OutStringInline(QString::number(this->GetPosIndex(*edge->end  )));
+            file.OutVectorInline(*edge->GetMiddle(0));
+        }
+        if(edge->is<CSpline>()){
+            file.OutStringInline("spline");
+            file.OutStringInline(QString::number(this->GetPosIndex(*edge->start)));
+            file.OutStringInline(QString::number(this->GetPosIndex(*edge->end  )));
+
+            file.OutStringInline("(");
+            for(int i=0;i<edge->GetMiddleCount();i++){
+                file.OutVectorInline(*edge->GetMiddle(i));
+            }
+            file.OutStringInline(")");
+        }
+        file.OutNewline();
+    }
     file.EndScope();
 
 
@@ -156,8 +198,8 @@ void ExportDialog::Export(QString filename)const{
     for(CBlock block:this->blocks){
         for(int i=0;i<6;i++){
             //頂点番号リスト出力
-            QVector<VPos> vp = this->GetBoundaryPos(block,static_cast<BoundaryDir>(i));
-            for(VPos v:vp){
+            QVector<Pos> vp = this->GetBoundaryPos(block,static_cast<BoundaryDir>(i));
+            for(Pos v:vp){
                 if(block.boundery[i] == BoundaryType::None)continue;//連続は登録しない
                 boundary_list[block.name[i]].first = block.boundery[i];
                 boundary_list[block.name[i]].second.push_back(GetPosIndex(v));

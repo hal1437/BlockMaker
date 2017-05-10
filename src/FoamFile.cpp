@@ -1,4 +1,5 @@
 #include "FoamFile.h"
+
 //タブ出力
 void FoamFile::TabOut(){
     for(int i=0;i<this->defs.size();i++)ofs << TAB;
@@ -20,6 +21,9 @@ void FoamFile::StartListDifinition(QString title){
 }
 
 
+void FoamFile::OutVector(Pos pos){
+    this->OutVector<double>({pos.x,pos.y,pos.z});
+}
 void FoamFile::OutValue(QString name,QString value){
     this->TabOut();
     ofs << name << " " << value << ";" << NEWLINE;
@@ -28,6 +32,9 @@ void FoamFile::OutValue(QString name,QString value){
 void FoamFile::OutString(QString str){
     this->TabOut();
     ofs << str << NEWLINE;
+}
+void FoamFile::OutVectorInline(Pos pos){
+    this->OutVectorInline<double>({pos.x,pos.y,pos.z});
 }
 void FoamFile::OutValueInline(QString name,QString value){
     ofs << name << " " << value << " ";

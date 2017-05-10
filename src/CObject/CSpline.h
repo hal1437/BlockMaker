@@ -41,11 +41,14 @@ public:
 
     //中間点操作
     virtual int GetMiddleCount()const;
-    virtual CPoint* GetMiddle(int index);
+    virtual CPoint* GetMiddle(int index)const;
     virtual void    SetMiddle(CPoint*,int index);
 
     //近接点
     virtual Pos GetNear(const Pos& pos)const;
+    //複製
+    CEdge* Clone()const;
+
 
     void RefreshNodes();
 

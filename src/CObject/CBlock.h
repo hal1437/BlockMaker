@@ -67,7 +67,7 @@ public:
 
     void SetEdgeAll(QVector<CEdge*> lines);
     void SetEdge(int index, CEdge *line);
-    CObject* GetEdge(int index)const;
+    CEdge* GetEdge(int index)const;
     QVector<Pos> GetVerticesPos()const;
     Pos GetClockworksPos(int index) const;//時計回り番号取得
 

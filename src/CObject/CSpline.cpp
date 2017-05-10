@@ -123,7 +123,7 @@ void CSpline::SetEndPos(CPoint* pos){
 int CSpline::GetMiddleCount()const{
     return this->pos.size();
 }
-CPoint* CSpline::GetMiddle(int index){
+CPoint* CSpline::GetMiddle(int index)const{
     return pos[index];
 }
 void CSpline::SetMiddle(CPoint* pos,int index){
@@ -167,7 +167,15 @@ void CSpline::RefreshNodes(){
 CSpline::CSpline(QObject *parent):
     CEdge(parent)
 {
-
+}
+CEdge* CSpline::Clone()const{
+    CSpline* ptr = new CSpline(this->parent());
+    ptr->start   = new CPoint(*this->start ,ptr);
+    ptr->end     = new CPoint(*this->end   ,ptr);
+    for(int i=0;i<this->GetMiddleCount();i++){
+        ptr->pos.push_back(new CPoint(*this->GetMiddle(i),ptr));
+    }
+    return ptr;
 }
 
 CSpline::~CSpline()

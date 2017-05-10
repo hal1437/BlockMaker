@@ -23,13 +23,16 @@ public:
 
     //中間点操作
     virtual int GetMiddleCount()const = 0;
-    virtual CPoint* GetMiddle(int index) = 0;
+    virtual CPoint* GetMiddle(int index)const = 0;
     virtual void    SetMiddle(CPoint*,int index) = 0;
 
     //近接点
     virtual Pos GetNear(const Pos& hand)const=0;
     virtual void SetStartPos(CPoint* pos);
     virtual void SetEndPos(CPoint* pos);
+
+    //複製
+    virtual CEdge* Clone()const = 0;
 
     CEdge(QObject* parent=nullptr);
     ~CEdge();

@@ -6,8 +6,9 @@
 #include <QFile>
 #include <QTextStream>
 #include <QMessageBox>
+#include <type_traits>
 #include "Utils.h"
-
+#include "Point.h"
 
 //FOAMファイル
 class FoamFile
@@ -30,6 +31,7 @@ public:
     //ベクトルを文字列に変換
     template<class T>
     static QString VectorToString(QVector<T> vector);
+    static QString VectorToString(Pos pos);
 
 public:
 
@@ -43,6 +45,7 @@ public:
     //各出力
     template<class T>
     void OutVector(QVector<T> vector);         //ベクトル出力
+    void OutVector(Pos pos);                   //座標出力
     void OutValue(QString name,QString value); //値出力
     void OutString(QString str);               //文字列出力
     void EndScope();                           //閉じかっこ出力
@@ -53,6 +56,7 @@ public:
     //改行&タブなし出力
     template<class T>
     void OutVectorInline(QVector<T> vector);         //ベクトル出力
+    void OutVectorInline(Pos pos);                   //座標出力
     void OutValueInline(QString name,QString value); //値出力
     void OutStringInline(QString str);               //文字列出力
 

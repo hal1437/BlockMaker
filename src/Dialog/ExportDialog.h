@@ -15,13 +15,6 @@
 #include <QSettings>
 #include "FoamFile.h"
 
-struct VPos{
-    double x,y,z;
-    bool operator==(const VPos& rhs)const{
-        return std::tie(this->x,this->y,this->z) == std::tie(rhs.x,rhs.y,rhs.z);
-    }
-};
-
 namespace Ui {
 class ExportDialog;
 }
@@ -35,13 +28,13 @@ private:
     void Export(QString filename)const;
 
     //座標から番号へ変換
-    int GetPosIndex(VPos p)const;
+    int GetPosIndex(Pos p)const;
 
     //全頂点リストを取得
-    QVector<VPos> GetVerticesPos()const;
+    QVector<Pos> GetVerticesPos()const;
 
     //境界面の座標を取得
-    QVector<VPos> GetBoundaryPos(CBlock block,BoundaryDir dir)const;
+    QVector<Pos> GetBoundaryPos(CBlock block,BoundaryDir dir)const;
 
 public:
     void SetBlocks(QVector<CBlock> blocks);

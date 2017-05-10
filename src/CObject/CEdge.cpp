@@ -12,7 +12,6 @@ void CEdge::SetEndPos(CPoint* pos){
     connect(this->end,SIGNAL(PosChanged(Pos,Pos)),this,SLOT(ChangePosCallback(Pos,Pos)));
 }
 
-
 CEdge::CEdge(QObject* parent):
     CObject(parent)
 {

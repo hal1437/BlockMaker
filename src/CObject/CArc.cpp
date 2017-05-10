@@ -74,7 +74,7 @@ void CArc::SetEndPos(CPoint* pos){
 int CArc::GetMiddleCount()const{
     return 1;
 }
-CPoint* CArc::GetMiddle(int index){
+CPoint* CArc::GetMiddle(int index)const{
     if(index == 0){
         return this->center;
     }else{
@@ -94,12 +94,18 @@ void CArc::SetMiddle(CPoint* pos,int index){
 Pos CArc::GetNear(const Pos& hand)const{
     return Pos::CircleNearPoint(*this->center,round,hand);
 }
+CEdge* CArc::Clone()const{
+    CArc* ptr   = new CArc(this->parent());
+    ptr->start  = new CPoint(*this->start ,ptr);
+    ptr->end    = new CPoint(*this->end   ,ptr);
+    ptr->center = new CPoint(*this->center,ptr);
+    return ptr;
+}
 
 CArc::CArc(QObject* parent):
     CEdge(parent)
 {
 }
-
 CArc::~CArc()
 {
 }
