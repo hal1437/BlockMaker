@@ -77,7 +77,7 @@ void MainWindow::CtrlZ(){
 }
 void MainWindow::Delete(){
     for(int i =0;i<CObject::selected.size();i++){
-        //ui->CadEdit->RemoveObject(CObject::selected[i]);
+        ui->CadEdit->RemoveObject(CObject::selected[i]);
     }
     CObject::selected.clear();
     repaint();
