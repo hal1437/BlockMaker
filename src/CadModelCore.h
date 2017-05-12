@@ -2,6 +2,8 @@
 #define CADMODELCORE_H
 
 #include <QObject>
+#include <iostream>
+#include <fstream>
 #include "CObject/CObject.h"
 #include "CObject/CPoint.h"
 #include "CObject/CEdge.h"
@@ -23,16 +25,17 @@ public:
     DEFINE_OBSERVER(Restraint*      ,Restraints)
     DEFINE_OBSERVER(SmartDimension* ,Dimensions)
 
-private:
+public:
     CPoint* origin; //原点
 
 public:
-    CadModelCore();
-    ~CadModelCore();
-
     //ファイル入出力
     bool ExportFoamFile(QString filename)const;
     bool ImportFoamFile(QString filename);
+
+public:
+    explicit CadModelCore(QWidget *parent = 0);
+    ~CadModelCore();
 
 signals:
     void SelectObjectChanged();

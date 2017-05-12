@@ -39,11 +39,10 @@ private:
     Ui::CadEditForm *ui; //UI
     CadModelCore* model;
 
-    int                       selecting_block; //選択物体
+    int selecting_block; //選択物体
 
     CEnum   state      = Edit;    //生成種類
     CEdge*  make_obj   = nullptr; //生成途中オブジェクト
-    CPoint* origin     = nullptr; //原点
     CPoint* hang_point = nullptr; //生成支点
     CREATE_RESULT make_result = COMPLETE; //生成管理フラグ
 
@@ -124,11 +123,9 @@ public slots:
     void Load();//読み込み
     void MovedMouse(QMouseEvent *event, CObject* under_object); //マウス移動シグナル
 
-
 public:
     explicit CadEditForm(QWidget *parent = 0);
     ~CadEditForm();
-
 
 };
 

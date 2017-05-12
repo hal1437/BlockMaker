@@ -188,14 +188,14 @@ void CadEditForm::paintEvent(QPaintEvent*){
     }
 
     //原点
-    if(this->origin->z > this->depth){
+    if(this->model->origin->z > this->depth){
         paint.setPen(QPen(QColor(200,200,200), CObject::DRAWING_LINE_SIZE / this->scale,Qt::SolidLine,Qt::RoundCap));
-    }else if(this->origin->z < this->depth){
+    }else if(this->model->origin->z < this->depth){
         paint.setPen(QPen(QColor(100,100,100), CObject::DRAWING_LINE_SIZE / this->scale,Qt::SolidLine,Qt::RoundCap));
     }else{
         paint.setPen(QPen(Qt::blue, CObject::DRAWING_LINE_SIZE / this->scale,Qt::SolidLine,Qt::RoundCap));
     }
-    this->origin->Draw(paint);
+    this->model->origin->Draw(paint);
 
     //選択されたオブジェクト
     paint.setPen(QPen(Qt::cyan, CObject::DRAWING_LINE_SIZE / this->scale,Qt::SolidLine,Qt::RoundCap));
@@ -294,10 +294,6 @@ CadEditForm::CadEditForm(QWidget *parent) :
 
     //マウストラッキング対象
     setMouseTracking(true);
-
-    //原点追加
-    origin = new CPoint();
-    origin->ControlPoint(true);
 }
 
 CadEditForm::~CadEditForm()
@@ -308,9 +304,9 @@ CadEditForm::~CadEditForm()
 CObject* CadEditForm::getHanged(){
     CObject* final = nullptr;
 
-    if(this->origin->isSelectable(CObject::mouse_pos)){
-        if(this->origin->z == this->depth)return this->origin;
-        else final = this->origin;
+    if(this->model->origin->isSelectable(CObject::mouse_pos)){
+        if(this->model->origin->z == this->depth)return this->model->origin;
+        else final = this->model->origin;
     }
 
     for(CEdge* obj:this->model->GetEdges()){
@@ -673,7 +669,7 @@ void CadEditForm::ImportObjectList(QTreeWidget* list){
 
         if(text == "Origin"){
             if(item->isSelected()){
-                CObject::selected.push_back(this->origin);
+                CObject::selected.push_back(this->model->origin);
             }
         }else{
             //CObject::selected内をループ
@@ -698,83 +694,6 @@ void CadEditForm::ImportObjectList(QTreeWidget* list){
     }
 }
 void CadEditForm::ExportObjectList(QTreeWidget* list){
-    if(list->topLevelItemCount() != this->model->GetEdges().size()+1){
-        list->clear();
-
-        //原点を追加
-        list->addTopLevelItem(new QTreeWidgetItem());
-        list->topLevelItem(list->topLevelItemCount()-1)->setText(0,"Origin");
-        list->topLevelItem(list->topLevelItemCount()-1)->setIcon(0,QIcon(":/ToolImages/Dot.png"));
-
-        for(int i=0;i<this->model->GetEdges().size();i++){
-            std::pair<std::string,std::string> p;
-            if(this->model->GetEdges()[i]->is<CLine>  ())p = std::make_pair("CLine"  ,":/ToolImages/Line.png");
-            if(this->model->GetEdges()[i]->is<CArc>   ())p = std::make_pair("CArc"   ,":/ToolImages/Arc.png");
-            if(this->model->GetEdges()[i]->is<CSpline>())p = std::make_pair("CSpline",":/ToolImages/Spline.png");
-
-            //オブジェクト追加
-            list->addTopLevelItem(new QTreeWidgetItem());
-            list->topLevelItem(list->topLevelItemCount()-1)->setText(0,p.first.c_str());
-            list->topLevelItem(list->topLevelItemCount()-1)->setIcon(0,QIcon(p.second.c_str()));
-
-            if(!list->topLevelItem(list->topLevelItemCount()-1)->isSelected()){
-                list->topLevelItem(list->topLevelItemCount()-1)->setSelected(this->model->GetEdges()[i]->isSelected());
-            }
-        }
-    }
-
-    //子の設定
-    for(int i=0;i<this->model->GetEdges().size();i++){
-        if(this->model->GetEdges()[i]->GetMiddleCount()+2 != list->topLevelItem(i+1)->childCount()){
-            for(int j=0;j<this->model->GetEdges()[i]->GetMiddleCount()+2;j++){
-                QTreeWidgetItem* child;
-                if(j < list->topLevelItem(i+1)->childCount()){
-                    child = list->topLevelItem(i+1)->child(j);
-                }else{
-                    child = new QTreeWidgetItem();
-                }
-
-                child->setIcon(0,QIcon(":/ToolImages/Dot.png"));
-                if(j == 0){
-                    child->setText(0,"Start");
-                }
-                else if(j == 1){
-                    child->setText(0,"End");
-                }
-                else{
-                    child->setText(0,QString("Middle_") + QString::number(j) + ")");
-                }
-
-                if(j >= list->topLevelItem(i+1)->childCount()){
-                    if(j==0 || j == this->model->GetEdges()[i]->GetMiddleCount()+1){
-                        list->topLevelItem(i+1)->addChild(child);
-                    }else{
-                        list->topLevelItem(i+1)->insertChild(1,child);
-                    }
-                }
-            }
-        }
-    }
-
-    //選択状態の反映
-    for(int i=0;i<list->topLevelItemCount();i++){
-        if(i == 0){
-            //原点
-            list->topLevelItem(0)->setSelected(this->origin->isSelected());
-        }else{
-            //Edge自身
-            list->topLevelItem(i)->setSelected(this->model->GetEdges()[i-1]->isSelected());
-
-            //端点
-            list->topLevelItem(i)->child(0)->setSelected(this->model->GetEdges()[i-1]->start->isSelected());
-            list->topLevelItem(i)->child(1)->setSelected(this->model->GetEdges()[i-1]->end->isSelected());
-            for(int j=0;j<this->model->GetEdges()[i-1]->GetMiddleCount() && j<list->topLevelItem(i)->childCount()-2;j++){
-                list->topLevelItem(i)->child(j+2)->setSelected(this->model->GetEdges()[i-1]->GetMiddle(j)->isSelected());
-            }
-        }
-    }
-
-
 }
 void CadEditForm::ImportCBoxList  (QListWidget *list){
     //selecting_blockを更新する
@@ -787,15 +706,6 @@ void CadEditForm::ImportCBoxList  (QListWidget *list){
     }
 }
 void CadEditForm::ExportCBoxList   (QListWidget *list){
-    //数が一致しなければ、全て削除し再度代入する
-    if(list->count() != this->model->GetBlocks().size()){
-        list->clear();
-        for(int i=0;i<this->model->GetBlocks().size();i++) {
-            list->addItem(new QListWidgetItem("CBox"));
-            list->item(list->count()-1)->setIcon(QIcon(":/ToolImages/Blocks.png"));
-            list->item(list->count()-1)->setSelected(selecting_block == i);
-        }
-    }
 }
 void CadEditForm::ConfigureBlock(QListWidgetItem*){
     if(this->selecting_block == -1)return;
@@ -829,199 +739,11 @@ void CadEditForm::Export(){
 }
 
 void CadEditForm::Save(){
-
-    QString filename = QFileDialog::getSaveFileName( this, "Save");
-    if(filename == "")return;
-
-    QVector<Pos> points;
-    //全ての頂点を保存
-    for(int i =0;i<this->model->GetEdges().size();i++){
-        if(this->model->GetEdges()[i]->is<CPoint>()){//CPointなら
-            points.push_back(*dynamic_cast<CPoint*>(this->model->GetEdges()[i]));
-        }
-        if(this->model->GetEdges()[i]->is<CEdge>()){//CEdgeなら
-            points.push_back(*this->model->GetEdges()[i]->start);
-            points.push_back(*this->model->GetEdges()[i]->end);
-            for(int j=0;j<this->model->GetEdges()[i]->GetMiddleCount();j++){
-                points.push_back(*this->model->GetEdges()[i]->GetMiddle(j));
-            }
-        }
-    }
-    //並び替え&同一排除
-    std::sort(points.begin(),points.end());
-    points.erase(std::unique(points.begin(),points.end()),points.end());
-
-
-    //オブジェクトリスト作成
-    QVector<std::pair<QString,QVector<int>>> pairs;//(名前,頂点番号)
-    for(int i =0;i<this->model->GetEdges().size();i++){
-        QString name = "Unknown";
-        QVector<int> vertex;
-        if(this->model->GetEdges()[i]->is<CPoint>()){
-            vertex.push_back(IndexOf(points,*dynamic_cast<CPoint*>(this->model->GetEdges()[i])));
-            name = "CPoint";
-        }
-        if(this->model->GetEdges()[i]->is<CEdge>()){
-            if(this->model->GetEdges()[i]->is<CLine>  ())name = "CLine";
-            if(this->model->GetEdges()[i]->is<CArc>   ())name = "CArc";
-            if(this->model->GetEdges()[i]->is<CSpline>())name = "CSpline";
-
-            //始点終点を追加
-            vertex.push_back(IndexOf(points,*this->model->GetEdges()[i]->start));
-            vertex.push_back(IndexOf(points,*this->model->GetEdges()[i]->end));
-            //中継点を追加
-            for(int j=0;j<this->model->GetEdges()[i]->GetMiddleCount();j++){
-                vertex.push_back(IndexOf(points,*this->model->GetEdges()[i]->GetMiddle(j)));
-            }
-        }
-        //登録
-        pairs.push_back(std::make_pair(name,vertex));
-    }
-
-    //出力
-    std::ofstream out(filename.toStdString().c_str());
-    if(!out)return;
-
-    //頂点数
-    out << points.size() << std::endl;
-    //頂点
-    for(Pos p : points){
-        out << p << std::endl;
-    }
-
-    //オブジェクト数
-    out << pairs.size() << std::endl;
-    //オブジェクト
-    for(std::pair<QString,QVector<int>> p : pairs){
-        out << p.first.toStdString();
-        for(int i=0;i<p.second.size();i++){
-            out << "," << p.second[i];
-        }
-        out << std::endl;
-    }
-
-    //ブロック
-    out << this->model->GetBlocks().size() << std::endl;
-    for(CBlock* b : this->model->GetBlocks()){
-        out << b->depth << std::endl;
-        out << b->grading << std::endl;
-
-        for(double d : b->grading_args)out << d << " ";
-        out << std::endl;
-        for(BoundaryType t : b->boundery)out << t << " ";
-        out << std::endl;
-        for(QString n : b->name)out << n.toStdString() << " ";
-        out << std::endl;
-        for(int d : b->div)out << d << " ";
-        out << std::endl;
-
-        for(int i=0;i<4;i++){
-            for(int j=0;j<this->model->GetEdges().size();j++){
-                if(this->model->GetEdges()[j] == b->GetEdge(i)){
-                    out << j << " ";
-                    break;
-                }
-            }
-        }
-    }
-
+    QString filename = QFileDialog::getSaveFileName(this, "Save");
+    this->model->ExportFoamFile(filename);
 }
 
 void CadEditForm::Load(){
-
     QString filename = QFileDialog::getOpenFileName(this, "Load");
-    std::ifstream in(filename.toStdString().c_str());
-    if(!in)return ;
-    //オブジェクトをクリア
-    this->model->GetEdges().clear();
-
-    //頂点数取得
-    int vertex_num;
-    in >> vertex_num;
-
-    //頂点取得
-    QVector<CPoint*> points;
-    for(int i=0;i<vertex_num;i++){
-        Pos p;
-        in >> p;
-        if(p != Pos()){
-            points.push_back(new CPoint(p));
-        }else{
-            points.push_back(this->origin);
-        }
-    }
-
-    //オブジェクト数取得
-    int object_num;
-    in >> object_num;
-
-    //オブジェクト復元
-    for(int i=0;i<object_num;i++){
-        std::string str;
-        in >> str;
-
-        //オブジェクト判定
-        CEdge* make = nullptr;
-        QStringList sl = QString(str.c_str()).split(',');
-
-        //if(sl[0] == "CPoint" )make = new CPoint();
-        if(sl[0] == "CLine"  )make = new CLine();
-        if(sl[0] == "CArc"   )make = new CArc();
-        if(sl[0] == "CSpline")make = new CSpline();
-        //オブジェクト生成
-        if(make != nullptr){
-
-            CREATE_RESULT res = make->Create(points[sl[1].toInt()]);
-
-            if(res == CREATE_RESULT::ENDLESS){
-                for(int j=3;j<sl.size();j++){
-                    make->Create(points[sl[j].toInt()]);
-                }
-                make->Create(points[sl[2].toInt()]);
-            }else{
-                for(int j=2;j<sl.size();j++){
-                    make->Create(points[sl[j].toInt()]);
-                }
-            }
-            this->model->GetEdges().push_back(make);
-        }
-    }
-
-    int block_num;
-    in >> block_num;
-    for(int i=0;i<block_num;i++){
-        CBlock* block = new CBlock();
-        int g;
-        in >> block->depth;
-        in >> g;
-        block->grading = static_cast<GradingType>(g);
-
-        if(block->grading == GradingType::SimpleGrading)block->grading_args.resize(3);
-        else                                           block->grading_args.resize(12);
-
-        for(int j=0;j<block->grading_args.size();j++){
-            in >> block->grading_args[j];
-        }
-        for(int j=0;j<6;j++){
-            int b;
-            in >> b;
-            block->boundery[j] = static_cast<BoundaryType>(b);
-        }
-        for(int j=0;j<6;j++){
-            std::string str;
-            in >> str;
-            block->name[j] = str.c_str();
-        }
-        for(int j=0;j<3;j++){
-            in >> block->div[j];
-        }
-        QVector<CEdge*> ed;
-        for(int i=0;i<4;i++){
-            int j;
-            in >> j;
-            ed.push_back(this->model->GetEdges()[j]);
-        }
-        block->SetEdgeAll(ed);
-        this->model->AddBlocks(block);
-    }
+    this->model->ImportFoamFile(filename);
 }
