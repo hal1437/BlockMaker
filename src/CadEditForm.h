@@ -13,16 +13,11 @@
 #include <random>
 #include <queue>
 #include <utility>
-#include "CObject/CObject.h"
-#include "CObject/CPoint.h"
-#include "CObject/CLine.h"
-#include "CObject/CBlock.h"
+#include "CadModelCore.h"
 #include "Dialog/CBoxDefineDialog.h"
-#include "Dialog/SmartDimension.h"
 #include "Dialog/SmartDimensionDialog.h"
 #include "Dialog/ExportDialog.h"
 #include "Dialog/GridFilter.h"
-#include "Restraint.h"
 
 namespace Ui {
 class CadEditForm;
@@ -42,11 +37,8 @@ class CadEditForm : public QWidget
     Q_OBJECT
 private:
     Ui::CadEditForm *ui; //UI
+    CadModelCore* model;
 
-    QVector<CEdge*>           edges;           //エッジ
-    QVector<CBlock>           blocks;          //ブロック
-    QVector<SmartDimension*>  dimensions;      //寸法
-    QVector<Restraint*>       restraints;      //拘束
     int                       selecting_block; //選択物体
 
     CEnum   state      = Edit;    //生成種類
@@ -80,14 +72,9 @@ public:
     void keyPressEvent    (QKeyEvent* event); //キーボード押しイベント
     void keyReleaseEvent  (QKeyEvent* event); //キーボード離しイベント
 
-    void Escape();//作成破棄
 
-    void AddEdge     (CEdge* obj);      //オブジェクト追加
-    void RemoveObject(CObject* obj);      //オブジェクト削除
-    void RemoveEdge  (CEdge* obj);      //オブジェクト削除
-    void CompleteObject(CObject* make_obj); //非端点を追加
-    //double GetScale()const;                 //スケール取得
-    //Pos    GetTranslate()const;             //平行移動量取得
+    void SetModel(CadModelCore* model);
+    void Escape();//作成破棄
 
     void Zoom     (double scale,Pos local_piv); //ズーム
     void Translate(Pos local_diff);             //平行移動

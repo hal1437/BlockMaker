@@ -1,6 +1,10 @@
 #include "CadEditForm.h"
 #include "ui_CadEditForm.h"
 
+void CadEditForm::SetModel(CadModelCore* model){
+    this->model = model;
+}
+
 void CadEditForm::mousePressEvent  (QMouseEvent*){
     release_flag = false;
     if(state==Edit)move_flag = true;
@@ -77,8 +81,7 @@ void CadEditForm::Escape(){
     //作成解除
     if(CObject::creating != nullptr){
         if(make_result == TWOSHOT){
-            this->RemoveObject(make_obj->end);
-            this->RemoveEdge(make_obj);
+            this->model->RemoveEdges(make_obj);
         }
         CObject::creating = nullptr;
         this->hang_point = nullptr;
@@ -86,51 +89,6 @@ void CadEditForm::Escape(){
     }
 }
 
-void CadEditForm::AddEdge(CEdge* obj){
-    if(!exist(edges,obj)){
-        edges.push_back(obj);
-    }
-}
-
-
-void CadEditForm::RemoveObject(CObject* obj){
-    //objを消す
-    QVector<CEdge*>::Iterator it = std::find(this->edges.begin(),this->edges.end(),obj);
-    if(it != this->edges.end()){
-        this->edges.erase(it);
-    }
-
-    //点ならばその点を含むObjectを全てnullptrにする。
-    if(obj->is<CPoint>()){
-        for(CEdge*& it : this->edges){
-            if(it != obj){
-                if(it->start == obj ||
-                   it->end   == obj ){
-                    it = nullptr;
-                    break;
-                }
-            }
-        }
-    }
-
-    //nullptrを消す
-    this->edges.removeAll(nullptr);
-    repaint();
-}
-void CadEditForm::RemoveEdge(CEdge* obj){
-    this->edges.removeAll(obj);
-}
-
-void CadEditForm::CompleteObject(CObject*){
-
-}
-
-/*double CadEditForm::GetScale()const{
-    return scale;
-}
-Pos    CadEditForm::GetTranslate()const{
-    return translate;
-}*/
 
 void CadEditForm::MovedMouse(QMouseEvent *event, CObject *under_object){
 
@@ -196,24 +154,24 @@ void CadEditForm::paintEvent(QPaintEvent*){
                           this->width()/this->scale,this->height()/this->scale);
 
     //CBox描画
-    for(int i=0;i<this->blocks.size();i++){ //エリア描画
+    for(int i=0;i<this->model->GetBlocks().size();i++){ //エリア描画
         paint.setPen(QPen(Qt::darkGray, CObject::DRAWING_LINE_SIZE/2 / this->scale,Qt::SolidLine,Qt::RoundCap));
         paint.setBrush(QBrush(Qt::lightGray));   //背景設定
-        this->blocks[i].Draw(paint);
+        this->model->GetBlocks()[i]->Draw(paint);
     }
-    if(this->selecting_block >= 0 && this->selecting_block < this->blocks.size()){
+    if(this->selecting_block >= 0 && this->selecting_block < this->model->GetBlocks().size()){
         paint.setPen(QPen(Qt::cyan, CObject::DRAWING_LINE_SIZE/2 / this->scale,Qt::SolidLine,Qt::RoundCap));
-        this->blocks[this->selecting_block].Draw(paint);
+        this->model->GetBlocks()[this->selecting_block]->Draw(paint);
     }
 
     //寸法を描画
     paint.setPen(QPen(Qt::blue, 1,Qt::SolidLine,Qt::RoundCap));
-    for(SmartDimension* dim:dimensions){
+    for(SmartDimension* dim:this->model->GetDimensions()){
         dim->Draw(paint);
     }
 
     //エッジ描画
-    for(CEdge* obj:this->edges){
+    for(CEdge* obj:this->model->GetEdges()){
         if(obj->start->z > this->depth){
             paint.setPen(QPen(QColor(200,200,200), CObject::DRAWING_LINE_SIZE / this->scale,Qt::SolidLine,Qt::RoundCap));
         }else if(obj->start->z < this->depth){
@@ -255,7 +213,7 @@ void CadEditForm::paintEvent(QPaintEvent*){
 
     //競合確認
     bool is_conflict = false;
-    for(Restraint* rest:this->restraints){
+    for(Restraint* rest:this->model->GetRestraints()){
         if(rest->isComplete()==false){
             is_conflict = true;
         }
@@ -308,7 +266,7 @@ void CadEditForm::MergePoints(){
 
     //先頭以外の点を破棄し、統合する。
     for(int i=1;i<CObject::selected.size();i++){
-        for(CEdge* p : this->edges){
+        for(CEdge* p : this->model->GetEdges()){
             if(p->start == CObject::selected[i]){
                 p->SetStartPos(dynamic_cast<CPoint*>(CObject::selected[0]));
             }
@@ -340,7 +298,6 @@ CadEditForm::CadEditForm(QWidget *parent) :
     //原点追加
     origin = new CPoint();
     origin->ControlPoint(true);
-    //this->AddObject(origin);
 }
 
 CadEditForm::~CadEditForm()
@@ -356,7 +313,7 @@ CObject* CadEditForm::getHanged(){
         else final = this->origin;
     }
 
-    for(CEdge* obj:this->edges){
+    for(CEdge* obj:this->model->GetEdges()){
         if(obj->isCreating())continue;
 
         //端点
@@ -437,7 +394,7 @@ void CadEditForm::MakeObject(){
             CObject::creating = new_obj;
 
             //新規作成
-            this->AddEdge(new_obj);
+            this->model->AddEdges(new_obj);
             make_result = MakeJoint(new_obj);
             //選択解除
             CObject::hanged = nullptr;
@@ -481,7 +438,7 @@ void CadEditForm::MakeObject(){
                 if(CObject::hanged->is<CPoint>() && dynamic_cast<CPoint*>(CObject::hanged)->z == this->depth){
                     //すり替え
                     dynamic_cast<CEdge*>(CObject::creating)->SetEndPos(dynamic_cast<CPoint*>(CObject::hanged));
-                    this->RemoveObject(this->hang_point);
+                    //this->model->RemoveEdges(this->hang_point);
                 }else{
                     //近接点へ移動
                     *this->hang_point = CObject::hanged->GetNear(*this->hang_point);
@@ -498,7 +455,7 @@ void CadEditForm::MakeObject(){
                 if(CObject::hanged->is<CPoint>()){
                     //すり替えて終了
                     dynamic_cast<CEdge*>(CObject::creating)->SetEndPos(dynamic_cast<CPoint*>(CObject::hanged));
-                    this->RemoveObject(this->hang_point);
+                    //this->RemoveObject(this->hang_point);
                 }else{
                     //近接点へ移動して終了
                     *this->hang_point = CObject::hanged->GetNear(*this->hang_point);
@@ -518,8 +475,6 @@ void CadEditForm::MakeObject(){
     }
     RefreshRestraints();
     repaint();
-    emit RequireRefreshUI();
-    emit RequireRefreshSolidUI(this->edges,this->blocks);
 }
 CREATE_RESULT CadEditForm::MakeJoint(CObject* obj){
 
@@ -557,11 +512,11 @@ void CadEditForm::MakeSmartDimension(){
             if(diag->exec()){
                 //登録
                 dim->SetValue(diag->GetValue());
-                this->dimensions.push_back(dim);
+                this->model->AddDimensions(dim);
                 //スマート寸法の拘束も追加
                 std::vector<Restraint*> rs = dim->MakeRestraint();
                 for(Restraint* r : rs){
-                    restraints.push_back(r);
+                    this->model->AddRestraints(r);
                 }
             }
         }
@@ -586,7 +541,7 @@ void CadEditForm::MakeRestraint(RestraintType type){
     }
 
     if(rest != nullptr){
-        restraints.push_back(rest);
+        this->model->AddRestraints(rest);
         RefreshRestraints();
     }
 }
@@ -598,9 +553,9 @@ bool CadEditForm::MakeBlock(){
         QVector<CEdge*> edges;
         for(CObject* obj:CObject::selected)edges.push_back(dynamic_cast<CEdge*>(obj));
 
-        CBlock block = diag->ExportCBlock();
-        block.SetEdgeAll(edges);
-        this->blocks.push_back(block);
+        CBlock* block = new CBlock(diag->ExportCBlock());
+        block->SetEdgeAll(edges);
+        this->model->AddBlocks(block);
         CObject::selected.clear();
     }
     return true;
@@ -609,7 +564,7 @@ bool CadEditForm::MakeBlock(){
 
 void CadEditForm::RefreshRestraints(){
     //拘束を解決
-    if(this->edges.size()!=0){
+    if(this->model->GetEdges().size()!=0){
         //持ち手が存在すれば
         if(CObject::hanged != nullptr){
             std::vector<std::pair<int,CObject*>> rank;
@@ -628,7 +583,7 @@ void CadEditForm::RefreshRestraints(){
             queue.push(std::make_pair(0,hand));//初期ノード
             while(!queue.empty()){
                 //全ての拘束リストから
-                for(Restraint* rest:restraints){
+                for(Restraint* rest:this->model->GetRestraints()){
                     QVector<CObject*> child = rest->nodes;
                     //childにqueue.frontが含まれる
                     if(exist(child,queue.front().second)){
@@ -654,7 +609,7 @@ void CadEditForm::RefreshRestraints(){
             std::vector<std::pair<int,Restraint*>> solver;
             if(max_rank > 0){
                 //拘束を捜査
-                for(Restraint* rest:restraints){
+                for(Restraint* rest:this->model->GetRestraints()){
                     if(rest->nodes.size()==2){
                         std::vector<std::pair<int,CObject*>>::iterator it1,it2;
                         int score1,score2,current;
@@ -695,7 +650,7 @@ void CadEditForm::RefreshRestraints(){
             }
         }else{
             //持ち手が存在しなければ
-            for(Restraint* rest:restraints){
+            for(Restraint* rest:this->model->GetRestraints()){
                 if(!rest->Complete()){
                     qDebug() << "CONFLICT" ;
                 }
@@ -714,7 +669,7 @@ void CadEditForm::ImportObjectList(QTreeWidget* list){
         QTreeWidgetItem* item = list->topLevelItem(i);
         QString          text = item->text(0);
 
-        if(i > this->edges.size())continue;
+        if(i > this->model->GetEdges().size())continue;
 
         if(text == "Origin"){
             if(item->isSelected()){
@@ -723,19 +678,19 @@ void CadEditForm::ImportObjectList(QTreeWidget* list){
         }else{
             //CObject::selected内をループ
             if(item->isSelected()){
-                CObject::selected.push_back(this->edges[i-1]);
+                CObject::selected.push_back(this->model->GetEdges()[i-1]);
             }
             //子が選択されているか
             for(int k=0;k<item->childCount();k++){
                 if(item->child(k)->isSelected()){
                     if(k==0){
-                        CObject::selected.push_back(this->edges[i-1]->start);
+                        CObject::selected.push_back(this->model->GetEdges()[i-1]->start);
                     }
                     else if(k == 1){
-                        CObject::selected.push_back(this->edges[i-1]->end);
+                        CObject::selected.push_back(this->model->GetEdges()[i-1]->end);
                     }
                     else{
-                        CObject::selected.push_back(this->edges[i-1]->GetMiddle(k-2));
+                        CObject::selected.push_back(this->model->GetEdges()[i-1]->GetMiddle(k-2));
                     }
                 }
             }
@@ -743,7 +698,7 @@ void CadEditForm::ImportObjectList(QTreeWidget* list){
     }
 }
 void CadEditForm::ExportObjectList(QTreeWidget* list){
-    if(list->topLevelItemCount() != this->edges.size()+1){
+    if(list->topLevelItemCount() != this->model->GetEdges().size()+1){
         list->clear();
 
         //原点を追加
@@ -751,11 +706,11 @@ void CadEditForm::ExportObjectList(QTreeWidget* list){
         list->topLevelItem(list->topLevelItemCount()-1)->setText(0,"Origin");
         list->topLevelItem(list->topLevelItemCount()-1)->setIcon(0,QIcon(":/ToolImages/Dot.png"));
 
-        for(int i=0;i<this->edges.size();i++){
+        for(int i=0;i<this->model->GetEdges().size();i++){
             std::pair<std::string,std::string> p;
-            if(this->edges[i]->is<CLine>  ())p = std::make_pair("CLine"  ,":/ToolImages/Line.png");
-            if(this->edges[i]->is<CArc>   ())p = std::make_pair("CArc"   ,":/ToolImages/Arc.png");
-            if(this->edges[i]->is<CSpline>())p = std::make_pair("CSpline",":/ToolImages/Spline.png");
+            if(this->model->GetEdges()[i]->is<CLine>  ())p = std::make_pair("CLine"  ,":/ToolImages/Line.png");
+            if(this->model->GetEdges()[i]->is<CArc>   ())p = std::make_pair("CArc"   ,":/ToolImages/Arc.png");
+            if(this->model->GetEdges()[i]->is<CSpline>())p = std::make_pair("CSpline",":/ToolImages/Spline.png");
 
             //オブジェクト追加
             list->addTopLevelItem(new QTreeWidgetItem());
@@ -763,15 +718,15 @@ void CadEditForm::ExportObjectList(QTreeWidget* list){
             list->topLevelItem(list->topLevelItemCount()-1)->setIcon(0,QIcon(p.second.c_str()));
 
             if(!list->topLevelItem(list->topLevelItemCount()-1)->isSelected()){
-                list->topLevelItem(list->topLevelItemCount()-1)->setSelected(this->edges[i]->isSelected());
+                list->topLevelItem(list->topLevelItemCount()-1)->setSelected(this->model->GetEdges()[i]->isSelected());
             }
         }
     }
 
     //子の設定
-    for(int i=0;i<this->edges.size();i++){
-        if(this->edges[i]->GetMiddleCount()+2 != list->topLevelItem(i+1)->childCount()){
-            for(int j=0;j<this->edges[i]->GetMiddleCount()+2;j++){
+    for(int i=0;i<this->model->GetEdges().size();i++){
+        if(this->model->GetEdges()[i]->GetMiddleCount()+2 != list->topLevelItem(i+1)->childCount()){
+            for(int j=0;j<this->model->GetEdges()[i]->GetMiddleCount()+2;j++){
                 QTreeWidgetItem* child;
                 if(j < list->topLevelItem(i+1)->childCount()){
                     child = list->topLevelItem(i+1)->child(j);
@@ -791,7 +746,7 @@ void CadEditForm::ExportObjectList(QTreeWidget* list){
                 }
 
                 if(j >= list->topLevelItem(i+1)->childCount()){
-                    if(j==0 || j == this->edges[i]->GetMiddleCount()+1){
+                    if(j==0 || j == this->model->GetEdges()[i]->GetMiddleCount()+1){
                         list->topLevelItem(i+1)->addChild(child);
                     }else{
                         list->topLevelItem(i+1)->insertChild(1,child);
@@ -808,13 +763,13 @@ void CadEditForm::ExportObjectList(QTreeWidget* list){
             list->topLevelItem(0)->setSelected(this->origin->isSelected());
         }else{
             //Edge自身
-            list->topLevelItem(i)->setSelected(this->edges[i-1]->isSelected());
+            list->topLevelItem(i)->setSelected(this->model->GetEdges()[i-1]->isSelected());
 
             //端点
-            list->topLevelItem(i)->child(0)->setSelected(this->edges[i-1]->start->isSelected());
-            list->topLevelItem(i)->child(1)->setSelected(this->edges[i-1]->end->isSelected());
-            for(int j=0;j<this->edges[i-1]->GetMiddleCount() && j<list->topLevelItem(i)->childCount()-2;j++){
-                list->topLevelItem(i)->child(j+2)->setSelected(this->edges[i-1]->GetMiddle(j)->isSelected());
+            list->topLevelItem(i)->child(0)->setSelected(this->model->GetEdges()[i-1]->start->isSelected());
+            list->topLevelItem(i)->child(1)->setSelected(this->model->GetEdges()[i-1]->end->isSelected());
+            for(int j=0;j<this->model->GetEdges()[i-1]->GetMiddleCount() && j<list->topLevelItem(i)->childCount()-2;j++){
+                list->topLevelItem(i)->child(j+2)->setSelected(this->model->GetEdges()[i-1]->GetMiddle(j)->isSelected());
             }
         }
     }
@@ -833,9 +788,9 @@ void CadEditForm::ImportCBoxList  (QListWidget *list){
 }
 void CadEditForm::ExportCBoxList   (QListWidget *list){
     //数が一致しなければ、全て削除し再度代入する
-    if(list->count() != this->blocks.size()){
+    if(list->count() != this->model->GetBlocks().size()){
         list->clear();
-        for(int i=0;i<this->blocks.size();i++) {
+        for(int i=0;i<this->model->GetBlocks().size();i++) {
             list->addItem(new QListWidgetItem("CBox"));
             list->item(list->count()-1)->setIcon(QIcon(":/ToolImages/Blocks.png"));
             list->item(list->count()-1)->setSelected(selecting_block == i);
@@ -846,12 +801,12 @@ void CadEditForm::ConfigureBlock(QListWidgetItem*){
     if(this->selecting_block == -1)return;
 
     CBoxDefineDialog* diag = new CBoxDefineDialog(this);
-    diag->ImportCBlock(this->blocks[selecting_block]);
+    diag->ImportCBlock(*this->model->GetBlocks()[selecting_block]);
     if(diag->exec()){
         QVector<CEdge*> ll;
-        for(int i =0;i<4;i++)ll.push_back(dynamic_cast<CEdge*>(this->blocks[selecting_block].GetEdge(i)));
-        this->blocks[selecting_block] = diag->ExportCBlock();
-        this->blocks[selecting_block].SetEdgeAll(ll);
+        for(int i =0;i<4;i++)ll.push_back(dynamic_cast<CEdge*>(this->model->GetBlocks()[selecting_block]->GetEdge(i)));
+        *this->model->GetBlocks()[selecting_block] = diag->ExportCBlock();
+        this->model->GetBlocks()[selecting_block]->SetEdgeAll(ll);
     }
 }
 
@@ -869,7 +824,7 @@ void CadEditForm::ResetAllExpantion(){
 
 void CadEditForm::Export(){
     ExportDialog* diag = new ExportDialog(this);
-    diag->SetBlocks(this->blocks);
+    diag->SetBlocks(this->model->GetBlocks());
     diag->exec();
 }
 
@@ -880,15 +835,15 @@ void CadEditForm::Save(){
 
     QVector<Pos> points;
     //全ての頂点を保存
-    for(int i =0;i<this->edges.size();i++){
-        if(this->edges[i]->is<CPoint>()){//CPointなら
-            points.push_back(*dynamic_cast<CPoint*>(this->edges[i]));
+    for(int i =0;i<this->model->GetEdges().size();i++){
+        if(this->model->GetEdges()[i]->is<CPoint>()){//CPointなら
+            points.push_back(*dynamic_cast<CPoint*>(this->model->GetEdges()[i]));
         }
-        if(this->edges[i]->is<CEdge>()){//CEdgeなら
-            points.push_back(*this->edges[i]->start);
-            points.push_back(*this->edges[i]->end);
-            for(int j=0;j<this->edges[i]->GetMiddleCount();j++){
-                points.push_back(*this->edges[i]->GetMiddle(j));
+        if(this->model->GetEdges()[i]->is<CEdge>()){//CEdgeなら
+            points.push_back(*this->model->GetEdges()[i]->start);
+            points.push_back(*this->model->GetEdges()[i]->end);
+            for(int j=0;j<this->model->GetEdges()[i]->GetMiddleCount();j++){
+                points.push_back(*this->model->GetEdges()[i]->GetMiddle(j));
             }
         }
     }
@@ -899,24 +854,24 @@ void CadEditForm::Save(){
 
     //オブジェクトリスト作成
     QVector<std::pair<QString,QVector<int>>> pairs;//(名前,頂点番号)
-    for(int i =0;i<this->edges.size();i++){
+    for(int i =0;i<this->model->GetEdges().size();i++){
         QString name = "Unknown";
         QVector<int> vertex;
-        if(this->edges[i]->is<CPoint>()){
-            vertex.push_back(IndexOf(points,*dynamic_cast<CPoint*>(this->edges[i])));
+        if(this->model->GetEdges()[i]->is<CPoint>()){
+            vertex.push_back(IndexOf(points,*dynamic_cast<CPoint*>(this->model->GetEdges()[i])));
             name = "CPoint";
         }
-        if(this->edges[i]->is<CEdge>()){
-            if(this->edges[i]->is<CLine>  ())name = "CLine";
-            if(this->edges[i]->is<CArc>   ())name = "CArc";
-            if(this->edges[i]->is<CSpline>())name = "CSpline";
+        if(this->model->GetEdges()[i]->is<CEdge>()){
+            if(this->model->GetEdges()[i]->is<CLine>  ())name = "CLine";
+            if(this->model->GetEdges()[i]->is<CArc>   ())name = "CArc";
+            if(this->model->GetEdges()[i]->is<CSpline>())name = "CSpline";
 
             //始点終点を追加
-            vertex.push_back(IndexOf(points,*this->edges[i]->start));
-            vertex.push_back(IndexOf(points,*this->edges[i]->end));
+            vertex.push_back(IndexOf(points,*this->model->GetEdges()[i]->start));
+            vertex.push_back(IndexOf(points,*this->model->GetEdges()[i]->end));
             //中継点を追加
-            for(int j=0;j<this->edges[i]->GetMiddleCount();j++){
-                vertex.push_back(IndexOf(points,*this->edges[i]->GetMiddle(j)));
+            for(int j=0;j<this->model->GetEdges()[i]->GetMiddleCount();j++){
+                vertex.push_back(IndexOf(points,*this->model->GetEdges()[i]->GetMiddle(j)));
             }
         }
         //登録
@@ -946,23 +901,23 @@ void CadEditForm::Save(){
     }
 
     //ブロック
-    out << this->blocks.size() << std::endl;
-    for(CBlock b : this->blocks){
-        out << b.depth << std::endl;
-        out << b.grading << std::endl;
+    out << this->model->GetBlocks().size() << std::endl;
+    for(CBlock* b : this->model->GetBlocks()){
+        out << b->depth << std::endl;
+        out << b->grading << std::endl;
 
-        for(double d : b.grading_args)out << d << " ";
+        for(double d : b->grading_args)out << d << " ";
         out << std::endl;
-        for(BoundaryType t : b.boundery)out << t << " ";
+        for(BoundaryType t : b->boundery)out << t << " ";
         out << std::endl;
-        for(QString n : b.name)out << n.toStdString() << " ";
+        for(QString n : b->name)out << n.toStdString() << " ";
         out << std::endl;
-        for(int d : b.div)out << d << " ";
+        for(int d : b->div)out << d << " ";
         out << std::endl;
 
         for(int i=0;i<4;i++){
-            for(int j=0;j<this->edges.size();j++){
-                if(this->edges[j] == b.GetEdge(i)){
+            for(int j=0;j<this->model->GetEdges().size();j++){
+                if(this->model->GetEdges()[j] == b->GetEdge(i)){
                     out << j << " ";
                     break;
                 }
@@ -978,7 +933,7 @@ void CadEditForm::Load(){
     std::ifstream in(filename.toStdString().c_str());
     if(!in)return ;
     //オブジェクトをクリア
-    this->edges.clear();
+    this->model->GetEdges().clear();
 
     //頂点数取得
     int vertex_num;
@@ -1028,47 +983,45 @@ void CadEditForm::Load(){
                     make->Create(points[sl[j].toInt()]);
                 }
             }
-            this->edges.push_back(make);
+            this->model->GetEdges().push_back(make);
         }
     }
 
     int block_num;
     in >> block_num;
     for(int i=0;i<block_num;i++){
-        CBlock block;
+        CBlock* block = new CBlock();
         int g;
-        in >> block.depth;
+        in >> block->depth;
         in >> g;
-        block.grading = static_cast<GradingType>(g);
+        block->grading = static_cast<GradingType>(g);
 
-        if(block.grading == GradingType::SimpleGrading)block.grading_args.resize(3);
-        else                                           block.grading_args.resize(12);
+        if(block->grading == GradingType::SimpleGrading)block->grading_args.resize(3);
+        else                                           block->grading_args.resize(12);
 
-        for(int j=0;j<block.grading_args.size();j++){
-            in >> block.grading_args[j];
+        for(int j=0;j<block->grading_args.size();j++){
+            in >> block->grading_args[j];
         }
         for(int j=0;j<6;j++){
             int b;
             in >> b;
-            block.boundery[j] = static_cast<BoundaryType>(b);
+            block->boundery[j] = static_cast<BoundaryType>(b);
         }
         for(int j=0;j<6;j++){
             std::string str;
             in >> str;
-            block.name[j] = str.c_str();
+            block->name[j] = str.c_str();
         }
         for(int j=0;j<3;j++){
-            in >> block.div[j];
+            in >> block->div[j];
         }
         QVector<CEdge*> ed;
         for(int i=0;i<4;i++){
             int j;
             in >> j;
-            ed.push_back(this->edges[j]);
+            ed.push_back(this->model->GetEdges()[j]);
         }
-        block.SetEdgeAll(ed);
-        this->blocks.push_back(block);
+        block->SetEdgeAll(ed);
+        this->model->AddBlocks(block);
     }
-    emit RequireRefreshUI();
-    emit RequireRefreshSolidUI(this->edges,this->blocks);
 }

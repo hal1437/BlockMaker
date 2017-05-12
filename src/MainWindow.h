@@ -5,6 +5,8 @@
 #include <QMouseEvent>
 #include <QListWidget>
 #include <limits>
+#include "CadModelCore.h"
+
 #include "Dialog/SolidView.h"
 #include "Dialog/SmartDimensionDialog.h"
 #include "Dialog/CBoxDefineDialog.h"
@@ -22,11 +24,13 @@ class MainWindow;
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
+
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 private:
     Ui::MainWindow *ui;
+    CadModelCore* model;
 
 protected:
     void keyPressEvent  (QKeyEvent* event);
@@ -36,6 +40,8 @@ signals:
     void ToggleChanged(CEnum state);
 
 public slots:
+    void SetModel(CadModelCore* model);
+
     void CtrlZ();
     void Delete();
     void ConnectSignals();

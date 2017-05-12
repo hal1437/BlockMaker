@@ -33,7 +33,8 @@ SOURCES += src/main.cpp\
     src/Dialog/MoveTransformDialog.cpp \
     src/Dialog/SmartDimension.cpp \
     src/Dialog/SmartDimensionDialog.cpp \
-    src/Dialog/SolidView.cpp
+    src/Dialog/SolidView.cpp \
+    src/CadModelCore.cpp
 
 HEADERS  += src/MainWindow.h \
     src/Point.h \
@@ -58,7 +59,8 @@ HEADERS  += src/MainWindow.h \
     src/Dialog/MoveTransformDialog.h \
     src/Dialog/SmartDimension.h \
     src/Dialog/SmartDimensionDialog.h \
-    src/Dialog/SolidView.h
+    src/Dialog/SolidView.h \
+    src/CadModelCore.h
 
 FORMS    += src/MainWindow.ui \
     src/CadEditForm.ui \

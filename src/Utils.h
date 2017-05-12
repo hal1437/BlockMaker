@@ -4,25 +4,40 @@
 #include <iterator>
 #include <algorithm>
 #include <QStringList>
+#include <QVector>
 #include <tuple>
 #define PI 3.1415926535897932384626433832795
 #define TAB "    "
 #define NEWLINE "\n"
 #define MOUSE_ZOOM_RATE 10000.0
 
+
+//監視オブジェクトの定義、関数宣言を行う
+#define DEFINE_OBSERVER(TYPE,NAME)               \
+private:                                         \
+    QVector<TYPE> NAME;                          \
+public slots:                                    \
+    QVector<TYPE> Get##NAME()const{return NAME;} \
+    inline void Add##NAME(TYPE value){           \
+        NAME.push_back(value);                   \
+        emit Update##NAME(NAME);                 \
+    }                                            \
+    inline void Remove##NAME(TYPE value){        \
+        NAME.removeAll(value);                   \
+        emit Update##NAME(NAME);                 \
+    }                                            \
+
+
 template<class C,class V>
 bool exist(const C& array,const V& value){
     return std::find(std::begin(array),std::end(array),value) != std::end(array);
 }
-
 template<class C,class V>
 int IndexOf(const C& array,const V& value){
     typename C::const_iterator result = std::find(std::begin(array),std::end(array),value);
     if(result == std::end(array))return -1;
     else                           return std::distance(std::begin(array),result);
 }
-
-
 template<class C,class V>
 void erase(C array,const V& value){
     auto it = std::find(std::begin(array),std::end(array),value);

@@ -24,7 +24,7 @@ class ExportDialog : public QDialog
     Q_OBJECT
 private:
     QVector<CObject*> objects;
-    QVector<CBlock> blocks;
+    QVector<CBlock*> blocks;
     void Export(QString filename)const;
 
     //座標から番号へ変換
@@ -34,10 +34,10 @@ private:
     QVector<Pos> GetVerticesPos()const;
 
     //境界面の座標を取得
-    QVector<Pos> GetBoundaryPos(CBlock block,BoundaryDir dir)const;
+    QVector<Pos> GetBoundaryPos(CBlock *block, BoundaryDir dir)const;
 
 public:
-    void SetBlocks(QVector<CBlock> blocks);
+    void SetBlocks(QVector<CBlock *> blocks);
 
     explicit ExportDialog(QWidget *parent = 0);
     ~ExportDialog();

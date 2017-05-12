@@ -2,7 +2,7 @@
 #include "ui_ExportDialog.h"
 
 
-void ExportDialog::SetBlocks(QVector<CBlock> blocks){
+void ExportDialog::SetBlocks(QVector<CBlock*> blocks){
     this->blocks = blocks;
 }
 
@@ -20,8 +20,8 @@ int ExportDialog::GetPosIndex(Pos p) const{
 QVector<Pos> ExportDialog::GetVerticesPos() const{
     //全頂点リスト作成(重複無し)
     QVector<Pos> ans;
-    for(CBlock block:blocks){
-        for(Pos pos:block.GetVerticesPos()){
+    for(CBlock* block:blocks){
+        for(Pos pos:block->GetVerticesPos()){
             //配列内に存在していなければ
             if(!exist(ans,pos)){
                 ans.push_back(pos);
@@ -29,10 +29,10 @@ QVector<Pos> ExportDialog::GetVerticesPos() const{
         }
     }
     //Z方向シフト分を作成
-    for(CBlock block:blocks){
-        for(Pos pos:block.GetVerticesPos()){
+    for(CBlock* block:blocks){
+        for(Pos pos:block->GetVerticesPos()){
             //配列内に存在していなければ
-            Pos next = pos + Pos(0,0,block.depth);
+            Pos next = pos + Pos(0,0,block->depth);
             if(!exist(ans,next)){
                 ans.push_back(next);
             }
@@ -42,13 +42,13 @@ QVector<Pos> ExportDialog::GetVerticesPos() const{
     return ans;
 }
 
-QVector<Pos> ExportDialog::GetBoundaryPos(CBlock block,BoundaryDir dir)const{
+QVector<Pos> ExportDialog::GetBoundaryPos(CBlock* block,BoundaryDir dir)const{
     QVector<Pos> vertices;
     QVector<Pos> ans;
     vertices.resize(8);
     for(int i=0;i<4;i++){
-        vertices[i]   = block.GetVerticesPos()[i];
-        vertices[i+4] = block.GetVerticesPos()[i] + Pos(0,0,block.depth);
+        vertices[i]   = block->GetVerticesPos()[i];
+        vertices[i+4] = block->GetVerticesPos()[i] + Pos(0,0,block->depth);
     }
 
     if(dir == BoundaryDir::Front){    //前面
@@ -87,14 +87,14 @@ void ExportDialog::Export(QString filename)const{
     QVector<CEdge*> edges;
 
     //全ての辺を抽出
-    for(CBlock block : this->blocks){
+    for(CBlock* block : this->blocks){
         for(int i=0;i<4;i++){
-            edges.push_back(block.GetEdge(i));
-            edges.push_back(block.GetEdge(i)->Clone());//複製
-            *edges.back()->start += Pos(0,0,block.depth);
-            *edges.back()->end   += Pos(0,0,block.depth);
+            edges.push_back(block->GetEdge(i));
+            edges.push_back(block->GetEdge(i)->Clone());//複製
+            *edges.back()->start += Pos(0,0,block->depth);
+            *edges.back()->end   += Pos(0,0,block->depth);
             for(int j=0;j<edges.back()->GetMiddleCount();j++){
-                *edges.back()->GetMiddle(j) += Pos(0,0,block.depth);
+                *edges.back()->GetMiddle(j) += Pos(0,0,block->depth);
             }
         }
     }
@@ -117,41 +117,41 @@ void ExportDialog::Export(QString filename)const{
 
     // ブロック出力
     file.StartListDifinition("blocks");
-    for(CBlock block:this->blocks){
+    for(CBlock* block:this->blocks){
         file.TabOut();
         file.OutStringInline("hex");
 
         //頂点番号
         QVector<int> pos_indices;
         for(int i=0;i<4;i++){
-            Pos p = block.GetClockworksPos(i);
+            Pos p = block->GetClockworksPos(i);
             pos_indices.push_back(this->GetPosIndex(p));
         }
         for(int i=0;i<4;i++){
-            Pos p = block.GetClockworksPos(i);
-            pos_indices.push_back(this->GetPosIndex(p + Pos(0,0,block.depth)));
+            Pos p = block->GetClockworksPos(i);
+            pos_indices.push_back(this->GetPosIndex(p + Pos(0,0,block->depth)));
         };
         file.OutVectorInline(pos_indices);
 
         //分割数
         QVector<int> div_indices;
         for(int i=0;i<3;i++){
-            div_indices.push_back(block.div[i]);
+            div_indices.push_back(block->div[i]);
         }
         file.OutVectorInline(div_indices);
 
         //分割パラメータ
         QVector<double> grading_args;
-        if(block.grading == GradingType::SimpleGrading){
+        if(block->grading == GradingType::SimpleGrading){
             file.OutStringInline("simpleGrading");
             for(int i=0;i<3;i++){
-                grading_args.push_back(block.grading_args[i]);
+                grading_args.push_back(block->grading_args[i]);
             }
             file.OutVectorInline(grading_args);
-        }else if(block.grading == GradingType::EdgeGrading){
+        }else if(block->grading == GradingType::EdgeGrading){
             file.OutStringInline("edgeGrading");
             for(int i=0;i<12;i++){
-                grading_args.push_back(block.grading_args[i]);
+                grading_args.push_back(block->grading_args[i]);
             }
             file.OutVectorInline(grading_args);
         }
@@ -195,14 +195,14 @@ void ExportDialog::Export(QString filename)const{
     file.StartListDifinition("boundary");
     //境界追加
     QMap<QString,std::pair<BoundaryType,QVector<int>>> boundary_list; //(name ,[[index]])
-    for(CBlock block:this->blocks){
+    for(CBlock* block:this->blocks){
         for(int i=0;i<6;i++){
             //頂点番号リスト出力
             QVector<Pos> vp = this->GetBoundaryPos(block,static_cast<BoundaryDir>(i));
             for(Pos v:vp){
-                if(block.boundery[i] == BoundaryType::None)continue;//連続は登録しない
-                boundary_list[block.name[i]].first = block.boundery[i];
-                boundary_list[block.name[i]].second.push_back(GetPosIndex(v));
+                if(block->boundery[i] == BoundaryType::None)continue;//連続は登録しない
+                boundary_list[block->name[i]].first = block->boundery[i];
+                boundary_list[block->name[i]].second.push_back(GetPosIndex(v));
             }
         }
     }

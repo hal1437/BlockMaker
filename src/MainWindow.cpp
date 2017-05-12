@@ -1,6 +1,12 @@
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
 
+
+void MainWindow::SetModel(CadModelCore* model){
+    this->model = model;
+    this->ui->CadEdit->SetModel(model);
+}
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -36,9 +42,9 @@ MainWindow::MainWindow(QWidget *parent) :
     //CadEditFoamにイベントフィルター導入
     this->installEventFilter(ui->CadEdit);
 
-    RefreshUI();
-    ReciveObjectListChanged();
-    ReciveBlockListChanged();
+    //RefreshUI();
+    //ReciveObjectListChanged();
+    //ReciveBlockListChanged();
     ConnectSignals();
     ui->ToolBlocks->setEnabled(false);
     ui->ObjectList->setSelectionMode(QAbstractItemView::ExtendedSelection);
@@ -76,8 +82,10 @@ void MainWindow::CtrlZ(){
     }*/
 }
 void MainWindow::Delete(){
-    for(int i =0;i<CObject::selected.size();i++){
-        ui->CadEdit->RemoveObject(CObject::selected[i]);
+    for(CObject* obj : this->model->GetSelected()){
+        if(obj->is<CEdge>()){
+            this->model->RemoveSelected(dynamic_cast<CEdge*>(obj));
+        }
     }
     CObject::selected.clear();
     repaint();

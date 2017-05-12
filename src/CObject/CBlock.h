@@ -43,12 +43,12 @@ private:
 public:
     BoundaryType boundery[6]; // 境界タイプ
     QString name[6];          // 境界名
-
     int div[3];               // 分割数
-    double depth;             //深さ
-    GradingType grading;          // 分割間隔タイプ
+    double depth;             // Z軸方向奥行き
+    GradingType grading;      // 分割間隔タイプ
     QVector<double> grading_args; // 分割パラメータ
 
+public:
     //分割点取得(辺の番号)
     Pos GetDivisionPoint(int edge_index, int count_index)const;
 
@@ -70,7 +70,6 @@ public:
     CEdge* GetEdge(int index)const;
     QVector<Pos> GetVerticesPos()const;
     Pos GetClockworksPos(int index) const;//時計回り番号取得
-
 
     CBlock();
     CBlock(QVector<CEdge *> lines);
