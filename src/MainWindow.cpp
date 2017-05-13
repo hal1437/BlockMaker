@@ -256,14 +256,17 @@ void MainWindow::ReciveBlockListChanged(){
 }
 void MainWindow::RefreshStatusBar(Pos){
     Pos out;
-    if(CObject::hanged == nullptr){
+    CObject* hanged = this->ui->CadEdit->getHanged();
+    if(hanged == nullptr){
         //マウス位置のローカル座標
         out = this->ui->CadEdit->getMousePos();
     }else{
         //選択オブジェクトの最近点
-        out = CObject::hanged->GetNear(this->ui->CadEdit->getMousePos());
+        out = hanged->GetNear(this->ui->CadEdit->getMousePos());
     }
-    this->ui->statusBar->showMessage(QString("(") + QString::number(out.x) + "," + QString::number(out.y) + "," + QString::number(out.z) + ")");
+    this->ui->statusBar->showMessage(QString("(") + QString::number(out.x) + "," +
+                                                    QString::number(out.y) + "," +
+                                                    QString::number(out.z) + ")");
 }
 
 void MainWindow::UpdateObjectTree(QVector<CEdge*> edges){
@@ -289,7 +292,7 @@ void MainWindow::UpdateObjectTree(QVector<CEdge*> edges){
             list->topLevelItem(list->topLevelItemCount()-1)->setIcon(0,QIcon(p.second.c_str()));
 
             if(!list->topLevelItem(list->topLevelItemCount()-1)->isSelected()){
-                list->topLevelItem(list->topLevelItemCount()-1)->setSelected(edges[i]->isSelected());
+                //list->topLevelItem(list->topLevelItemCount()-1)->setSelected(edges[i]->isSelected());
             }
         }
     }
@@ -335,16 +338,16 @@ void MainWindow::UpdateObjectTreeSelected(QVector<CObject*>){
     for(int i=0;i<list->topLevelItemCount();i++){
         if(i == 0){
             //原点
-            list->topLevelItem(0)->setSelected(this->model->origin->isSelected());
+            //list->topLevelItem(0)->setSelected(this->model->origin->isSelected());
         }else{
             //Edge自身
-            list->topLevelItem(i)->setSelected(this->model->GetEdges()[i-1]->isSelected());
+            //list->topLevelItem(i)->setSelected(this->model->GetEdges()[i-1]->isSelected());
 
             //端点
-            list->topLevelItem(i)->child(0)->setSelected(this->model->GetEdges()[i-1]->start->isSelected());
-            list->topLevelItem(i)->child(1)->setSelected(this->model->GetEdges()[i-1]->end->isSelected());
+            //list->topLevelItem(i)->child(0)->setSelected(this->model->GetEdges()[i-1]->start->isSelected());
+            //list->topLevelItem(i)->child(1)->setSelected(this->model->GetEdges()[i-1]->end->isSelected());
             for(int j=0;j<this->model->GetEdges()[i-1]->GetMiddleCount() && j<list->topLevelItem(i)->childCount()-2;j++){
-                list->topLevelItem(i)->child(j+2)->setSelected(this->model->GetEdges()[i-1]->GetMiddle(j)->isSelected());
+                //list->topLevelItem(i)->child(j+2)->setSelected(this->model->GetEdges()[i-1]->GetMiddle(j)->isSelected());
             }
         }
     }

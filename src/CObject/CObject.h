@@ -25,8 +25,6 @@ public:
     static constexpr double SAME_POINT_EPS = 0.001;    //同一点誤差
 
     static double drawing_scale;           //描画スケール
-    static CObject* hanged;                //マウス直下のオブジェクト
-    static CObject*  creating;             //作成中オブジェクト
     static QVector<CObject*> selected;     //選択オブジェクト
 
 protected:

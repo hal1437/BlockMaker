@@ -35,8 +35,9 @@ void CadEditForm::wheelEvent(QWheelEvent * event){
         //拡大値は負にならない
         if(next_scale > 0){
             //適応
-            if(CObject::hanged == nullptr)this->Zoom(next_scale,this->mouse_pos); //マウス座標中心に拡大
-            else                          this->Zoom(next_scale,CObject::hanged->GetNear(this->mouse_pos));//選択点があればそれを中心に拡大
+            CObject* hanged = this->getHanged();
+            if(hanged == nullptr)this->Zoom(next_scale,this->mouse_pos); //マウス座標中心に拡大
+            else                 this->Zoom(next_scale,hanged->GetNear(this->mouse_pos));//選択点があればそれを中心に拡大
 
             //シグナル発生
             emit ScaleChanged(next_scale);
@@ -79,6 +80,7 @@ void CadEditForm::resizeEvent(QResizeEvent*){
 
 void CadEditForm::Escape(){
     //作成解除
+    /*
     if(CObject::creating != nullptr){
         if(make_result == TWOSHOT){
             this->model->RemoveEdges(make_obj);
@@ -86,7 +88,7 @@ void CadEditForm::Escape(){
         CObject::creating = nullptr;
         this->hang_point = nullptr;
         this->make_result = COMPLETE;
-    }
+    }*/
 }
 
 
@@ -98,11 +100,10 @@ void CadEditForm::MovedMouse(QMouseEvent *event, CObject *under_object){
 
     //選択
     if(!(event->buttons() & Qt::LeftButton) || !move_flag){
-        CObject::hanged = under_object;
         piv = null_pos;//移動支点を解除
     }
     //画面移動
-    if((event->buttons() & Qt::LeftButton) && CObject::hanged == nullptr && this->state == Edit){
+    if((event->buttons() & Qt::LeftButton) && this->getHanged() == nullptr && this->state == Edit){
         //支点登録
         if(piv == null_pos){
             piv = this->ConvertWorldPos(this->mouse_pos);
@@ -204,8 +205,8 @@ void CadEditForm::paintEvent(QPaintEvent*){
     }
     //メイン選択中
     paint.setPen(QPen(Qt::red , CObject::DRAWING_LINE_SIZE / this->scale,Qt::SolidLine,Qt::RoundCap));
-    if(CObject::hanged!=nullptr){
-        CObject::hanged->Draw(paint);
+    if(this->getHanged() != nullptr){
+        this->getHanged()->Draw(paint);
     }
 
     //描画復元
@@ -360,7 +361,8 @@ void CadEditForm::SetGridFilterStatus(double x,double y){
 void CadEditForm::MakeObject(){
 
     Pos local_pos = this->mouse_pos;
-    if(CObject::hanged != nullptr)local_pos = CObject::hanged->GetNear(local_pos);
+    CObject* hanged = this->getHanged();
+    if(hanged != nullptr)local_pos = hanged->GetNear(local_pos);
 
     release_flag=false;
 
@@ -370,8 +372,8 @@ void CadEditForm::MakeObject(){
         if(!shift_pressed)CObject::selected.clear();
 
         //選択状態をトグル
-        if(exist(CObject::selected,CObject::hanged))erase(CObject::selected,CObject::hanged);
-        else if(CObject::hanged != nullptr)CObject::selected.push_back(CObject::hanged);
+        if(exist(CObject::selected,hanged))erase(CObject::selected,hanged);
+        else if(hanged != nullptr)CObject::selected.push_back(hanged);
 
     }else{
         //新規オブジェクト
@@ -387,13 +389,13 @@ void CadEditForm::MakeObject(){
             }
 
             //追加
-            CObject::creating = new_obj;
+            this->creating = new_obj;
 
             //新規作成
             this->model->AddEdges(new_obj);
             make_result = MakeJoint(new_obj);
             //選択解除
-            CObject::hanged = nullptr;
+            //CObject::hanged = nullptr;
 
             //一回だけ
             if(make_result == COMPLETE){
@@ -430,33 +432,32 @@ void CadEditForm::MakeObject(){
             }
         }else if(make_result == TWOSHOT){
             //hangedが存在した場合
-            if(CObject::hanged != nullptr ){
-                if(CObject::hanged->is<CPoint>() && dynamic_cast<CPoint*>(CObject::hanged)->z == this->depth){
+            if(hanged != nullptr ){
+                if(hanged->is<CPoint>() && dynamic_cast<CPoint*>(hanged)->z == this->depth){
                     //すり替え
-                    dynamic_cast<CEdge*>(CObject::creating)->SetEndPos(dynamic_cast<CPoint*>(CObject::hanged));
+                    dynamic_cast<CEdge*>(this->creating)->SetEndPos(dynamic_cast<CPoint*>(hanged));
                     //this->model->RemoveEdges(this->hang_point);
                 }else{
                     //近接点へ移動
-                    *this->hang_point = CObject::hanged->GetNear(*this->hang_point);
+                    *this->hang_point = hanged->GetNear(*this->hang_point);
                 }
             }
-            CObject::creating = nullptr;
+            this->creating = nullptr;
             this->hang_point = nullptr;
             make_result = COMPLETE;
-            CObject::hanged = this->getHanged();
 
         }else if(make_result == ENDLESS){
             //hangedが存在した場合
-            if(CObject::hanged != nullptr){
-                if(CObject::hanged->is<CPoint>()){
+            if(hanged != nullptr){
+                if(hanged->is<CPoint>()){
                     //すり替えて終了
-                    dynamic_cast<CEdge*>(CObject::creating)->SetEndPos(dynamic_cast<CPoint*>(CObject::hanged));
+                    dynamic_cast<CEdge*>(this->creating)->SetEndPos(dynamic_cast<CPoint*>(hanged));
                     //this->RemoveObject(this->hang_point);
                 }else{
                     //近接点へ移動して終了
-                    *this->hang_point = CObject::hanged->GetNear(*this->hang_point);
+                    *this->hang_point = hanged->GetNear(*this->hang_point);
                 }
-                CObject::creating = nullptr;
+                //CObject::creating = nullptr;
                 this->hang_point = nullptr;
                 make_result = COMPLETE;
             }else{
@@ -474,16 +475,17 @@ void CadEditForm::MakeObject(){
 }
 CREATE_RESULT CadEditForm::MakeJoint(CObject* obj){
 
-    if(CObject::hanged == nullptr){
+    CObject* hanged = this->getHanged();
+    if(hanged == nullptr){
         //始点を作成
         CPoint* new_point = new CPoint(this->mouse_pos);
         return obj->Create(new_point);
-    }else if(CObject::hanged->is<CPoint>() && dynamic_cast<CPoint*>(CObject::hanged)->z == this->depth){
+    }else if(hanged->is<CPoint>() && dynamic_cast<CPoint*>(hanged)->z == this->depth){
         //既存の点を使用
-        return obj->Create(dynamic_cast<CPoint*>(CObject::hanged));
+        return obj->Create(dynamic_cast<CPoint*>(hanged));
     }else{
         //近接点を作成
-        CPoint* new_point = new CPoint(CObject::hanged->GetNear(this->mouse_pos));
+        CPoint* new_point = new CPoint(hanged->GetNear(this->mouse_pos));
         new_point->z = this->depth;
         return obj->Create(new_point);
     }
@@ -561,16 +563,17 @@ bool CadEditForm::MakeBlock(){
 void CadEditForm::RefreshRestraints(){
     //拘束を解決
     if(this->model->GetEdges().size()!=0){
+        CObject* hanged = this->getHanged();
         //持ち手が存在すれば
-        if(CObject::hanged != nullptr){
+        if(hanged != nullptr){
             std::vector<std::pair<int,CObject*>> rank;
 
             //過去の選択位置を保持する
             static CObject* hand = nullptr;
 
             //持ち手は0番に
-            if(CObject::hanged != nullptr && CObject::hanged->is<CPoint>()){
-                hand = CObject::hanged;
+            if(hanged != nullptr && hanged->is<CPoint>()){
+                hand = this->getHanged();
             }
             rank.push_back(std::make_pair(0,hand));
             //ランク分けダイクストラ

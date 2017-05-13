@@ -41,6 +41,9 @@ private:
     CadModelCore* model;
 
     Pos mouse_pos;//マウス位置
+    //CObject* hanged; //直下オブジェクト
+    CObject* creating; //作成途中オブジェクト
+
     int selecting_block; //選択物体
 
     CEnum   state      = Edit;    //生成種類
@@ -75,6 +78,7 @@ public:
 
 
     Pos getMousePos()const{return mouse_pos;} //マウス座標取得
+    CObject* getHanged(); //直下オブジェクト選定
 
     void setModel(CadModelCore* model);//モデルセット
     void Escape();//作成破棄
@@ -100,7 +104,6 @@ signals:
 public slots:
 
 
-    CObject* getHanged(); //直下オブジェクト選定
     void SetDepth(double depth);  //深さ視点セット
     void SetScale(double scale);  //スケールセット
     void SetTranslate(Pos trans); //並行移動セット
