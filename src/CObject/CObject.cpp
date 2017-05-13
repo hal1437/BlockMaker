@@ -4,7 +4,6 @@ double   CObject::drawing_scale;
 CObject* CObject::hanged;
 CObject* CObject::creating;
 QVector<CObject*> CObject::selected;
-Pos CObject::mouse_pos;
 
 bool CObject::isSelecting()const{
     return (hanged == this);

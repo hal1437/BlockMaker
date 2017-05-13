@@ -193,6 +193,7 @@ bool CadModelCore::ImportFoamFile(QString filename){
 CadModelCore::CadModelCore(QWidget *parent)
 {
     this->origin = new CPoint(Pos(0,0));
+    this->origin->ControlPoint(true);
 }
 
 CadModelCore::~CadModelCore()

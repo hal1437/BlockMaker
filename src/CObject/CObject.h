@@ -28,7 +28,6 @@ public:
     static CObject* hanged;                //マウス直下のオブジェクト
     static CObject*  creating;             //作成中オブジェクト
     static QVector<CObject*> selected;     //選択オブジェクト
-    static Pos mouse_pos;                  //マウス位置
 
 protected:
     bool lock  = false; //ロック状態

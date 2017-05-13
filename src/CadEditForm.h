@@ -35,10 +35,12 @@ enum CEnum{
 class CadEditForm : public QWidget
 {
     Q_OBJECT
+
 private:
     Ui::CadEditForm *ui; //UI
     CadModelCore* model;
 
+    Pos mouse_pos;//マウス位置
     int selecting_block; //選択物体
 
     CEnum   state      = Edit;    //生成種類
@@ -72,7 +74,9 @@ public:
     void keyReleaseEvent  (QKeyEvent* event); //キーボード離しイベント
 
 
-    void SetModel(CadModelCore* model);
+    Pos getMousePos()const{return mouse_pos;} //マウス座標取得
+
+    void setModel(CadModelCore* model);//モデルセット
     void Escape();//作成破棄
 
     void Zoom     (double scale,Pos local_piv); //ズーム
@@ -94,6 +98,8 @@ signals:
 
 
 public slots:
+
+
     CObject* getHanged(); //直下オブジェクト選定
     void SetDepth(double depth);  //深さ視点セット
     void SetScale(double scale);  //スケールセット

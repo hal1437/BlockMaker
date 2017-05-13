@@ -2,9 +2,9 @@
 #include "ui_MainWindow.h"
 
 
-void MainWindow::SetModel(CadModelCore* model){
+void MainWindow::setModel(CadModelCore* model){
     this->model = model;
-    this->ui->CadEdit->SetModel(model);
+    this->ui->CadEdit->setModel(model);
     //モデルと結合
     connect(this->model,SIGNAL(UpdateEdges   (QVector<CEdge*>  )),this,SLOT(UpdateObjectTree        (QVector<CEdge*>)));
     connect(this->model,SIGNAL(UpdateSelected(QVector<CObject*>)),this,SLOT(UpdateObjectTreeSelected(QVector<CObject*>)));
@@ -258,10 +258,10 @@ void MainWindow::RefreshStatusBar(Pos){
     Pos out;
     if(CObject::hanged == nullptr){
         //マウス位置のローカル座標
-        out = CObject::mouse_pos;
+        out = this->ui->CadEdit->getMousePos();
     }else{
         //選択オブジェクトの最近点
-        out = CObject::hanged->GetNear(CObject::mouse_pos);
+        out = CObject::hanged->GetNear(this->ui->CadEdit->getMousePos());
     }
     this->ui->statusBar->showMessage(QString("(") + QString::number(out.x) + "," + QString::number(out.y) + "," + QString::number(out.z) + ")");
 }

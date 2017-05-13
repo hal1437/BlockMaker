@@ -40,7 +40,7 @@ signals:
     void ToggleChanged(CEnum state);
 
 public slots:
-    void SetModel(CadModelCore* model);
+    void setModel(CadModelCore* model);
 
     void CtrlZ();
     void Delete();

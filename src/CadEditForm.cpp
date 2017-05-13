@@ -1,7 +1,7 @@
 #include "CadEditForm.h"
 #include "ui_CadEditForm.h"
 
-void CadEditForm::SetModel(CadModelCore* model){
+void CadEditForm::setModel(CadModelCore* model){
     this->model = model;
 }
 
@@ -35,8 +35,8 @@ void CadEditForm::wheelEvent(QWheelEvent * event){
         //拡大値は負にならない
         if(next_scale > 0){
             //適応
-            if(CObject::hanged == nullptr)this->Zoom(next_scale,CObject::mouse_pos); //マウス座標中心に拡大
-            else                          this->Zoom(next_scale,CObject::hanged->GetNear(CObject::mouse_pos));//選択点があればそれを中心に拡大
+            if(CObject::hanged == nullptr)this->Zoom(next_scale,this->mouse_pos); //マウス座標中心に拡大
+            else                          this->Zoom(next_scale,CObject::hanged->GetNear(this->mouse_pos));//選択点があればそれを中心に拡大
 
             //シグナル発生
             emit ScaleChanged(next_scale);
@@ -52,12 +52,12 @@ void CadEditForm::wheelEvent(QWheelEvent * event){
 }
 void CadEditForm::mouseMoveEvent   (QMouseEvent* event){
     //マウス移動を監視
-    CObject::mouse_pos = ConvertLocalPos(Pos(event->pos().x(),event->pos().y())) + Pos(0,0,this->depth);
+    this->mouse_pos = ConvertLocalPos(Pos(event->pos().x(),event->pos().y())) + Pos(0,0,this->depth);
 
     //選択オブジェクトの選定
     CObject* answer = this->getHanged();
     //フィルター適用
-    CObject::mouse_pos = filter.Filtering(CObject::mouse_pos);
+    this->mouse_pos = filter.Filtering(this->mouse_pos);
     //Z座標設定
     if(this->hang_point != nullptr)this->hang_point->z = this->depth;
 
@@ -65,7 +65,7 @@ void CadEditForm::mouseMoveEvent   (QMouseEvent* event){
     zoom_piv = Pos(0,0);
     //生成点座標を更新
     if(hang_point != nullptr){
-        hang_point->Move(CObject::mouse_pos-*hang_point);
+        hang_point->Move(this->mouse_pos-*hang_point);
     }
     //UI更新
     repaint();
@@ -105,9 +105,9 @@ void CadEditForm::MovedMouse(QMouseEvent *event, CObject *under_object){
     if((event->buttons() & Qt::LeftButton) && CObject::hanged == nullptr && this->state == Edit){
         //支点登録
         if(piv == null_pos){
-            piv = this->ConvertWorldPos(CObject::mouse_pos);
+            piv = this->ConvertWorldPos(this->mouse_pos);
         }
-        Pos hand = this->ConvertWorldPos(CObject::mouse_pos);
+        Pos hand = this->ConvertWorldPos(this->mouse_pos);
         Pos diff = (piv - hand);
 
         this->SetTranslate(this->translate + diff);
@@ -122,16 +122,16 @@ void CadEditForm::MovedMouse(QMouseEvent *event, CObject *under_object){
                 p->Move(this->filter.Filtering(*dynamic_cast<CPoint*>(p)) - *dynamic_cast<CPoint*>(p));
             }
             //移動量適用
-            p->Move(CObject::mouse_pos - past);
+            p->Move(this->mouse_pos - past);
         }
     }
 
     //拘束更新
     this->RefreshRestraints();
 
-    emit MouseMoved(CObject::mouse_pos);
+    emit MouseMoved(this->mouse_pos);
 
-    past = CObject::mouse_pos;
+    past = this->mouse_pos;
     release_flag=true;
 }
 
@@ -249,7 +249,7 @@ void CadEditForm::Zoom(double scale,Pos local_piv){
     this->translate += (zoom_piv + this->translate) * ((scale / this->scale) - 1);
     this->scale = scale;
     //マウス座標復元
-    CObject::mouse_pos = this->ConvertLocalPos(zoom_piv);
+    this->mouse_pos = this->ConvertLocalPos(zoom_piv);
 }
 void CadEditForm::Translate(Pos local_diff){
     this->translate += local_diff;
@@ -304,7 +304,7 @@ CadEditForm::~CadEditForm()
 CObject* CadEditForm::getHanged(){
     CObject* final = nullptr;
 
-    if(this->model->origin->isSelectable(CObject::mouse_pos)){
+    if(this->model->origin->isSelectable(this->mouse_pos)){
         if(this->model->origin->z == this->depth)return this->model->origin;
         else final = this->model->origin;
     }
@@ -313,22 +313,22 @@ CObject* CadEditForm::getHanged(){
         if(obj->isCreating())continue;
 
         //端点
-        if(obj->start->isSelectable(CObject::mouse_pos)){
+        if(obj->start->isSelectable(this->mouse_pos)){
             if(obj->start->z == this->depth)return obj->start;
             else final = obj->start;
         }
-        if(obj->end  ->isSelectable(CObject::mouse_pos)){
+        if(obj->end  ->isSelectable(this->mouse_pos)){
             if(obj->end->z == this->depth)return obj->end;
             else final = obj->end;
         }
         for(int i=0;i<obj->GetMiddleCount();i++){
-            if(obj->GetMiddle(i)->isSelectable(CObject::mouse_pos)){
+            if(obj->GetMiddle(i)->isSelectable(this->mouse_pos)){
                 if(obj->GetMiddle(i)->z == this->depth)return obj->GetMiddle(i);
                 else final = obj->GetMiddle(i);
             }
         }
         //エッジ自身
-        if(obj->isSelectable(CObject::mouse_pos)){
+        if(obj->isSelectable(this->mouse_pos)){
             if(obj->start->z == this->depth && obj->end->z == this->depth)return obj;
             else if(final == nullptr) final = obj;
         }
@@ -359,7 +359,7 @@ void CadEditForm::SetGridFilterStatus(double x,double y){
 }
 void CadEditForm::MakeObject(){
 
-    Pos local_pos = CObject::mouse_pos;
+    Pos local_pos = this->mouse_pos;
     if(CObject::hanged != nullptr)local_pos = CObject::hanged->GetNear(local_pos);
 
     release_flag=false;
@@ -476,14 +476,14 @@ CREATE_RESULT CadEditForm::MakeJoint(CObject* obj){
 
     if(CObject::hanged == nullptr){
         //始点を作成
-        CPoint* new_point = new CPoint(CObject::mouse_pos);
+        CPoint* new_point = new CPoint(this->mouse_pos);
         return obj->Create(new_point);
     }else if(CObject::hanged->is<CPoint>() && dynamic_cast<CPoint*>(CObject::hanged)->z == this->depth){
         //既存の点を使用
         return obj->Create(dynamic_cast<CPoint*>(CObject::hanged));
     }else{
         //近接点を作成
-        CPoint* new_point = new CPoint(CObject::hanged->GetNear(CObject::mouse_pos));
+        CPoint* new_point = new CPoint(CObject::hanged->GetNear(this->mouse_pos));
         new_point->z = this->depth;
         return obj->Create(new_point);
     }

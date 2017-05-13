@@ -8,7 +8,7 @@ int main(int argc, char *argv[])
     CadModelCore* model = new CadModelCore();
 
     MainWindow w;
-    w.SetModel(model);
+    w.setModel(model);
     w.show();
 
     return a.exec();
