@@ -26,6 +26,10 @@ public:
     virtual CPoint* GetMiddle(int index)const = 0;
     virtual void    SetMiddle(CPoint*,int index) = 0;
 
+    //全ノード取得
+    int     GetPosSequenceCount()const;
+    CPoint* GetPosSequence(int index)const;
+
     //近接点
     virtual Pos GetNear(const Pos& hand)const=0;
     virtual void SetStartPos(CPoint* pos);

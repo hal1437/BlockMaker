@@ -12,6 +12,16 @@ void CEdge::SetEndPos(CPoint* pos){
     connect(this->end,SIGNAL(PosChanged(Pos,Pos)),this,SLOT(ChangePosCallback(Pos,Pos)));
 }
 
+int CEdge::GetPosSequenceCount()const{
+    return this->GetMiddleCount()+2;
+}
+CPoint* CEdge::GetPosSequence(int index)const{
+    if     (index == 0                        )return this->start;
+    else if(index == GetPosSequenceCount() - 1)return this->end;
+    else if(index > 0 && index < GetPosSequenceCount() - 1)return this->GetMiddle(index-1);
+}
+
+
 CEdge::CEdge(QObject* parent):
     CObject(parent)
 {

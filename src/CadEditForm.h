@@ -41,13 +41,12 @@ private:
     CadModelCore* model;
 
     Pos mouse_pos;//マウス位置
-    //CObject* hanged; //直下オブジェクト
-    CObject* creating; //作成途中オブジェクト
+    CEdge* creating;          //作成途中オブジェクト
+    QVector<CObject*> selected; //選択オブジェクト
 
     int selecting_block; //選択物体
 
     CEnum   state      = Edit;    //生成種類
-    CEdge*  make_obj   = nullptr; //生成途中オブジェクト
     CPoint* hang_point = nullptr; //生成支点
     CREATE_RESULT make_result = COMPLETE; //生成管理フラグ
 
@@ -77,8 +76,9 @@ public:
     void keyReleaseEvent  (QKeyEvent* event); //キーボード離しイベント
 
 
-    Pos getMousePos()const{return mouse_pos;} //マウス座標取得
-    CObject* getHanged(); //直下オブジェクト選定
+    Pos               getMousePos()const{return this->mouse_pos;} //マウス座標取得
+    QVector<CObject*> getSelected()const{return this->selected; } //選択オブジェクト取得
+    CObject*          getHanged  ()const; //直下オブジェクト選定
 
     void setModel(CadModelCore* model);//モデルセット
     void Escape();//作成破棄

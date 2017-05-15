@@ -56,8 +56,7 @@ bool CArc::isSelectable(Pos pos) const{
     //角度判定、半径判定、作成判定
     return (Pos::Angle(*this->start - *this->center,*this->end - *this->center) <
             Pos::Angle(*this->start - *this->center,pos        - *this->center)) &&
-           (std::abs((pos - *this->center).Length() - this->round) < COLLISION_SIZE) &&
-           !this->isCreating();
+           (std::abs((pos - *this->center).Length() - this->round) < COLLISION_SIZE);
 }
 
 //始点終点操作オーバーライド
@@ -112,40 +111,35 @@ CArc::~CArc()
 
 void CArc::ChangePosCallback(const Pos& new_pos,const Pos& old_pos){
 
-    if(this->isCreating()){
-        *this->center = (*this->start - *this->end) / 2 + *this->end;
-        round = (*this->end - *this->center).Length();
-    }else{
-        //中心の移動
-        if(old_pos == *this->center){
-            *this->center = new_pos; //中心座標を一時的に次位置へ
-            if(this->start->isLock()){
-                round = (*this->start - *this->center).Length();
-                this->end->Move((*this->end - *this->center).GetNormalize() * round + *this->center - *this->end);
-            }else if(this->end->isLock()){
-                round = (*this->end - *this->center).Length();
-                this->start->Move((*this->start - *this->center).GetNormalize() * round + *this->center - *this->start);
-            }else{
-                this->start->Move(this->GetNear(*this->start) - *this->start);
-                this->end  ->Move(this->GetNear(*this->end)   - *this->end);
-            }
-            *this->center = old_pos; //中心座標を復元
+    //中心の移動
+    if(old_pos == *this->center){
+        *this->center = new_pos; //中心座標を一時的に次位置へ
+        if(this->start->isLock()){
+            round = (*this->start - *this->center).Length();
+            this->end->Move((*this->end - *this->center).GetNormalize() * round + *this->center - *this->end);
+        }else if(this->end->isLock()){
+            round = (*this->end - *this->center).Length();
+            this->start->Move((*this->start - *this->center).GetNormalize() * round + *this->center - *this->start);
         }else{
-            round = (new_pos-*this->center).Length();
+            this->start->Move(this->GetNear(*this->start) - *this->start);
+            this->end  ->Move(this->GetNear(*this->end)   - *this->end);
         }
-        if(old_pos == *this->start){
-            if(this->end->isControlPoint() || this->end->isLock()){
-                *this->center = (*this->start - *this->end) / 2 + *this->end;
-            }else{
-                this->end  ->Move((*this->end   - *this->center).GetNormalize() * round + *this->center - *this->end);
-            }
+        *this->center = old_pos; //中心座標を復元
+    }else{
+        round = (new_pos-*this->center).Length();
+    }
+    if(old_pos == *this->start){
+        if(this->end->isControlPoint() || this->end->isLock()){
+            *this->center = (*this->start - *this->end) / 2 + *this->end;
+        }else{
+            this->end  ->Move((*this->end   - *this->center).GetNormalize() * round + *this->center - *this->end);
         }
-        if(old_pos == *this->end){
-            if(this->start->isControlPoint() || this->start->isLock()){
-                *this->center = (*this->start - *this->end) / 2 + *this->end;
-            }else{
-                this->start->Move((*this->start - *this->center).GetNormalize() * round + *this->center - *this->start);
-            }
+    }
+    if(old_pos == *this->end){
+        if(this->start->isControlPoint() || this->start->isLock()){
+            *this->center = (*this->start - *this->end) / 2 + *this->end;
+        }else{
+            this->start->Move((*this->start - *this->center).GetNormalize() * round + *this->center - *this->start);
         }
     }
 }

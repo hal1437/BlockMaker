@@ -103,7 +103,7 @@ void CadEditForm::MovedMouse(QMouseEvent *event, CObject *under_object){
         piv = null_pos;//移動支点を解除
     }
     //画面移動
-    if((event->buttons() & Qt::LeftButton) && this->getHanged() == nullptr && this->state == Edit){
+    if((event->buttons() & Qt::LeftButton) && this->selected.isEmpty() && this->state == Edit){
         //支点登録
         if(piv == null_pos){
             piv = this->ConvertWorldPos(this->mouse_pos);
@@ -117,7 +117,7 @@ void CadEditForm::MovedMouse(QMouseEvent *event, CObject *under_object){
 
     //編集
     if(move_flag == true){
-        for(CObject* p : CObject::selected){
+        for(CObject* p : this->selected){
             //フィルタリング
             if(p->is<CPoint>()){
                 p->Move(this->filter.Filtering(*dynamic_cast<CPoint*>(p)) - *dynamic_cast<CPoint*>(p));
@@ -151,18 +151,18 @@ void CadEditForm::paintEvent(QPaintEvent*){
     paint.setTransform(trans); // 変換行列を以降の描画に適応
 
     //グリッド描画
-    this->filter.DrawGrid(paint,this->translate.x/this->scale,(-this->height()-this->translate.y)/this->scale,
-                          this->width()/this->scale,this->height()/this->scale);
+    this->filter.DrawGrid(paint,this->translate.x/this->scale ,(-this->height()-this->translate.y)/this->scale,
+                                this->width()    /this->scale ,this->height()                     /this->scale);
 
     //CBox描画
     for(int i=0;i<this->model->GetBlocks().size();i++){ //エリア描画
-        paint.setPen(QPen(Qt::darkGray, CObject::DRAWING_LINE_SIZE/2 / this->scale,Qt::SolidLine,Qt::RoundCap));
+        if(i == this->selecting_block){
+            paint.setPen(QPen(Qt::cyan, CObject::DRAWING_LINE_SIZE/2 / this->scale,Qt::SolidLine,Qt::RoundCap));
+        }else{
+            paint.setPen(QPen(Qt::darkGray, CObject::DRAWING_LINE_SIZE/2 / this->scale,Qt::SolidLine,Qt::RoundCap));
+        }
         paint.setBrush(QBrush(Qt::lightGray));   //背景設定
         this->model->GetBlocks()[i]->Draw(paint);
-    }
-    if(this->selecting_block >= 0 && this->selecting_block < this->model->GetBlocks().size()){
-        paint.setPen(QPen(Qt::cyan, CObject::DRAWING_LINE_SIZE/2 / this->scale,Qt::SolidLine,Qt::RoundCap));
-        this->model->GetBlocks()[this->selecting_block]->Draw(paint);
     }
 
     //寸法を描画
@@ -173,34 +173,25 @@ void CadEditForm::paintEvent(QPaintEvent*){
 
     //エッジ描画
     for(CEdge* obj:this->model->GetEdges()){
-        if(obj->start->z > this->depth){
-            paint.setPen(QPen(QColor(200,200,200), CObject::DRAWING_LINE_SIZE / this->scale,Qt::SolidLine,Qt::RoundCap));
-        }else if(obj->start->z < this->depth){
-            paint.setPen(QPen(QColor(100,100,100), CObject::DRAWING_LINE_SIZE / this->scale,Qt::SolidLine,Qt::RoundCap));
-        }else{
-            paint.setPen(QPen(Qt::blue, CObject::DRAWING_LINE_SIZE / this->scale,Qt::SolidLine,Qt::RoundCap));
-        }
+        if     (obj->start->z > this->depth)paint.setPen(QPen(QColor(200,200,200), CObject::DRAWING_LINE_SIZE / this->scale,Qt::SolidLine,Qt::RoundCap));
+        else if(obj->start->z < this->depth)paint.setPen(QPen(QColor(100,100,100), CObject::DRAWING_LINE_SIZE / this->scale,Qt::SolidLine,Qt::RoundCap));
+        else                                paint.setPen(QPen(Qt::blue           , CObject::DRAWING_LINE_SIZE / this->scale,Qt::SolidLine,Qt::RoundCap));
+
         obj->Draw(paint);
-        obj->start->Draw(paint);
-        obj->end  ->Draw(paint);
-        for(int i=0;i<dynamic_cast<CEdge*>(obj)->GetMiddleCount();i++){
-            dynamic_cast<CEdge*>(obj)->GetMiddle(i)->Draw(paint);
+        for(int i=0;i<obj->GetPosSequenceCount();i++){
+            obj->GetPosSequence(i)->Draw(paint);
         }
     }
 
     //原点
-    if(this->model->origin->z > this->depth){
-        paint.setPen(QPen(QColor(200,200,200), CObject::DRAWING_LINE_SIZE / this->scale,Qt::SolidLine,Qt::RoundCap));
-    }else if(this->model->origin->z < this->depth){
-        paint.setPen(QPen(QColor(100,100,100), CObject::DRAWING_LINE_SIZE / this->scale,Qt::SolidLine,Qt::RoundCap));
-    }else{
-        paint.setPen(QPen(Qt::blue, CObject::DRAWING_LINE_SIZE / this->scale,Qt::SolidLine,Qt::RoundCap));
-    }
+    if     (this->model->origin->z > this->depth)paint.setPen(QPen(QColor(200,200,200), CObject::DRAWING_LINE_SIZE / this->scale,Qt::SolidLine,Qt::RoundCap));
+    else if(this->model->origin->z < this->depth)paint.setPen(QPen(QColor(100,100,100), CObject::DRAWING_LINE_SIZE / this->scale,Qt::SolidLine,Qt::RoundCap));
+    else                                         paint.setPen(QPen(Qt::blue           , CObject::DRAWING_LINE_SIZE / this->scale,Qt::SolidLine,Qt::RoundCap));
     this->model->origin->Draw(paint);
 
     //選択されたオブジェクト
     paint.setPen(QPen(Qt::cyan, CObject::DRAWING_LINE_SIZE / this->scale,Qt::SolidLine,Qt::RoundCap));
-    for(CObject* obj:CObject::selected){
+    for(CObject* obj:this->selected){
         obj->Draw(paint);
     }
     //メイン選択中
@@ -258,31 +249,31 @@ void CadEditForm::Translate(Pos local_diff){
 
 void CadEditForm::MergePoints(){
     //原点が存在する場合は先頭に出す
-    for(int i=0;i<CObject::selected.size();i++){
-        if(dynamic_cast<CPoint*>(CObject::selected[i])->isControlPoint()){
-            std::swap(CObject::selected[0],CObject::selected[i]);
+    for(int i=0;i<this->selected.size();i++){
+        if(dynamic_cast<CPoint*>(this->selected[i])->isControlPoint()){
+            std::swap(this->selected[0],this->selected[i]);
             break;
         }
     }
 
     //先頭以外の点を破棄し、統合する。
-    for(int i=1;i<CObject::selected.size();i++){
+    for(int i=1;i<this->selected.size();i++){
         for(CEdge* p : this->model->GetEdges()){
-            if(p->start == CObject::selected[i]){
-                p->SetStartPos(dynamic_cast<CPoint*>(CObject::selected[0]));
+            if(p->start == this->selected[i]){
+                p->SetStartPos(dynamic_cast<CPoint*>(this->selected[0]));
             }
-            if(p->end == CObject::selected[i]){
-                p->SetEndPos(dynamic_cast<CPoint*>(CObject::selected[0]));
+            if(p->end == this->selected[i]){
+                p->SetEndPos(dynamic_cast<CPoint*>(this->selected[0]));
             }
             for(int j=0;j<p->GetMiddleCount();j++){
-                if(p->GetMiddle(j) == CObject::selected[i]){
-                    p->SetMiddle(dynamic_cast<CPoint*>(CObject::selected[0]),j);
+                if(p->GetMiddle(j) == this->selected[i]){
+                    p->SetMiddle(dynamic_cast<CPoint*>(this->selected[0]),j);
                 }
             }
         }
-        //this->objects.removeAll(CObject::selected[i]);
+        //this->objects.removeAll(this->selected[i]);
     }
-    CObject::selected.clear();
+    this->selected.clear();
     repaint();
 }
 
@@ -302,30 +293,27 @@ CadEditForm::~CadEditForm()
     delete ui;
 }
 
-CObject* CadEditForm::getHanged(){
+CObject* CadEditForm::getHanged()const{
     CObject* final = nullptr;
 
+    //原点
     if(this->model->origin->isSelectable(this->mouse_pos)){
         if(this->model->origin->z == this->depth)return this->model->origin;
         else final = this->model->origin;
     }
 
+    //エッジ
     for(CEdge* obj:this->model->GetEdges()){
-        if(obj->isCreating())continue;
+        //選択済みは除外
+        if(exist(this->selected,obj))continue;
+        //作成中も除外
+        if(obj == this->creating)continue;
 
-        //端点
-        if(obj->start->isSelectable(this->mouse_pos)){
-            if(obj->start->z == this->depth)return obj->start;
-            else final = obj->start;
-        }
-        if(obj->end  ->isSelectable(this->mouse_pos)){
-            if(obj->end->z == this->depth)return obj->end;
-            else final = obj->end;
-        }
-        for(int i=0;i<obj->GetMiddleCount();i++){
-            if(obj->GetMiddle(i)->isSelectable(this->mouse_pos)){
-                if(obj->GetMiddle(i)->z == this->depth)return obj->GetMiddle(i);
-                else final = obj->GetMiddle(i);
+        //構成点
+        for(int i=0;i<obj->GetPosSequenceCount();i++){
+            if(obj->GetPosSequence(i)->isSelectable(this->mouse_pos)){
+                if(obj->GetPosSequence(i)->z == this->depth)return obj->GetPosSequence(i);
+                else final = obj->GetPosSequence(i);
             }
         }
         //エッジ自身
@@ -333,9 +321,7 @@ CObject* CadEditForm::getHanged(){
             if(obj->start->z == this->depth && obj->end->z == this->depth)return obj;
             else if(final == nullptr) final = obj;
         }
-
     }
-
     return final;
 }
 
@@ -369,105 +355,65 @@ void CadEditForm::MakeObject(){
     //編集
     if(state == Edit){
         //シフト状態
-        if(!shift_pressed)CObject::selected.clear();
+        if(!shift_pressed)this->selected.clear();
 
         //選択状態をトグル
-        if(exist(CObject::selected,hanged))erase(CObject::selected,hanged);
-        else if(hanged != nullptr)CObject::selected.push_back(hanged);
+        if(exist(this->selected,hanged))erase(this->selected,hanged);
+        else if(hanged != nullptr)this->selected.push_back(hanged);
 
     }else{
         //新規オブジェクト
         if(make_result == COMPLETE){
             //新規作成CEdge
-            CEdge* new_obj;
-            //if(state == Dot   )new_obj = new CPoint(this);
-            if(state == Line  )new_obj = new CLine(this);
-            if(state == Arc   )new_obj = new CArc(this);
-            if(state == Spline)new_obj = new CSpline(this);
+            //if(state == Dot   )creating = new CPoint(this);
+            if(state == Line  )this->creating = new CLine(this);
+            if(state == Arc   )this->creating = new CArc(this);
+            if(state == Spline)this->creating = new CSpline(this);
             if(state == Rect  ){
-                new_obj = new CLine(this);
+                this->creating = new CLine(this);
             }
+            //startを作成する。
+            make_result = MakeJoint(this->creating);
 
-            //追加
-            this->creating = new_obj;
-
-            //新規作成
-            this->model->AddEdges(new_obj);
-            make_result = MakeJoint(new_obj);
-            //選択解除
-            //CObject::hanged = nullptr;
-
-            //一回だけ
+            //完了
             if(make_result == COMPLETE){
                 //おわり
             }
-            //二回必要
-            if(make_result == TWOSHOT){
-                //保持
-                make_obj = dynamic_cast<CEdge*>(new_obj);
-                //同一の点を作成
-                MakeJoint(make_obj);
+            //継続
+            if(make_result == TWOSHOT || make_result == ENDLESS){
+                //終点を作成
+                this->creating->Create(new CPoint(this->mouse_pos,this->creating));
+            }
+            //終端を持つ
+            this->hang_point = this->creating->end;
+            this->model->AddEdges(this->creating);
 
-                //端点をオブジェクトリストに追加
-                //this->AddObject(make_obj->start);
-                //this->AddObject(make_obj->end);
-                //中継点をオブジェクトリストに追加
-                for(int i =0;i<make_obj->GetMiddleCount();i++){
-                    //this->AddObject(make_obj->GetMiddle(i));
-                }
-                //終端を持つ
-                this->hang_point = make_obj->end;
-            }
-            //無限回指定
-            if(make_result == ENDLESS){
-                //保持
-                make_obj = dynamic_cast<CEdge*>(new_obj);
-                //同一の点を作成
-                MakeJoint(make_obj);
-                //端点をオブジェクトリストに追加
-                //this->AddObject(make_obj->start);
-                //this->AddObject(make_obj->end);
-                //終端を持つ
-                this->hang_point = make_obj->end;
-            }
-        }else if(make_result == TWOSHOT){
+        }else if(make_result == TWOSHOT || make_result == ENDLESS){
             //hangedが存在した場合
-            if(hanged != nullptr ){
+            if(hanged != nullptr){
+                //点であるかつ、Z軸が同じ
                 if(hanged->is<CPoint>() && dynamic_cast<CPoint*>(hanged)->z == this->depth){
                     //すり替え
-                    dynamic_cast<CEdge*>(this->creating)->SetEndPos(dynamic_cast<CPoint*>(hanged));
-                    //this->model->RemoveEdges(this->hang_point);
+                    this->creating->SetEndPos(dynamic_cast<CPoint*>(hanged));
                 }else{
                     //近接点へ移動
                     *this->hang_point = hanged->GetNear(*this->hang_point);
                 }
-            }
-            this->creating = nullptr;
-            this->hang_point = nullptr;
-            make_result = COMPLETE;
-
-        }else if(make_result == ENDLESS){
-            //hangedが存在した場合
-            if(hanged != nullptr){
-                if(hanged->is<CPoint>()){
-                    //すり替えて終了
-                    dynamic_cast<CEdge*>(this->creating)->SetEndPos(dynamic_cast<CPoint*>(hanged));
-                    //this->RemoveObject(this->hang_point);
-                }else{
-                    //近接点へ移動して終了
-                    *this->hang_point = hanged->GetNear(*this->hang_point);
-                }
-                //CObject::creating = nullptr;
-                this->hang_point = nullptr;
-                make_result = COMPLETE;
-            }else{
-                //同一の点を作成
-                MakeJoint(make_obj);
+            }else if(make_result == ENDLESS){
+                //同一座標の点を作成
+                MakeJoint(this->creating);
 
                 //終端を持つ
-                this->hang_point = make_obj->end;
-                //this->AddObject(make_obj->end);
+                this->hang_point = this->creating->end;
             }
+
+            //二点の場合はここで、終了
+            if(make_result == TWOSHOT){
+                this->creating = nullptr;
+                this->hang_point = nullptr;
+                make_result = COMPLETE;
+            }
+
         }
     }
     RefreshRestraints();
@@ -478,8 +424,7 @@ CREATE_RESULT CadEditForm::MakeJoint(CObject* obj){
     CObject* hanged = this->getHanged();
     if(hanged == nullptr){
         //始点を作成
-        CPoint* new_point = new CPoint(this->mouse_pos);
-        return obj->Create(new_point);
+        return obj->Create(new CPoint(this->mouse_pos,obj));
     }else if(hanged->is<CPoint>() && dynamic_cast<CPoint*>(hanged)->z == this->depth){
         //既存の点を使用
         return obj->Create(dynamic_cast<CPoint*>(hanged));
@@ -492,16 +437,16 @@ CREATE_RESULT CadEditForm::MakeJoint(CObject* obj){
 }
 
 void CadEditForm::MakeSmartDimension(){
-    if(CObject::selected.size() > 0 && CObject::selected.size() < 3){
+    if(this->selected.size() > 0 && this->selected.size() < 3){
         //スマート寸法ダイアログ生成
         SmartDimensionDialog* diag = new SmartDimensionDialog(this);
         SmartDimension* dim (new SmartDimension());
 
         //ターゲット設定
         CObject* target[2];
-        target[0] = CObject::selected[0];
-        if(CObject::selected.size() == 1)target[1] = nullptr;
-        else                             target[1] = CObject::selected[1];
+        target[0] = this->selected[0];
+        if(this->selected.size() == 1)target[1] = nullptr;
+        else                             target[1] = this->selected[1];
 
         if(dim->SetTarget(target[0],target[1])){//寸法定義可能ならば
 
@@ -524,16 +469,16 @@ void CadEditForm::MakeSmartDimension(){
 
 void CadEditForm::MakeRestraint(RestraintType type){
     Restraint* rest = nullptr;
-    if(type == EQUAL)     rest = new EqualRestraint({CObject::selected[0],CObject::selected[1]});
-    if(type == VERTICAL)  rest = new VerticalRestraint(CObject::selected);
-    if(type == HORIZONTAL)rest = new HorizontalRestraint(CObject::selected);
-    if(type == MATCH)     rest = new MatchRestraint({CObject::selected[0],CObject::selected[1]});
-    if(type == CONCURRENT)rest = new ConcurrentRestraint({CObject::selected[0],CObject::selected[1]});
-    //if(type == TANGENT)   rest = new TangentRestraint(CObject::selected[0],CObject::selected[1]);
+    if(type == EQUAL)     rest = new EqualRestraint({this->selected[0],this->selected[1]});
+    if(type == VERTICAL)  rest = new VerticalRestraint(this->selected);
+    if(type == HORIZONTAL)rest = new HorizontalRestraint(this->selected);
+    if(type == MATCH)     rest = new MatchRestraint({this->selected[0],this->selected[1]});
+    if(type == CONCURRENT)rest = new ConcurrentRestraint({this->selected[0],this->selected[1]});
+    //if(type == TANGENT)   rest = new TangentRestraint(this->selected[0],this->selected[1]);
 
     //固定
     if(type == LOCK | type == UNLOCK){
-        for(CObject* obj : CObject::selected){
+        for(CObject* obj : this->selected){
             obj->Lock(type == LOCK);
         }
     }
@@ -549,12 +494,12 @@ bool CadEditForm::MakeBlock(){
     if(diag->exec()){
         //QVector<CObject*>からQVector<CEdge*>に変換
         QVector<CEdge*> edges;
-        for(CObject* obj:CObject::selected)edges.push_back(dynamic_cast<CEdge*>(obj));
+        for(CObject* obj:this->selected)edges.push_back(dynamic_cast<CEdge*>(obj));
 
         CBlock* block = new CBlock(diag->ExportCBlock());
         block->SetEdgeAll(edges);
         this->model->AddBlocks(block);
-        CObject::selected.clear();
+        this->selected.clear();
     }
     return true;
 }
@@ -660,9 +605,9 @@ void CadEditForm::RefreshRestraints(){
 
 
 void CadEditForm::ImportObjectList(QTreeWidget* list){
-    //CObject::selectedを更新する。
+    //this->selectedを更新する。
     //ポインタを保持していないため、添字でカウント
-    CObject::selected.clear();
+    this->selected.clear();
 
     for(int i=0;i<list->topLevelItemCount();i++){
         QTreeWidgetItem* item = list->topLevelItem(i);
@@ -672,24 +617,24 @@ void CadEditForm::ImportObjectList(QTreeWidget* list){
 
         if(text == "Origin"){
             if(item->isSelected()){
-                CObject::selected.push_back(this->model->origin);
+                this->selected.push_back(this->model->origin);
             }
         }else{
-            //CObject::selected内をループ
+            //this->selected内をループ
             if(item->isSelected()){
-                CObject::selected.push_back(this->model->GetEdges()[i-1]);
+                this->selected.push_back(this->model->GetEdges()[i-1]);
             }
             //子が選択されているか
             for(int k=0;k<item->childCount();k++){
                 if(item->child(k)->isSelected()){
                     if(k==0){
-                        CObject::selected.push_back(this->model->GetEdges()[i-1]->start);
+                        this->selected.push_back(this->model->GetEdges()[i-1]->start);
                     }
                     else if(k == 1){
-                        CObject::selected.push_back(this->model->GetEdges()[i-1]->end);
+                        this->selected.push_back(this->model->GetEdges()[i-1]->end);
                     }
                     else{
-                        CObject::selected.push_back(this->model->GetEdges()[i-1]->GetMiddle(k-2));
+                        this->selected.push_back(this->model->GetEdges()[i-1]->GetMiddle(k-2));
                     }
                 }
             }

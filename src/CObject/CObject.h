@@ -25,7 +25,6 @@ public:
     static constexpr double SAME_POINT_EPS = 0.001;    //同一点誤差
 
     static double drawing_scale;           //描画スケール
-    static QVector<CObject*> selected;     //選択オブジェクト
 
 protected:
     bool lock  = false; //ロック状態
@@ -45,9 +44,6 @@ public:
     virtual bool Move(const Pos& diff) = 0;//移動関数
     virtual void Lock(bool lock);//ロック
 
-    virtual bool isSelecting() const;  //選択中
-    virtual bool isSelected()  const;  //選択済
-    virtual bool isCreating()  const;  //作成中
     virtual bool isLock()      const;  //固定中
     virtual bool isSelectable(Pos pos)const;  //mouse_posの位置で選択可能か
 

@@ -32,7 +32,7 @@ struct Restraint{
     double value;      //値
     RestraintType type; //タイプ
 
-    static QVector<RestraintType> Restraintable(const QVector<CObject *> &values);
+    static QVector<RestraintType> Restraintable(const QVector<CObject *> values);
 
     //最寄りの点に補完
     virtual bool Complete() = 0;

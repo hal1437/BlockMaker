@@ -16,14 +16,19 @@ MoveTransformDialog::~MoveTransformDialog()
     delete ui;
 }
 
+
+void MoveTransformDialog::setObjects(QVector<CObject*> obj){
+    this->objects = obj;
+}
+
 void MoveTransformDialog::Accept(){
     if(this->ui->RelativeRadio->isChecked()){
-        for(CObject* obj : CObject::selected){
+        for(CObject* obj : this->objects){
             obj->Move(Pos(this->ui->XSpinBox->value(),this->ui->YSpinBox->value()));
         }
     }
     if(this->ui->AbsoluteRadio->isChecked()){
-        for(CObject* obj : CObject::selected){
+        for(CObject* obj : this->objects){
             Pos p(0,0);
             if(obj->is<CPoint>())p = *dynamic_cast<CPoint*>(obj);
             obj->Move(Pos(this->ui->XSpinBox->value(),this->ui->YSpinBox->value()) - p);

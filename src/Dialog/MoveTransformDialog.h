@@ -15,8 +15,11 @@ class MoveTransformDialog : public QDialog
 
 private:
     Ui::MoveTransformDialog *ui;
+    QVector<CObject*> objects;
 
 public:
+    void setObjects(QVector<CObject*> obj);
+
     explicit MoveTransformDialog(QWidget *parent = 0);
     ~MoveTransformDialog();
 

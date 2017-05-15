@@ -1,6 +1,6 @@
 #include "Restraint.h"
 
-QVector<RestraintType> Restraint::Restraintable(const QVector<CObject*> &values){
+QVector<RestraintType> Restraint::Restraintable(const QVector<CObject*> values){
     QVector<RestraintType> answer;
     //等値
     if(values.size()>=2 && !values[0]->is<CPoint>() && std::all_of(values.begin(),values.end(),[&](CObject* v){return typeid(values[0])==typeid(v);}))answer.push_back(EQUAL);
