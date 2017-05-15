@@ -43,7 +43,7 @@ public:
 
 public slots:
     //点移動コールバック
-    virtual void ChangePosCallback(const Pos& new_pos,const Pos& old_pos);
+    virtual void ChangePosCallback(CPoint* pos,Pos old_pos);
 
 };
 

@@ -52,9 +52,9 @@ bool CPoint::Move(const Pos& diff){
         if(diff != Pos(0,0) && moving == false){
             //シグナル
             moving = true;  //再帰呼び出し制限
-            emit PosChanged(*this + diff,*this);
-            moving = false; //再帰呼び出し制限
             *this += diff;//単純な平行移動
+            emit PosChanged(this,*this-diff);
+            moving = false; //再帰呼び出し制限
         }
     }
     return true;

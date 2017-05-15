@@ -10,9 +10,10 @@
 class CPoint;
 
 enum CREATE_RESULT{
-    COMPLETE,//一回で終了
-    TWOSHOT,//二回で終了
-    ENDLESS,//何回でも可能
+    COMPLETE  = 1,//一回で終了
+    TWOSHOT   = 2,//二回で終了
+    THREESHOT = 3,//三回で終了
+    ENDLESS   = -1,//何回でも可能
 };
 
 

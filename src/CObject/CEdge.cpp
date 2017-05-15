@@ -1,15 +1,19 @@
 #include "CEdge.h"
 
 void CEdge::SetStartPos(CPoint* pos){
-    disconnect(this->start,SIGNAL(PosChanged(Pos,Pos)),this,SLOT(ChangePosCallback(Pos,Pos)));
+    if(this->start != nullptr){
+        disconnect(this->start,SIGNAL(PosChanged(CPoint*,Pos)),this,SLOT(ChangePosCallback(CPoint*,Pos)));
+    }
     this->start = pos;
-    connect(this->start,SIGNAL(PosChanged(Pos,Pos)),this,SLOT(ChangePosCallback(Pos,Pos)));
+    connect   (this->start,SIGNAL(PosChanged(CPoint*,Pos)),this,SLOT(ChangePosCallback(CPoint*,Pos)));
 }
 
 void CEdge::SetEndPos(CPoint* pos){
-    disconnect(this->end,SIGNAL(PosChanged(Pos,Pos)),this,SLOT(ChangePosCallback(Pos,Pos)));
+    if(this->end != nullptr){
+        disconnect(this->end,SIGNAL(PosChanged(CPoint*,Pos)),this,SLOT(ChangePosCallback(CPoint*,Pos)));
+    }
     this->end = pos;
-    connect(this->end,SIGNAL(PosChanged(Pos,Pos)),this,SLOT(ChangePosCallback(Pos,Pos)));
+    connect(this->end,SIGNAL(PosChanged(CPoint*,Pos)),this,SLOT(ChangePosCallback(CPoint*,Pos)));
 }
 
 int CEdge::GetPosSequenceCount()const{
@@ -33,6 +37,6 @@ CEdge::~CEdge()
 }
 
 //点移動コールバック
-void CEdge::ChangePosCallback(const Pos& new_pos,const Pos& old_pos){
+void CEdge::ChangePosCallback(CPoint* ,Pos ){
 }
 

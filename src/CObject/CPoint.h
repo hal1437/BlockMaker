@@ -39,7 +39,7 @@ public:
 
 signals:
     //座標移動シグナル
-    void PosChanged(Pos new_pos,Pos old_pos);
+    void PosChanged(CPoint* pos,Pos old_pos);
 
 public slots:
 

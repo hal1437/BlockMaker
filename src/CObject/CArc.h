@@ -2,8 +2,6 @@
 #define CARC_H
 #include "CEdge.h"
 
-
-
 class CArc : public CEdge
 {
 protected:
@@ -26,8 +24,9 @@ public:
     virtual bool isSelectable(Pos pos) const;//選択可能オーバーライド
 
     //始点終点操作オーバーライド
-    virtual void SetStartPos(CPoint* pos);
-    virtual void SetEndPos(CPoint* pos);
+    virtual void SetStartPos (CPoint* pos);
+    virtual void SetEndPos   (CPoint* pos);
+    virtual void SetCenterPos(CPoint* pos);
 
     //中間点操作
     virtual int GetMiddleCount()const;
@@ -44,7 +43,7 @@ public:
 
 public slots:
     //点移動コールバックオーバーライド
-    virtual void ChangePosCallback(const Pos& new_pos,const Pos& old_pos);
+    virtual void ChangePosCallback(CPoint* pos,Pos old_pos);
 
 };
 

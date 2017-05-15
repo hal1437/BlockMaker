@@ -48,7 +48,7 @@ private:
 
     CEnum   state      = Edit;    //生成種類
     CPoint* hang_point = nullptr; //生成支点
-    CREATE_RESULT make_result = COMPLETE; //生成管理フラグ
+    int make_count     = COMPLETE; //生成管理フラグ
 
     double depth  = 0.0f;     //視点の深さ
     double scale  = 1.0f;     //拡大率
