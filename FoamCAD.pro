@@ -34,7 +34,8 @@ SOURCES += src/main.cpp\
     src/Dialog/SmartDimension.cpp \
     src/Dialog/SmartDimensionDialog.cpp \
     src/Dialog/SolidView.cpp \
-    src/CadModelCore.cpp
+    src/CadModelCore.cpp \
+    src/SolidEditForm.cpp
 
 HEADERS  += src/MainWindow.h \
     src/Point.h \
@@ -60,7 +61,8 @@ HEADERS  += src/MainWindow.h \
     src/Dialog/SmartDimension.h \
     src/Dialog/SmartDimensionDialog.h \
     src/Dialog/SolidView.h \
-    src/CadModelCore.h
+    src/CadModelCore.h \
+    src/SolidEditForm.h
 
 FORMS    += src/MainWindow.ui \
     src/CadEditForm.ui \
@@ -68,7 +70,8 @@ FORMS    += src/MainWindow.ui \
     src/Dialog/ExportDialog.ui \
     src/Dialog/CBoxDefineDialog.ui \
     src/Dialog/MoveTransformDialog.ui \
-    src/Dialog/GridFilterDialog.ui
+    src/Dialog/GridFilterDialog.ui \
+    src/SolidEditForm.ui
 
 RESOURCES += \
     Resource/images.qrc

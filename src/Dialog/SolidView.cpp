@@ -2,7 +2,6 @@
 
 
 void SolidView::initializeGL(){
-
 }
 
 void SolidView::resizeGL(int w, int h){
