@@ -1,6 +1,17 @@
 #include "SolidEditForm.h"
 #include "ui_SolidEditForm.h"
 
+//カメラ方向セット
+void SolidEditForm::setCameraRotate(double theta1,double theta2){
+    TimeDivider *p1,*p2;
+    p1 = TimeDivider::TimeDivide(this->theta1  ,theta1,500);
+    p2 = TimeDivider::TimeDivide(this->theta2  ,theta2,500);
+    connect(p1,SIGNAL(PerTime()),this,SLOT(repaint()));
+    connect(p2,SIGNAL(PerTime()),this,SLOT(repaint()));
+    repaint();
+}
+
+
 void SolidEditForm::mousePressEvent  (QMouseEvent *event){
     click_base = Pos(event->pos().x(),event->pos().y());
 }
@@ -51,6 +62,10 @@ void SolidEditForm::resizeGL(int w, int h){
 }
 
 void SolidEditForm::paintGL(){
+    this->camera.x = round * std::cos(theta2);
+    this->camera.y = round * std::sin(theta1);
+    this->camera.z = round * std::sin(theta2);
+
     glMatrixMode(GL_PROJECTION);  //行列モード切替
     glLoadIdentity();
     glOrtho(-this->width()*round,this->width()*round,-this->height()*round,this->height()*round,-100000000,100000000);

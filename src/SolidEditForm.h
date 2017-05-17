@@ -6,6 +6,7 @@
 #include <QOpenGLWidget>
 #include <gl.h>
 #include <glu.h>
+#include "TimeDivider.h"
 #include "CadModelCore.h"
 
 namespace Ui {
@@ -24,12 +25,14 @@ private:
 
     Pos camera; //カメラ位置
     Pos center; //カメラ注意点
-    double round = 10;//半径
-    double theta1 = 45.0; //角度1
-    double theta2 = 45.0; //角度2
+    double round = 3;//半径
+    double theta1 = M_PI/2; //角度1
+    double theta2 = M_PI/2; //角度2
 
 public:
 
+    //カメラ方向セット
+    void setCameraRotate(double theta1, double theta2);
 public:
     void mousePressEvent  (QMouseEvent *event);
     void mouseMoveEvent   (QMouseEvent *event);

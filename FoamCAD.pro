@@ -35,7 +35,8 @@ SOURCES += src/main.cpp\
     src/Dialog/SmartDimensionDialog.cpp \
     src/Dialog/SolidView.cpp \
     src/CadModelCore.cpp \
-    src/SolidEditForm.cpp
+    src/SolidEditForm.cpp \
+    src/TimeDivider.cpp
 
 HEADERS  += src/MainWindow.h \
     src/Point.h \
@@ -62,7 +63,8 @@ HEADERS  += src/MainWindow.h \
     src/Dialog/SmartDimensionDialog.h \
     src/Dialog/SolidView.h \
     src/CadModelCore.h \
-    src/SolidEditForm.h
+    src/SolidEditForm.h \
+    src/TimeDivider.h
 
 FORMS    += src/MainWindow.ui \
     src/CadEditForm.ui \

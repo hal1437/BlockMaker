@@ -49,8 +49,7 @@ void erase(C array,const V& value){
 
 template<class T,class U = T>
 T Mod(T lhs,const U& rhs){
-    while(lhs > rhs)lhs -= rhs;
-    return lhs;
+    return lhs - rhs * static_cast<int>(lhs/rhs);
 }
 
 #define CREATEGETTER(TYPE,NAME,VALUE) \
