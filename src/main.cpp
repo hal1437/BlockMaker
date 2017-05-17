@@ -9,12 +9,8 @@ int main(int argc, char *argv[])
     CadModelCore* model = new CadModelCore();
 
     MainWindow w;
-    SolidEditForm s;
-    s.setModel(model);
     w.setModel(model);
 
-    w.installEventFilter(&s);
-    s.show();
     w.show();
 
     return a.exec();

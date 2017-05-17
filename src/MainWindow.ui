@@ -278,6 +278,9 @@
      </widget>
     </item>
     <item>
+     <widget class="SolidEditForm" name="SolidEdit"/>
+    </item>
+    <item>
      <widget class="QGroupBox" name="groupBox_3">
       <property name="maximumSize">
        <size>
@@ -584,6 +587,11 @@
    <extends>QWidget</extends>
    <header>CadEditForm.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>SolidEditForm</class>
+   <extends>QOpenGLWidget</extends>
+   <header>solideditform.h</header>
   </customwidget>
  </customwidgets>
  <resources>

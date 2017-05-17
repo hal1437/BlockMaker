@@ -23,6 +23,13 @@ void SolidEditForm::mouseMoveEvent   (QMouseEvent *event){
 void SolidEditForm::mouseReleaseEvent(QMouseEvent *event){
     click_base = Pos(0,0);
 }
+void SolidEditForm::wheelEvent(QWheelEvent *event){
+    this->round += static_cast<double>(event->angleDelta().y())/MOUSE_ZOOM_RATE;
+    this->camera.x = round * std::cos(theta2);
+    this->camera.y = round * std::sin(theta1);
+    this->camera.z = round * std::sin(theta2);
+    repaint();
+}
 
 void SolidEditForm::setModel(CadModelCore* model){
     this->model = model;
@@ -34,7 +41,7 @@ void SolidEditForm::initializeGL(){
 void SolidEditForm::resizeGL(int w, int h){
     glMatrixMode(GL_PROJECTION);  //行列モード切替
     glLoadIdentity();
-    glOrtho(-w,w,-h,h,-100000000,100000000);
+    glOrtho(-w*round,w*round,-h*round,h*round,-100000000,100000000);
 
     glMatrixMode(GL_MODELVIEW); //行列モードを戻す
     glLoadIdentity();
@@ -44,6 +51,10 @@ void SolidEditForm::resizeGL(int w, int h){
 }
 
 void SolidEditForm::paintGL(){
+    glMatrixMode(GL_PROJECTION);  //行列モード切替
+    glLoadIdentity();
+    glOrtho(-this->width()*round,this->width()*round,-this->height()*round,this->height()*round,-100000000,100000000);
+
     glMatrixMode(GL_MODELVIEW); //行列モードを戻す
     glLoadIdentity();
     gluLookAt(camera.x, camera.y, camera.z,

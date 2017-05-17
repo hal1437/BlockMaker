@@ -4,7 +4,8 @@
 
 void MainWindow::setModel(CadModelCore* model){
     this->model = model;
-    this->ui->CadEdit->setModel(model);
+    this->ui->CadEdit  ->setModel(model);
+    this->ui->SolidEdit->setModel(model);
     //モデルと結合
     connect(this->model,SIGNAL(UpdateEdges   (QVector<CEdge*>  )),this,SLOT(UpdateObjectTree        (QVector<CEdge*>)));
     connect(this->model,SIGNAL(UpdateSelected(QVector<CObject*>)),this,SLOT(UpdateObjectTreeSelected(QVector<CObject*>)));
@@ -44,6 +45,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     //CadEditFoamにイベントフィルター導入
     this->installEventFilter(ui->CadEdit);
+    this->installEventFilter(ui->SolidEdit);
 
     //RefreshUI();
     //ReciveObjectListChanged();
