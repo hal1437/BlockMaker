@@ -36,7 +36,8 @@ SOURCES += src/main.cpp\
     src/Dialog/SolidView.cpp \
     src/CadModelCore.cpp \
     src/SolidEditForm.cpp \
-    src/TimeDivider.cpp
+    src/TimeDivider.cpp \
+    src/SolidEditController.cpp
 
 HEADERS  += src/MainWindow.h \
     src/Point.h \
@@ -64,7 +65,8 @@ HEADERS  += src/MainWindow.h \
     src/Dialog/SolidView.h \
     src/CadModelCore.h \
     src/SolidEditForm.h \
-    src/TimeDivider.h
+    src/TimeDivider.h \
+    src/SolidEditController.h
 
 FORMS    += src/MainWindow.ui \
     src/CadEditForm.ui \

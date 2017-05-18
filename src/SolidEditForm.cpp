@@ -21,13 +21,6 @@ void SolidEditForm::mouseMoveEvent   (QMouseEvent *event){
     this->theta2 += static_cast<double>(event->pos().x() - click_base.x)/SENSITIVITY;
     click_base = Pos(event->pos().x(),event->pos().y());
 
-    //回転
-    this->camera.x = round * std::cos(theta2);
-    this->camera.y = round * std::sin(theta1);
-    this->camera.z = round * std::sin(theta2);
-
-    //qDebug() << "Thera1:" << this->theta1*(180/M_PI) << "Thera2:" << this->theta2*(180/M_PI);
-
     repaint();
 }
 
@@ -36,9 +29,7 @@ void SolidEditForm::mouseReleaseEvent(QMouseEvent *event){
 }
 void SolidEditForm::wheelEvent(QWheelEvent *event){
     this->round += static_cast<double>(event->angleDelta().y())/MOUSE_ZOOM_RATE;
-    this->camera.x = round * std::cos(theta2);
-    this->camera.y = round * std::sin(theta1);
-    this->camera.z = round * std::sin(theta2);
+    qDebug() << this->round;
     repaint();
 }
 
@@ -52,7 +43,10 @@ void SolidEditForm::initializeGL(){
 void SolidEditForm::resizeGL(int w, int h){
     glMatrixMode(GL_PROJECTION);  //行列モード切替
     glLoadIdentity();
-    glOrtho(-w*round,w*round,-h*round,h*round,-100000000,100000000);
+    glOrtho(-w*round,
+             w*round,
+            -h*round,
+             h*round,-100000000,100000000);
 
     glMatrixMode(GL_MODELVIEW); //行列モードを戻す
     glLoadIdentity();

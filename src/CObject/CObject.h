@@ -46,7 +46,7 @@ public:
     virtual void Lock(bool lock);//ロック
 
     virtual bool isLock()      const;  //固定中
-    virtual bool isSelectable(Pos pos)const;  //mouse_posの位置で選択可能か
+    virtual bool isSelectable(Pos pos)const;  //posの位置で選択可能か
 
     //近接点
     virtual Pos GetNear(const Pos& hand)const=0;
