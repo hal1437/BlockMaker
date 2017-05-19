@@ -15,8 +15,8 @@ void SolidView::resizeGL(int w, int h){
 
     glMatrixMode(GL_MODELVIEW); //行列モードを戻す
     glLoadIdentity();
-    gluLookAt(camera.x, camera.y, camera.z,
-              center.x, center.y, center.z,
+    gluLookAt(camera.x(), camera.y(), camera.z(),
+              center.x(), center.y(), center.z(),
               0, 1, 0);
 }
 
@@ -28,30 +28,30 @@ void SolidView::paintGL(){
     for(CEdge* e:this->edges){
         glBegin(GL_LINES);
         glColor3f(1.0, 0.0, 0.0);
-        glVertex3f(e->start->x, e->start->y, e->start->z);
-        glVertex3f(e->end->x  , e->end->y  , e->end->z  );
+        glVertex3f(e->start->x(), e->start->y(), e->start->z());
+        glVertex3f(e->end->x()  , e->end->y()  , e->end->z()  );
         glEnd();
     }
     for(CBlock b:this->blocks){
         glBegin(GL_LINE_LOOP);
         glColor3f(1.0, 0.0, 0.0);
-        glVertex3f(b.GetClockworksPos(0).x, b.GetClockworksPos(0).y, 0);
-        glVertex3f(b.GetClockworksPos(1).x, b.GetClockworksPos(1).y, 0);
-        glVertex3f(b.GetClockworksPos(2).x, b.GetClockworksPos(2).y, 0);
-        glVertex3f(b.GetClockworksPos(3).x, b.GetClockworksPos(3).y, 0);
+        glVertex3f(b.GetClockworksPos(0).x(), b.GetClockworksPos(0).y(), 0);
+        glVertex3f(b.GetClockworksPos(1).x(), b.GetClockworksPos(1).y(), 0);
+        glVertex3f(b.GetClockworksPos(2).x(), b.GetClockworksPos(2).y(), 0);
+        glVertex3f(b.GetClockworksPos(3).x(), b.GetClockworksPos(3).y(), 0);
         glEnd();
         glBegin(GL_LINE_LOOP);
         glColor3f(1.0, 0.0, 0.0);
-        glVertex3f(b.GetClockworksPos(0).x, b.GetClockworksPos(0).y, b.depth);
-        glVertex3f(b.GetClockworksPos(1).x, b.GetClockworksPos(1).y, b.depth);
-        glVertex3f(b.GetClockworksPos(2).x, b.GetClockworksPos(2).y, b.depth);
-        glVertex3f(b.GetClockworksPos(3).x, b.GetClockworksPos(3).y, b.depth);
+        glVertex3f(b.GetClockworksPos(0).x(), b.GetClockworksPos(0).y(), b.depth);
+        glVertex3f(b.GetClockworksPos(1).x(), b.GetClockworksPos(1).y(), b.depth);
+        glVertex3f(b.GetClockworksPos(2).x(), b.GetClockworksPos(2).y(), b.depth);
+        glVertex3f(b.GetClockworksPos(3).x(), b.GetClockworksPos(3).y(), b.depth);
         glEnd();
         for(int i=0;i<4;i++){
             glBegin(GL_LINES);
             glColor3f(1.0, 0.0, 0.0);
-            glVertex3f(b.GetClockworksPos(i).x, b.GetClockworksPos(i).y, b.GetClockworksPos(i).z);
-            glVertex3f(b.GetClockworksPos(i).x, b.GetClockworksPos(i).y, b.GetClockworksPos(i).z + b.depth);
+            glVertex3f(b.GetClockworksPos(i).x(), b.GetClockworksPos(i).y(), b.GetClockworksPos(i).z());
+            glVertex3f(b.GetClockworksPos(i).x(), b.GetClockworksPos(i).y(), b.GetClockworksPos(i).z() + b.depth);
             glEnd();
         }
 

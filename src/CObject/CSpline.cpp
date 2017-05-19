@@ -84,7 +84,7 @@ bool CSpline::Draw(QPainter& painter)const{
         double t, m;
         m = (double)(pos.size()+1);
 
-        path.moveTo(this->start->x,this->start->y);
+        path.moveTo(this->start->x(),this->start->y());
         const double dt = 1.0/DIVISION;
         for(t=0; t<=m; t += dt){
             if(t + dt > m)t=m;
@@ -94,7 +94,7 @@ bool CSpline::Draw(QPainter& painter)const{
         painter.setBrush(QColor(0,0,0,0));
         painter.drawPath(path);
     }else{
-        painter.drawLine(QPointF(this->start->x,this->start->y),QPointF(this->end->x,this->end->y));
+        painter.drawLine(QPointF(this->start->x(),this->start->y()),QPointF(this->end->x(),this->end->y()));
     }
     return true;
 }
@@ -152,14 +152,14 @@ Pos CSpline::GetNear(const Pos& pos)const{
 
 void CSpline::RefreshNodes(){
     std::vector<double> x,y;
-    x.push_back(this->start->x);
-    y.push_back(this->start->y);
+    x.push_back(this->start->x());
+    y.push_back(this->start->y());
     for(CPoint* p : this->pos){
-        x.push_back(p->x);
-        y.push_back(p->y);
+        x.push_back(p->x());
+        y.push_back(p->y());
     }
-    x.push_back(this->end->x);
-    y.push_back(this->end->y);
+    x.push_back(this->end->x());
+    y.push_back(this->end->y());
     xs.init(x);
     ys.init(y);
 }

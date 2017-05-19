@@ -10,10 +10,10 @@ Face SolidEditController::getFrontFace()const{//正面
     double top,bottom,right,left;
     for(CEdge* edge:this->model->GetEdges()){
         for(int i=0;i<edge->GetPosSequenceCount();i++){
-            top    = std::max(top   ,edge->GetPosSequence(i)->y);
-            bottom = std::min(bottom,edge->GetPosSequence(i)->y);
-            right  = std::max(right ,edge->GetPosSequence(i)->x);
-            left   = std::min(left  ,edge->GetPosSequence(i)->x);
+            top    = std::max(top   ,edge->GetPosSequence(i)->y());
+            bottom = std::min(bottom,edge->GetPosSequence(i)->y());
+            right  = std::max(right ,edge->GetPosSequence(i)->x());
+            left   = std::min(left  ,edge->GetPosSequence(i)->x());
         }
     }
     double height_delta = top - bottom;

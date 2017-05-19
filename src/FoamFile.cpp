@@ -22,7 +22,7 @@ void FoamFile::StartListDifinition(QString title){
 
 
 void FoamFile::OutVector(Pos pos){
-    this->OutVector<double>({pos.x,pos.y,pos.z});
+    this->OutVector<double>({pos.x(),pos.y(),pos.z()});
 }
 void FoamFile::OutValue(QString name,QString value){
     this->TabOut();
@@ -34,7 +34,7 @@ void FoamFile::OutString(QString str){
     ofs << str << NEWLINE;
 }
 void FoamFile::OutVectorInline(Pos pos){
-    this->OutVectorInline<double>({pos.x,pos.y,pos.z});
+    this->OutVectorInline<double>({pos.x(),pos.y(),pos.z()});
 }
 void FoamFile::OutValueInline(QString name,QString value){
     ofs << name << " " << value << " ";

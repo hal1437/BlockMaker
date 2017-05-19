@@ -7,32 +7,114 @@
 #include <limits>
 #include "Utils.h"
 
+template<class T,std::size_t W,std::size_t H>
+class Matrix{
+public:
+    T mat[W*H];
+public:
+    typedef Matrix<T,W,H> current;
+    typedef const Matrix<T,W,H>& cr_current;
+public:
+    Matrix(){std::fill(mat,mat+W*H,0);}
+    Matrix(const current& origin){std::copy(origin.begin(),origin.end(),this->begin());}
+    Matrix(const T mat[W*H]     ){std::copy(mat,mat+W*H,this->begin());}
+
+public:
+
+    T* begin()   {return this->mat;}
+    T* end()     {return this->mat+H*W;}
+    const T* begin()const{return this->mat;}
+    const T* end()  const{return this->mat+H*W;}
+
+    current operator-()const{return (*this)*-1;}
+    current operator+(cr_current rhs)const{
+        Matrix ans;
+        for(std::size_t i=0;i<W;i++)for(std::size_t j=0;j<H;j++){
+            ans.mat[i*W+j] = this->mat[i*W+j] + rhs.mat[i*W+j];
+        }
+        return ans;
+    }
+    current operator-(cr_current rhs)const{
+        Matrix ans;
+        for(std::size_t i=0;i<W;i++)for(std::size_t j=0;j<H;j++){
+            ans.mat[i*W+j] = this->mat[i*W+j] - rhs.mat[i*W+j];
+        }
+        return ans;
+    }
+    template<class V> current operator*(V rhs)const{
+        Matrix ans;
+        for(std::size_t i=0;i<W;i++)for(std::size_t j=0;j<H;j++){
+            ans.mat[i*W+j] = this->mat[i*W+j] * rhs;
+        }
+        return ans;
+    }
+    template<class V> current operator/(V rhs)const{
+        Matrix ans;
+        for(std::size_t i=0;i<W;i++)for(std::size_t j=0;j<H;j++){
+            ans.mat[i*W+j] = this->mat[i*W+j] / rhs;
+        }
+        return ans;
+    }
+
+    current& operator+=(cr_current rhs){*this = *this + rhs;return (*this);}
+    current& operator-=(cr_current rhs){*this = *this - rhs;return (*this);}
+    template<class V> current operator*=(V rhs){*this = *this * rhs;return (*this);}
+    template<class V> current operator/=(V rhs){*this = *this * rhs;return (*this);}
+
+    bool operator==(cr_current rhs)const{
+        return std::equal(this->begin(),this->end(),rhs.begin());
+    }
+    bool operator!=(cr_current rhs)const{return !(*this == rhs);}
+    bool operator<(cr_current rhs)const{
+        for(int i=0;i<W;i++)for(int j=0;j<H;j++){
+            if(this->mat[i*W+j] != rhs.mat[i*W+j])return this->mat[i*W+j] < rhs.mat[i*W+j];
+        }
+        return false;
+    }
+
+};
+
+
 
 //座標
 template<class T>
-struct Point{
-    T x;
-    T y;
-    T z;
+struct Point : public Matrix<T,1,3>{
+//    T x;
+//    T y;
+//    T z;
 public:
+    typedef Matrix<T,1,3> base;
     typedef Point<T> current;
     typedef const Point<T>& cr_current;
 public:
-    Point():x(0),y(0),z(0){}
-    Point(const T& X,const T& Y):x(X),y(Y),z(0){}
-    Point(const T& X,const T& Y,const T& Z):x(X),y(Y),z(Z){}
-    Point(const QPoint& p):x(p.x()),y(p.y()),z(0){}
+    Point(){}
+    Point(const T& X,const T& Y,const T& Z = 0){this->mat[0] = X;this->mat[1] = Y;this->mat[2] = Z;}
+    Point(const QPoint& p):Point(p.x(),p.y(),0){}
+    Point(const base& p):base(p){}
+
+    T& x(){return this->mat[0];}
+    T& y(){return this->mat[1];}
+    T& z(){return this->mat[2];}
+    T x()const{return this->mat[0];}
+    T y()const{return this->mat[1];}
+    T z()const{return this->mat[2];}
+
+    current operator-()const{return current(-(*static_cast<const base*>(this)));}
+    current operator+(cr_current rhs)const{return current(*static_cast<const base*>(this) + rhs);}
+    current operator-(cr_current rhs)const{return current(*static_cast<const base*>(this) - rhs);}
+    template<class V> current operator*(V rhs)const{return current(*static_cast<const base*>(this) * rhs);}
+    template<class V> current operator/(V rhs)const{return current(*static_cast<const base*>(this) * rhs);}
 
     //直線と点の最近点を求める
     static current LineNearPoint(cr_current pos1,cr_current pos2,cr_current hand){
         //内積で一発
-        return (pos1 + (pos2-pos1).GetNormalize() * (pos2-pos1).GetNormalize().Dot(hand-pos1));
+        return current(pos1 + current(pos2-pos1).GetNormalize() * current(pos2-pos1).GetNormalize().Dot(hand-pos1));
     }
 
     //円と点の最近点を求める
     static current CircleNearPoint(cr_current center,double r,cr_current hand){
         //当然centerとhandの線分上にある
-        return (hand-center).GetNormalize() * r + center;
+        return current(hand-center).GetNormalize() * r + center;
     }
     //方向比較
     static bool DirComp(cr_current lhs,cr_current rhs){
@@ -46,12 +128,12 @@ public:
             return !MoreThan(current(),b,a)*180+90;
         }
         if(MoreThan(current(),a,b)){
-            if(a.x > 0)return 360 - std::acos(a.x*b.x + a.y*b.y) * 180 / PI;
-            else return std::acos(a.x*b.x + a.y*b.y) * 180 / PI;
+            if(a.x() > 0)return 360 - std::acos(a.x()*b.x() + a.y()*b.y()) * 180 / PI;
+            else return std::acos(a.x()*b.x() + a.y()*b.y()) * 180 / PI;
         }
         else {
-            if(a.x < 0)return 360 - std::acos(a.x*b.x + a.y*b.y) * 180 / PI;
-            else return std::acos(a.x*b.x + a.y*b.y) * 180 / PI;
+            if(a.x() < 0)return 360 - std::acos(a.x()*b.x() + a.y()*b.y()) * 180 / PI;
+            else return std::acos(a.x()*b.x() + a.y()*b.y()) * 180 / PI;
         }
     }
 
@@ -59,80 +141,58 @@ public:
     static bool MoreThan(cr_current pos1,cr_current pos2,cr_current hand){
         //y=ax+b
         //b=y-ax
-        const T a = (pos2.y - pos1.y)/(pos2.x - pos1.x);
-        const T b = pos1.y - a*pos1.x;
-        return ((hand.x * a + b) <= hand.y);
+        const T a = (pos2.y() - pos1.y())/(pos2.x() - pos1.x());
+        const T b = pos1.y() - a*pos1.x();
+        return ((hand.x() * a + b) <= hand.y());
     }
 
     double Length()const{
-        return std::sqrt(x*x+y*y+z*z);
+        return std::sqrt(x()*x()+y()*y()+z()*z());
     }
     double Length(cr_current rhs)const{
-        return std::sqrt(std::pow(x - rhs.x,2)+std::pow(y - rhs.y,2)+std::pow(z - rhs.z,2));
+        return std::sqrt(std::pow(x() - rhs.x(),2)+
+                         std::pow(y() - rhs.y(),2)+
+                         std::pow(z() - rhs.z(),2));
     }
     double Length2D()const{
-        return std::sqrt(x*x+y*y);
+        return std::sqrt(x()*x()+y()*y());
     }
     double Length2D(cr_current rhs)const{
-        return std::sqrt(std::pow(x - rhs.x,2)+std::pow(y - rhs.y,2));
+        return std::sqrt(std::pow(x() - rhs.x(),2)+
+                         std::pow(y() - rhs.y(),2));
     }
     double Dot(cr_current rhs)const{
-        return x * rhs.x + y * rhs.y + z * rhs.z;
+        return x() * rhs.x() + y() * rhs.y() + z() * rhs.z();
     }
     double Dot2D(cr_current rhs)const{
-        return x * rhs.x + y * rhs.y;
+        return x() * rhs.x() + y() * rhs.y();
     }
     current GetNormalize()const{
-        return current(x/Length(),y/Length(),z/Length());
+        return current(x()/Length(),y()/Length(),z()/Length());
     }
     current GetNormalize2D()const{
-        return current(x/Length2D(),y/Length2D(),0);
+        return current(x()/Length2D(),y()/Length2D(),0);
     }
     current convert2D()const{
-        return current(x,y,0);
+        return current(x(),y(),0);
     }
 
     current& Transform(QTransform rhs){
-        QPointF p(x,y);
+        QPointF p(x(),y());
         p = p * rhs;
-        this->x = p.x();
-        this->y = p.y();
+        this->x() = p.x();
+        this->y() = p.y();
         return (*this);
     }
 
-
-    current operator-()const{return Point(-x,-y,-z);}
-    current operator+(cr_current rhs)const{return Point(x + rhs.x,y + rhs.y,z + rhs.z);}
-    current operator-(cr_current rhs)const{return Point(x - rhs.x,y - rhs.y,z - rhs.z);}
-    template<class V> current operator*(V rhs)const{return Point(x * rhs,y * rhs,z * rhs);}
-    template<class V> current operator/(V rhs)const{return Point(x / rhs,y / rhs,z / rhs);}
-
-    current& operator+=(cr_current rhs){x += rhs.x;y += rhs.y;z += rhs.z;return (*this);}
-    current& operator-=(cr_current rhs){x -= rhs.x;y -= rhs.y;z -= rhs.z;return (*this);}
-    template<class V> current operator*=(V rhs){x *= rhs;y *= rhs;z *= rhs;return (*this);}
-    template<class V> current operator/=(V rhs){x /= rhs;y /= rhs;z /= rhs;return (*this);}
-
-    bool operator==(cr_current rhs)const{
-        return (this->x == rhs.x && this->y == rhs.y && this->z == rhs.z);
-    }
-    bool operator!=(cr_current rhs)const{
-        return !(*this == rhs);
-    }
-    bool operator<(cr_current rhs)const{
-        if(this->x == rhs.x){
-            if(this->y == rhs.y){
-                return (this->z < rhs.z);
-            }else return (this->y < rhs.y);
-        }else return (this->x < rhs.x);
-    }
     operator QPointF(){
-        return QPointF(this->x,this->y);
+        return QPointF(this->x(),this->y());
     }
 };
 
 template<class T>
 std::ostream& operator<<(std::ostream& ost,Point<T> pos){
-    ost << "(" << pos.x << "," << pos.y << "," << pos.z << ")";
+    ost << "(" << pos.x() << "," << pos.y() << "," << pos.z() << ")";
     return ost;
 }
 template<class T>
@@ -141,12 +201,12 @@ std::istream& operator>>(std::istream& ost,Point<T>& pos){
     QStringList list;
     ost >> str;
     list = QString(str.c_str()).replace('(',"").replace(')',"").split(',');
-    pos.x = list[0].toDouble();
-    pos.y = list[1].toDouble();
+    pos.x() = list[0].toDouble();
+    pos.y() = list[1].toDouble();
     if(list.size()>2){
-        pos.z = list[2].toDouble();
+        pos.z() = list[2].toDouble();
     }else{
-        pos.z = 0;
+        pos.z() = 0;
     }
     return ost;
 }

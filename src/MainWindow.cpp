@@ -272,9 +272,9 @@ void MainWindow::RefreshStatusBar(Pos){
         //選択オブジェクトの最近点
         out = hanged->GetNear(this->ui->CadEdit->getMousePos());
     }
-    this->ui->statusBar->showMessage(QString("(") + QString::number(out.x) + "," +
-                                                    QString::number(out.y) + "," +
-                                                    QString::number(out.z) + ")");
+    this->ui->statusBar->showMessage(QString("(") + QString::number(out.x()) + "," +
+                                                    QString::number(out.y()) + "," +
+                                                    QString::number(out.z()) + ")");
 }
 
 void MainWindow::UpdateObjectTree(QVector<CEdge*> edges){

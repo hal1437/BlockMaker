@@ -45,7 +45,7 @@ void SmartDimension::DrawString(QPainter& painter,const Pos& pos,const QString& 
     //拡大無効化+平行移動+回転
     trans = painter.transform();
     trans.scale(-1/CObject::drawing_scale,1/CObject::drawing_scale);
-    trans.translate(-pos.x*CObject::drawing_scale,pos.y*CObject::drawing_scale);
+    trans.translate(-pos.x()*CObject::drawing_scale,pos.y()*CObject::drawing_scale);
     trans.rotate(-angle + 180*bit);
     painter.setTransform(trans);
 
@@ -61,13 +61,13 @@ void SmartDimension::DrawArrow(QPainter& painter,const Pos& pos,const Pos& rote,
     Pos base = rote.GetNormalize() * length;
 
     //行列に基づくベクトル回転
-    Pos arrow1 = pos+Pos(base.x*cos( angle) - base.y*sin( angle),
-                         base.x*sin( angle) + base.y*cos( angle));
-    Pos arrow2 = pos+Pos(base.x*cos(-angle) - base.y*sin(-angle),
-                         base.x*sin(-angle) + base.y*cos(-angle));
+    Pos arrow1 = pos+Pos(base.x()*cos( angle) - base.y()*sin( angle),
+                         base.x()*sin( angle) + base.y()*cos( angle));
+    Pos arrow2 = pos+Pos(base.x()*cos(-angle) - base.y()*sin(-angle),
+                         base.x()*sin(-angle) + base.y()*cos(-angle));
 
-    painter.drawLine(pos.x,pos.y,arrow1.x,arrow1.y);
-    painter.drawLine(pos.x,pos.y,arrow2.x,arrow2.y);
+    painter.drawLine(pos.x(),pos.y(),arrow1.x(),arrow1.y());
+    painter.drawLine(pos.x(),pos.y(),arrow2.x(),arrow2.y());
 }
 
 

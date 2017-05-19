@@ -4,17 +4,17 @@
 Pos GridFilter::Filtering(Pos p)const{
 
     Pos answer;
-    if(this->x_grid == 0)answer.x = p.x;
-    else                 answer.x = this->x_grid * std::round(p.x/this->x_grid);
-    if(this->y_grid == 0)answer.y = p.y;
-    else                 answer.y = this->y_grid * std::round(p.y/this->y_grid);
+    if(this->x_grid == 0)answer.x() = p.x();
+    else                 answer.x() = this->x_grid * std::round(p.x()/this->x_grid);
+    if(this->y_grid == 0)answer.y() = p.y();
+    else                 answer.y() = this->y_grid * std::round(p.y()/this->y_grid);
     return answer;
 }
 
 void GridFilter::DrawGrid(QPainter &p, int x, int y, int w, int h)const{
 
-    x = this->Filtering(Pos(x,y)).x;
-    y = this->Filtering(Pos(x,y)).y;
+    x = this->Filtering(Pos(x,y)).x();
+    y = this->Filtering(Pos(x,y)).y();
 
     //点線に変更
     QPen pen = p.pen();

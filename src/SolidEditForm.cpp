@@ -17,8 +17,8 @@ void SolidEditForm::mousePressEvent  (QMouseEvent *event){
 }
 void SolidEditForm::mouseMoveEvent   (QMouseEvent *event){
     //差分
-    this->theta1 += static_cast<double>(event->pos().y() - click_base.y)/SENSITIVITY;
-    this->theta2 += static_cast<double>(event->pos().x() - click_base.x)/SENSITIVITY;
+    this->theta1 += static_cast<double>(event->pos().y() - click_base.y())/SENSITIVITY;
+    this->theta2 += static_cast<double>(event->pos().x() - click_base.x())/SENSITIVITY;
     click_base = Pos(event->pos().x(),event->pos().y());
 
     repaint();
@@ -50,15 +50,15 @@ void SolidEditForm::resizeGL(int w, int h){
 
     glMatrixMode(GL_MODELVIEW); //行列モードを戻す
     glLoadIdentity();
-    gluLookAt(camera.x, camera.y, camera.z,
-              center.x, center.y, center.z,
+    gluLookAt(camera.x(), camera.y(), camera.z(),
+              center.x(), center.y(), center.z(),
               0, 1, 0);
 }
 
 void SolidEditForm::paintGL(){
-    this->camera.x = round * std::cos(theta2);
-    this->camera.y = round * std::sin(theta1);
-    this->camera.z = round * std::sin(theta2);
+    this->camera.x() = round * std::cos(theta2);
+    this->camera.y() = round * std::sin(theta1);
+    this->camera.z() = round * std::sin(theta2);
 
     glMatrixMode(GL_PROJECTION);  //行列モード切替
     glLoadIdentity();
@@ -66,8 +66,8 @@ void SolidEditForm::paintGL(){
 
     glMatrixMode(GL_MODELVIEW); //行列モードを戻す
     glLoadIdentity();
-    gluLookAt(camera.x, camera.y, camera.z,
-              center.x, center.y, center.z,
+    gluLookAt(camera.x(), camera.y(), camera.z(),
+              center.x(), center.y(), center.z(),
               0, 1, 0);
 
     glClear(GL_COLOR_BUFFER_BIT);
@@ -79,8 +79,8 @@ void SolidEditForm::paintGL(){
         if(edge->is<CLine>()){
             glBegin(GL_LINE_LOOP);
             glColor3f(1,0,0);
-            glVertex3f(edge->start->x,edge->start->y,edge->start->z);
-            glVertex3f(edge->end->x,edge->end->y,edge->end->z);
+            glVertex3f(edge->start->x(),edge->start->y(),edge->start->z());
+            glVertex3f(edge->end->x(),edge->end->y(),edge->end->z());
             glEnd();
         }
     }
@@ -111,9 +111,9 @@ SolidEditForm::SolidEditForm(QWidget *parent) :
 
     camera = Pos(round,0,0);
     center = Pos(0,0,0);
-    this->camera.x = round * std::cos(theta2);
-    this->camera.y = round * std::sin(theta1);
-    this->camera.z = round * std::sin(theta2);
+    this->camera.x() = round * std::cos(theta2);
+    this->camera.y() = round * std::sin(theta1);
+    this->camera.z() = round * std::sin(theta2);
 }
 
 SolidEditForm::~SolidEditForm()

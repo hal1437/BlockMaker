@@ -22,7 +22,7 @@ CREATE_RESULT CArc::Create(CPoint *pos){
         disconnect(this->end   ,SIGNAL(PosChanged(CPoint*,Pos)),this,SLOT(ChangePosCallback(CPoint*,Pos)));
         disconnect(this->center,SIGNAL(PosChanged(CPoint*,Pos)),this,SLOT(ChangePosCallback(CPoint*,Pos)));
         this->center = pos;
-        round = (*this->end - *this->center).Length();
+        round = Pos(*this->end - *this->center).Length();
         connect(this->start ,SIGNAL(PosChanged(CPoint*,Pos)),this,SLOT(ChangePosCallback(CPoint*,Pos)));
         connect(this->end   ,SIGNAL(PosChanged(CPoint*,Pos)),this,SLOT(ChangePosCallback(CPoint*,Pos)));
         connect(this->center,SIGNAL(PosChanged(CPoint*,Pos)),this,SLOT(ChangePosCallback(CPoint*,Pos)));
@@ -31,11 +31,11 @@ CREATE_RESULT CArc::Create(CPoint *pos){
 }
 bool CArc::Draw(QPainter& painter)const{
     if(this->start == nullptr && this->end == nullptr && this->center == nullptr)return false;
-    QRectF rect(this->center->x - round,
-                this->center->y - round,
+    QRectF rect(this->center->x() - round,
+                this->center->y() - round,
                 round*2,round*2);
     Pos dir1 = (*this->start   - *this->center);
-    double angle1 = std::atan2(-dir1.y,dir1.x) * 180 / PI;
+    double angle1 = std::atan2(-dir1.y(),dir1.x()) * 180 / PI;
 
     if(this->end == nullptr){
         //点線
@@ -48,11 +48,11 @@ bool CArc::Draw(QPainter& painter)const{
     }else{
         //実線
         Pos dir2 = (*this->end - *this->center);
-        double angle1 = std::atan2(-dir1.y,dir1.x) * 180 / PI;
-        double angle2 = 360 - angle1 + (std::atan2(-dir2.y,dir2.x)) * 180 / PI;
+        double angle1 = std::atan2(-dir1.y(),dir1.x()) * 180 / PI;
+        double angle2 = 360 - angle1 + (std::atan2(-dir2.y(),dir2.x())) * 180 / PI;
 
-        QRectF rect(this->center->x - round,
-                    this->center->y - round,
+        QRectF rect(this->center->x() - round,
+                    this->center->y() - round,
                     round*2,round*2);
         painter.drawArc (rect,angle1*16,Mod(angle2,(360))*16);
     }

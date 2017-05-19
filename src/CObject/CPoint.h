@@ -32,7 +32,7 @@ public:
     CPoint(QObject* parent=nullptr);
     CPoint(const Pos& origin);
     CPoint(const Pos& pos,QObject* parent);
-    CPoint(double x,double y,QObject* parent=nullptr);//初期Create済みスターターセット
+    CPoint(double x,double y,double z = 0,QObject* parent=nullptr);//初期Create済みスターターセット
     ~CPoint();
 
     CPoint& operator=(const Pos& rhs);

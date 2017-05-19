@@ -60,7 +60,7 @@ void CadEditForm::mouseMoveEvent   (QMouseEvent* event){
     //フィルター適用
     this->mouse_pos = filter.Filtering(this->mouse_pos);
     //Z座標設定
-    if(this->hang_point != nullptr)this->hang_point->z = this->depth;
+    if(this->hang_point != nullptr)this->hang_point->z() = this->depth;
 
     //ズーム支点リセット
     zoom_piv = Pos(0,0);
@@ -74,8 +74,8 @@ void CadEditForm::mouseMoveEvent   (QMouseEvent* event){
 }
 void CadEditForm::resizeEvent(QResizeEvent*){
     //原点を中心に来るように上書き
-    this->translate.x = -this->width()  / 2;
-    this->translate.y = -this->height() / 2;
+    this->translate.x() = -this->width()  / 2;
+    this->translate.y() = -this->height() / 2;
 }
 
 void CadEditForm::Escape(){
@@ -145,13 +145,13 @@ void CadEditForm::paintEvent(QPaintEvent*){
 
     //変換行列を作成
     QTransform trans;
-    trans.translate(-translate.x,-translate.y);
+    trans.translate(-translate.x(),-translate.y());
     trans.scale(scale,-scale);
     paint.setTransform(trans); // 変換行列を以降の描画に適応
 
     //グリッド描画
-    this->filter.DrawGrid(paint,this->translate.x/this->scale ,(-this->height()-this->translate.y)/this->scale,
-                                this->width()    /this->scale ,this->height()                     /this->scale);
+    this->filter.DrawGrid(paint,this->translate.x()/this->scale ,(-this->height()-this->translate.y())/this->scale,
+                                this->width()      /this->scale ,this->height()                     /this->scale);
 
     //CBox描画
     for(int i=0;i<this->model->GetBlocks().size();i++){ //エリア描画
@@ -172,9 +172,9 @@ void CadEditForm::paintEvent(QPaintEvent*){
 
     //エッジ描画
     for(CEdge* obj:this->model->GetEdges()){
-        if     (obj->start->z > this->depth)paint.setPen(QPen(QColor(200,200,200), CObject::DRAWING_LINE_SIZE / this->scale,Qt::SolidLine,Qt::RoundCap));
-        else if(obj->start->z < this->depth)paint.setPen(QPen(QColor(100,100,100), CObject::DRAWING_LINE_SIZE / this->scale,Qt::SolidLine,Qt::RoundCap));
-        else                                paint.setPen(QPen(Qt::blue           , CObject::DRAWING_LINE_SIZE / this->scale,Qt::SolidLine,Qt::RoundCap));
+        if     (obj->start->z() > this->depth)paint.setPen(QPen(QColor(200,200,200), CObject::DRAWING_LINE_SIZE / this->scale,Qt::SolidLine,Qt::RoundCap));
+        else if(obj->start->z() < this->depth)paint.setPen(QPen(QColor(100,100,100), CObject::DRAWING_LINE_SIZE / this->scale,Qt::SolidLine,Qt::RoundCap));
+        else                                  paint.setPen(QPen(Qt::blue           , CObject::DRAWING_LINE_SIZE / this->scale,Qt::SolidLine,Qt::RoundCap));
 
         obj->Draw(paint);
         for(int i=0;i<obj->GetPosSequenceCount();i++){
@@ -185,9 +185,9 @@ void CadEditForm::paintEvent(QPaintEvent*){
     }
 
     //原点
-    if     (this->model->origin->z > this->depth)paint.setPen(QPen(QColor(200,200,200), CObject::DRAWING_LINE_SIZE / this->scale,Qt::SolidLine,Qt::RoundCap));
-    else if(this->model->origin->z < this->depth)paint.setPen(QPen(QColor(100,100,100), CObject::DRAWING_LINE_SIZE / this->scale,Qt::SolidLine,Qt::RoundCap));
-    else                                         paint.setPen(QPen(Qt::blue           , CObject::DRAWING_LINE_SIZE / this->scale,Qt::SolidLine,Qt::RoundCap));
+    if     (this->model->origin->z() > this->depth)paint.setPen(QPen(QColor(200,200,200), CObject::DRAWING_LINE_SIZE / this->scale,Qt::SolidLine,Qt::RoundCap));
+    else if(this->model->origin->z() < this->depth)paint.setPen(QPen(QColor(100,100,100), CObject::DRAWING_LINE_SIZE / this->scale,Qt::SolidLine,Qt::RoundCap));
+    else                                           paint.setPen(QPen(Qt::blue           , CObject::DRAWING_LINE_SIZE / this->scale,Qt::SolidLine,Qt::RoundCap));
     this->model->origin->Draw(paint);
 
     //選択されたオブジェクト
@@ -218,17 +218,17 @@ void CadEditForm::paintEvent(QPaintEvent*){
 
 Pos CadEditForm::ConvertLocalPos(Pos pos)const{
     QTransform trans;
-    trans.translate(-translate.x,-translate.y);
+    trans.translate(-translate.x(),-translate.y());
     trans.scale(scale,-scale);
     trans = trans.inverted();//逆行列化
-    QPointF ans = trans.map(QPointF(pos.x,pos.y));
+    QPointF ans = trans.map(QPointF(pos.x(),pos.y()));
     return Pos(ans.x(),ans.y());
 }
 Pos CadEditForm::ConvertWorldPos(Pos pos)const{
     QTransform trans;
-    trans.translate(-translate.x,-translate.y);
+    trans.translate(-translate.x(),-translate.y());
     trans.scale(scale,-scale);//逆行列化
-    QPointF ans = trans.map(QPointF(pos.x,pos.y));
+    QPointF ans = trans.map(QPointF(pos.x(),pos.y()));
     return Pos(ans.x(),ans.y());
 }
 
@@ -299,7 +299,7 @@ CObject* CadEditForm::getHanged()const{
 
     //原点
     if(this->model->origin->isSelectable(this->mouse_pos)){
-        if(this->model->origin->z == this->depth)return this->model->origin;
+        if(this->model->origin->z() == this->depth)return this->model->origin;
         else final = this->model->origin;
     }
 
@@ -318,7 +318,7 @@ CObject* CadEditForm::getHanged()const{
                 break;
             }
             if(obj->GetPosSequence(i)->isSelectable(this->mouse_pos)){
-                if(obj->GetPosSequence(i)->z == this->depth)return obj->GetPosSequence(i);
+                if(obj->GetPosSequence(i)->z() == this->depth)return obj->GetPosSequence(i);
                 else final = obj->GetPosSequence(i);
             }
         }
@@ -326,7 +326,7 @@ CObject* CadEditForm::getHanged()const{
 
         //エッジ自身
         if(obj->isSelectable(this->mouse_pos)){
-            if(obj->start->z == this->depth && obj->end->z == this->depth)return obj;
+            if(obj->start->z() == this->depth && obj->end->z() == this->depth)return obj;
             else if(final == nullptr) final = obj;
         }
     }
@@ -423,13 +423,13 @@ CREATE_RESULT CadEditForm::MakeJoint(CObject* obj){
     if(hanged == nullptr){
         //始点を作成
         this->hang_point = new CPoint(this->mouse_pos,obj);
-    }else if(hanged->is<CPoint>() && dynamic_cast<CPoint*>(hanged)->z == this->depth){
+    }else if(hanged->is<CPoint>() && dynamic_cast<CPoint*>(hanged)->z() == this->depth){
         //既存の点を使用
         this->hang_point = dynamic_cast<CPoint*>(hanged);
     }else{
         //近接点を作成
         CPoint* new_point = new CPoint(hanged->GetNear(this->mouse_pos));
-        new_point->z = this->depth;
+        new_point->z() = this->depth;
         this->hang_point = new_point;
     }
 
@@ -677,8 +677,8 @@ void CadEditForm::SetState(CEnum state){
 
 void CadEditForm::ResetAllExpantion(){
     //原点を中心に
-    this->translate.x = -this->width()  / 2;
-    this->translate.y = -this->height() / 2;
+    this->translate.x() = -this->width()  / 2;
+    this->translate.y() = -this->height() / 2;
     this->scale = 1.0;
 }
 

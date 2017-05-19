@@ -10,7 +10,7 @@ bool CObject::isLock()const{
     return this->lock;
 }
 bool CObject::isSelectable(Pos pos)const{
-    return (this->GetNear(pos) - pos).Length2D() < CObject::COLLISION_SIZE / drawing_scale;
+    return Pos(this->GetNear(pos) - pos).Length2D() < CObject::COLLISION_SIZE / drawing_scale;
 }
 
 

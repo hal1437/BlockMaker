@@ -31,10 +31,10 @@ void CLine::Lock(bool lock){
 bool CLine::isSelectable(Pos pos)const{
     //追加条件
     if(CObject::isSelectable(pos) &&
-       std::min(this->start->x,this->end->x) - COLLISION_SIZE <= pos.x &&
-       std::max(this->start->x,this->end->x) + COLLISION_SIZE >= pos.x &&
-       std::min(this->start->y,this->end->y) - COLLISION_SIZE <= pos.y &&
-       std::max(this->start->y,this->end->y) + COLLISION_SIZE >= pos.y){
+       std::min(this->start->x(),this->end->x()) - COLLISION_SIZE <= pos.x() &&
+       std::max(this->start->x(),this->end->x()) + COLLISION_SIZE >= pos.x() &&
+       std::min(this->start->y(),this->end->y()) - COLLISION_SIZE <= pos.y() &&
+       std::max(this->start->y(),this->end->y()) + COLLISION_SIZE >= pos.y()){
         return true;
     }
     return false;

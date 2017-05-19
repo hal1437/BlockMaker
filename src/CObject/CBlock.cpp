@@ -42,16 +42,16 @@ Pos CBlock::GetDivisionPoint(int edge_index,int count_index)const{
 double CBlock::GetWidth(){
     QVector<Pos> pp;
     pp = this->GetVerticesPos();
-    double left   = std::min_element(pp.begin(),pp.end(),[](const Pos& lhs,const Pos& rhs){return lhs.x < rhs.x;})->x;
-    double right  = std::max_element(pp.begin(),pp.end(),[](const Pos& lhs,const Pos& rhs){return lhs.x < rhs.x;})->x;
+    double left   = std::min_element(pp.begin(),pp.end(),[](const Pos& lhs,const Pos& rhs){return lhs.x() < rhs.x();})->x();
+    double right  = std::max_element(pp.begin(),pp.end(),[](const Pos& lhs,const Pos& rhs){return lhs.x() < rhs.x();})->x();
     return right-left;
 }
 
 double CBlock::GetHeight(){
     QVector<Pos> pp;
     pp = this->GetVerticesPos();
-    double top    = std::min_element(pp.begin(),pp.end(),[](const Pos& lhs,const Pos& rhs){return lhs.y < rhs.y;})->y;
-    double bottom = std::max_element(pp.begin(),pp.end(),[](const Pos& lhs,const Pos& rhs){return lhs.y < rhs.y;})->y;
+    double top    = std::min_element(pp.begin(),pp.end(),[](const Pos& lhs,const Pos& rhs){return lhs.y() < rhs.y();})->y();
+    double bottom = std::max_element(pp.begin(),pp.end(),[](const Pos& lhs,const Pos& rhs){return lhs.y() < rhs.y();})->y();
     return top-bottom;
 }
 
@@ -101,26 +101,26 @@ void CBlock::Draw(QPainter& painter)const{
     for(int i=0;i<4;i++){
         pp.push_back(this->GetClockworksPos(i));
     }
-    top    = std::min_element(pp.begin(),pp.end(),[](const Pos& lhs,const Pos& rhs){return lhs.y < rhs.y;})->y;
-    bottom = std::max_element(pp.begin(),pp.end(),[](const Pos& lhs,const Pos& rhs){return lhs.y < rhs.y;})->y;
-    left   = std::min_element(pp.begin(),pp.end(),[](const Pos& lhs,const Pos& rhs){return lhs.x < rhs.x;})->x;
-    right  = std::max_element(pp.begin(),pp.end(),[](const Pos& lhs,const Pos& rhs){return lhs.x < rhs.x;})->x;
+    top    = std::min_element(pp.begin(),pp.end(),[](const Pos& lhs,const Pos& rhs){return lhs.y() < rhs.y();})->y();
+    bottom = std::max_element(pp.begin(),pp.end(),[](const Pos& lhs,const Pos& rhs){return lhs.y() < rhs.y();})->y();
+    left   = std::min_element(pp.begin(),pp.end(),[](const Pos& lhs,const Pos& rhs){return lhs.x() < rhs.x();})->x();
+    right  = std::max_element(pp.begin(),pp.end(),[](const Pos& lhs,const Pos& rhs){return lhs.x() < rhs.x();})->x();
 
     //多角形の描画
     QPointF vertex[4];
     for(int i=0;i<4;i++){
-        vertex[i] = QPointF(pp[i].x,pp[i].y);
+        vertex[i] = QPointF(pp[i].x(),pp[i].y());
     }
     painter.drawPolygon(vertex,4);
 
     //分割線の描画
     for(int i =0;i<=this->div[0];i++){
-        painter.drawLine(QPointF(this->GetDivisionPoint(0,i).x,this->GetDivisionPoint(0,i).y),
-                         QPointF(this->GetDivisionPoint(2,i).x,this->GetDivisionPoint(2,i).y));
+        painter.drawLine(QPointF(this->GetDivisionPoint(0,i).x(),this->GetDivisionPoint(0,i).y()),
+                         QPointF(this->GetDivisionPoint(2,i).x(),this->GetDivisionPoint(2,i).y()));
     }
     for(int i =0;i<=this->div[1];i++){
-        painter.drawLine(QPointF(this->GetDivisionPoint(1,i).x,this->GetDivisionPoint(1,i).y),
-                         QPointF(this->GetDivisionPoint(3,i).x,this->GetDivisionPoint(3,i).y));
+        painter.drawLine(QPointF(this->GetDivisionPoint(1,i).x(),this->GetDivisionPoint(1,i).y()),
+                         QPointF(this->GetDivisionPoint(3,i).x(),this->GetDivisionPoint(3,i).y()));
     }
 }
 
@@ -144,10 +144,10 @@ Pos CBlock::GetClockworksPos(int index)const{
     //左下の探索
     QVector<Pos> hit;
     Pos corner;//左下
-    std::sort(pp.begin(),pp.end(),[](Pos p1,Pos p2){return std::tie(p1.x,p1.y) < std::tie(p2.x,p2.y);});//X座標が小さい順
+    std::sort(pp.begin(),pp.end(),[](Pos p1,Pos p2){return std::tie(p1.x(),p1.y()) < std::tie(p2.x(),p2.y());});//X座標が小さい順
     hit.push_back(pp[0]);//もっともX座標の小さいもの
     hit.push_back(pp[1]);//二番目にX座標の小さいもの
-    std::sort(pp.begin(),pp.end(),[](Pos p1,Pos p2){return std::tie(p1.y,p1.x) < std::tie(p2.y,p2.x);});//Y座標が小さい順
+    std::sort(pp.begin(),pp.end(),[](Pos p1,Pos p2){return std::tie(p1.y(),p1.x()) < std::tie(p2.y(),p2.x());});//Y座標が小さい順
     hit.push_back(pp[0]);//もっともY座標の小さいもの
     hit.push_back(pp[1]);//二番目にY座標の小さいもの
     //hitに二回入った奴が左下

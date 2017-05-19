@@ -1,8 +1,8 @@
 #include "CPoint.h"
 
 CREATE_RESULT CPoint::Create(CPoint *pos){
-    this->x = pos->x;
-    this->y = pos->y;
+    this->x() = pos->x();
+    this->y() = pos->y();
     return CREATE_RESULT::COMPLETE;//生成終了
 }
 
@@ -21,14 +21,14 @@ bool CPoint::Draw(QPainter& painter)const{
 
     if(control_point){//制御点ならば
         //四角
-        QLineF ps[4] = {QLineF(center.x-DRAWING_CIRCLE_SIZE,center.y-DRAWING_CIRCLE_SIZE,center.x+DRAWING_CIRCLE_SIZE,center.y-DRAWING_CIRCLE_SIZE),
-                        QLineF(center.x+DRAWING_CIRCLE_SIZE,center.y-DRAWING_CIRCLE_SIZE,center.x+DRAWING_CIRCLE_SIZE,center.y+DRAWING_CIRCLE_SIZE),
-                        QLineF(center.x+DRAWING_CIRCLE_SIZE,center.y+DRAWING_CIRCLE_SIZE,center.x-DRAWING_CIRCLE_SIZE,center.y+DRAWING_CIRCLE_SIZE),
-                        QLineF(center.x-DRAWING_CIRCLE_SIZE,center.y+DRAWING_CIRCLE_SIZE,center.x-DRAWING_CIRCLE_SIZE,center.y-DRAWING_CIRCLE_SIZE)};
+        QLineF ps[4] = {QLineF(center.x()-DRAWING_CIRCLE_SIZE,center.y()-DRAWING_CIRCLE_SIZE,center.x()+DRAWING_CIRCLE_SIZE,center.y()-DRAWING_CIRCLE_SIZE),
+                        QLineF(center.x()+DRAWING_CIRCLE_SIZE,center.y()-DRAWING_CIRCLE_SIZE,center.x()+DRAWING_CIRCLE_SIZE,center.y()+DRAWING_CIRCLE_SIZE),
+                        QLineF(center.x()+DRAWING_CIRCLE_SIZE,center.y()+DRAWING_CIRCLE_SIZE,center.x()-DRAWING_CIRCLE_SIZE,center.y()+DRAWING_CIRCLE_SIZE),
+                        QLineF(center.x()-DRAWING_CIRCLE_SIZE,center.y()+DRAWING_CIRCLE_SIZE,center.x()-DRAWING_CIRCLE_SIZE,center.y()-DRAWING_CIRCLE_SIZE)};
         painter.drawLines(ps,4);
     }else{
-        QRectF rect(center.x-DRAWING_CIRCLE_SIZE,
-                    center.y-DRAWING_CIRCLE_SIZE,
+        QRectF rect(center.x()-DRAWING_CIRCLE_SIZE,
+                    center.y()-DRAWING_CIRCLE_SIZE,
                     DRAWING_CIRCLE_SIZE*2,
                     DRAWING_CIRCLE_SIZE*2);
         //丸
@@ -36,7 +36,7 @@ bool CPoint::Draw(QPainter& painter)const{
     }
     //ロック時
     if(this->isLock() && !this->isControlPoint()){
-        painter.drawImage(center.x+10,center.y-10,QImage(":/Restraint/LockRestraint.png"));
+        painter.drawImage(center.x()+10,center.y()-10,QImage(":/Restraint/LockRestraint.png"));
     }
 
     //復元
@@ -81,9 +81,9 @@ CPoint::CPoint(QObject* parent):
     CObject(parent){
 }
 CPoint::CPoint(const Pos& origin){
-    this->x = origin.x;
-    this->y = origin.y;
-    this->z = origin.z;
+    this->x() = origin.x();
+    this->y() = origin.y();
+    this->z() = origin.z();
 }
 CPoint::CPoint(const Pos &pos,QObject* parent):
     CObject(parent),
@@ -91,9 +91,9 @@ CPoint::CPoint(const Pos &pos,QObject* parent):
 
 }
 
-CPoint::CPoint(double x, double y, QObject *parent):
+CPoint::CPoint(double x, double y, double z, QObject *parent):
     CObject(parent),
-    Pos(Pos(x,y,z)){
+    Pos(x,y,z){
 
 }
 
@@ -103,7 +103,7 @@ CPoint::~CPoint()
 }
 
 CPoint& CPoint::operator=(const Pos& rhs){
-    this->x = rhs.x;
-    this->y = rhs.y;
-    this->z = rhs.z;
+    this->x() = rhs.x();
+    this->y() = rhs.y();
+    this->z() = rhs.z();
 }
