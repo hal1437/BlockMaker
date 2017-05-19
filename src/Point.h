@@ -56,6 +56,21 @@ public:
         return ans;
     }
 
+
+    template<std::size_t N>
+    Matrix<T,N,H> Dot(Matrix<T,N,W> rhs){// W*H * N*W
+        Matrix<T,N,H> ans;
+        for(std::size_t i=0;i<N;i++){
+            for(std::size_t j=0;j<H;j++){
+                int sum = 0;
+                for(std::size_t piv=0;i<W;i++){
+                    sum += this->mat[i * W + piv] * rhs.mat[piv * W + j];
+                }
+                ans.mat[i*W+j] = sum;
+            }
+        }
+    }
+
     current& operator+=(cr_current rhs){*this = *this + rhs;return (*this);}
     current& operator-=(cr_current rhs){*this = *this - rhs;return (*this);}
     template<class V> current operator*=(V rhs){*this = *this * rhs;return (*this);}
