@@ -1,8 +1,39 @@
 #include "SolidEditController.h"
 
+Matrix<double, 3, 3> SolidEditController::getConvertFrontToSide()const{
+    return Matrix<double, 3, 3>({0.0f,0.0f,0.0f,
+                                 0.0f,0.0f,0.0f,
+                                 0.0f,0.0f,0.0f});
+}
+Matrix<double, 3, 3> SolidEditController::getConvertFrontToTop ()const{
+    return Matrix<double, 3, 3>({0.0f,0.0f,0.0f,
+                                 0.0f,0.0f,0.0f,
+                                 0.0f,0.0f,0.0f});
+}
+Matrix<double, 3, 3> SolidEditController::getConvertSideToFront()const{
+    return Matrix<double, 3, 3>({0.0f,0.0f,0.0f,
+                                 0.0f,0.0f,0.0f,
+                                 0.0f,0.0f,0.0f});
+}
+Matrix<double, 3, 3> SolidEditController::getConvertTopToFront ()const{
+    return Matrix<double, 3, 3>({0.0f,0.0f,0.0f,
+                                 0.0f,0.0f,0.0f,
+                                 0.0f,0.0f,0.0f});
+}
+Matrix<double, 3, 3> SolidEditController::getConvertSideToTop  ()const{
+    return Matrix<double, 3, 3>({0.0f,0.0f,0.0f,
+                                 0.0f,0.0f,0.0f,
+                                 0.0f,0.0f,0.0f});
+}
+Matrix<double, 3, 3> SolidEditController::getConvertTopToSide()const{
+    return Matrix<double, 3, 3>({0.0f,0.0f,0.0f,
+                                 0.0f,0.0f,0.0f,
+                                 0.0f,0.0f,0.0f});
+}
 
 
-Face SolidEditController::getFrontFace()const{//正面
+
+Face SolidEditController::getFrontFace_impl(Matrix<double, 3, 3> convert)const{//正面
     if(this->model->GetEdges().empty())return Face{{Pos( DEFAULT_FACE_LEGTH, DEFAULT_FACE_LEGTH,0),
                                                     Pos(-DEFAULT_FACE_LEGTH, DEFAULT_FACE_LEGTH,0),
                                                     Pos(-DEFAULT_FACE_LEGTH,-DEFAULT_FACE_LEGTH,0),

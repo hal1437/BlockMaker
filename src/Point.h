@@ -3,6 +3,7 @@
 #include <cmath>
 #include <QPoint>
 #include <QTransform>
+#include <initializer_list>
 #include <iostream>
 #include <limits>
 #include "Utils.h"
@@ -16,7 +17,8 @@ public:
     typedef const Matrix<T,W,H>& cr_current;
 public:
     Matrix(){std::fill(mat,mat+W*H,0);}
-    Matrix(const current& origin){std::copy(origin.begin(),origin.end(),this->begin());}
+    Matrix(const current& origin             ){std::copy(origin.begin(),origin.end(),this->begin());}
+    Matrix(const std::initializer_list<T> mat){std::copy(mat.begin(),mat.end(),this->begin());}
     Matrix(const T mat[W*H]     ){std::copy(mat,mat+W*H,this->begin());}
 
 public:
