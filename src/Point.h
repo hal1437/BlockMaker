@@ -99,7 +99,7 @@ public:
     }
     bool operator!=(cr_current rhs)const{return !(*this == rhs);}
     bool operator<(cr_current rhs)const{
-        for(std::size_t i=0;i<W;i++)for(std::size_t j=0;j<H;j++){
+        for(std::size_t i=0;i<H;i++)for(std::size_t j=0;j<W;j++){
             if(this->mat[i*W+j] != rhs.mat[i*W+j])return this->mat[i*W+j] < rhs.mat[i*W+j];
         }
         return false;

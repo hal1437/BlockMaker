@@ -62,7 +62,7 @@ bool CBlock::Creatable(QVector<CObject*> values){
         //構成点カウント
         std::map<Pos,int> map;
         for(CObject* p:values){
-            CEdge* e= dynamic_cast<CEdge*>(p);
+            CEdge* e = dynamic_cast<CEdge*>(p);
             map[*e->start]++;
             map[*e->end]++;
         }
