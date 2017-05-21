@@ -30,7 +30,7 @@ public:
 
 
     //正面を取得
-    Face getFrontFace_impl(Matrix<double,3,3> convert)const;
+    Face getFrontFace_impl(Matrix<double,3,3> convert, Matrix<double, 3, 3> invert)const;
 
 public:
     void setModel(CadModelCore* model){this->model = model;}

@@ -4,6 +4,7 @@
 #include <QPoint>
 #include <QTransform>
 #include <initializer_list>
+#include <type_traits>
 #include <iostream>
 #include <limits>
 #include "Utils.h"
@@ -20,6 +21,13 @@ public:
     Matrix(const current& origin             ){std::copy(origin.begin(),origin.end(),this->begin());}
     Matrix(const std::initializer_list<T> mat){std::copy(mat.begin(),mat.end(),this->begin());}
     Matrix(const T mat[W*H]     ){std::copy(mat,mat+W*H,this->begin());}
+
+    static current getIdentityMatrix(){
+        static_assert(W==H,"This Matrix is not square matrix");
+        current ans;
+        for(int i=0;i<W;i++)ans.mat[i*W+i] = 1;
+        return ans;
+    }
 
 public:
 
@@ -83,7 +91,7 @@ public:
     }
     bool operator!=(cr_current rhs)const{return !(*this == rhs);}
     bool operator<(cr_current rhs)const{
-        for(int i=0;i<W;i++)for(int j=0;j<H;j++){
+        for(std::size_t i=0;i<W;i++)for(std::size_t j=0;j<H;j++){
             if(this->mat[i*W+j] != rhs.mat[i*W+j])return this->mat[i*W+j] < rhs.mat[i*W+j];
         }
         return false;
@@ -95,12 +103,12 @@ public:
 
 //座標
 template<class T>
-struct Point : public Matrix<T,1,3>{
+struct Point : public Matrix<T,3,1>{
 //    T x;
 //    T y;
 //    T z;
 public:
-    typedef Matrix<T,1,3> base;
+    typedef Matrix<T,3,1> base;
     typedef Point<T> current;
     typedef const Point<T>& cr_current;
 public:
@@ -125,7 +133,7 @@ public:
     //直線と点の最近点を求める
     static current LineNearPoint(cr_current pos1,cr_current pos2,cr_current hand){
         //内積で一発
-        return current(pos1 + current(pos2-pos1).GetNormalize() * current(pos2-pos1).GetNormalize().Dot(hand-pos1));
+        return current(pos1 + current(pos2-pos1).GetNormalize() * current(pos2-pos1).GetNormalize().DotPos(hand-pos1));
     }
 
     //円と点の最近点を求める
@@ -141,7 +149,7 @@ public:
     static double Angle(cr_current base,cr_current dir){
         current a = base.GetNormalize();
         current b = dir.GetNormalize();
-        if(a.Dot(b) == 0){
+        if(a.DotPos(b) == 0){
             return !MoreThan(current(),b,a)*180+90;
         }
         if(MoreThan(current(),a,b)){
@@ -178,10 +186,10 @@ public:
         return std::sqrt(std::pow(x() - rhs.x(),2)+
                          std::pow(y() - rhs.y(),2));
     }
-    double Dot(cr_current rhs)const{
+    double DotPos(cr_current rhs)const{
         return x() * rhs.x() + y() * rhs.y() + z() * rhs.z();
     }
-    double Dot2D(cr_current rhs)const{
+    double DotPos2D(cr_current rhs)const{
         return x() * rhs.x() + y() * rhs.y();
     }
     current GetNormalize()const{

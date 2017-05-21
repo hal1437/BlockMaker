@@ -41,6 +41,8 @@ void SolidEditForm::initializeGL(){
 }
 
 void SolidEditForm::resizeGL(int w, int h){
+    glClearColor(1.0,1.0,1.0,1.0);//カラーバッファのクリアの色
+
     glMatrixMode(GL_PROJECTION);  //行列モード切替
     glLoadIdentity();
     glOrtho(-w*round,

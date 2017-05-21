@@ -33,7 +33,7 @@ Matrix<double, 3, 3> SolidEditController::getConvertTopToSide()const{
 
 
 
-Face SolidEditController::getFrontFace_impl(Matrix<double, 3, 3> convert)const{//正面
+Face SolidEditController::getFrontFace_impl(Matrix<double, 3, 3> convert,Matrix<double, 3, 3> invert)const{//正面
     if(this->model->GetEdges().empty())return Face{{Pos( DEFAULT_FACE_LEGTH, DEFAULT_FACE_LEGTH,0),
                                                     Pos(-DEFAULT_FACE_LEGTH, DEFAULT_FACE_LEGTH,0),
                                                     Pos(-DEFAULT_FACE_LEGTH,-DEFAULT_FACE_LEGTH,0),
@@ -41,10 +41,10 @@ Face SolidEditController::getFrontFace_impl(Matrix<double, 3, 3> convert)const{/
     double top,bottom,right,left;
     for(CEdge* edge:this->model->GetEdges()){
         for(int i=0;i<edge->GetPosSequenceCount();i++){
-            top    = std::max(top   ,edge->GetPosSequence(i)->y());
-            bottom = std::min(bottom,edge->GetPosSequence(i)->y());
-            right  = std::max(right ,edge->GetPosSequence(i)->x());
-            left   = std::min(left  ,edge->GetPosSequence(i)->x());
+            top    = std::max(top   ,((*edge->GetPosSequence(i)).Dot(convert)).mat[1]);
+            bottom = std::min(bottom,((*edge->GetPosSequence(i)).Dot(convert)).mat[1]);
+            right  = std::max(right ,((*edge->GetPosSequence(i)).Dot(convert)).mat[0]);
+            left   = std::min(left  ,((*edge->GetPosSequence(i)).Dot(convert)).mat[0]);
         }
     }
     double height_delta = top - bottom;
@@ -64,10 +64,15 @@ Face SolidEditController::getFrontFace_impl(Matrix<double, 3, 3> convert)const{/
     right  += widht_delta *0.1;
     left   += widht_delta *0.1;
 
-    return Face{{Pos( top   ,right,0),
-                 Pos( bottom,right,0),
-                 Pos( bottom,left ,0),
-                 Pos( top   ,left ,0)}};
+    return Face{{Pos( top   ,right,0).Dot(invert),
+                 Pos( bottom,right,0).Dot(invert),
+                 Pos( bottom,left ,0).Dot(invert),
+                 Pos( top   ,left ,0).Dot(invert)}};
+}
+
+
+Face SolidEditController::getFrontFace()const{//正面
+    Matrix<double,3,3>matrix = Matrix<double,3,3>::getIdentityMatrix();
 }
 Face SolidEditController::getTopFace  ()const{//平面
 }
