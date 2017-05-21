@@ -6,6 +6,7 @@
 #include <QOpenGLWidget>
 #include <gl.h>
 #include <glu.h>
+#include "SolidEditController.h"
 #include "TimeDivider.h"
 #include "CadModelCore.h"
 
@@ -20,6 +21,7 @@ class SolidEditForm : public QOpenGLWidget
     const int SENSITIVITY = 100;
 private:
     CadModelCore* model;
+    SolidEditController* controller;
 
     Pos click_base; //ドラッグ保持点
 

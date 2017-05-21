@@ -43,30 +43,30 @@ public:
     const T* end()  const{return this->mat+H*W;}
 
     current operator-()const{return (*this)*-1;}
-    current operator+(cr_current rhs)const{
+    current operator+(current rhs)const{
         Matrix ans;
-        for(std::size_t i=0;i<W;i++)for(std::size_t j=0;j<H;j++){
+        for(std::size_t i=0;i<H;i++)for(std::size_t j=0;j<W;j++){
             ans.mat[i*W+j] = this->mat[i*W+j] + rhs.mat[i*W+j];
         }
         return ans;
     }
-    current operator-(cr_current rhs)const{
+    current operator-(current rhs)const{
         Matrix ans;
-        for(std::size_t i=0;i<W;i++)for(std::size_t j=0;j<H;j++){
+        for(std::size_t i=0;i<H;i++)for(std::size_t j=0;j<W;j++){
             ans.mat[i*W+j] = this->mat[i*W+j] - rhs.mat[i*W+j];
         }
         return ans;
     }
     template<class V> current operator*(V rhs)const{
         Matrix ans;
-        for(std::size_t i=0;i<W;i++)for(std::size_t j=0;j<H;j++){
+        for(std::size_t i=0;i<H;i++)for(std::size_t j=0;j<W;j++){
             ans.mat[i*W+j] = this->mat[i*W+j] * rhs;
         }
         return ans;
     }
     template<class V> current operator/(V rhs)const{
         Matrix ans;
-        for(std::size_t i=0;i<W;i++)for(std::size_t j=0;j<H;j++){
+        for(std::size_t i=0;i<H;i++)for(std::size_t j=0;j<W;j++){
             ans.mat[i*W+j] = this->mat[i*W+j] / rhs;
         }
         return ans;
@@ -76,21 +76,21 @@ public:
     template<std::size_t N>
     Matrix<T,N,H> Dot(Matrix<T,N,W> rhs){// W*H * N*W
         Matrix<T,N,H> ans;
-        for(std::size_t i=0;i<N;i++){
-            for(std::size_t j=0;j<H;j++){
+        for(std::size_t i=0;i<H;i++){
+            for(std::size_t j=0;j<N;j++){
                 int sum = 0;
-                for(std::size_t piv=0;i<W;i++){
+                for(std::size_t piv=0;piv<W;piv++){
                     sum += this->mat[i * W + piv] * rhs.mat[piv * W + j];
                 }
-                ans.mat[i*W+j] = sum;
+                ans.mat[i*N+j] = sum;
             }
         }
         return ans;
     }
 
     //代入演算子
-                      current& operator+=(cr_current rhs){*this = *this + rhs;return (*this);}
-                      current& operator-=(cr_current rhs){*this = *this - rhs;return (*this);}
+                      current& operator+=(current rhs){*this = *this + rhs;return (*this);}
+                      current& operator-=(current rhs){*this = *this - rhs;return (*this);}
     template<class V> current& operator*=(V rhs)         {*this = *this * rhs;return (*this);}
     template<class V> current& operator/=(V rhs)         {*this = *this / rhs;return (*this);}
 

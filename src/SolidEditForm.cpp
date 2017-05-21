@@ -35,6 +35,7 @@ void SolidEditForm::wheelEvent(QWheelEvent *event){
 
 void SolidEditForm::setModel(CadModelCore* model){
     this->model = model;
+    this->controller->setModel(model);
 }
 
 void SolidEditForm::initializeGL(){
@@ -88,16 +89,15 @@ void SolidEditForm::paintGL(){
     }
 
     //平面、正面、右側面
+    Face face[3] = {controller->getFrontFace(),controller->getTopFace(),controller->getSideFace()};
+
+
     glLineWidth(2);
-    const int RANGE = 100;
     for(int i=0;i<3;i++){
-        int PP[12] = {    0,     0,     0,     0,
-                      RANGE,-RANGE,-RANGE, RANGE,
-                      RANGE, RANGE,-RANGE,-RANGE};
         glBegin(GL_LINE_LOOP);
         glColor3f((i==0), (i==1), (i==2));
         for(int j=0;j<4;j++){
-            glVertex3f( PP[(i*4+j)%12],PP[(i*4+j+4)%12], PP[(i*4+j+8)%12]);
+            glVertex3f(face[i].corner[j].x(),face[i].corner[j].y(), face[i].corner[j].z());
         }
         glEnd();
     }
@@ -111,8 +111,9 @@ SolidEditForm::SolidEditForm(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    camera = Pos(round,0,0);
-    center = Pos(0,0,0);
+    this->controller = new SolidEditController();
+    this->camera = Pos(round,0,0);
+    this->center = Pos(0,0,0);
     this->camera.x() = round * std::cos(theta2);
     this->camera.y() = round * std::sin(theta1);
     this->camera.z() = round * std::sin(theta2);
@@ -121,4 +122,5 @@ SolidEditForm::SolidEditForm(QWidget *parent) :
 SolidEditForm::~SolidEditForm()
 {
     delete ui;
+    delete this->controller;
 }
