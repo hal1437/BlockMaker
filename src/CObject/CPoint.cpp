@@ -106,4 +106,5 @@ CPoint& CPoint::operator=(const Pos& rhs){
     this->x() = rhs.x();
     this->y() = rhs.y();
     this->z() = rhs.z();
+    return (*this);
 }

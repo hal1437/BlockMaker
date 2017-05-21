@@ -23,6 +23,7 @@ CPoint* CEdge::GetPosSequence(int index)const{
     if     (index == 0                        )return this->start;
     else if(index == GetPosSequenceCount() - 1)return this->end;
     else if(index > 0 && index < GetPosSequenceCount() - 1)return this->GetMiddle(index-1);
+    return nullptr;
 }
 
 

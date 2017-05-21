@@ -13,19 +13,25 @@ template<class T,std::size_t W,std::size_t H>
 class Matrix{
 public:
     T mat[W*H];
-public:
+private:
     typedef Matrix<T,W,H> current;
     typedef const Matrix<T,W,H>& cr_current;
 public:
     Matrix(){std::fill(mat,mat+W*H,0);}
-    Matrix(const current& origin             ){std::copy(origin.begin(),origin.end(),this->begin());}
-    Matrix(const std::initializer_list<T> mat){std::copy(mat.begin(),mat.end(),this->begin());}
-    Matrix(const T mat[W*H]     ){std::copy(mat,mat+W*H,this->begin());}
+    Matrix(cr_current origin){
+        std::copy(origin.begin(),origin.end(),this->begin());
+    }
+    Matrix(const std::initializer_list<T> mat){
+        std::copy(mat.begin(),mat.end(),this->begin());
+    }
+    Matrix(const T mat[W*H]     ){
+        std::copy(mat,mat+W*H,this->begin());
+    }
 
     static current getIdentityMatrix(){
         static_assert(W==H,"This Matrix is not square matrix");
         current ans;
-        for(int i=0;i<W;i++)ans.mat[i*W+i] = 1;
+        for(std::size_t i=0;i<W;i++)ans.mat[i*W+i] = 1;
         return ans;
     }
 
@@ -79,12 +85,14 @@ public:
                 ans.mat[i*W+j] = sum;
             }
         }
+        return ans;
     }
 
-    current& operator+=(cr_current rhs){*this = *this + rhs;return (*this);}
-    current& operator-=(cr_current rhs){*this = *this - rhs;return (*this);}
-    template<class V> current operator*=(V rhs){*this = *this * rhs;return (*this);}
-    template<class V> current operator/=(V rhs){*this = *this * rhs;return (*this);}
+    //代入演算子
+                      current& operator+=(cr_current rhs){*this = *this + rhs;return (*this);}
+                      current& operator-=(cr_current rhs){*this = *this - rhs;return (*this);}
+    template<class V> current& operator*=(V rhs)         {*this = *this * rhs;return (*this);}
+    template<class V> current& operator/=(V rhs)         {*this = *this / rhs;return (*this);}
 
     bool operator==(cr_current rhs)const{
         return std::equal(this->begin(),this->end(),rhs.begin());
@@ -107,12 +115,12 @@ struct Point : public Matrix<T,3,1>{
 //    T x;
 //    T y;
 //    T z;
-public:
+private:
     typedef Matrix<T,3,1> base;
     typedef Point<T> current;
     typedef const Point<T>& cr_current;
 public:
-    Point(){}
+    Point():base(){}
     Point(const T& X,const T& Y,const T& Z = 0){this->mat[0] = X;this->mat[1] = Y;this->mat[2] = Z;}
     Point(const QPoint& p):Point(p.x(),p.y(),0){}
     Point(const base& p):base(p){}
@@ -124,11 +132,11 @@ public:
     T y()const{return this->mat[1];}
     T z()const{return this->mat[2];}
 
-    current operator-()const{return current(-(*static_cast<const base*>(this)));}
-    current operator+(cr_current rhs)const{return current(*static_cast<const base*>(this) + rhs);}
-    current operator-(cr_current rhs)const{return current(*static_cast<const base*>(this) - rhs);}
-    template<class V> current operator*(V rhs)const{return current(*static_cast<const base*>(this) * rhs);}
-    template<class V> current operator/(V rhs)const{return current(*static_cast<const base*>(this) * rhs);}
+    current operator-()                       const{return (-(*static_cast<const base*>(this)));}
+    current operator+(current rhs)            const{return (*static_cast<const base*>(this) + static_cast<base>(rhs));}
+    current operator-(current rhs)            const{return (*static_cast<const base*>(this) - static_cast<base>(rhs));}
+    template<class V> current operator*(V rhs)const{return (*static_cast<const base*>(this) * rhs);}
+    template<class V> current operator/(V rhs)const{return (*static_cast<const base*>(this) / rhs);}
 
     //直線と点の最近点を求める
     static current LineNearPoint(cr_current pos1,cr_current pos2,cr_current hand){
