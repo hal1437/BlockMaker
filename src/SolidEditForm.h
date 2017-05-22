@@ -32,9 +32,9 @@ private:
     double theta2 = M_PI/4; //角度2
 
 public:
-
     //カメラ方向セット
     void setCameraRotate(double theta1, double theta2);
+
 public:
     void mousePressEvent  (QMouseEvent *event);
     void mouseMoveEvent   (QMouseEvent *event);
@@ -45,6 +45,10 @@ public:
     void initializeGL();        //  OpenGL 初期化
     void resizeGL(int, int);    //  ウィジットリサイズ時のハンドラ
     void paintGL();             //  描画処理
+public slots:
+
+    void CEdgeChanged(QVector<CEdge*> e);
+    void CBlockChanged(QVector<CBlock*> e);
 
 public:
     explicit SolidEditForm(QWidget *parent = 0);

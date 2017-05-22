@@ -35,14 +35,14 @@ Face SolidEditController::getFrontFace_impl(Matrix<double, 3, 3> convert,Matrix<
                                                      Pos(-DEFAULT_FACE_LEGTH, DEFAULT_FACE_LEGTH,0).Dot(invert),
                                                      Pos(-DEFAULT_FACE_LEGTH,-DEFAULT_FACE_LEGTH,0).Dot(invert),
                                                      Pos( DEFAULT_FACE_LEGTH,-DEFAULT_FACE_LEGTH,0).Dot(invert)}};
-    double top,bottom,right,left;
+    double top=0,bottom=0,right=0,left=0;
     for(CBlock* block:this->model->GetBlocks()){
         for(int i=0;i<4;i++){
             for(int j=0;j<block->GetEdge(i)->GetPosSequenceCount();j++){
-                top    = std::max(top   ,((*block->GetEdge(i)->GetPosSequence(j)).Dot(convert)).mat[1]);
-                bottom = std::min(bottom,((*block->GetEdge(i)->GetPosSequence(j)).Dot(convert)).mat[1]);
-                right  = std::max(right ,((*block->GetEdge(i)->GetPosSequence(j)).Dot(convert)).mat[0]);
-                left   = std::min(left  ,((*block->GetEdge(i)->GetPosSequence(j)).Dot(convert)).mat[0]);
+                top    = std::max(top   ,((*block->GetEdge(i)->GetPosSequence(j)).Dot(invert)).mat[1]);
+                bottom = std::min(bottom,((*block->GetEdge(i)->GetPosSequence(j)).Dot(invert)).mat[1]);
+                right  = std::max(right ,((*block->GetEdge(i)->GetPosSequence(j)).Dot(invert)).mat[0]);
+                left   = std::min(left  ,((*block->GetEdge(i)->GetPosSequence(j)).Dot(invert)).mat[0]);
             }
         }
     }
@@ -59,14 +59,14 @@ Face SolidEditController::getFrontFace_impl(Matrix<double, 3, 3> convert,Matrix<
 
     //幅の10%を足す
     top    += height_delta*0.1;
-    bottom += height_delta*0.1;
+    bottom -= height_delta*0.1;
     right  += widht_delta *0.1;
-    left   += widht_delta *0.1;
+    left   -= widht_delta *0.1;
 
-    return Face{{Pos( top   ,right,0).Dot(invert),
-                 Pos( bottom,right,0).Dot(invert),
-                 Pos( bottom,left ,0).Dot(invert),
-                 Pos( top   ,left ,0).Dot(invert)}};
+    return Face{{Pos( right ,top   ,0).Dot(invert),
+                 Pos( right ,bottom,0).Dot(invert),
+                 Pos( left  ,bottom,0).Dot(invert),
+                 Pos( left  ,top   ,0).Dot(invert)}};
 }
 
 Face SolidEditController::getFrontFace()const{//正面

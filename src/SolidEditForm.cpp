@@ -36,6 +36,8 @@ void SolidEditForm::wheelEvent(QWheelEvent *event){
 void SolidEditForm::setModel(CadModelCore* model){
     this->model = model;
     this->controller->setModel(model);
+    connect(this->model,SIGNAL(UpdateEdges (QVector<CEdge*>)) ,this,SLOT(CEdgeChanged(QVector<CEdge*>)));
+    connect(this->model,SIGNAL(UpdateBlocks(QVector<CBlock*>)),this,SLOT(CBlockChanged(QVector<CBlock*>)));
 }
 
 void SolidEditForm::initializeGL(){
@@ -71,10 +73,9 @@ void SolidEditForm::paintGL(){
     glLoadIdentity();
     gluLookAt(camera.x(), camera.y(), camera.z(),
               center.x(), center.y(), center.z(),
-              0, 1, 0);
+                       0,          1,          0);
 
     glClear(GL_COLOR_BUFFER_BIT);
-
 
     for(int i=0;i<this->model->GetEdges().size();i++){
         CEdge* edge = this->model->GetEdges()[i];
@@ -91,7 +92,6 @@ void SolidEditForm::paintGL(){
     //平面、正面、右側面
     Face face[3] = {controller->getFrontFace(),controller->getTopFace(),controller->getSideFace()};
 
-
     glLineWidth(2);
     for(int i=0;i<3;i++){
         glBegin(GL_LINE_LOOP);
@@ -103,6 +103,15 @@ void SolidEditForm::paintGL(){
     }
     glFlush();
 }
+
+void SolidEditForm::CEdgeChanged(QVector<CEdge*> e){
+    this->repaint();
+}
+void SolidEditForm::CBlockChanged(QVector<CBlock*> e){
+    this->repaint();
+}
+
+
 
 
 SolidEditForm::SolidEditForm(QWidget *parent) :
