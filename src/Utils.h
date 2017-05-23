@@ -6,7 +6,7 @@
 #include <QStringList>
 #include <QVector>
 #include <tuple>
-#define PI 3.1415926535897932384626433832795
+#define PI M_PI
 #define TAB "    "
 #define NEWLINE "\n"
 #define MOUSE_ZOOM_RATE 10000.0

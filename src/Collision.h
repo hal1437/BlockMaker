@@ -2,6 +2,7 @@
 #define COLLISION_H
 
 #include "Point.h"
+#include <qdebug.h>
 
 //線
 struct Line{

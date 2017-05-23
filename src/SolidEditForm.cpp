@@ -50,10 +50,10 @@ void SolidEditForm::resizeGL(int w, int h){
 
     glMatrixMode(GL_PROJECTION);  //行列モード切替
     glLoadIdentity();
-    glOrtho(-w*round,
-             w*round,
-            -h*round,
-             h*round,-100000000,100000000);
+    glOrtho(-w,
+             w,
+            -h,
+             h,-100000000,100000000);
 
     glMatrixMode(GL_MODELVIEW); //行列モードを戻す
     glLoadIdentity();
@@ -63,18 +63,14 @@ void SolidEditForm::resizeGL(int w, int h){
 }
 
 void SolidEditForm::paintGL(){
+
+    //カメラ調整
     if(theta1 >  M_PI/2) theta1 =  M_PI/2;
     if(theta1 < -M_PI/2) theta1 = -M_PI/2;
-    //this->camera.x() = round * std::cos(theta2) * std::sin(theta1);
-    //this->camera.y() = round * std::cos(theta1);
-    //this->camera.z() = round * std::sin(theta2) * std::sin(theta1);
-    this->camera = Pos(round,0,0).Dot(Matrix<double,3,3>::getRotateZMatrix(theta1).Dot(Matrix<double,3,3>::getRotateYMatrix(theta2)));
-    qDebug() << this->camera.x() << this->camera.y() << this->camera.z();
-
+    this->camera = Pos(0,0,round).Dot(Matrix<double,3,3>::getRotateXMatrix(theta1).Dot(Matrix<double,3,3>::getRotateYMatrix(theta2)));
     glMatrixMode(GL_PROJECTION);  //行列モード切替
     glLoadIdentity();
     glOrtho(-this->width()*round,this->width()*round,-this->height()*round,this->height()*round,-100000000,100000000);
-
     glMatrixMode(GL_MODELVIEW); //行列モードを戻す
     glLoadIdentity();
     gluLookAt(camera.x(), camera.y(), camera.z(),
@@ -109,15 +105,11 @@ void SolidEditForm::paintGL(){
     }
     glFlush();
 
-
-    Pos dir = Pos(mouse_pos.x()/std::sin(theta2),
-                  mouse_pos.y(),
-                  mouse_pos.x()/std::cos(theta2));
-    //qDebug() << dir.x() << dir.y() << dir.z();
-    Face hang = this->controller->getHangedFace(this->camera,this->center + dir);
+    Pos pos = (Pos(0,0,round)+this->mouse_pos).Dot(Matrix<double,3,3>::getRotateXMatrix(theta1).Dot(Matrix<double,3,3>::getRotateYMatrix(theta2)));
+    Face hang = this->controller->getHangedFace(pos,(this->camera -this->center).GetNormalize());
 
     glBegin(GL_LINE_LOOP);
-    glColor3f(1,0,1);
+    glColor3f(0,0,0);
     for(int j=0;j<4;j++){
         glVertex3f(hang.corner[j].x(),
                    hang.corner[j].y(),

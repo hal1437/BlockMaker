@@ -223,7 +223,7 @@ public:
         current a = base.GetNormalize();
         current b = dir.GetNormalize();
         if(a.DotPos(b) == 0){
-            return 0;
+            return PI/2;
         }
         return std::acos(a.x()*b.x() + a.y()*b.y()) * 180 / PI;
     }
