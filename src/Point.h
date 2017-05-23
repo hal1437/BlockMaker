@@ -35,6 +35,8 @@ public:
         return ans;
     }
 
+private:
+
 public:
 
     T* begin()   {return this->mat;}
@@ -73,6 +75,7 @@ public:
     }
 
 
+    //内積
     template<std::size_t N>
     Matrix<T,N,H> Dot(Matrix<T,N,W> rhs){// W*H * N*W
         Matrix<T,N,H> ans;
@@ -87,6 +90,17 @@ public:
         }
         return ans;
     }
+    //外積
+    current Cross(Matrix<T,W,H> rhs){// W*H * N*W
+        static_assert(H==1,"This Matrix height is not 1.");
+        current ans;
+        ans.mat[0] = this->mat[1] * rhs.mat[2] - this->mat[2] * rhs.mat[1];
+        ans.mat[1] = this->mat[2] * rhs.mat[0] - this->mat[0] * rhs.mat[2];
+        ans.mat[2] = this->mat[0] * rhs.mat[1] - this->mat[1] * rhs.mat[0];
+        return ans;
+    }
+
+
 
     //代入演算子
                       current& operator+=(current rhs){*this = *this + rhs;return (*this);}
