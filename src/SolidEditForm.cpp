@@ -16,11 +16,13 @@ void SolidEditForm::mousePressEvent  (QMouseEvent *event){
     click_base = Pos(event->pos().x(),event->pos().y());
 }
 void SolidEditForm::mouseMoveEvent   (QMouseEvent *event){
-    //差分
-    this->theta1 += static_cast<double>(event->pos().y() - click_base.y())/SENSITIVITY;
-    this->theta2 += static_cast<double>(event->pos().x() - click_base.x())/SENSITIVITY;
-    click_base = Pos(event->pos().x(),event->pos().y());
-
+    this->mouse_pos = Pos(event->pos().x(),event->pos().y());
+    if(this->click_base != Pos(0,0)){
+        //差分
+        this->theta1 += static_cast<double>(event->pos().y() - click_base.y())/SENSITIVITY;
+        this->theta2 += static_cast<double>(event->pos().x() - click_base.x())/SENSITIVITY;
+        click_base = Pos(event->pos().x(),event->pos().y());
+    }
     repaint();
 }
 
@@ -61,9 +63,11 @@ void SolidEditForm::resizeGL(int w, int h){
 }
 
 void SolidEditForm::paintGL(){
-    this->camera.x() = round * std::cos(theta2);
-    this->camera.y() = round * std::sin(theta1);
-    this->camera.z() = round * std::sin(theta2);
+    if(theta1 > M_PI) theta1 = M_PI;
+    if(theta1 < 0.01) theta1 = 0.01 ;
+    this->camera.x() = round * std::cos(theta2) * std::sin(theta1);
+    this->camera.y() = round * std::cos(theta1);
+    this->camera.z() = round * std::sin(theta2) * std::sin(theta1);
 
     glMatrixMode(GL_PROJECTION);  //行列モード切替
     glLoadIdentity();
@@ -119,6 +123,8 @@ SolidEditForm::SolidEditForm(QWidget *parent) :
     ui(new Ui::SolidEditForm)
 {
     ui->setupUi(this);
+    //マウストラッキング対象
+    setMouseTracking(true);
 
     this->controller = new SolidEditController();
     this->camera = Pos(round,0,0);

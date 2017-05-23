@@ -3,11 +3,8 @@
 
 #include <QObject>
 #include <algorithm>
+#include "Collision.h"
 #include "CadModelCore.h"
-
-struct Face{
-    Pos corner[4];
-};
 
 class SolidEditController:public QObject
 {

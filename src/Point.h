@@ -168,7 +168,7 @@ public:
         return (lhs.GetNormalize() == rhs.GetNormalize() || lhs.GetNormalize() == -rhs.GetNormalize());
     }
     //角度比較
-    static double Angle(cr_current base,cr_current dir){
+    static double Angle2D(cr_current base,cr_current dir){
         current a = base.GetNormalize();
         current b = dir.GetNormalize();
         if(a.DotPos(b) == 0){
@@ -183,6 +183,16 @@ public:
             else return std::acos(a.x()*b.x() + a.y()*b.y()) * 180 / PI;
         }
     }
+    //角度比較
+    static double Angle(cr_current base,cr_current dir){
+        current a = base.GetNormalize();
+        current b = dir.GetNormalize();
+        if(a.DotPos(b) == 0){
+            return 0;
+        }
+        return std::acos(a.x()*b.x() + a.y()*b.y()) * 180 / PI;
+    }
+
 
     //直線以上
     static bool MoreThan(cr_current pos1,cr_current pos2,cr_current hand){

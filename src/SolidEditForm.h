@@ -23,12 +23,13 @@ private:
     CadModelCore* model;
     SolidEditController* controller;
 
+    Pos mouse_pos;  //マウス座標
     Pos click_base; //ドラッグ保持点
 
     Pos camera; //カメラ位置
     Pos center; //カメラ注意点
     double round = 1;//半径
-    double theta1 = M_PI/8; //角度1
+    double theta1 = M_PI/4; //角度1
     double theta2 = M_PI/4; //角度2
 
 public:
