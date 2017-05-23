@@ -17,6 +17,8 @@ public:
     constexpr static int DEFAULT_FACE_LEGTH = 100;
     CadModelCore* model;
 
+    QVector<Face> face_select;//面選択
+
     //正面を単位行列とした時の各面変換への行列
     Matrix<double,3,3> getConvertFrontToSide()const;
     Matrix<double,3,3> getConvertFrontToTop ()const;
@@ -32,10 +34,13 @@ public:
 public:
     void setModel(CadModelCore* model){this->model = model;}
 
-
     Face getFrontFace()const;//正面
     Face getTopFace  ()const;//平面
     Face getSideFace ()const;//右側面
+
+    Face getHangedFace(Pos center, Pos dir)const;//直下面
+
+
 
 
     explicit SolidEditController(QObject *parent = 0);

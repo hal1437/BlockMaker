@@ -16,7 +16,8 @@ void SolidEditForm::mousePressEvent  (QMouseEvent *event){
     click_base = Pos(event->pos().x(),event->pos().y());
 }
 void SolidEditForm::mouseMoveEvent   (QMouseEvent *event){
-    this->mouse_pos = Pos(event->pos().x(),event->pos().y());
+
+    this->mouse_pos = Pos(event->pos().x() - this->width()/2,-(event->pos().y() - this->height()/2))*2;
     if(this->click_base != Pos(0,0)){
         //差分
         this->theta1 += static_cast<double>(event->pos().y() - click_base.y())/SENSITIVITY;
@@ -31,7 +32,6 @@ void SolidEditForm::mouseReleaseEvent(QMouseEvent *event){
 }
 void SolidEditForm::wheelEvent(QWheelEvent *event){
     this->round += static_cast<double>(event->angleDelta().y())/MOUSE_ZOOM_RATE;
-    qDebug() << this->round;
     repaint();
 }
 
@@ -63,11 +63,13 @@ void SolidEditForm::resizeGL(int w, int h){
 }
 
 void SolidEditForm::paintGL(){
-    if(theta1 > M_PI) theta1 = M_PI;
-    if(theta1 < 0.01) theta1 = 0.01 ;
-    this->camera.x() = round * std::cos(theta2) * std::sin(theta1);
-    this->camera.y() = round * std::cos(theta1);
-    this->camera.z() = round * std::sin(theta2) * std::sin(theta1);
+    if(theta1 >  M_PI/2) theta1 =  M_PI/2;
+    if(theta1 < -M_PI/2) theta1 = -M_PI/2;
+    //this->camera.x() = round * std::cos(theta2) * std::sin(theta1);
+    //this->camera.y() = round * std::cos(theta1);
+    //this->camera.z() = round * std::sin(theta2) * std::sin(theta1);
+    this->camera = Pos(round,0,0).Dot(Matrix<double,3,3>::getRotateZMatrix(theta1).Dot(Matrix<double,3,3>::getRotateYMatrix(theta2)));
+    qDebug() << this->camera.x() << this->camera.y() << this->camera.z();
 
     glMatrixMode(GL_PROJECTION);  //行列モード切替
     glLoadIdentity();
@@ -106,6 +108,24 @@ void SolidEditForm::paintGL(){
         glEnd();
     }
     glFlush();
+
+
+    Pos dir = Pos(mouse_pos.x()/std::sin(theta2),
+                  mouse_pos.y(),
+                  mouse_pos.x()/std::cos(theta2));
+    //qDebug() << dir.x() << dir.y() << dir.z();
+    Face hang = this->controller->getHangedFace(this->camera,this->center + dir);
+
+    glBegin(GL_LINE_LOOP);
+    glColor3f(1,0,1);
+    for(int j=0;j<4;j++){
+        glVertex3f(hang.corner[j].x(),
+                   hang.corner[j].y(),
+                   hang.corner[j].z());
+    }
+    glEnd();
+    glFlush();
+
 }
 
 void SolidEditForm::CEdgeChanged(QVector<CEdge*> e){
@@ -114,9 +134,6 @@ void SolidEditForm::CEdgeChanged(QVector<CEdge*> e){
 void SolidEditForm::CBlockChanged(QVector<CBlock*> e){
     this->repaint();
 }
-
-
-
 
 SolidEditForm::SolidEditForm(QWidget *parent) :
     QOpenGLWidget(parent),

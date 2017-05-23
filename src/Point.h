@@ -28,22 +28,56 @@ public:
         std::copy(mat,mat+W*H,this->begin());
     }
 
+    //単位行列
     static current getIdentityMatrix(){
         static_assert(W==H,"This Matrix is not square matrix");
         current ans;
-        for(std::size_t i=0;i<W;i++)ans.mat[i*W+i] = 1;
+        for(std::size_t i=0;i<W;i++)ans.access(i,i) = 1;
         return ans;
     }
+    static current getRotateXMatrix(double value){
+        static_assert(W==3 && H==3,"This Matrix is not square matrix");
+        current ans = getIdentityMatrix();
+        ans.access(1,1) =  std::cos(value);
+        ans.access(2,1) = -std::sin(value);
+        ans.access(1,2) =  std::sin(value);
+        ans.access(2,2) =  std::cos(value);
+        return ans;
+    }
+    static current getRotateYMatrix(double value){
+        static_assert(W==3 && H==3,"This Matrix is not square matrix");
+        current ans = getIdentityMatrix();
+        ans.access(0,0) =  std::cos(value);
+        ans.access(2,0) =  std::sin(value);
+        ans.access(0,2) = -std::sin(value);
+        ans.access(2,2) =  std::cos(value);
+        return ans;
+    }
+    static current getRotateZMatrix(double value){
+        static_assert(W==3 && H==3,"This Matrix is not square matrix");
+        current ans = getIdentityMatrix();
+        ans.access(0,0) =  std::cos(value);
+        ans.access(1,0) =  std::sin(value);
+        ans.access(0,1) = -std::sin(value);
+        ans.access(1,1) =  std::cos(value);
+        return ans;
+    }
+
 
 private:
 
 public:
 
+    T& access(int x,int y)     {return this->mat[y*W+x];}
+    T& access(int x,int y)const{return this->mat[y*W+x];}
+
+    //イテレータ
     T* begin()   {return this->mat;}
     T* end()     {return this->mat+H*W;}
     const T* begin()const{return this->mat;}
     const T* end()  const{return this->mat+H*W;}
 
+    //演算子
     current operator-()const{return (*this)*-1;}
     current operator+(current rhs)const{
         Matrix ans;
@@ -81,7 +115,7 @@ public:
         Matrix<T,N,H> ans;
         for(std::size_t i=0;i<H;i++){
             for(std::size_t j=0;j<N;j++){
-                int sum = 0;
+                double sum = 0;
                 for(std::size_t piv=0;piv<W;piv++){
                     sum += this->mat[i * W + piv] * rhs.mat[piv * W + j];
                 }
@@ -108,6 +142,7 @@ public:
     template<class V> current& operator*=(V rhs)         {*this = *this * rhs;return (*this);}
     template<class V> current& operator/=(V rhs)         {*this = *this / rhs;return (*this);}
 
+    //比較演算子
     bool operator==(cr_current rhs)const{
         return std::equal(this->begin(),this->end(),rhs.begin());
     }

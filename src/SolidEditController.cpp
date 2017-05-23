@@ -27,8 +27,6 @@ Matrix<double, 3, 3> SolidEditController::getConvertTopToSide()const{
     return this->getConvertTopToFront().Dot(this->getConvertFrontToSide());
 }
 
-
-
 Face SolidEditController::getFrontFace_impl(Matrix<double, 3, 3> convert,Matrix<double, 3, 3> invert)const{
     //正面を軸として変換を通し各平面の大きさを取得する関数
     if(this->model->GetBlocks().empty())return Face{{Pos( DEFAULT_FACE_LEGTH, DEFAULT_FACE_LEGTH,0).Dot(invert),
@@ -77,6 +75,13 @@ Face SolidEditController::getTopFace  ()const{//平面
 }
 Face SolidEditController::getSideFace ()const{//右側面
     return this->getFrontFace_impl(this->getConvertFrontToSide(),this->getConvertSideToFront());
+}
+
+Face SolidEditController::getHangedFace(Pos center, Pos dir)const{
+    if(Collision::CheckHitFaceToLine(this->getFrontFace(),Line{center,center+dir}))return this->getFrontFace();
+    if(Collision::CheckHitFaceToLine(this->getTopFace()  ,Line{center,center+dir}))return this->getTopFace();
+    if(Collision::CheckHitFaceToLine(this->getSideFace() ,Line{center,center+dir}))return this->getSideFace();
+    return Face();
 }
 
 SolidEditController::SolidEditController(QObject *parent):

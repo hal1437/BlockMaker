@@ -29,8 +29,13 @@ private:
     Pos camera; //カメラ位置
     Pos center; //カメラ注意点
     double round = 1;//半径
-    double theta1 = M_PI/4; //角度1
-    double theta2 = M_PI/4; //角度2
+    double theta1 = M_PI/4; //角度1(縦方向)
+    double theta2 = M_PI/4; //角度2(横方向)
+
+private:
+
+    //選択
+    void MouseSelect();
 
 public:
     //カメラ方向セット
