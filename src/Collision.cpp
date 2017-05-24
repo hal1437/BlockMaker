@@ -23,7 +23,7 @@ bool Collision::CheckHitFaceToLine(Face face,Line line){
         sum += Pos::Angle(face.corner[i]-p,face.corner[(i+1)%4]-p);
     }
     qDebug() << sum;
-    return sum==360;
+    return std::abs(sum-360) < 0.000001;
 }
 
 Collision::Collision()

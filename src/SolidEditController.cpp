@@ -79,8 +79,8 @@ Face SolidEditController::getSideFace ()const{//右側面
 
 Face SolidEditController::getHangedFace(Pos center, Pos dir)const{
     if(Collision::CheckHitFaceToLine(this->getFrontFace(),Line{center,center+dir}))return this->getFrontFace();
-    if(Collision::CheckHitFaceToLine(this->getTopFace()  ,Line{center,center+dir}))return this->getTopFace();
-    if(Collision::CheckHitFaceToLine(this->getSideFace() ,Line{center,center+dir}))return this->getSideFace();
+    //if(Collision::CheckHitFaceToLine(this->getTopFace()  ,Line{center,center+dir}))return this->getTopFace();
+    //if(Collision::CheckHitFaceToLine(this->getSideFace() ,Line{center,center+dir}))return this->getSideFace();
     return Face();
 }
 
