@@ -90,7 +90,7 @@ void MainWindow::Delete(){
     static int c = 0;
     double cc[4] = {0,M_PI/2,M_PI,M_PI*3/2};
     std::random_device rd;
-    this->ui->SolidEdit->setCameraRotate(Mod((double)rd(),2*M_PI),Mod((double)rd(),M_PI));
+    this->ui->SolidEdit->setCameraRotate(Mod((double)rd(),M_PI)-M_PI/2,Mod((double)rd(),2*M_PI));
     c++;
     /*
     for(CObject* obj : this->model->GetSelected()){

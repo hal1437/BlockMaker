@@ -1,24 +1,16 @@
 #include "SolidEditController.h"
 
 Matrix<double, 3, 3> SolidEditController::getConvertFrontToSide()const{
-    return Matrix<double, 3, 3>({ 0.0f,0.0f,1.0f,
-                                  0.0f,1.0f,0.0f,
-                                 -1.0f,0.0f,0.0f});
+    return Matrix<double, 3, 3>::getRotateYMatrix(M_PI/2);
 }
 Matrix<double, 3, 3> SolidEditController::getConvertFrontToTop ()const{
-    return Matrix<double, 3, 3>({1.0f,0.0f,0.0f,
-                                 0.0f,0.0f,-1.0f,
-                                 0.0f,1.0f,0.0f});
+    return Matrix<double, 3, 3>::getRotateXMatrix(-M_PI/2);
 }
 Matrix<double, 3, 3> SolidEditController::getConvertSideToFront()const{
-    return Matrix<double, 3, 3>({0.0f,0.0f,-1.0f,
-                                 0.0f,1.0f, 0.0f,
-                                 1.0f,0.0f, 0.0f});
+    return Matrix<double, 3, 3>::getRotateYMatrix(-M_PI/2);
 }
 Matrix<double, 3, 3> SolidEditController::getConvertTopToFront ()const{
-    return Matrix<double, 3, 3>({1.0f, 0.0f,0.0f,
-                                 0.0f, 0.0f,1.0f,
-                                 0.0f,-1.0f,0.0f});
+    return Matrix<double, 3, 3>::getRotateXMatrix(M_PI/2);
 }
 Matrix<double, 3, 3> SolidEditController::getConvertSideToTop  ()const{
     return this->getConvertSideToFront().Dot(this->getConvertFrontToTop());
@@ -82,8 +74,6 @@ Face SolidEditController::getHangedFace(Pos center, Pos dir)const{
     rank.push_back(std::make_pair(Collision::GetLengthFaceToLine(this->getFrontFace(),Line{center,center+dir}),this->getFrontFace()));
     rank.push_back(std::make_pair(Collision::GetLengthFaceToLine(this->getTopFace()  ,Line{center,center+dir}),this->getTopFace()));
     rank.push_back(std::make_pair(Collision::GetLengthFaceToLine(this->getSideFace() ,Line{center,center+dir}),this->getSideFace()));
-
-    qDebug() << rank[0].first << rank[1].first << rank[2].first;
 
     if(std::all_of(rank.begin(),rank.end(),[](std::pair<double,Face> v){return v.first==-1;})){
         return Face();

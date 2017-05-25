@@ -84,7 +84,7 @@ void SolidEditForm::paintGL(){
 
         if(edge->is<CLine>()){
             glBegin(GL_LINE_LOOP);
-            glColor3f(1,0,0);
+            glColor3f(0,0,0);
             glVertex3f(edge->start->x(),edge->start->y(),edge->start->z());
             glVertex3f(edge->end->x(),edge->end->y(),edge->end->z());
             glEnd();
@@ -106,15 +106,11 @@ void SolidEditForm::paintGL(){
     glFlush();
 
     //中央線の描画
-    Matrix<double,3,3> mats[3] = {Matrix<double,3,3>::getIdentityMatrix() ,
-                                  this->controller->getConvertFrontToTop(),
-                                  this->controller->getConvertFrontToSide()};
     for(int i=0;i<3;i++){
-        Pos pp = Pos(0,0,50).Dot(mats[i]);
         glBegin(GL_LINES);
         glColor3f((i==0), (i==1), (i==2));
         glVertex3f(0,0,0);
-        glVertex3f(pp.x(),pp.y(),pp.z());
+        glVertex3f(50*(i==0), 50*(i==1), 50*(i==2));
         glEnd();
     }
 
