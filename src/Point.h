@@ -223,9 +223,9 @@ public:
         current a = base.GetNormalize();
         current b = dir.GetNormalize();
         if(a.DotPos(b) == 0){
-            return PI/2;
+            return 90;
         }
-        return std::acos(a.x()*b.x() + a.y()*b.y()) * 180 / PI;
+        return std::acos(a.x()*b.x() + a.y()*b.y() + a.z()*b.z()) * 180 / PI;
     }
 
 

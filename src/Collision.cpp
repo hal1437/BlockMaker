@@ -7,7 +7,7 @@ Pos Collision::GetHitPosFaceToLine(Pos face_norm,Pos face_center,Pos line_0,Pos 
     return (line_0+line_s * cc);
 }
 
-bool Collision::CheckHitFaceToLine(Face face,Line line){
+double Collision::GetLengthFaceToLine(Face face, Line line){
     //法線ベクトルの算出
     Pos norm = Pos((face.corner[1]-face.corner[0]).Cross(face.corner[3]-face.corner[0])).GetNormalize();
 
@@ -22,8 +22,12 @@ bool Collision::CheckHitFaceToLine(Face face,Line line){
     for(int i=0;i<4;i++){
         sum += Pos::Angle(face.corner[i]-p,face.corner[(i+1)%4]-p);
     }
-    qDebug() << sum;
-    return std::abs(sum-360) < 0.000001;
+    if(std::abs(sum-360) > 0.000001)return -1;
+    else return (line.pos1 - p).Length();
+}
+
+bool Collision::CheckHitFaceToLine(Face face,Line line){
+    return (GetLengthFaceToLine(face,line) != -1);
 }
 
 Collision::Collision()

@@ -30,7 +30,7 @@ private:
     Pos center; //カメラ注意点
     double round = 1;//半径
     double theta1 = 0; //角度1(縦方向)
-    double theta2 = 0; //角度2(横方向)
+    double theta2 = M_PI/2; //角度2(横方向)
 
 private:
 

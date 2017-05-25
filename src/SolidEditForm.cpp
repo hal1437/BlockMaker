@@ -105,6 +105,19 @@ void SolidEditForm::paintGL(){
     }
     glFlush();
 
+    //中央線の描画
+    Matrix<double,3,3> mats[3] = {Matrix<double,3,3>::getIdentityMatrix() ,
+                                  this->controller->getConvertFrontToTop(),
+                                  this->controller->getConvertFrontToSide()};
+    for(int i=0;i<3;i++){
+        Pos pp = Pos(0,0,50).Dot(mats[i]);
+        glBegin(GL_LINES);
+        glColor3f((i==0), (i==1), (i==2));
+        glVertex3f(0,0,0);
+        glVertex3f(pp.x(),pp.y(),pp.z());
+        glEnd();
+    }
+
     Pos pos = (Pos(0,0,round)+this->mouse_pos).Dot(Matrix<double,3,3>::getRotateXMatrix(theta1).Dot(Matrix<double,3,3>::getRotateYMatrix(theta2)));
     Face hang = this->controller->getHangedFace(pos,(this->camera -this->center).GetNormalize());
 

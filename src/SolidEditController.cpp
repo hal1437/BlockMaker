@@ -78,10 +78,21 @@ Face SolidEditController::getSideFace ()const{//右側面
 }
 
 Face SolidEditController::getHangedFace(Pos center, Pos dir)const{
-    if(Collision::CheckHitFaceToLine(this->getFrontFace(),Line{center,center+dir}))return this->getFrontFace();
-    //if(Collision::CheckHitFaceToLine(this->getTopFace()  ,Line{center,center+dir}))return this->getTopFace();
-    //if(Collision::CheckHitFaceToLine(this->getSideFace() ,Line{center,center+dir}))return this->getSideFace();
-    return Face();
+    QVector<std::pair<double,Face>> rank;
+    rank.push_back(std::make_pair(Collision::GetLengthFaceToLine(this->getFrontFace(),Line{center,center+dir}),this->getFrontFace()));
+    rank.push_back(std::make_pair(Collision::GetLengthFaceToLine(this->getTopFace()  ,Line{center,center+dir}),this->getTopFace()));
+    rank.push_back(std::make_pair(Collision::GetLengthFaceToLine(this->getSideFace() ,Line{center,center+dir}),this->getSideFace()));
+
+    qDebug() << rank[0].first << rank[1].first << rank[2].first;
+
+    if(std::all_of(rank.begin(),rank.end(),[](std::pair<double,Face> v){return v.first==-1;})){
+        return Face();
+    }else{
+        return std::min_element(rank.begin(),rank.end(),[](std::pair<double,Face> lhs,std::pair<double,Face> rhs){
+            return lhs.first > rhs.first;
+        })->second;
+    }
+
 }
 
 SolidEditController::SolidEditController(QObject *parent):

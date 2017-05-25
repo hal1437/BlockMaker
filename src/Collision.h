@@ -24,6 +24,7 @@ public:
 
 public:
 
+    static double GetLengthFaceToLine(Face face,struct Line line);
     static bool CheckHitFaceToLine(Face face,struct Line line);
 
     Collision();
