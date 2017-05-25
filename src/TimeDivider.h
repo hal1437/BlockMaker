@@ -15,6 +15,7 @@ class TimeDivider :public QObject
     Q_OBJECT
 
 public:
+    static QVector<TimeDivider*> all_object;
     constexpr static double TIME_DIVIDE = 30;//デフォルト分割時間
 private:
     double& obj; //対象

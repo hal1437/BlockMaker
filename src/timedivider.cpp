@@ -1,6 +1,8 @@
 
 #include "TimeDivider.h"
 
+QVector<TimeDivider*> TimeDivider::all_object;
+
 void TimeDivider::step(){
     this->now += TIME_DIVIDE;//時間遷移
     emit PerTime();
@@ -13,15 +15,24 @@ void TimeDivider::step(){
 }
 
 void TimeDivider::run(){
+    //競合確認
+    for(TimeDivider* p : all_object){
+        if(&p->obj == &this->obj){
+            this->start = p->obj;
+            p->stop();
+        }
+    }
     this->timer = new QTimer(this);
     connect(this->timer,SIGNAL(timeout()),this,SLOT(step()));
     this->timer->start(TIME_DIVIDE);
     obj = start;
+    all_object.push_back(this);
 }
 void TimeDivider::stop(){
     this->timer->stop();
     disconnect(this->timer,SIGNAL(timeout()),this,SLOT(step()));
     this->timer = nullptr;
+    all_object.removeAll(this);
     emit EndTime();
 }
 

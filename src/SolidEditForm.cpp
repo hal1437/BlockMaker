@@ -14,8 +14,8 @@ void SolidEditForm::setCameraRotate(double theta1,double theta2){
 void SolidEditForm::keyPressEvent    (QKeyEvent *event){
     if(event->key() == Qt::Key_Up   )setCameraRotate(M_PI/2,0);
     if(event->key() == Qt::Key_Left )setCameraRotate(0,0);
-    if(event->key() == Qt::Key_Down )setCameraRotate(0,-M_PI/2);
-    if(event->key() == Qt::Key_Right)setCameraRotate(M_PI/4,-M_PI/4);
+    if(event->key() == Qt::Key_Right)setCameraRotate(0,-M_PI/2);
+    if(event->key() == Qt::Key_Down )setCameraRotate(M_PI/4,-M_PI/4);
 }
 
 void SolidEditForm::mousePressEvent  (QMouseEvent *event){
