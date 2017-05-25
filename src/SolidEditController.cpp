@@ -1,25 +1,25 @@
 #include "SolidEditController.h"
 
-Matrix<double, 3, 3> SolidEditController::getConvertFrontToSide()const{
-    return Matrix<double, 3, 3>::getRotateYMatrix(M_PI/2);
+Quat SolidEditController::getConvertFrontToSide()const{
+    return Quat::getRotateYMatrix(M_PI/2);
 }
-Matrix<double, 3, 3> SolidEditController::getConvertFrontToTop ()const{
-    return Matrix<double, 3, 3>::getRotateXMatrix(-M_PI/2);
+Quat SolidEditController::getConvertFrontToTop ()const{
+    return Quat::getRotateXMatrix(-M_PI/2);
 }
-Matrix<double, 3, 3> SolidEditController::getConvertSideToFront()const{
-    return Matrix<double, 3, 3>::getRotateYMatrix(-M_PI/2);
+Quat SolidEditController::getConvertSideToFront()const{
+    return Quat::getRotateYMatrix(-M_PI/2);
 }
-Matrix<double, 3, 3> SolidEditController::getConvertTopToFront ()const{
-    return Matrix<double, 3, 3>::getRotateXMatrix(M_PI/2);
+Quat SolidEditController::getConvertTopToFront ()const{
+    return Quat::getRotateXMatrix(M_PI/2);
 }
-Matrix<double, 3, 3> SolidEditController::getConvertSideToTop  ()const{
+Quat SolidEditController::getConvertSideToTop  ()const{
     return this->getConvertSideToFront().Dot(this->getConvertFrontToTop());
 }
-Matrix<double, 3, 3> SolidEditController::getConvertTopToSide()const{
+Quat SolidEditController::getConvertTopToSide()const{
     return this->getConvertTopToFront().Dot(this->getConvertFrontToSide());
 }
 
-Face SolidEditController::getFrontFace_impl(Matrix<double, 3, 3> convert,Matrix<double, 3, 3> invert)const{
+Face SolidEditController::getFrontFace_impl(Quat convert,Quat invert)const{
     //正面を軸として変換を通し各平面の大きさを取得する関数
     if(this->model->GetBlocks().empty())return Face{{Pos( DEFAULT_FACE_LEGTH, DEFAULT_FACE_LEGTH,0).Dot(invert),
                                                      Pos(-DEFAULT_FACE_LEGTH, DEFAULT_FACE_LEGTH,0).Dot(invert),
@@ -40,12 +40,12 @@ Face SolidEditController::getFrontFace_impl(Matrix<double, 3, 3> convert,Matrix<
     double widht_delta  = right  - left;
 
     //0補正
-    if(height_delta == 0 && widht_delta  == 0){
+    if(NearlyEqual(height_delta,0) && NearlyEqual(widht_delta,0)){
         top = bottom = right = left =   DEFAULT_FACE_LEGTH;
         height_delta = widht_delta  = 2*DEFAULT_FACE_LEGTH;
     }
-    if(height_delta == 0)height_delta = widht_delta;
-    if(widht_delta  == 0)widht_delta = height_delta;
+    if(NearlyEqual(height_delta,0))height_delta = widht_delta;
+    if(NearlyEqual(widht_delta,0))widht_delta = height_delta;
 
     //幅の10%を足す
     top    += height_delta*0.1;
@@ -60,7 +60,7 @@ Face SolidEditController::getFrontFace_impl(Matrix<double, 3, 3> convert,Matrix<
 }
 
 Face SolidEditController::getFrontFace()const{//正面
-    return this->getFrontFace_impl(Matrix<double,3,3>::getIdentityMatrix(),Matrix<double,3,3>::getIdentityMatrix());
+    return this->getFrontFace_impl(Quat::getIdentityMatrix(),Quat::getIdentityMatrix());
 }
 Face SolidEditController::getTopFace  ()const{//平面
     return this->getFrontFace_impl(this->getConvertFrontToTop(),this->getConvertTopToFront());

@@ -10,6 +10,7 @@
 #define TAB "    "
 #define NEWLINE "\n"
 #define MOUSE_ZOOM_RATE 10000.0
+#define NearlyEqual(RHS,LHS) (std::abs(RHS-LHS) < 0.000001)
 
 
 //監視オブジェクトの定義、関数宣言を行う

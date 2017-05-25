@@ -64,6 +64,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::keyPressEvent  (QKeyEvent* event){
     this->ui->CadEdit->keyPressEvent(event);
+    this->ui->SolidEdit->keyPressEvent(event);
 
     //ESC押下時
     if(event->key() == Qt::Key_Escape){

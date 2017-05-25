@@ -11,6 +11,12 @@ void SolidEditForm::setCameraRotate(double theta1,double theta2){
     repaint();
 }
 
+void SolidEditForm::keyPressEvent    (QKeyEvent *event){
+    if(event->key() == Qt::Key_Up   )setCameraRotate(M_PI/2,0);
+    if(event->key() == Qt::Key_Left )setCameraRotate(0,0);
+    if(event->key() == Qt::Key_Down )setCameraRotate(0,-M_PI/2);
+    if(event->key() == Qt::Key_Right)setCameraRotate(M_PI/4,-M_PI/4);
+}
 
 void SolidEditForm::mousePressEvent  (QMouseEvent *event){
     click_base = Pos(event->pos().x(),event->pos().y());
@@ -46,7 +52,7 @@ void SolidEditForm::initializeGL(){
 }
 
 void SolidEditForm::resizeGL(int w, int h){
-    glClearColor(1.0,1.0,1.0,1.0);//カラーバッファのクリアの色
+    glClearColor(0.7,0.7,0.7,1);
 
     glMatrixMode(GL_PROJECTION);  //行列モード切替
     glLoadIdentity();
@@ -67,7 +73,8 @@ void SolidEditForm::paintGL(){
     //カメラ調整
     if(theta1 >  M_PI/2) theta1 =  M_PI/2;
     if(theta1 < -M_PI/2) theta1 = -M_PI/2;
-    this->camera = Pos(0,0,round).Dot(Matrix<double,3,3>::getRotateXMatrix(theta1).Dot(Matrix<double,3,3>::getRotateYMatrix(theta2)));
+    this->camera = Pos(0,0,round).Dot(Quat::getRotateXMatrix(theta1).Dot(Quat::getRotateYMatrix(theta2)));
+
     glMatrixMode(GL_PROJECTION);  //行列モード切替
     glLoadIdentity();
     glOrtho(-this->width()*round,this->width()*round,-this->height()*round,this->height()*round,-100000000,100000000);
@@ -76,9 +83,9 @@ void SolidEditForm::paintGL(){
     gluLookAt(camera.x(), camera.y(), camera.z(),
               center.x(), center.y(), center.z(),
                        0,          1,          0);
+    glClearColor(0.7,0.7,0.7,1);
 
-    glClear(GL_COLOR_BUFFER_BIT);
-
+    //エッジ描画
     for(int i=0;i<this->model->GetEdges().size();i++){
         CEdge* edge = this->model->GetEdges()[i];
 
@@ -90,10 +97,20 @@ void SolidEditForm::paintGL(){
             glEnd();
         }
     }
+    //ブロック描画
+    for(int i=0;i<this->model->GetBlocks().size();i++){
+        CBlock* block = this->model->GetBlocks()[i];
+
+        for(int j=0;j<4;j++){
+            glBegin(GL_LINE_LOOP);
+            glColor3f(0,0,0);
+            //glVertex3f(block->GetEdge(j)->start,block->GetEdge(j)->start,block->GetEdge(j)->start);
+            glEnd();
+        }
+    }
 
     //平面、正面、右側面
     Face face[3] = {controller->getFrontFace(),controller->getTopFace(),controller->getSideFace()};
-
     glLineWidth(2);
     for(int i=0;i<3;i++){
         glBegin(GL_LINE_LOOP);
@@ -114,9 +131,9 @@ void SolidEditForm::paintGL(){
         glEnd();
     }
 
-    Pos pos = (Pos(0,0,round)+this->mouse_pos).Dot(Matrix<double,3,3>::getRotateXMatrix(theta1).Dot(Matrix<double,3,3>::getRotateYMatrix(theta2)));
+    //直下面の選定
+    Pos pos = (Pos(0,0,round)+this->mouse_pos).Dot(Quat::getRotateXMatrix(theta1).Dot(Quat::getRotateYMatrix(theta2)));
     Face hang = this->controller->getHangedFace(pos,(this->camera -this->center).GetNormalize());
-
     glBegin(GL_LINE_LOOP);
     glColor3f(0,0,0);
     for(int j=0;j<4;j++){

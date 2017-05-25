@@ -36,7 +36,7 @@ public:
         return ans;
     }
     static current getRotateXMatrix(double value){
-        static_assert(W==3 && H==3,"This Matrix is not square matrix");
+        static_assert(W>3 && H>3,"This Matrix is not square matrix");
         current ans = getIdentityMatrix();
         ans.access(1,1) =  std::cos(value);
         ans.access(2,1) = -std::sin(value);
@@ -45,7 +45,7 @@ public:
         return ans;
     }
     static current getRotateYMatrix(double value){
-        static_assert(W==3 && H==3,"This Matrix is not square matrix");
+        static_assert(W>3 && H>3,"This Matrix is not square matrix");
         current ans = getIdentityMatrix();
         ans.access(0,0) =  std::cos(value);
         ans.access(2,0) =  std::sin(value);
@@ -54,7 +54,7 @@ public:
         return ans;
     }
     static current getRotateZMatrix(double value){
-        static_assert(W==3 && H==3,"This Matrix is not square matrix");
+        static_assert(W>3 && H>3,"This Matrix is not square matrix");
         current ans = getIdentityMatrix();
         ans.access(0,0) =  std::cos(value);
         ans.access(1,0) =  std::sin(value);
@@ -63,13 +63,10 @@ public:
         return ans;
     }
 
-
-private:
-
 public:
 
     T& access(int x,int y)     {return this->mat[y*W+x];}
-    T& access(int x,int y)const{return this->mat[y*W+x];}
+    T  access(int x,int y)const{return this->mat[y*W+x];}
 
     //イテレータ
     T* begin()   {return this->mat;}
@@ -108,7 +105,6 @@ public:
         return ans;
     }
 
-
     //内積
     template<std::size_t N>
     Matrix<T,N,H> Dot(Matrix<T,N,W> rhs){// W*H * N*W
@@ -139,8 +135,8 @@ public:
     //代入演算子
                       current& operator+=(current rhs){*this = *this + rhs;return (*this);}
                       current& operator-=(current rhs){*this = *this - rhs;return (*this);}
-    template<class V> current& operator*=(V rhs)         {*this = *this * rhs;return (*this);}
-    template<class V> current& operator/=(V rhs)         {*this = *this / rhs;return (*this);}
+    template<class V> current& operator*=(V rhs)      {*this = *this * rhs;return (*this);}
+    template<class V> current& operator/=(V rhs)      {*this = *this / rhs;return (*this);}
 
     //比較演算子
     bool operator==(cr_current rhs)const{
@@ -149,7 +145,7 @@ public:
     bool operator!=(cr_current rhs)const{return !(*this == rhs);}
     bool operator<(cr_current rhs)const{
         for(std::size_t i=0;i<H;i++)for(std::size_t j=0;j<W;j++){
-            if(this->mat[i*W+j] != rhs.mat[i*W+j])return this->mat[i*W+j] < rhs.mat[i*W+j];
+            if(this->access(i,j) != rhs.access(i,j))return this->access(i,j) < rhs.access(i,j);
         }
         return false;
     }
@@ -160,32 +156,38 @@ public:
 
 //座標
 template<class T>
-struct Point : public Matrix<T,3,1>{
+struct Point : public Matrix<T,4,1>{
 //    T x;
 //    T y;
 //    T z;
+//    T 1;
 private:
-    typedef Matrix<T,3,1> base;
+    typedef Matrix<T,4,1> base;
     typedef Point<T> current;
     typedef const Point<T>& cr_current;
 public:
-    Point():base(){}
-    Point(const T& X,const T& Y,const T& Z = 0){this->mat[0] = X;this->mat[1] = Y;this->mat[2] = Z;}
-    Point(const QPoint& p):Point(p.x(),p.y(),0){}
+    Point():base({0,0,0,1}){}
+    Point(const T& X,const T& Y,const T& Z = 0){
+        this->mat[0] = X;
+        this->mat[1] = Y;
+        this->mat[2] = Z;
+        this->mat[3] = 1;}
+    Point(const QPoint& p):Point(p.x(),p.y(),0,1){}
     Point(const base& p):base(p){}
 
     T& x(){return this->mat[0];}
     T& y(){return this->mat[1];}
     T& z(){return this->mat[2];}
+    T& w()const{return this->mat[3];}
     T x()const{return this->mat[0];}
     T y()const{return this->mat[1];}
     T z()const{return this->mat[2];}
 
-    current operator-()                       const{return (-(*static_cast<const base*>(this)));}
-    current operator+(current rhs)            const{return (*static_cast<const base*>(this) + static_cast<base>(rhs));}
-    current operator-(current rhs)            const{return (*static_cast<const base*>(this) - static_cast<base>(rhs));}
-    template<class V> current operator*(V rhs)const{return (*static_cast<const base*>(this) * rhs);}
-    template<class V> current operator/(V rhs)const{return (*static_cast<const base*>(this) / rhs);}
+    current operator-()                       const{current ans = (-(*static_cast<const base*>(this)));                       ans.mat[3] = 1; return ans;}
+    current operator+(current rhs)            const{current ans = (*static_cast<const base*>(this) + static_cast<base>(rhs)); ans.mat[3] = 1; return ans;}
+    current operator-(current rhs)            const{current ans = (*static_cast<const base*>(this) - static_cast<base>(rhs)); ans.mat[3] = 1; return ans;}
+    template<class V> current operator*(V rhs)const{current ans = (*static_cast<const base*>(this) * rhs);                    ans.mat[3] = 1; return ans;}
+    template<class V> current operator/(V rhs)const{current ans = (*static_cast<const base*>(this) / rhs);                    ans.mat[3] = 1; return ans;}
 
     //直線と点の最近点を求める
     static current LineNearPoint(cr_current pos1,cr_current pos2,cr_current hand){
@@ -225,7 +227,7 @@ public:
         if(a.DotPos(b) == 0){
             return 90;
         }
-        return std::acos(a.x()*b.x() + a.y()*b.y() + a.z()*b.z()) * 180 / PI;
+        return std::acos(a.DotPos(b)) * 180 / PI;
     }
 
 
@@ -319,6 +321,8 @@ namespace std {
 
 
 typedef Point<double> Pos;
+typedef Matrix<double,3,3> Mat;
+typedef Matrix<double,4,4> Quat;
 
 #endif // POINT_H
 
