@@ -38,7 +38,8 @@ SOURCES += src/main.cpp\
     src/SolidEditForm.cpp \
     src/TimeDivider.cpp \
     src/SolidEditController.cpp \
-    src/Collision.cpp
+    src/Collision.cpp \
+    src/MakeObjectController.cpp
 
 HEADERS  += src/MainWindow.h \
     src/Point.h \
@@ -68,7 +69,8 @@ HEADERS  += src/MainWindow.h \
     src/SolidEditForm.h \
     src/TimeDivider.h \
     src/SolidEditController.h \
-    src/Collision.h
+    src/Collision.h \
+    src/MakeObjectController.h
 
 FORMS    += src/MainWindow.ui \
     src/CadEditForm.ui \
