@@ -113,11 +113,14 @@ void CArc::SetMiddle(CPoint* pos,int index){
         connect   (this->center,SIGNAL(PosChanged(CPoint*,Pos)),this,SLOT(ChangePosCallback(CPoint*,Pos)));
     }
 }
+Pos CArc::GetMiddleDivide(double t)const{
+    return Pos(); //要検討
+}
 
-
-Pos CArc::GetNear(const Pos& hand)const{
+Pos CArc::GetNearPos (const Pos& hand)const{
     return Pos::CircleNearPoint(*this->center,round,hand);
 }
+
 CEdge* CArc::Clone()const{
     CArc* ptr   = new CArc(this->parent());
     ptr->start  = new CPoint(*this->start ,ptr);
@@ -151,8 +154,8 @@ void CArc::ChangePosCallback(CPoint *pos, Pos old_pos){
             round = (*this->end - *this->center).Length();
             this->start->Move((*this->start - *this->center).GetNormalize() * round + *this->center - *this->start);
         }else{
-            this->start->Move(this->GetNear(*this->start) - *this->start);
-            this->end  ->Move(this->GetNear(*this->end)   - *this->end);
+            this->start->Move(this->GetNearPos(*this->start) - *this->start);
+            this->end  ->Move(this->GetNearPos(*this->end)   - *this->end);
         }
     }else{
         round = (*pos-*this->center).Length();

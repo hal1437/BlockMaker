@@ -37,7 +37,7 @@ void CadEditForm::wheelEvent(QWheelEvent * event){
             //適応
             CObject* hanged = this->getHanged();
             if(hanged == nullptr)this->Zoom(next_scale,this->mouse_pos); //マウス座標中心に拡大
-            else                 this->Zoom(next_scale,hanged->GetNear(this->mouse_pos));//選択点があればそれを中心に拡大
+            else                 this->Zoom(next_scale,hanged->GetNearPos(this->mouse_pos));//選択点があればそれを中心に拡大
 
             //シグナル発生
             emit ScaleChanged(next_scale);
@@ -356,7 +356,7 @@ void CadEditForm::MakeObject(){
 
     Pos local_pos = this->mouse_pos;
     CObject* hanged = this->getHanged();
-    if(hanged != nullptr)local_pos = hanged->GetNear(local_pos);
+    if(hanged != nullptr)local_pos = hanged->GetNearPos(local_pos);
 
     release_flag=false;
 
@@ -400,7 +400,7 @@ void CadEditForm::MakeObject(){
                         this->creating->SetEndPos(dynamic_cast<CPoint*>(hanged));
                     }else{
                         //近似移動
-                        this->hang_point->Move(this->hang_point->GetNear(*this->hang_point) - *this->hang_point);
+                        this->hang_point->Move(this->hang_point->GetNearPos(*this->hang_point) - *this->hang_point);
                     }
                 }
                 this->hang_point = nullptr; //手放す
@@ -428,7 +428,7 @@ CREATE_RESULT CadEditForm::MakeJoint(CObject* obj){
         this->hang_point = dynamic_cast<CPoint*>(hanged);
     }else{
         //近接点を作成
-        CPoint* new_point = new CPoint(hanged->GetNear(this->mouse_pos));
+        CPoint* new_point = new CPoint(hanged->GetNearPos(this->mouse_pos));
         new_point->z() = this->depth;
         this->hang_point = new_point;
     }

@@ -271,7 +271,7 @@ void MainWindow::RefreshStatusBar(Pos){
         out = this->ui->CadEdit->getMousePos();
     }else{
         //選択オブジェクトの最近点
-        out = hanged->GetNear(this->ui->CadEdit->getMousePos());
+        out = hanged->GetNearPos(this->ui->CadEdit->getMousePos());
     }
     this->ui->statusBar->showMessage(QString("(") + QString::number(out.x()) + "," +
                                                     QString::number(out.y()) + "," +

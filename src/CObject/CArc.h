@@ -32,9 +32,12 @@ public:
     virtual int GetMiddleCount()const;
     virtual CPoint* GetMiddle(int index)const;
     virtual void    SetMiddle(CPoint*,int index);
+    virtual Pos     GetMiddleDivide(double t)const;
 
     //近接点
-    virtual Pos GetNear(const Pos& hand)const;
+    virtual Pos GetNearPos (const Pos& hand)const;
+    //virtual Pos GetNearLine(const Pos& pos1,const Pos& pos2)const;  //省略
+
     //複製
     virtual CEdge* Clone()const;
 

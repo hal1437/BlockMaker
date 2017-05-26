@@ -3,7 +3,7 @@
 
 #include "CObject.h"
 
-//CAD上の点
+//三次元座標上の点
 class CPoint : public CObject,public Pos
 {
     Q_OBJECT
@@ -18,7 +18,7 @@ public:
     virtual CREATE_RESULT Create(CPoint* pos); //作成関数
 
     virtual bool Draw(QPainter& painter)const ;//描画関数
-    virtual bool Move(const Pos& diff);//移動関数
+    virtual bool Move(const Pos& diff);        //移動関数
 
 
     virtual bool isLock()const;  //固定点
@@ -26,13 +26,14 @@ public:
     virtual bool ControlPoint(bool f);   //作用点設定
 
     //近接点
-    virtual Pos GetNear(const Pos& hand)const;
+    virtual Pos GetNearPos (const Pos& hand)const;
+    virtual Pos GetNearLine(const Pos& pos1,const Pos& pos2)const;
 
     //コンストラクタ
     CPoint(QObject* parent=nullptr);
     CPoint(const Pos& origin);
     CPoint(const Pos& pos,QObject* parent);
-    CPoint(double x,double y,double z = 0,QObject* parent=nullptr);//初期Create済みスターターセット
+    CPoint(double x,double y,double z = 0,QObject* parent=nullptr);//初期Create済みコンストラクタ
     ~CPoint();
 
     CPoint& operator=(const Pos& rhs);

@@ -50,9 +50,12 @@ CPoint* CLine::GetMiddle(int)const{
 }
 void CLine::SetMiddle(CPoint*,int){
 }
+Pos  CLine::GetMiddleDivide(double t)const{
+    return (*end - *start) * t + *start;
+}
 
 
-Pos CLine::GetNear(const Pos& hand)const{
+Pos CLine::GetNearPos(const Pos& hand)const{
     //点と直線の最近点
     return Pos::LineNearPoint(*this->start,*this->end,hand);
 }

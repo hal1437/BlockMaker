@@ -129,8 +129,13 @@ CPoint* CSpline::GetMiddle(int index)const{
 void CSpline::SetMiddle(CPoint* pos,int index){
     this->pos[index] = pos;
 }
+Pos  CSpline::GetMiddleDivide(double t)const{
+    if(pos.size() == 0)return (*end - *start)*t + *start;
+    double tt = t * (pos.size()+1);
+    return Pos(xs.culc(tt),ys.culc(tt),zs.culc(tt));
+}
 
-Pos CSpline::GetNear(const Pos& pos)const{
+Pos CSpline::GetNearPos(const Pos& pos)const{
     if(this->pos.size() >= 1){
         QVector<Pos> pp;
         const double dt = 1.0/DIVISION;
@@ -138,7 +143,7 @@ Pos CSpline::GetNear(const Pos& pos)const{
         m = (double)(this->pos.size()+1);
         for(t=0; t<=m; t += dt){
             if(t + dt > m)t=m;
-            pp.push_back(Pos(xs.culc(t), ys.culc(t)));
+            pp.push_back(Pos(xs.culc(t), ys.culc(t),zs.culc(t)));
         }
         //もっとも近いもの
         return *std::min_element(pp.begin(),pp.end(),[&](Pos lhs,Pos rhs){
@@ -151,17 +156,21 @@ Pos CSpline::GetNear(const Pos& pos)const{
 }
 
 void CSpline::RefreshNodes(){
-    std::vector<double> x,y;
+    std::vector<double> x,y,z;
     x.push_back(this->start->x());
     y.push_back(this->start->y());
+    z.push_back(this->start->y());
     for(CPoint* p : this->pos){
         x.push_back(p->x());
         y.push_back(p->y());
+        z.push_back(p->z());
     }
     x.push_back(this->end->x());
     y.push_back(this->end->y());
+    z.push_back(this->end->z());
     xs.init(x);
     ys.init(y);
+    zs.init(z);
 }
 
 CSpline::CSpline(QObject *parent):

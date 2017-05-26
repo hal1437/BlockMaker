@@ -73,9 +73,13 @@ bool CPoint::ControlPoint(bool f){
     return true;
 }
 
-Pos CPoint::GetNear(const Pos&)const{
+Pos CPoint::GetNearPos(const Pos&)const{
     return *this;
 }
+Pos CPoint::GetNearLine(const Pos&,const Pos&)const{
+    return *this;
+}
+
 
 CPoint::CPoint(QObject* parent):
     CObject(parent){

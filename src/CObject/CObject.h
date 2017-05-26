@@ -49,7 +49,8 @@ public:
     virtual bool isSelectable(Pos pos)const;  //posの位置で選択可能か
 
     //近接点
-    virtual Pos GetNear(const Pos& hand)const=0;
+    virtual Pos GetNearPos (const Pos& hand)const=0;
+    virtual Pos GetNearLine(const Pos& pos1,const Pos& pos2)const=0;
 
     //コンストラクタ
     CObject(QObject* parent=nullptr);

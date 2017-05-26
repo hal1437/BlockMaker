@@ -26,6 +26,20 @@ CPoint* CEdge::GetPosSequence(int index)const{
     return nullptr;
 }
 
+Pos CEdge::GetNearLine(const Pos& pos1,const Pos& pos2)const{
+    //GetNearPosによる近似
+    Pos ans = *this->start;
+    for(double i=0;i<1;i += 1.0/LINE_NEAR_DIVIDE){
+        //より線に近い方を保存
+        ans = std::max(this->GetMiddleDivide(i),ans,[&](Pos p1,Pos p2){
+            return Pos::LineNearPoint(pos1,pos2,p1) < Pos::LineNearPoint(pos1,pos2,p2);
+        });
+    }
+    return ans;
+}
+
+
+
 
 CEdge::CEdge(QObject* parent):
     CObject(parent)
