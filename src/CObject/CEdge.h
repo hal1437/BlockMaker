@@ -7,7 +7,8 @@
 class CEdge :public CObject
 {
     Q_OBJECT
-protected:
+
+public:
     const static int COLLISION_SIZE   = 5; //当たり判定半径
     const static int LINE_NEAR_DIVIDE = 100; //近似直線判定関数の分割数
 

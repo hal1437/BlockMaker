@@ -9,12 +9,13 @@ class CPoint : public CObject,public Pos
     Q_OBJECT
 private:
     const static int DRAWING_CIRCLE_SIZE = 5; //描画円半径
+public:
     const static int COLLISION_SIZE = 8;      //当たり判定半径
-
     bool control_point = false; //作用点
     bool moving = false;
 
 public:
+
     virtual CREATE_RESULT Create(CPoint* pos); //作成関数
 
     virtual bool Draw(QPainter& painter)const ;//描画関数

@@ -69,7 +69,23 @@ Face SolidEditController::getSideFace ()const{//右側面
     return this->getFrontFace_impl(this->getConvertFrontToSide(),this->getConvertSideToFront());
 }
 
+
+CObject* SolidEditController::getHangedObject(Pos center, Pos dir)const{
+    Line line = Line{center,center+dir};
+    CObject* ans = nullptr;
+
+    //点の選択
+    for(int i=0;i<this->model->GetEdges().size();i++){
+        CEdge* e = this->model->GetEdges()[i];
+        if((Pos::LineNearPoint(line.pos1,line.pos2, *e->start) - *e->start).Length() < CPoint::COLLISION_SIZE)ans = e->start;
+        if((Pos::LineNearPoint(line.pos1,line.pos2, *e->end  ) - *e->end  ).Length() < CPoint::COLLISION_SIZE)ans = e->end;
+    }
+    return ans;
+}
+
 Face SolidEditController::getHangedFace(Pos center, Pos dir)const{
+
+    //最も近い面を選択する
     QVector<std::pair<double,Face>> rank;
     rank.push_back(std::make_pair(Collision::GetLengthFaceToLine(this->getFrontFace(),Line{center,center+dir}),this->getFrontFace()));
     rank.push_back(std::make_pair(Collision::GetLengthFaceToLine(this->getTopFace()  ,Line{center,center+dir}),this->getTopFace()));

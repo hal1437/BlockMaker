@@ -83,31 +83,7 @@ void SolidEditForm::paintGL(){
     gluLookAt(camera.x(), camera.y(), camera.z(),
               center.x(), center.y(), center.z(),
                        0,          1,          0);
-    glClearColor(0.7,0.7,0.7,1);
-
-    //エッジ描画
-    for(int i=0;i<this->model->GetEdges().size();i++){
-        CEdge* edge = this->model->GetEdges()[i];
-
-        if(edge->is<CLine>()){
-            glBegin(GL_LINE_LOOP);
-            glColor3f(0,0,0);
-            glVertex3f(edge->start->x(),edge->start->y(),edge->start->z());
-            glVertex3f(edge->end->x(),edge->end->y(),edge->end->z());
-            glEnd();
-        }
-    }
-    //ブロック描画
-    for(int i=0;i<this->model->GetBlocks().size();i++){
-        CBlock* block = this->model->GetBlocks()[i];
-
-        for(int j=0;j<4;j++){
-            glBegin(GL_LINE_LOOP);
-            glColor3f(0,0,0);
-            //glVertex3f(block->GetEdge(j)->start,block->GetEdge(j)->start,block->GetEdge(j)->start);
-            glEnd();
-        }
-    }
+    glClearColor(0.7,0.7,0.7,1);//背景
 
     //平面、正面、右側面
     Face face[3] = {controller->getFrontFace(),controller->getTopFace(),controller->getSideFace()};
@@ -132,24 +108,72 @@ void SolidEditForm::paintGL(){
     }
 
     //直下面の選定
-    Pos pos = (Pos(0,0,round)+this->mouse_pos).Dot(Quat::getRotateXMatrix(theta1).Dot(Quat::getRotateYMatrix(theta2)));
-    Face hang = this->controller->getHangedFace(pos,(this->camera -this->center).GetNormalize());
-    glBegin(GL_LINE_LOOP);
-    glColor3f(0,0,0);
-    for(int j=0;j<4;j++){
-        glVertex3f(hang.corner[j].x(),
-                   hang.corner[j].y(),
-                   hang.corner[j].z());
-    }
-    glEnd();
-    glFlush();
+    Pos  hang_center = (Pos(0,0,round)+this->mouse_pos).Dot(Quat::getRotateXMatrix(theta1).Dot(Quat::getRotateYMatrix(theta2)));
+    Face    hang_face = this->controller->getHangedFace  (hang_center,(this->camera -this->center).GetNormalize());
+    CObject* hang_obj = this->controller->getHangedObject(hang_center,(this->camera -this->center).GetNormalize());
 
+    //直下面の描画
+    if(hang_obj == nullptr){
+        glBegin(GL_LINE_LOOP);
+        glColor3f(0,0,0);
+        for(int j=0;j<4;j++){
+            glVertex3f(hang_face.corner[j].x(),hang_face.corner[j].y(),hang_face.corner[j].z());
+        }
+        glEnd();
+    }
+
+    //エッジ描画
+    for(int i=0;i<this->model->GetEdges().size();i++){
+        CEdge* edge = this->model->GetEdges()[i];
+        glBegin(GL_LINE_LOOP);
+        if(hang_obj == edge) glColor3f(1,0,0);
+        else                 glColor3f(0,0,0);
+
+        //線の分割描画
+        for(double i=0;i<1;i += 1.0/CEdge::LINE_NEAR_DIVIDE){
+            glVertex3f(edge->GetMiddleDivide(i).x(),
+                       edge->GetMiddleDivide(i).y(),
+                       edge->GetMiddleDivide(i).z());
+        }
+        glEnd();
+
+        //端点の描画
+        QVector<CPoint*> points = {edge->start,edge->end};
+        for(int j=0;j<edge->GetMiddleCount();j++)points.push_back(edge->GetMiddle(j));
+        for(int j=0;j<points.size();j++){
+            glBegin(GL_LINE_LOOP);
+            if(hang_obj == points[j])glColor3f(1,0,0);
+            else                     glColor3f(0,0,0);
+
+            //円の描画
+            for(double k=0;k < 2*M_PI;k += M_PI/32){
+                const int length = 5;
+                Pos p = Pos(length*std::sin(k),length*std::cos(k),round).Dot(Quat::getRotateXMatrix(theta1).Dot(Quat::getRotateYMatrix(theta2)));
+                glVertex3f((p + *points[j]).x(),(p + *points[j]).y(),(p + *points[j]).z());
+            }
+            glEnd();
+        }
+
+    }
+    //ブロック描画
+    for(int i=0;i<this->model->GetBlocks().size();i++){
+        CBlock* block = this->model->GetBlocks()[i];
+
+        for(int j=0;j<4;j++){
+            glBegin(GL_LINE_LOOP);
+            glColor3f(0,0,0);
+            //glVertex3f(block->GetEdge(j)->start,block->GetEdge(j)->start,block->GetEdge(j)->start);
+            glEnd();
+        }
+    }
+
+    glFlush();
 }
 
-void SolidEditForm::CEdgeChanged(QVector<CEdge*> e){
+void SolidEditForm::CEdgeChanged(QVector<CEdge*>){
     this->repaint();
 }
-void SolidEditForm::CBlockChanged(QVector<CBlock*> e){
+void SolidEditForm::CBlockChanged(QVector<CBlock*>){
     this->repaint();
 }
 

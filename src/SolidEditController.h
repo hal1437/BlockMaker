@@ -38,6 +38,7 @@ public:
     Face getTopFace  ()const;//平面
     Face getSideFace ()const;//右側面
 
+    CObject* getHangedObject(Pos center, Pos dir)const;
     Face getHangedFace(Pos center, Pos dir)const;//直下面
 
 
