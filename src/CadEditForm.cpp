@@ -165,6 +165,11 @@ void CadEditForm::paintEvent(QPaintEvent*){
         else if(obj->start->z() < this->depth)paint.setPen(QPen(QColor(100,100,100), CObject::DRAWING_LINE_SIZE / this->scale,Qt::SolidLine,Qt::RoundCap));
         else                                  paint.setPen(QPen(Qt::blue           , CObject::DRAWING_LINE_SIZE / this->scale,Qt::SolidLine,Qt::RoundCap));
 
+        //Z軸不一致
+        if(obj->start->z() != obj->end->z()){
+               paint.setPen(QPen(Qt::blue           , CObject::DRAWING_LINE_SIZE / this->scale,Qt::DotLine,Qt::RoundCap));
+        }
+
         obj->Draw(paint);
         for(int i=0;i<obj->GetPosSequenceCount();i++){
             if(obj->GetPosSequence(i)!=nullptr){
