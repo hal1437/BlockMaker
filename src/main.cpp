@@ -9,8 +9,7 @@ int main(int argc, char *argv[])
     CadModelCore* model = new CadModelCore();
 
     MainWindow w;
-    w.setModel(model);
-
+    w.SetModel(model);
     w.show();
 
     return a.exec();

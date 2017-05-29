@@ -18,13 +18,12 @@ enum EDIT_STATE{
     SKETCH , //二次元作業中
 };
 
-class SolidEditForm : public QOpenGLWidget
+class SolidEditForm : public QOpenGLWidget,public CadModelCoreInterface
 {
     Q_OBJECT
 
     const int SENSITIVITY = 100;
 private:
-    CadModelCore* model;
     SolidEditController* controller;
 
     Pos mouse_pos;  //マウス座標
@@ -55,7 +54,7 @@ public:
     void mouseReleaseEvent(QMouseEvent *event);
     void wheelEvent       (QWheelEvent *event);
 
-    void setModel(CadModelCore *model);
+    void SetModel(CadModelCore* model);
     void initializeGL();        //  OpenGL 初期化
     void resizeGL(int, int);    //  ウィジットリサイズ時のハンドラ
     void paintGL();             //  描画処理

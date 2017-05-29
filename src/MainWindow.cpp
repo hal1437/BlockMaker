@@ -2,10 +2,10 @@
 #include "ui_MainWindow.h"
 
 
-void MainWindow::setModel(CadModelCore* model){
+void MainWindow::SetModel(CadModelCore* model){
     this->model = model;
-    this->ui->CadEdit  ->setModel(model);
-    this->ui->SolidEdit->setModel(model);
+    this->ui->CadEdit  ->SetModel(model);
+    this->ui->SolidEdit->SetModel(model);
     //モデルと結合
     connect(this->model,SIGNAL(UpdateEdges   (QVector<CEdge*>  )),this,SLOT(UpdateObjectTree        (QVector<CEdge*>)));
     connect(this->model,SIGNAL(UpdateSelected(QVector<CObject*>)),this,SLOT(UpdateObjectTreeSelected(QVector<CObject*>)));

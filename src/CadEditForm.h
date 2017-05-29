@@ -32,13 +32,12 @@ enum CEnum{
     Spline,
 };
 
-class CadEditForm : public QWidget
+class CadEditForm : public QWidget ,public CadModelCoreInterface
 {
     Q_OBJECT
 
 private:
     Ui::CadEditForm *ui; //UI
-    CadModelCore* model;
 
     Pos mouse_pos;//マウス位置
     CEdge* creating;          //作成途中オブジェクト
@@ -80,7 +79,6 @@ public:
     QVector<CObject*> getSelected()const{return this->selected; } //選択オブジェクト取得
     CObject*          getHanged  ()const; //直下オブジェクト選定
 
-    void setModel(CadModelCore* model);//モデルセット
     void Escape();//作成破棄
 
     void Zoom     (double scale,Pos local_piv); //ズーム

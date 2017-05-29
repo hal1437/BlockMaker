@@ -50,7 +50,7 @@ class CadModelCoreInterface{
 protected:
     CadModelCore* model;
 public:
-    void SetModel(CadModelCore* m){this->model = m;}
+    virtual void SetModel(CadModelCore* m){this->model = m;}
 };
 
 

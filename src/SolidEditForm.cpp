@@ -41,7 +41,7 @@ void SolidEditForm::wheelEvent(QWheelEvent *event){
     repaint();
 }
 
-void SolidEditForm::setModel(CadModelCore* model){
+void SolidEditForm::SetModel(CadModelCore* model){
     this->model = model;
     this->controller->setModel(model);
     connect(this->model,SIGNAL(UpdateEdges (QVector<CEdge*>)) ,this,SLOT(CEdgeChanged(QVector<CEdge*>)));

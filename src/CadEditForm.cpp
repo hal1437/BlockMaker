@@ -1,9 +1,7 @@
 #include "CadEditForm.h"
 #include "ui_CadEditForm.h"
 
-void CadEditForm::setModel(CadModelCore* model){
-    this->model = model;
-}
+
 
 void CadEditForm::mousePressEvent  (QMouseEvent*){
     release_flag = false;

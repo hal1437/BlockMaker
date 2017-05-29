@@ -21,7 +21,7 @@ class MainWindow;
 }
 
 
-class MainWindow : public QMainWindow
+class MainWindow : public QMainWindow ,CadModelCoreInterface
 {
     Q_OBJECT
 
@@ -30,7 +30,6 @@ public:
     ~MainWindow();
 private:
     Ui::MainWindow *ui;
-    CadModelCore* model;
 
 protected:
     void keyPressEvent  (QKeyEvent* event);
@@ -40,7 +39,7 @@ signals:
     void ToggleChanged(CEnum state);
 
 public slots:
-    void setModel(CadModelCore* model);
+    void SetModel(CadModelCore* model);
 
     void CtrlZ();
     void Delete();
