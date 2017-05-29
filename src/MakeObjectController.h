@@ -10,28 +10,31 @@ enum MakeObject{
 };
 
 //オブジェクト生成に関するコントローラ
-class MakeObjectController
+class MakeObjectController : public CadModelCoreInterface
 {
-    //生成方法
-    //生成タイプと座標をを選択してStartMaking();
+private:
+    CPoint*  last_point;    //最終生成点
+    CEdge* making_object; //生成オブジェクト
+    int      making_step;   //生成段階
 
-    int making_step; //生成段階
-    Quat converter;  //変換行列
+private:
+
+    CREATE_RESULT MakeJoint(CObject* obj,Pos pos, CObject *merge);
+    void StartMaking(MakeObject type,Pos pos,CObject* merge = nullptr); //生成開始
+    void StepMaking (Pos pos,CObject* merge = nullptr);                 //追加生成
+    void EndMaking  (Pos pos,CObject* merge = nullptr);                 //生成終了
 
 public:
-    static CObject* GetNearPos(Pos pos);           //近接点を取得(点)
-    static CObject* GetNearPos(Pos pos1,Pos pos2); //近接点を取得(線)
 
-public:
-
-    void SetConvertMatrix(Quat);//変換
-
-    Pos ConvertMatrix();//変換
+    //作成
+    void Making(MakeObject type,Pos pos,CObject* merge = nullptr);
 
 
-    void StartMaking(MakeObject type,Pos pos,CObject* obj = nullptr); //生成開始
-    void StepMaking (Pos pos,CObject* obj = nullptr);                 //追加生成
-    void EndMaking  (Pos pos,CObject* obj = nullptr);                 //生成終了
+    //生成中断
+    void Escape();
+
+    //最終点を保持
+    CPoint* GetLastPos();
 
     MakeObjectController();
     ~MakeObjectController();

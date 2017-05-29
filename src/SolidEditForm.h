@@ -4,8 +4,7 @@
 #include <QWidget>
 #include <QMouseEvent>
 #include <QOpenGLWidget>
-#include <gl.h>
-#include <glu.h>
+#include <GLUT/glut.h>
 #include "SolidEditController.h"
 #include "TimeDivider.h"
 #include "CadModelCore.h"

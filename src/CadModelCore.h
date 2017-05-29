@@ -44,7 +44,14 @@ signals:
     void UpdateBlocks    (QVector<CBlock*>);
     void UpdateRestraints(QVector<Restraint*>);
     void UpdateDimensions(QVector<SmartDimension*>);
-
 };
+
+class CadModelCoreInterface{
+protected:
+    CadModelCore* model;
+public:
+    void SetModel(CadModelCore* m){this->model = m;}
+};
+
 
 #endif // CADMODELCORE_H
