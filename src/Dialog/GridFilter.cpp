@@ -3,11 +3,9 @@
 //フィルタリング
 Pos GridFilter::Filtering(Pos p)const{
 
-    Pos answer;
-    if(this->x_grid == 0)answer.x() = p.x();
-    else                 answer.x() = this->x_grid * std::round(p.x()/this->x_grid);
-    if(this->y_grid == 0)answer.y() = p.y();
-    else                 answer.y() = this->y_grid * std::round(p.y()/this->y_grid);
+    Pos answer = p;
+    if(this->x_grid != 0)answer.x() = this->x_grid * std::round(p.x()/this->x_grid);
+    if(this->y_grid != 0)answer.y() = this->y_grid * std::round(p.y()/this->y_grid);
     return answer;
 }
 

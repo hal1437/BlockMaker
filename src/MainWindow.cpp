@@ -30,7 +30,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->DepthSpin            ,SIGNAL(valueChanged(double))               ,ui->CadEdit,SLOT(SetDepth(double)));
 
     //CadEditFoam関連
-    connect(this          ,SIGNAL(ToggleChanged(CEnum)),ui->CadEdit   ,SLOT(SetState(CEnum)));
+    connect(this          ,SIGNAL(ToggleChanged(MAKE_OBJECT)),ui->CadEdit   ,SLOT(SetState(MAKE_OBJECT)));
     connect(ui->CadEdit   ,SIGNAL(ScaleChanged(double)),ui->ScaleSpin ,SLOT(setValue(double)));
     connect(ui->CadEdit   ,SIGNAL(DepthChanged(double)),ui->DepthSpin ,SLOT(setValue(double)));
     connect(ui->CadEdit   ,SIGNAL(RequireRefreshUI())  ,this          ,SLOT(RefreshUI()));
@@ -88,41 +88,36 @@ void MainWindow::CtrlZ(){
     }*/
 }
 void MainWindow::Delete(){
+
+    //ランダム回転関数に置き換え中
     static int c = 0;
-    double cc[4] = {0,M_PI/2,M_PI,M_PI*3/2};
     std::random_device rd;
     this->ui->SolidEdit->setCameraRotate(Mod((double)rd(),M_PI)-M_PI/2,Mod((double)rd(),2*M_PI));
     c++;
-    /*
-    for(CObject* obj : this->model->GetSelected()){
-        if(obj->is<CEdge>()){
-            this->model->RemoveSelected(dynamic_cast<CEdge*>(obj));
-        }
-    }*/
-    //CObject::selected.clear();
+
     repaint();
     RefreshUI();
 }
 
 void MainWindow::ConnectSignals(){
-    connect(ui->ToolDot   ,SIGNAL(toggled(bool)),this,SLOT(ToggledDot(bool)));
+    connect(ui->ToolPoint ,SIGNAL(toggled(bool)),this,SLOT(ToggledPoint(bool)));
     connect(ui->ToolArc   ,SIGNAL(toggled(bool)),this,SLOT(ToggledArc(bool)));
     connect(ui->ToolLine  ,SIGNAL(toggled(bool)),this,SLOT(ToggledLine(bool)));
-    connect(ui->ToolRect  ,SIGNAL(toggled(bool)),this,SLOT(ToggledRect(bool)));
+    //connect(ui->ToolRect  ,SIGNAL(toggled(bool)),this,SLOT(ToggledRect(bool)));
     connect(ui->ToolSpline,SIGNAL(toggled(bool)),this,SLOT(ToggledSpline(bool)));
 }
 
 void MainWindow::DisconnectSignals(){
-    disconnect(ui->ToolDot   ,SIGNAL(toggled(bool)),this,SLOT(ToggledDot(bool)));
+    disconnect(ui->ToolPoint ,SIGNAL(toggled(bool)),this,SLOT(ToggledPoint(bool)));
     disconnect(ui->ToolArc   ,SIGNAL(toggled(bool)),this,SLOT(ToggledArc(bool)));
     disconnect(ui->ToolLine  ,SIGNAL(toggled(bool)),this,SLOT(ToggledLine(bool)));
-    disconnect(ui->ToolRect  ,SIGNAL(toggled(bool)),this,SLOT(ToggledRect(bool)));
+    //disconnect(ui->ToolRect  ,SIGNAL(toggled(bool)),this,SLOT(ToggledRect(bool)));
     disconnect(ui->ToolSpline,SIGNAL(toggled(bool)),this,SLOT(ToggledSpline(bool)));
 }
 
 void MainWindow::ClearButton(){
     //if(make_obj != nullptr && make_obj->isCreating())make_obj->Create(nullptr,-1);
-    if(ui->ToolDot   ->isChecked())ui->ToolDot   ->setChecked(false);
+    if(ui->ToolPoint ->isChecked())ui->ToolPoint ->setChecked(false);
     if(ui->ToolLine  ->isChecked())ui->ToolLine  ->setChecked(false);
     if(ui->ToolArc   ->isChecked())ui->ToolArc   ->setChecked(false);
     if(ui->ToolRect  ->isChecked())ui->ToolRect  ->setChecked(false);
@@ -172,21 +167,21 @@ void MainWindow::RefreshUI(){
 
 #define ToggledToolDefinition(TYPE)             \
 void MainWindow::Toggled##TYPE (bool checked){  \
-    if(TYPE != Edit)DisconnectSignals();        \
+    if(MAKE_OBJECT::TYPE != MAKE_OBJECT::Edit)DisconnectSignals();        \
     if(checked){                                \
         ClearButton();                          \
-        emit ToggleChanged(TYPE);               \
+        emit ToggleChanged(MAKE_OBJECT::TYPE);               \
         ui->Tool##TYPE->setChecked(true);       \
     }else{                                      \
-        emit ToggleChanged(Edit);               \
+        emit ToggleChanged(MAKE_OBJECT::Edit);               \
     }                                           \
     ConnectSignals();                           \
 }                                               \
 
-ToggledToolDefinition(Dot)
+ToggledToolDefinition(Point)
 ToggledToolDefinition(Line)
 ToggledToolDefinition(Arc)
-ToggledToolDefinition(Rect)
+//ToggledToolDefinition(Rect)
 ToggledToolDefinition(Spline)
 
 void MainWindow::ToggleConflict(bool conflict){

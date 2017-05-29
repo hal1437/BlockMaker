@@ -1,11 +1,9 @@
 #include "CadEditForm.h"
 #include "ui_CadEditForm.h"
 
-
-
 void CadEditForm::mousePressEvent  (QMouseEvent*){
     release_flag = false;
-    if(state==Edit)move_flag = true;
+    if(state == MAKE_OBJECT::Edit)move_flag = true;
     MakeObject();
 }
 
@@ -78,14 +76,7 @@ void CadEditForm::resizeEvent(QResizeEvent*){
 
 void CadEditForm::Escape(){
     //作成解除    
-    if(this->creating != nullptr){
-        if(make_count > 0){
-            this->model->RemoveEdges(this->creating);
-        }
-        this->creating   = nullptr;
-        this->hang_point = nullptr;
-        this->make_count = COMPLETE;
-    }
+    this->make_controller->Escape();
 }
 
 
@@ -100,7 +91,7 @@ void CadEditForm::MovedMouse(QMouseEvent *event, CObject *under_object){
         piv = null_pos;//移動支点を解除
     }
     //画面移動
-    if((event->buttons() & Qt::LeftButton) && this->selected.isEmpty() && this->state == Edit){
+    if((event->buttons() & Qt::LeftButton) && this->selected.isEmpty() && this->state == MAKE_OBJECT::Edit){
         //支点登録
         if(piv == null_pos){
             piv = this->ConvertWorldPos(this->mouse_pos);
@@ -240,7 +231,7 @@ void CadEditForm::Zoom(double scale,Pos local_piv){
     this->translate += (zoom_piv + this->translate) * ((scale / this->scale) - 1);
     this->scale = scale;
     //マウス座標復元
-    this->mouse_pos = this->ConvertLocalPos(zoom_piv);
+    this->mouse_pos = this->ConvertLocalPos(zoom_piv) + Pos(0,0,this->depth);
 }
 void CadEditForm::Translate(Pos local_diff){
     this->translate += local_diff;
@@ -274,22 +265,6 @@ void CadEditForm::MergePoints(){
     }
     this->selected.clear();
     repaint();
-}
-
-
-CadEditForm::CadEditForm(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::CadEditForm)
-{
-    ui->setupUi(this);
-
-    //マウストラッキング対象
-    setMouseTracking(true);
-}
-
-CadEditForm::~CadEditForm()
-{
-    delete ui;
 }
 
 CObject* CadEditForm::getHanged()const{
@@ -352,88 +327,23 @@ void CadEditForm::SetGridFilterStatus(double x,double y){
 }
 void CadEditForm::MakeObject(){
 
-    Pos local_pos = this->mouse_pos;
     CObject* hanged = this->getHanged();
-    if(hanged != nullptr)local_pos = hanged->GetNearPos(local_pos);
+    if(state == MAKE_OBJECT::Edit){
+            //シフト状態
+            if(!shift_pressed)this->selected.clear();
 
-    release_flag=false;
-
-    //編集
-    if(state == Edit){
-        //シフト状態
-        if(!shift_pressed)this->selected.clear();
-
-        //選択状態をトグル
-        if(exist(this->selected,hanged))erase(this->selected,hanged);
-        else if(hanged != nullptr)this->selected.push_back(hanged);
+            //選択状態をトグル
+            if(exist(this->selected,hanged))erase(this->selected,hanged);
+            else if(hanged != nullptr)this->selected.push_back(hanged);
 
     }else{
-        //新規オブジェクト
-        if(make_count == COMPLETE){
-            //新規作成CEdge
-            if(state == Line  )this->creating = new CLine(this);
-            if(state == Arc   )this->creating = new CArc(this);
-            if(state == Spline)this->creating = new CSpline(this);
-            if(state == Rect  ){
-                this->creating = new CLine(this);
-            }
-            //startを作成する。
-            make_count = MakeJoint(this->creating);
-
-            //持ち点を作成
-            this->hang_point = new CPoint(this->mouse_pos,this->creating);
-            this->creating->Create(this->hang_point);
-
-            //モデルに追加
-            this->model->AddEdges(this->creating);
-        }else{
-            //継続
-            if(this->make_count != ENDLESS)this->make_count--;//作成過程を進める
-
-            //終了処理
-            if(this->make_count == COMPLETE){
-                if(hanged != nullptr){
-                    if(hanged->is<CPoint>()){
-                        //すり替え
-                        this->creating->SetEndPos(dynamic_cast<CPoint*>(hanged));
-                    }else{
-                        //近似移動
-                        this->hang_point->Move(this->hang_point->GetNearPos(*this->hang_point) - *this->hang_point);
-                    }
-                }
-                this->hang_point = nullptr; //手放す
-                this->creating = nullptr;   //作成完了
-            }else{
-                //ジョイントを作成しつつ継続
-                MakeJoint(this->creating);
-            }
-
-
-        }
+        this->make_controller->Making(state,this->mouse_pos,hanged);
+        //最終点を保持
+        this->hang_point = this->make_controller->GetLastPos();
     }
     RefreshRestraints();
     repaint();
-}
-CREATE_RESULT CadEditForm::MakeJoint(CObject* obj){
-
-    CObject* hanged = this->getHanged();
-
-    if(hanged == nullptr){
-        //始点を作成
-        this->hang_point = new CPoint(this->mouse_pos,obj);
-    }else if(hanged->is<CPoint>() && dynamic_cast<CPoint*>(hanged)->z() == this->depth){
-        //既存の点を使用
-        this->hang_point = dynamic_cast<CPoint*>(hanged);
-    }else{
-        //近接点を作成
-        CPoint* new_point = new CPoint(hanged->GetNearPos(this->mouse_pos));
-        new_point->z() = this->depth;
-        this->hang_point = new_point;
-    }
-
-    //実行
-    CREATE_RESULT result = obj->Create(this->hang_point);
-    return result;
+    return ;
 }
 
 void CadEditForm::MakeSmartDimension(){
@@ -669,7 +579,7 @@ void CadEditForm::ConfigureBlock(QListWidgetItem*){
 }
 
 
-void CadEditForm::SetState(CEnum state){
+void CadEditForm::SetState(MAKE_OBJECT state){
     this->state = state;
 }
 
@@ -695,3 +605,28 @@ void CadEditForm::Load(){
     QString filename = QFileDialog::getOpenFileName(this, "Load");
     this->model->ImportFoamFile(filename);
 }
+
+void CadEditForm::SetModel(CadModelCore *m){
+    this->model = m;
+    this->make_controller->SetModel(m);
+}
+
+CadEditForm::CadEditForm(QWidget *parent) :
+    QWidget(parent),
+    ui(new Ui::CadEditForm)
+{
+    ui->setupUi(this);
+
+    make_controller = new MakeObjectController();
+
+    //マウストラッキング対象
+    setMouseTracking(true);
+}
+
+CadEditForm::~CadEditForm()
+{
+    delete ui;
+    delete make_controller;
+}
+
+

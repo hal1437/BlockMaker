@@ -14,6 +14,7 @@
 #include <queue>
 #include <utility>
 #include "CadModelCore.h"
+#include "MakeObjectController.h"
 #include "Dialog/CBoxDefineDialog.h"
 #include "Dialog/SmartDimensionDialog.h"
 #include "Dialog/ExportDialog.h"
@@ -23,21 +24,13 @@ namespace Ui {
 class CadEditForm;
 }
 
-enum CEnum{
-    Edit,
-    Dot,
-    Line,
-    Arc,
-    Rect,
-    Spline,
-};
-
 class CadEditForm : public QWidget ,public CadModelCoreInterface
 {
     Q_OBJECT
 
 private:
     Ui::CadEditForm *ui; //UI
+    MakeObjectController* make_controller;
 
     Pos mouse_pos;//マウス位置
     CEdge* creating;          //作成途中オブジェクト
@@ -45,9 +38,8 @@ private:
 
     int selecting_block; //選択物体
 
-    CEnum   state      = Edit;    //生成種類
+    MAKE_OBJECT state = MAKE_OBJECT::Edit;    //生成種類
     CPoint* hang_point = nullptr; //生成支点
-    int make_count     = COMPLETE; //生成管理フラグ
 
     double depth  = 0.0f;     //視点の深さ
     double scale  = 1.0f;     //拡大率
@@ -107,9 +99,7 @@ public slots:
     void SetTranslate(Pos trans); //並行移動セット
     void SetGridFilterStatus(double x,double y); //フィルターグリッドセット
 
-
     void MakeObject();
-    CREATE_RESULT MakeJoint(CObject* obj);           //ジョイント作成
 
     void MakeRestraint(RestraintType type); //拘束作成
     void MakeSmartDimension();              //寸法設定
@@ -122,7 +112,7 @@ public slots:
     void ExportCBoxList   (QListWidget *list); //ブロックリスト出力
     void ConfigureBlock (QListWidgetItem*);  //ブロック再編集
 
-    void SetState(CEnum state); //生成種類設定
+    void SetState(MAKE_OBJECT state); //生成種類設定
 
     void ResetAllExpantion();//拡大、移動リセット
     void Export(); //出力
@@ -131,6 +121,8 @@ public slots:
     void MovedMouse(QMouseEvent *event, CObject* under_object); //マウス移動シグナル
 
 public:
+    void SetModel(CadModelCore *m);
+
     explicit CadEditForm(QWidget *parent = 0);
     ~CadEditForm();
 

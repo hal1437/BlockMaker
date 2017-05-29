@@ -36,7 +36,7 @@ protected:
     void keyReleaseEvent(QKeyEvent* event);
 
 signals:
-    void ToggleChanged(CEnum state);
+    void ToggleChanged(MAKE_OBJECT state);
 
 public slots:
     void SetModel(CadModelCore* model);
@@ -47,10 +47,10 @@ public slots:
     void DisconnectSignals();
     void ClearButton();
     void RefreshUI();
-    void ToggledDot    (bool checked);
+    void ToggledPoint  (bool checked);
     void ToggledLine   (bool checked);
     void ToggledArc    (bool checked);
-    void ToggledRect   (bool checked);
+    //void ToggledRect   (bool checked);
     void ToggledSpline (bool checked);
     void ToggleConflict(bool conflict);
     void ResetAllExpantion();     //拡大、移動リセット

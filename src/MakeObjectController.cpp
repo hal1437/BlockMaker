@@ -22,15 +22,15 @@ CREATE_RESULT MakeObjectController::MakeJoint(CObject* obj,Pos pos,CObject* merg
 }
 
 
-void MakeObjectController::StartMaking(MakeObject type,Pos pos,CObject* merge){
-    if(type == MakeObject::POINT){    //点
+void MakeObjectController::StartMaking(MAKE_OBJECT type,Pos pos,CObject* merge){
+    if(type == MAKE_OBJECT::Point){    //点
         CPoint* pos = new CPoint(pos);
         //追加処理
 
     }else{//それ以外
-        if(type == MakeObject::LINE  )this->making_object = new CLine  ();
-        if(type == MakeObject::ARC   )this->making_object = new CArc   ();
-        if(type == MakeObject::SPLINE)this->making_object = new CSpline();
+        if(type == MAKE_OBJECT::Line  )this->making_object = new CLine  ();
+        if(type == MAKE_OBJECT::Arc   )this->making_object = new CArc   ();
+        if(type == MAKE_OBJECT::Spline)this->making_object = new CSpline();
         //startを作成する。
         this->making_step = MakeJoint(this->making_object,pos,merge);
 
@@ -61,7 +61,7 @@ void MakeObjectController::EndMaking  (Pos pos,CObject* merge){
     this->making_object = nullptr;   //作成完了
 }
 
-void MakeObjectController::Making(MakeObject type,Pos pos,CObject* merge){
+void MakeObjectController::Making(MAKE_OBJECT type, Pos pos, CObject* merge){
     if(this->making_step == COMPLETE){
         //開始
         StartMaking(type,pos,merge);
