@@ -161,18 +161,24 @@ void CadEditForm::paintEvent(QPaintEvent*){
 
     //エッジ描画
     for(CEdge* obj:this->model->GetEdges()){
-        if     (obj->start->z() > this->depth)paint.setPen(QPen(QColor(200,200,200), CObject::DRAWING_LINE_SIZE / this->scale,Qt::SolidLine,Qt::RoundCap));
-        else if(obj->start->z() < this->depth)paint.setPen(QPen(QColor(100,100,100), CObject::DRAWING_LINE_SIZE / this->scale,Qt::SolidLine,Qt::RoundCap));
-        else                                  paint.setPen(QPen(Qt::blue           , CObject::DRAWING_LINE_SIZE / this->scale,Qt::SolidLine,Qt::RoundCap));
 
         //Z軸不一致
         if(obj->start->z() != obj->end->z()){
-               paint.setPen(QPen(Qt::blue           , CObject::DRAWING_LINE_SIZE / this->scale,Qt::DotLine,Qt::RoundCap));
+            paint.setPen(QPen(QColor(0,0,0) , CObject::DRAWING_LINE_SIZE / this->scale,Qt::DotLine,Qt::RoundCap));
+        }else{
+            //Z軸前後
+            if     (obj->start->z() > this->depth)paint.setPen(QPen(QColor(200,200,200),CObject::DRAWING_LINE_SIZE / this->scale,Qt::SolidLine,Qt::RoundCap));
+            else if(obj->start->z() < this->depth)paint.setPen(QPen(QColor(100,100,100),CObject::DRAWING_LINE_SIZE / this->scale,Qt::SolidLine,Qt::RoundCap));
+            else                                  paint.setPen(QPen(Qt::blue           ,CObject::DRAWING_LINE_SIZE / this->scale,Qt::SolidLine,Qt::RoundCap));
         }
 
         obj->Draw(paint);
+
         for(int i=0;i<obj->GetPosSequenceCount();i++){
             if(obj->GetPosSequence(i)!=nullptr){
+                if     (obj->GetPosSequence(i)->z() > this->depth)paint.setPen(QPen(QColor(200,200,200)));
+                else if(obj->GetPosSequence(i)->z() < this->depth)paint.setPen(QPen(QColor(100,100,100)));
+                else                                  paint.setPen(QPen(Qt::blue));
                 obj->GetPosSequence(i)->Draw(paint);
             }
         }
