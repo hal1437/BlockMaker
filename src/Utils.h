@@ -18,7 +18,7 @@
 private:                                         \
     QVector<TYPE> NAME;                          \
 public slots:                                    \
-    QVector<TYPE> Get##NAME()const{return NAME;} \
+    QVector<TYPE>& Get##NAME(){return NAME;}     \
     inline void Add##NAME(TYPE value){           \
         NAME.push_back(value);                   \
         emit Update##NAME(NAME);                 \

@@ -39,6 +39,7 @@ public:
 
 signals:
     void SelectObjectChanged();
+    void UpdateObjects   ();
     void UpdateSelected  (QVector<CObject*>);
     void UpdateEdges     (QVector<CEdge*>);
     void UpdateBlocks    (QVector<CBlock*>);

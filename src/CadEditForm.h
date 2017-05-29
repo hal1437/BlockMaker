@@ -34,7 +34,7 @@ private:
 
     Pos mouse_pos;//マウス位置
     CEdge* creating;          //作成途中オブジェクト
-    QVector<CObject*> selected; //選択オブジェクト
+    //QVector<CObject*> selected; //選択オブジェクト
 
     int selecting_block; //選択物体
 
@@ -68,7 +68,7 @@ public:
 
 
     Pos               getMousePos()const{return this->mouse_pos;} //マウス座標取得
-    QVector<CObject*> getSelected()const{return this->selected; } //選択オブジェクト取得
+    //QVector<CObject*> getSelected()const{return this->selected; } //選択オブジェクト取得
     CObject*          getHanged  ()const; //直下オブジェクト選定
 
     void Escape();//作成破棄

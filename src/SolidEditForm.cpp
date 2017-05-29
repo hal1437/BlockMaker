@@ -24,6 +24,7 @@ void SolidEditForm::mousePressEvent  (QMouseEvent *event){
 void SolidEditForm::mouseMoveEvent   (QMouseEvent *event){
 
     this->mouse_pos = Pos(event->pos().x() - this->width()/2,-(event->pos().y() - this->height()/2))*2;
+    this->mouse_pos *= round;
     if(this->click_base != Pos(0,0)){
         //差分
         this->theta1 += static_cast<double>(event->pos().y() - click_base.y())/SENSITIVITY;
@@ -77,7 +78,10 @@ void SolidEditForm::paintGL(){
 
     glMatrixMode(GL_PROJECTION);  //行列モード切替
     glLoadIdentity();
-    glOrtho(-this->width()*round,this->width()*round,-this->height()*round,this->height()*round,-100000000,100000000);
+    glOrtho(-this->width() *(round),
+             this->width() *(round),
+            -this->height()*(round),
+             this->height()*(round),-10000,10000);
     glMatrixMode(GL_MODELVIEW); //行列モードを戻す
     glLoadIdentity();
     gluLookAt(camera.x(), camera.y(), camera.z(),
@@ -96,7 +100,6 @@ void SolidEditForm::paintGL(){
         }
         glEnd();
     }
-    glFlush();
 
     //中央線の描画
     for(int i=0;i<3;i++){
@@ -108,9 +111,9 @@ void SolidEditForm::paintGL(){
     }
 
     //直下面の選定
-    Pos  hang_center = (Pos(0,0,round)+this->mouse_pos).Dot(Quat::getRotateXMatrix(theta1).Dot(Quat::getRotateYMatrix(theta2)));
-    Face    hang_face = this->controller->getHangedFace  (hang_center,(this->camera -this->center).GetNormalize());
-    CObject* hang_obj = this->controller->getHangedObject(hang_center,(this->camera -this->center).GetNormalize());
+    Pos  hang_center = (Pos(0,0,1) + this->mouse_pos).Dot(Quat::getRotateXMatrix(theta1).Dot(Quat::getRotateYMatrix(theta2)));
+    Face    hang_face = this->controller->getHangedFace  (hang_center,(this->camera - this->center).GetNormalize());
+    CObject* hang_obj = this->controller->getHangedObject(hang_center,(this->camera - this->center).GetNormalize());
 
     //直下面の描画
     if(hang_obj == nullptr){

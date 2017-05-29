@@ -8,9 +8,11 @@ double CArc::GetRound()const{
 CREATE_RESULT CArc::Create(CPoint *pos){
     if(this->center == nullptr){
         this->SetCenterPos(pos);
-    }else if(this->start == nullptr){
+        this->start = this->center;
+    }else if(this->start == this->center){
         this->SetStartPos(pos);
-    }else if(this->end == nullptr){
+        this->end = this->start;
+    }else if(this->end == this->start){
         this->SetEndPos(pos);
         //this->center = new CPoint((*this->start - *this->end) / 2 + *this->end,this->parent());
         connect(this->start ,SIGNAL(PosChanged(CPoint*,Pos)),this,SLOT(ChangePosCallback(CPoint*,Pos)));
@@ -37,7 +39,7 @@ bool CArc::Draw(QPainter& painter)const{
     Pos dir1 = (*this->start   - *this->center);
     double angle1 = std::atan2(-dir1.y(),dir1.x()) * 180 / PI;
 
-    if(this->end == nullptr){
+    if(this->end == this->start){
         //点線
         QPen pen = painter.pen();
         painter.save();

@@ -128,7 +128,7 @@ void MainWindow::RefreshUI(){
     ui->RestraintList->clear();
     //ui->BlockList->clear();
 
-    QVector<RestraintType> able = Restraint::Restraintable(this->ui->CadEdit->getSelected());
+    QVector<RestraintType> able = Restraint::Restraintable(this->model->GetSelected());
     for(RestraintType r:able){
         std::pair<std::string,std::string> p;
         if(r == MATCH     )p = std::make_pair("一致"   ,":/Restraint/MatchRestraint.png");
@@ -156,9 +156,9 @@ void MainWindow::RefreshUI(){
     //拘束更新
     ui->CadEdit->RefreshRestraints();
     //ブロック生成可否判定
-    ui->ToolBlocks->setEnabled(CBlock::Creatable(this->ui->CadEdit->getSelected()));
+    ui->ToolBlocks->setEnabled(CBlock::Creatable(this->model->GetSelected()));
     //スマート寸法は1つから
-    ui->ToolDimension->setEnabled(this->ui->CadEdit->getSelected().size() >= 1);
+    ui->ToolDimension->setEnabled(this->model->GetSelected().size() >= 1);
     //リスト要素数で出力ボタンの無効化を決定
     ui->ExportButton->setEnabled(this->ui->BlockList->count() > 0);
 

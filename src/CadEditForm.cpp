@@ -91,7 +91,7 @@ void CadEditForm::MovedMouse(QMouseEvent *event, CObject *under_object){
         piv = null_pos;//移動支点を解除
     }
     //画面移動
-    if((event->buttons() & Qt::LeftButton) && this->selected.isEmpty() && this->state == MAKE_OBJECT::Edit){
+    if((event->buttons() & Qt::LeftButton) && this->model->GetSelected().isEmpty() && this->state == MAKE_OBJECT::Edit){
         //支点登録
         if(piv == null_pos){
             piv = this->ConvertWorldPos(this->mouse_pos);
@@ -105,7 +105,7 @@ void CadEditForm::MovedMouse(QMouseEvent *event, CObject *under_object){
 
     //編集
     if(move_flag == true){
-        for(CObject* p : this->selected){
+        for(CObject* p : this->model->GetSelected()){
             //フィルタリング
             if(p->is<CPoint>()){
                 p->Move(this->filter.Filtering(*dynamic_cast<CPoint*>(p)) - *dynamic_cast<CPoint*>(p));
@@ -172,6 +172,7 @@ void CadEditForm::paintEvent(QPaintEvent*){
             else                                  paint.setPen(QPen(Qt::blue           ,CObject::DRAWING_LINE_SIZE / this->scale,Qt::SolidLine,Qt::RoundCap));
         }
 
+        //エッジの描画
         obj->Draw(paint);
 
         for(int i=0;i<obj->GetPosSequenceCount();i++){
@@ -192,7 +193,7 @@ void CadEditForm::paintEvent(QPaintEvent*){
 
     //選択されたオブジェクト
     paint.setPen(QPen(Qt::cyan, CObject::DRAWING_LINE_SIZE / this->scale,Qt::SolidLine,Qt::RoundCap));
-    for(CObject* obj:this->selected){
+    for(CObject* obj:this->model->GetSelected()){
         obj->Draw(paint);
     }
     //メイン選択中
@@ -250,31 +251,31 @@ void CadEditForm::Translate(Pos local_diff){
 
 void CadEditForm::MergePoints(){
     //原点が存在する場合は先頭に出す
-    for(int i=0;i<this->selected.size();i++){
-        if(dynamic_cast<CPoint*>(this->selected[i])->isControlPoint()){
-            std::swap(this->selected[0],this->selected[i]);
+    for(int i=0;i<this->model->GetSelected().size();i++){
+        if(dynamic_cast<CPoint*>(this->model->GetSelected()[i])->isControlPoint()){
+            std::swap(this->model->GetSelected()[0],this->model->GetSelected()[i]);
             break;
         }
     }
 
     //先頭以外の点を破棄し、統合する。
-    for(int i=1;i<this->selected.size();i++){
+    for(int i=1;i<this->model->GetSelected().size();i++){
         for(CEdge* p : this->model->GetEdges()){
-            if(p->start == this->selected[i]){
-                p->SetStartPos(dynamic_cast<CPoint*>(this->selected[0]));
+            if(p->start == this->model->GetSelected()[i]){
+                p->SetStartPos(dynamic_cast<CPoint*>(this->model->GetSelected()[0]));
             }
-            if(p->end == this->selected[i]){
-                p->SetEndPos(dynamic_cast<CPoint*>(this->selected[0]));
+            if(p->end == this->model->GetSelected()[i]){
+                p->SetEndPos(dynamic_cast<CPoint*>(this->model->GetSelected()[0]));
             }
             for(int j=0;j<p->GetMiddleCount();j++){
-                if(p->GetMiddle(j) == this->selected[i]){
-                    p->SetMiddle(dynamic_cast<CPoint*>(this->selected[0]),j);
+                if(p->GetMiddle(j) == this->model->GetSelected()[i]){
+                    p->SetMiddle(dynamic_cast<CPoint*>(this->model->GetSelected()[0]),j);
                 }
             }
         }
-        //this->objects.removeAll(this->selected[i]);
+        //this->objects.removeAll(this->model->GetSelected()[i]);
     }
-    this->selected.clear();
+    this->model->GetSelected().clear();
     repaint();
 }
 
@@ -290,7 +291,7 @@ CObject* CadEditForm::getHanged()const{
     //エッジ
     for(CEdge* obj:this->model->GetEdges()){
         //選択済みは除外
-        if(exist(this->selected,obj))continue;
+        if(exist(this->model->GetSelected(),obj))continue;
         //作成中も除外
         if(obj == this->creating)continue;
 
@@ -341,11 +342,11 @@ void CadEditForm::MakeObject(){
     CObject* hanged = this->getHanged();
     if(state == MAKE_OBJECT::Edit){
             //シフト状態
-            if(!shift_pressed)this->selected.clear();
+            if(!shift_pressed)this->model->GetSelected().clear();
 
             //選択状態をトグル
-            if(exist(this->selected,hanged))erase(this->selected,hanged);
-            else if(hanged != nullptr)this->selected.push_back(hanged);
+            if(exist(this->model->GetSelected(),hanged))this->model->RemoveSelected(hanged);
+            else if(hanged != nullptr)this->model->AddSelected(hanged);
 
     }else{
         this->make_controller->Making(state,this->mouse_pos,hanged);
@@ -358,16 +359,16 @@ void CadEditForm::MakeObject(){
 }
 
 void CadEditForm::MakeSmartDimension(){
-    if(this->selected.size() > 0 && this->selected.size() < 3){
+    if(this->model->GetSelected().size() > 0 && this->model->GetSelected().size() < 3){
         //スマート寸法ダイアログ生成
         SmartDimensionDialog* diag = new SmartDimensionDialog(this);
         SmartDimension* dim (new SmartDimension());
 
         //ターゲット設定
         CObject* target[2];
-        target[0] = this->selected[0];
-        if(this->selected.size() == 1)target[1] = nullptr;
-        else                          target[1] = this->selected[1];
+        target[0] = this->model->GetSelected()[0];
+        if(this->model->GetSelected().size() == 1)target[1] = nullptr;
+        else                          target[1] = this->model->GetSelected()[1];
 
         if(dim->SetTarget(target[0],target[1])){//寸法定義可能ならば
 
@@ -390,16 +391,16 @@ void CadEditForm::MakeSmartDimension(){
 
 void CadEditForm::MakeRestraint(RestraintType type){
     Restraint* rest = nullptr;
-    if(type == EQUAL)     rest = new EqualRestraint({this->selected[0],this->selected[1]});
-    if(type == VERTICAL)  rest = new VerticalRestraint(this->selected);
-    if(type == HORIZONTAL)rest = new HorizontalRestraint(this->selected);
-    if(type == MATCH)     rest = new MatchRestraint({this->selected[0],this->selected[1]});
-    if(type == CONCURRENT)rest = new ConcurrentRestraint({this->selected[0],this->selected[1]});
-    //if(type == TANGENT)   rest = new TangentRestraint(this->selected[0],this->selected[1]);
+    if(type == EQUAL)     rest = new EqualRestraint({this->model->GetSelected()[0],this->model->GetSelected()[1]});
+    if(type == VERTICAL)  rest = new VerticalRestraint(this->model->GetSelected());
+    if(type == HORIZONTAL)rest = new HorizontalRestraint(this->model->GetSelected());
+    if(type == MATCH)     rest = new MatchRestraint({this->model->GetSelected()[0],this->model->GetSelected()[1]});
+    if(type == CONCURRENT)rest = new ConcurrentRestraint({this->model->GetSelected()[0],this->model->GetSelected()[1]});
+    //if(type == TANGENT)   rest = new TangentRestraint(this->model->GetSelected()[0],this->model->GetSelected()[1]);
 
     //固定
     if(type == LOCK | type == UNLOCK){
-        for(CObject* obj : this->selected){
+        for(CObject* obj : this->model->GetSelected()){
             obj->Lock(type == LOCK);
         }
     }
@@ -415,12 +416,12 @@ bool CadEditForm::MakeBlock(){
     if(diag->exec()){
         //QVector<CObject*>からQVector<CEdge*>に変換
         QVector<CEdge*> edges;
-        for(CObject* obj:this->selected)edges.push_back(dynamic_cast<CEdge*>(obj));
+        for(CObject* obj:this->model->GetSelected())edges.push_back(dynamic_cast<CEdge*>(obj));
 
         CBlock* block = new CBlock(diag->ExportCBlock());
         block->SetEdgeAll(edges);
         this->model->AddBlocks(block);
-        this->selected.clear();
+        this->model->GetSelected().clear();
     }
     return true;
 }
@@ -526,9 +527,9 @@ void CadEditForm::RefreshRestraints(){
 
 
 void CadEditForm::ImportObjectList(QTreeWidget* list){
-    //this->selectedを更新する。
+    //this->model->GetSelected()を更新する。
     //ポインタを保持していないため、添字でカウント
-    this->selected.clear();
+    this->model->GetSelected().clear();
 
     for(int i=0;i<list->topLevelItemCount();i++){
         QTreeWidgetItem* item = list->topLevelItem(i);
@@ -538,24 +539,24 @@ void CadEditForm::ImportObjectList(QTreeWidget* list){
 
         if(text == "Origin"){
             if(item->isSelected()){
-                this->selected.push_back(this->model->origin);
+                this->model->GetSelected().push_back(this->model->origin);
             }
         }else{
-            //this->selected内をループ
+            //this->model->GetSelected()内をループ
             if(item->isSelected()){
-                this->selected.push_back(this->model->GetEdges()[i-1]);
+                this->model->GetSelected().push_back(this->model->GetEdges()[i-1]);
             }
             //子が選択されているか
             for(int k=0;k<item->childCount();k++){
                 if(item->child(k)->isSelected()){
                     if(k==0){
-                        this->selected.push_back(this->model->GetEdges()[i-1]->start);
+                        this->model->GetSelected().push_back(this->model->GetEdges()[i-1]->start);
                     }
                     else if(k == 1){
-                        this->selected.push_back(this->model->GetEdges()[i-1]->end);
+                        this->model->GetSelected().push_back(this->model->GetEdges()[i-1]->end);
                     }
                     else{
-                        this->selected.push_back(this->model->GetEdges()[i-1]->GetMiddle(k-2));
+                        this->model->GetSelected().push_back(this->model->GetEdges()[i-1]->GetMiddle(k-2));
                     }
                 }
             }
