@@ -128,7 +128,8 @@ void SolidEditForm::paintGL(){
     //エッジ描画
     for(int i=0;i<this->model->GetEdges().size();i++){
         CEdge* edge = this->model->GetEdges()[i];
-        glBegin(GL_LINE_LOOP);
+
+        glBegin(GL_LINES);
         if(hang_obj == edge) glColor3f(1,0,0);
         else                 glColor3f(0,0,0);
 

@@ -2,6 +2,7 @@
 #define POINT_H
 #include <cmath>
 #include <QPoint>
+#include <QDebug>
 #include <QTransform>
 #include <initializer_list>
 #include <type_traits>
@@ -214,8 +215,7 @@ public:
         if(MoreThan(current(),a,b)){
             if(a.x() > 0)return 360 - std::acos(a.x()*b.x() + a.y()*b.y()) * 180 / PI;
             else return std::acos(a.x()*b.x() + a.y()*b.y()) * 180 / PI;
-        }
-        else {
+        }else {
             if(a.x() < 0)return 360 - std::acos(a.x()*b.x() + a.y()*b.y()) * 180 / PI;
             else return std::acos(a.x()*b.x() + a.y()*b.y()) * 180 / PI;
         }
@@ -228,6 +228,13 @@ public:
             return 90;
         }
         return std::acos(a.DotPos(b)) * 180 / PI;
+    }
+
+    //任意軸回転
+    static current RodriguesRotate(current value,current base,double theta){
+        current n = base.GetNormalize();
+        current r = value;//.GetNormalize();
+        return n * (n.DotPos(r)) + (r - n*(n.DotPos(r)))*std::cos(theta) - (r.Cross(n)*std::sin(theta));
     }
 
 
