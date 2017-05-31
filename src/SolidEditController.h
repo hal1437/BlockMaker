@@ -17,7 +17,7 @@ public:
     constexpr static int DEFAULT_FACE_LEGTH = 100;
     CadModelCore* model;
 
-    QVector<Face> face_select;//面選択
+    CPoint* hang_point = nullptr;//最終生成点
 
     //正面を単位行列とした時の各面変換への行列
     Quat getConvertFrontToSide()const;

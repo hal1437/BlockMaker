@@ -15,7 +15,7 @@ void SolidEditForm::MakeObject(){
         //生成
         this->make_controller->Making(state,this->mouse_pos,hanged);
         //最終点を保持
-        this->hang_point = this->make_controller->GetLastPos();
+        this->controller->hang_point = this->make_controller->GetLastPos();
     }
     this->repaint();
 }
@@ -47,7 +47,6 @@ Face     SolidEditForm::GetHangedFace  (){
 }
 
 CObject* SolidEditForm::GetHangedObject(){
-    if(click_base != Pos(0,0))return nullptr;
     Pos  hang_center = (Pos(0,0,1) + this->mouse_pos).Dot(Quat::getRotateXMatrix(theta1).Dot(Quat::getRotateYMatrix(theta2)));
     return this->controller->getHangedObject(hang_center,(this->camera - this->center).GetNormalize());
 }
@@ -87,7 +86,7 @@ void SolidEditForm::mousePressEvent  (QMouseEvent *event){
     click_base = Pos(event->pos().x(),event->pos().y());
 
     //スケッチ開始
-    if(this->state == MAKE_OBJECT::Edit){
+    if(this->state == MAKE_OBJECT::Edit || !this->isSketcheing()){
         Pos  hang_center = (Pos(0,0,1) + this->mouse_pos).Dot(Quat::getRotateXMatrix(theta1).Dot(Quat::getRotateYMatrix(theta2)));
         Face f = this->controller->getHangedFace  (hang_center,(this->camera - this->center).GetNormalize());
         //面が選択済みならスケッチ開始
@@ -109,8 +108,8 @@ void SolidEditForm::mouseMoveEvent   (QMouseEvent *event){
         click_base = Pos(event->pos().x(),event->pos().y());
     }
     //最終保持座標を更新
-    if(hang_point != nullptr){
-        hang_point->Move(this->mouse_pos-*hang_point);
+    if(this->controller->hang_point != nullptr){
+        this->controller->hang_point->Move(this->mouse_pos-*this->controller->hang_point);
     }
     repaint();
 }
@@ -161,7 +160,6 @@ void SolidEditForm::paintGL(){
         if(theta1 < -M_PI/2) theta1 = -M_PI/2;
         this->camera = Pos(0,0,round).Dot(Quat::getRotateXMatrix(theta1).Dot(Quat::getRotateYMatrix(theta2)));
     }
-    qDebug() << this->camera.x() << this->camera.y() << this->camera.z();
     glMatrixMode(GL_PROJECTION);  //行列モード切替
     glLoadIdentity();
     glOrtho(-this->width() *(round),

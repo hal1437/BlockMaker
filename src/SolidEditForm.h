@@ -25,7 +25,6 @@ private:
 
     Pos mouse_pos;  //マウス座標
     Pos click_base; //ドラッグ保持点
-    CPoint* hang_point = nullptr;
 
     MAKE_OBJECT state = MAKE_OBJECT::Edit;    //生成種類
     Face sketch_face;  //スケッチ平面

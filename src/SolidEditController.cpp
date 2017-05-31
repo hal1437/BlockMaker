@@ -77,8 +77,8 @@ CObject* SolidEditController::getHangedObject(Pos center, Pos dir)const{
     //点の選択
     for(int i=0;i<this->model->GetEdges().size();i++){
         CEdge* e = this->model->GetEdges()[i];
-        if((Pos::LineNearPoint(line.pos1,line.pos2, *e->start) - *e->start).Length() < CPoint::COLLISION_SIZE)ans = e->start;
-        if((Pos::LineNearPoint(line.pos1,line.pos2, *e->end  ) - *e->end  ).Length() < CPoint::COLLISION_SIZE)ans = e->end;
+        if((Pos::LineNearPoint(line.pos1,line.pos2, *e->start) - *e->start).Length() < CPoint::COLLISION_SIZE && hang_point != e->start)ans = e->start;
+        if((Pos::LineNearPoint(line.pos1,line.pos2, *e->end  ) - *e->end  ).Length() < CPoint::COLLISION_SIZE && hang_point != e->end  )ans = e->end;
     }
     return ans;
 }
