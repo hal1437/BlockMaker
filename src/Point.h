@@ -152,6 +152,8 @@ public:
     }
 
 };
+typedef Matrix<double,3,3> Mat;
+typedef Matrix<double,4,4> Quat;
 
 
 
@@ -326,10 +328,7 @@ namespace std {
     };
 }
 
-
 typedef Point<double> Pos;
-typedef Matrix<double,3,3> Mat;
-typedef Matrix<double,4,4> Quat;
 
 #endif // POINT_H
 

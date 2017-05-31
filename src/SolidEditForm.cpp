@@ -26,14 +26,16 @@ void SolidEditForm::StartSketch(Face face){
     this->sketch_face = face;
     Pos cross = face.corner[0].Cross(face.corner[1]);
     cross = cross.GetNormalize();
-    TimeDivider *p1,*p2,*p3;
+
+    double theta1_ = std::atan2(cross.y(),std::sqrt(cross.x()*cross.x()+cross.z()*cross.z()));
+    double theta2_ = std::atan2(-cross.x(),cross.z());
+
+    TimeDivider *p1,*p2;
     //カメラ向き占有
-    p1 = TimeDivider::TimeDivide(this->camera.x(),round*cross.x(),500);
-    p2 = TimeDivider::TimeDivide(this->camera.y(),round*cross.y(),500);
-    p3 = TimeDivider::TimeDivide(this->camera.z(),round*cross.z(),500);
+    p1 = TimeDivider::TimeDivide(this->theta1,theta1_,500);
+    p2 = TimeDivider::TimeDivide(this->theta2,theta2_,500);
     connect(p1,SIGNAL(PerTime()),this,SLOT(repaint()));
     connect(p2,SIGNAL(PerTime()),this,SLOT(repaint()));
-    connect(p3,SIGNAL(PerTime()),this,SLOT(repaint()));
 }
 
 bool SolidEditForm::isSketcheing(){
@@ -42,12 +44,12 @@ bool SolidEditForm::isSketcheing(){
 
 Face     SolidEditForm::GetHangedFace  (){
     if(click_base != Pos(0,0))return Face();
-    Pos  hang_center = (Pos(0,0,1) + this->mouse_pos).Dot(Quat::getRotateXMatrix(theta1).Dot(Quat::getRotateYMatrix(theta2)));
+    Pos  hang_center = (Pos(0,0,1) + this->screen_pos).Dot(Quat::getRotateXMatrix(theta1).Dot(Quat::getRotateYMatrix(theta2)));
     return  this->controller->getHangedFace  (hang_center,(this->camera - this->center).GetNormalize());
 }
 
 CObject* SolidEditForm::GetHangedObject(){
-    Pos  hang_center = (Pos(0,0,1) + this->mouse_pos).Dot(Quat::getRotateXMatrix(theta1).Dot(Quat::getRotateYMatrix(theta2)));
+    Pos  hang_center = (Pos(0,0,1) + this->screen_pos).Dot(Quat::getRotateXMatrix(theta1).Dot(Quat::getRotateYMatrix(theta2)));
     return this->controller->getHangedObject(hang_center,(this->camera - this->center).GetNormalize());
 }
 void SolidEditForm::ColorSelect(CObject* obj){
@@ -99,8 +101,9 @@ void SolidEditForm::mousePressEvent  (QMouseEvent *event){
 }
 void SolidEditForm::mouseMoveEvent   (QMouseEvent *event){
 
-    this->mouse_pos = Pos(event->pos().x() - this->width()/2,-(event->pos().y() - this->height()/2))*2;
-    this->mouse_pos *= round;
+    this->screen_pos =  Pos(event->pos().x() - this->width()/2,-(event->pos().y() - this->height()/2))*2;
+    this->screen_pos =  this->screen_pos * round;
+    this->mouse_pos  =  this->screen_pos.Dot(Quat::getRotateXMatrix(theta1).Dot(Quat::getRotateYMatrix(theta2)));
     if(this->click_base != Pos(0,0) && !this->isSketcheing()){
         //カメラ角度変更
         this->theta1 += static_cast<double>(event->pos().y() - click_base.y())/SENSITIVITY;
@@ -155,11 +158,9 @@ void SolidEditForm::resizeGL(int w, int h){
 void SolidEditForm::paintGL(){
 
     //カメラ調整
-    if(!this->isSketcheing()){
-        if(theta1 >  M_PI/2) theta1 =  M_PI/2;
-        if(theta1 < -M_PI/2) theta1 = -M_PI/2;
-        this->camera = Pos(0,0,round).Dot(Quat::getRotateXMatrix(theta1).Dot(Quat::getRotateYMatrix(theta2)));
-    }
+    if(theta1 >  M_PI/2) theta1 =  M_PI/2;
+    if(theta1 < -M_PI/2) theta1 = -M_PI/2;
+    this->camera = Pos(0,0,round).Dot(Quat::getRotateXMatrix(theta1).Dot(Quat::getRotateYMatrix(theta2)));
     glMatrixMode(GL_PROJECTION);  //行列モード切替
     glLoadIdentity();
     glOrtho(-this->width() *(round),

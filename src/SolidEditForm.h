@@ -24,6 +24,7 @@ private:
     MakeObjectController* make_controller;
 
     Pos mouse_pos;  //マウス座標
+    Pos screen_pos; //スクリーン座標
     Pos click_base; //ドラッグ保持点
 
     MAKE_OBJECT state = MAKE_OBJECT::Edit;    //生成種類
