@@ -5,6 +5,7 @@
 #include <QMouseEvent>
 #include <QOpenGLWidget>
 #include <GLUT/glut.h>
+#include "MakeObjectController.h"
 #include "SolidEditController.h"
 #include "TimeDivider.h"
 #include "CadModelCore.h"
@@ -13,11 +14,6 @@ namespace Ui {
 class SolidEditForm;
 }
 
-enum EDIT_STATE{
-    FREE   , //カメラ自由旋回モード
-    SKETCH , //二次元作業中
-};
-
 class SolidEditForm : public QOpenGLWidget,public CadModelCoreInterface
 {
     Q_OBJECT
@@ -25,23 +21,34 @@ class SolidEditForm : public QOpenGLWidget,public CadModelCoreInterface
     const int SENSITIVITY = 100;
 private:
     SolidEditController* controller;
+    MakeObjectController* make_controller;
 
     Pos mouse_pos;  //マウス座標
     Pos click_base; //ドラッグ保持点
+    CPoint* hang_point = nullptr;
 
-    EDIT_STATE status; //作業状態
+    MAKE_OBJECT state = MAKE_OBJECT::Edit;    //生成種類
+    Face sketch_face;  //スケッチ平面
     Quat sketch_mat;   //スケッチ生成行列
 
     Pos camera; //カメラ位置
     Pos center; //カメラ注意点
-    double round = 1;//半径
+    double round = 1;  //半径
     double theta1 = 0; //角度1(縦方向)
     double theta2 = 0; //角度2(横方向)
 
+    bool shift_pressed = false; //shiftボタン
+    bool ctrl_pressed  = false; //ctrlボタン
+
 private:
 
-    //選択
-    void MouseSelect();
+    void MakeObject();//オブジェクト生成
+
+    void StartSketch(Face face);//スケッチ開始
+    bool isSketcheing();        //スケッチ中
+    Face     GetHangedFace  (); //直下面を取得
+    CObject* GetHangedObject(); //直下オブジェクトを取得
+    void ColorSelect(CObject* obj);//オブジェクト色選択
 
 public:
     //カメラ方向セット
@@ -49,6 +56,7 @@ public:
 
 public:
     void keyPressEvent    (QKeyEvent *event);
+    void keyReleaseEvent  (QKeyEvent *event);
     void mousePressEvent  (QMouseEvent *event);
     void mouseMoveEvent   (QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
@@ -60,6 +68,7 @@ public:
     void paintGL();             //  描画処理
 public slots:
 
+    void SetState(MAKE_OBJECT state); //生成種類設定
     void CEdgeChanged(QVector<CEdge*> e);
     void CBlockChanged(QVector<CBlock*> e);
 

@@ -31,6 +31,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     //CadEditFoam関連
     connect(this          ,SIGNAL(ToggleChanged(MAKE_OBJECT)),ui->CadEdit   ,SLOT(SetState(MAKE_OBJECT)));
+    connect(this          ,SIGNAL(ToggleChanged(MAKE_OBJECT)),ui->SolidEdit ,SLOT(SetState(MAKE_OBJECT)));
     connect(ui->CadEdit   ,SIGNAL(ScaleChanged(double)),ui->ScaleSpin ,SLOT(setValue(double)));
     connect(ui->CadEdit   ,SIGNAL(DepthChanged(double)),ui->DepthSpin ,SLOT(setValue(double)));
     connect(ui->CadEdit   ,SIGNAL(RequireRefreshUI())  ,this          ,SLOT(RefreshUI()));

@@ -13,6 +13,10 @@ struct Line{
 //面
 struct Face{
     Pos corner[4];
+    bool operator==(Face f){
+        return std::equal(this->corner,this->corner+4,f.corner);
+    }
+    bool operator!=(Face f){return !(*this == f);}
 };
 
 
