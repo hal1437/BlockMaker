@@ -25,7 +25,6 @@ private:
 
     Pos mouse_pos;  //マウス座標
     Pos screen_pos; //スクリーン座標
-    Pos click_base; //ドラッグ保持点
 
     MAKE_OBJECT state = MAKE_OBJECT::Edit;    //生成種類
     Face sketch_face;  //スケッチ平面
@@ -39,6 +38,8 @@ private:
 
     bool shift_pressed = false; //shiftボタン
     bool ctrl_pressed  = false; //ctrlボタン
+    Pos drag_base;   //ドラッグ起点
+    Pos first_click; //クリック起点
 
 private:
 
@@ -58,8 +59,8 @@ public:
     void keyPressEvent    (QKeyEvent *event);
     void keyReleaseEvent  (QKeyEvent *event);
     void mousePressEvent  (QMouseEvent *event);
-    void mouseMoveEvent   (QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
+    void mouseMoveEvent   (QMouseEvent *event);
     void wheelEvent       (QWheelEvent *event);
 
     void SetModel(CadModelCore* model);
