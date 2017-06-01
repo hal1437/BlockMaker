@@ -17,21 +17,21 @@ MoveTransformDialog::~MoveTransformDialog()
 }
 
 
-void MoveTransformDialog::setObjects(QVector<CObject*> obj){
-    this->objects = obj;
-}
-
 void MoveTransformDialog::Accept(){
+    Pos value = Pos(this->ui->XSpinBox->value(),
+                    this->ui->YSpinBox->value(),
+                    this->ui->ZSpinBox->value());
+
     if(this->ui->RelativeRadio->isChecked()){
-        for(CObject* obj : this->objects){
-            obj->Move(Pos(this->ui->XSpinBox->value(),this->ui->YSpinBox->value()));
+        for(CObject* obj : this->model->GetSelected()){
+            obj->Move(value);
         }
     }
     if(this->ui->AbsoluteRadio->isChecked()){
-        for(CObject* obj : this->objects){
-            Pos p(0,0);
+        for(CObject* obj : this->model->GetSelected()){
+            Pos p = Pos(0,0);
             if(obj->is<CPoint>())p = *dynamic_cast<CPoint*>(obj);
-            obj->Move(Pos(this->ui->XSpinBox->value(),this->ui->YSpinBox->value()) - p);
+            obj->Move(value - p);
         }
     }
     emit RepaintRequest();

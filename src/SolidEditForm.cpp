@@ -74,9 +74,15 @@ void SolidEditForm::keyPressEvent    (QKeyEvent *event){
     if(event->key() == Qt::Key_Left  )setCameraRotate(0,0);
     if(event->key() == Qt::Key_Right )setCameraRotate(0,-M_PI/2);
     if(event->key() == Qt::Key_Down  )setCameraRotate(M_PI/4,-M_PI/4);
-    if(event->key() == Qt::Key_Escape)this->sketch_face = Face(); //スケッチ終了
     shift_pressed = event->modifiers() & Qt::ShiftModifier;
     ctrl_pressed  = event->modifiers() & Qt::ControlModifier;
+
+    if(event->key() == Qt::Key_Escape){
+        this->controller->hang_point = nullptr;
+        this->make_controller->Escape();
+        this->sketch_face = Face(); //スケッチ終了
+    }
+
     this->repaint();
 }
 void SolidEditForm::keyReleaseEvent  (QKeyEvent *event){
@@ -102,7 +108,7 @@ void SolidEditForm::mouseReleaseEvent(QMouseEvent *event){
             StartSketch(f);
         }
     }
-    drag_base = Pos(0,0);
+    this->drag_base = Pos(0,0);
 }
 void SolidEditForm::mouseMoveEvent   (QMouseEvent *event){
     this->screen_pos =  Pos(event->pos().x() - this->width()/2,-(event->pos().y() - this->height()/2))*2;
@@ -114,6 +120,7 @@ void SolidEditForm::mouseMoveEvent   (QMouseEvent *event){
         this->theta2 += static_cast<double>(event->pos().x() - this->drag_base.x())/SENSITIVITY;
         this->drag_base = Pos(event->pos().x(),event->pos().y());
     }
+
     //最終保持座標を更新
     if(this->controller->hang_point != nullptr){
         this->controller->hang_point->Move(this->mouse_pos-*this->controller->hang_point);

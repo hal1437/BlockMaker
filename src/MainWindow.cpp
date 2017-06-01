@@ -201,6 +201,9 @@ void MainWindow::ResetAllExpantion(){
 void MainWindow::ShowMoveTransform(){
     static MoveTransformDialog* diag = new MoveTransformDialog(this);
     connect(diag,SIGNAL(RepaintRequest()),this,SLOT(repaint()));
+    connect(diag,SIGNAL(RepaintRequest()),ui->CadEdit  ,SLOT(repaint()));
+    connect(diag,SIGNAL(RepaintRequest()),ui->SolidEdit,SLOT(repaint()));
+    diag->SetModel(this->model);
     diag->setWindowTitle("MoveTransform");
     diag->setWindowFlags(Qt::Dialog | Qt::WindowStaysOnTopHint);
     diag->show();

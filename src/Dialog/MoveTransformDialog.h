@@ -2,23 +2,20 @@
 #define MOVETRANSFORMDIALOG_H
 
 #include <QDialog>
-#include "CObject/CObject.h"
-#include "CObject/CPoint.h"
+#include "CadModelCore.h"
 
 namespace Ui {
 class MoveTransformDialog;
 }
 
-class MoveTransformDialog : public QDialog
+class MoveTransformDialog : public QDialog,public CadModelCoreInterface
 {
     Q_OBJECT
 
 private:
     Ui::MoveTransformDialog *ui;
-    QVector<CObject*> objects;
 
 public:
-    void setObjects(QVector<CObject*> obj);
 
     explicit MoveTransformDialog(QWidget *parent = 0);
     ~MoveTransformDialog();

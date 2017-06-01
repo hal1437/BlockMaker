@@ -75,7 +75,6 @@ void MakeObjectController::Making(MAKE_OBJECT type, Pos pos, CObject* merge){
             //継続
             StepMaking(pos,merge);
         }
-
     }
 }
 
