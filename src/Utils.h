@@ -21,11 +21,11 @@ public slots:                                    \
     QVector<TYPE>& Get##NAME(){return NAME;}     \
     inline void Add##NAME(TYPE value){           \
         NAME.push_back(value);                   \
-        emit Update##NAME(NAME);                 \
+        emit Update##NAME();                     \
     }                                            \
     inline void Remove##NAME(TYPE value){        \
         NAME.removeAll(value);                   \
-        emit Update##NAME(NAME);                 \
+        emit Update##NAME();                     \
     }                                            \
 
 

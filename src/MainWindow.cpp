@@ -7,8 +7,8 @@ void MainWindow::SetModel(CadModelCore* model){
     this->ui->CadEdit  ->SetModel(model);
     this->ui->SolidEdit->SetModel(model);
     //モデルと結合
-    connect(this->model,SIGNAL(UpdateEdges   (QVector<CEdge*>  )),this,SLOT(UpdateObjectTree        (QVector<CEdge*>)));
-    connect(this->model,SIGNAL(UpdateSelected(QVector<CObject*>)),this,SLOT(UpdateObjectTreeSelected(QVector<CObject*>)));
+    connect(this->model,SIGNAL(UpdateEdges   ()),this,SLOT(UpdateObjectTree        ()));
+    connect(this->model,SIGNAL(UpdateSelected()),this,SLOT(UpdateObjectTreeSelected()));
 }
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -277,7 +277,8 @@ void MainWindow::RefreshStatusBar(Pos){
                                                     QString::number(out.z()) + ")");
 }
 
-void MainWindow::UpdateObjectTree(QVector<CEdge*> edges){
+void MainWindow::UpdateObjectTree(){
+    QVector<CEdge*> edges = this->model->GetEdges();
 
     QTreeWidget* list = this->ui->ObjectList;
     if(list->topLevelItemCount() != edges.size()+1){
@@ -340,7 +341,7 @@ void MainWindow::UpdateObjectTree(QVector<CEdge*> edges){
 
 }
 
-void MainWindow::UpdateObjectTreeSelected(QVector<CObject*>){
+void MainWindow::UpdateObjectTreeSelected(){
     //選択状態の反映
     QTreeWidget* list = this->ui->ObjectList;
     for(int i=0;i<list->topLevelItemCount();i++){
@@ -361,7 +362,8 @@ void MainWindow::UpdateObjectTreeSelected(QVector<CObject*>){
     }
 }
 
-void MainWindow::UpdateBlocksTree(QVector<CBlock*> blocks){
+void MainWindow::UpdateBlocksTree(){
+    QVector<CBlock*> blocks = this->model->GetBlocks();
     //数が一致しなければ、全て削除し再度代入する
     QListWidget* list = this->ui->BlockList;
     if(list->count() != blocks.size()){

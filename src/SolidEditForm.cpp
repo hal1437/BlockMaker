@@ -136,8 +136,8 @@ void SolidEditForm::SetModel(CadModelCore* model){
     this->model = model;
     this->controller->setModel(model);
     this->make_controller->SetModel(model);
-    connect(this->model,SIGNAL(UpdateEdges (QVector<CEdge*>)) ,this,SLOT(CEdgeChanged(QVector<CEdge*>)));
-    connect(this->model,SIGNAL(UpdateBlocks(QVector<CBlock*>)),this,SLOT(CBlockChanged(QVector<CBlock*>)));
+    connect(this->model,SIGNAL(UpdateEdges ()),this,SLOT(repaint()));
+    connect(this->model,SIGNAL(UpdateBlocks()),this,SLOT(repaint()));
 }
 
 void SolidEditForm::initializeGL(){

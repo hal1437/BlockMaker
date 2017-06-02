@@ -39,12 +39,11 @@ public:
 
 signals:
     void SelectObjectChanged();
-    void UpdateObjects   ();
-    void UpdateSelected  (QVector<CObject*>);
-    void UpdateEdges     (QVector<CEdge*>);
-    void UpdateBlocks    (QVector<CBlock*>);
-    void UpdateRestraints(QVector<Restraint*>);
-    void UpdateDimensions(QVector<SmartDimension*>);
+    void UpdateSelected  ();
+    void UpdateEdges     ();
+    void UpdateBlocks    ();
+    void UpdateRestraints();
+    void UpdateDimensions();
 };
 
 class CadModelCoreInterface{

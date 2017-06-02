@@ -65,9 +65,9 @@ public slots:
     void ReciveBlockListChanged (); //ブロックリスト更新
     void RefreshStatusBar(Pos);        //ステータスバー更新
 
-    void UpdateObjectTree        (QVector<CEdge *> edges);  //エッジ表示
-    void UpdateObjectTreeSelected(QVector<CObject*>);       //選択情報表示
-    void UpdateBlocksTree        (QVector<CBlock*> blocks); //箱表示
+    void UpdateObjectTree        ();  //エッジ表示
+    void UpdateObjectTreeSelected();       //選択情報表示
+    void UpdateBlocksTree        (); //箱表示
     //void UpdateBLocksTreeSelected(); //選択箱表示
 
 
