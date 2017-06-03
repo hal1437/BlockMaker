@@ -7,7 +7,6 @@
 #include <limits>
 #include "CadModelCore.h"
 
-#include "Dialog/SolidView.h"
 #include "Dialog/SmartDimensionDialog.h"
 #include "Dialog/CBoxDefineDialog.h"
 #include "Dialog/MoveTransformDialog.h"
@@ -55,7 +54,6 @@ public slots:
     void ToggleConflict(bool conflict);
     void ResetAllExpantion();     //拡大、移動リセット
     void ShowMoveTransform();     //移動
-    void ShowSolidView();         //立体表示
     void ShowGridFilter();        //グリッドフィルター
 
     void MakeRestraint();   //拘束作成

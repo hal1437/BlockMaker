@@ -388,7 +388,6 @@
    <addaction name="separator"/>
    <addaction name="actionDelete"/>
    <addaction name="actionCheckConflict"/>
-   <addaction name="actionSolidView"/>
    <addaction name="actionGridFilter"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
@@ -567,11 +566,6 @@
    </property>
    <property name="text">
     <string>Move</string>
-   </property>
-  </action>
-  <action name="actionSolidView">
-   <property name="text">
-    <string>SolidView</string>
    </property>
   </action>
   <action name="actionGridFilter">

@@ -19,7 +19,6 @@ MainWindow::MainWindow(QWidget *parent) :
     //connect(ui->actionCtrlZ          ,SIGNAL(triggered())                        ,this       ,SLOT(CtrlZ()));
     connect(ui->actionDelete         ,SIGNAL(triggered())                        ,this       ,SLOT(Delete()));
     connect(ui->actionMove           ,SIGNAL(triggered())                        ,this       ,SLOT(ShowMoveTransform()));
-    connect(ui->actionSolidView      ,SIGNAL(triggered())                        ,this       ,SLOT(ShowSolidView()));
     connect(ui->actionGridFilter     ,SIGNAL(triggered())                        ,this       ,SLOT(ShowGridFilter()));
     connect(ui->actionResetExpantion ,SIGNAL(triggered())                        ,this       ,SLOT(ResetAllExpantion()));
     connect(ui->ToolDimension        ,SIGNAL(triggered())                        ,ui->CadEdit,SLOT(MakeSmartDimension()));
@@ -207,18 +206,6 @@ void MainWindow::ShowMoveTransform(){
     diag->setWindowTitle("MoveTransform");
     diag->setWindowFlags(Qt::Dialog | Qt::WindowStaysOnTopHint);
     diag->show();
-}
-void MainWindow::ShowSolidView(){
-    static SolidView* s = nullptr;
-    if(s == nullptr){
-        s = new SolidView(this);
-        connect(this->ui->CadEdit,SIGNAL(RequireRefreshSolidUI(QVector<CEdge*>,QVector<CBlock>)),
-                s                ,SLOT  (RefreshUI            (QVector<CEdge*>,QVector<CBlock>)));
-    }
-    s->setWindowTitle("SolidView");
-    s->setWindowFlags(Qt::Dialog | Qt::WindowStaysOnTopHint);
-    s->setMinimumSize(300,300);
-    s->show();
 }
 void MainWindow::ShowGridFilter(){
     static GridFilterDialog* diag = new GridFilterDialog(this);
