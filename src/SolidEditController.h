@@ -5,6 +5,7 @@
 #include <algorithm>
 #include "Collision.h"
 #include "CadModelCore.h"
+#include "CObject/CFace.h"
 
 class SolidEditController:public QObject
 {
@@ -27,25 +28,27 @@ public:
     Quat getConvertSideToTop  ()const;
     Quat getConvertTopToSide  ()const;
 
+    CFace* base[3];//正面,平面,右側面
 
     //正面を取得
-    Face getFrontFace_impl(Quat convert, Quat invert)const;
+    CFace* getFrontFace_impl(Quat convert, Quat invert)const;
 
 public:
     void setModel(CadModelCore* model){this->model = model;}
 
-    Face getFrontFace()const;//正面
-    Face getTopFace  ()const;//平面
-    Face getSideFace ()const;//右側面
+    CFace* getFrontFace()const;//正面
+    CFace* getTopFace  ()const;//平面
+    CFace* getSideFace ()const;//右側面
 
     CObject* getHangedObject(Pos center, Pos dir)const;
-    Face getHangedFace(Pos center, Pos dir)const;//直下面
-
-
-
+    CFace* getHangedFace(Pos center, Pos dir)const;//直下面
 
     explicit SolidEditController(QObject *parent = 0);
     ~SolidEditController();
+
+public slots:
+    void Refresh3Face();//三面を更新する。
+
 };
 
 #endif // SOLIDEDITCONTROLLER_H

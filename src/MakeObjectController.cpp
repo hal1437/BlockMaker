@@ -1,7 +1,7 @@
 #include "MakeObjectController.h"
 
 
-CREATE_RESULT MakeObjectController::MakeJoint(CObject* obj,Pos pos,CObject* merge){
+CREATE_RESULT MakeObjectController::MakeJoint(CEdge* obj,Pos pos,CObject* merge){
 
     CPoint* new_point;
     if(merge == nullptr){

@@ -19,12 +19,17 @@ Quat SolidEditController::getConvertTopToSide()const{
     return this->getConvertTopToFront().Dot(this->getConvertFrontToSide());
 }
 
-Face SolidEditController::getFrontFace_impl(Quat convert,Quat invert)const{
+CFace* SolidEditController::getFrontFace_impl(Quat convert,Quat invert)const{
     //正面を軸として変換を通し各平面の大きさを取得する関数
-    if(this->model->GetBlocks().empty())return Face{{Pos( DEFAULT_FACE_LEGTH, DEFAULT_FACE_LEGTH,0).Dot(invert),
-                                                     Pos(-DEFAULT_FACE_LEGTH, DEFAULT_FACE_LEGTH,0).Dot(invert),
-                                                     Pos(-DEFAULT_FACE_LEGTH,-DEFAULT_FACE_LEGTH,0).Dot(invert),
-                                                     Pos( DEFAULT_FACE_LEGTH,-DEFAULT_FACE_LEGTH,0).Dot(invert)}};
+    if(this->model->GetBlocks().empty()){
+        CFace* face = new CFace();
+        face->corner.push_back(new CPoint(Pos( DEFAULT_FACE_LEGTH, DEFAULT_FACE_LEGTH,0).Dot(invert)));
+        face->corner.push_back(new CPoint(Pos(-DEFAULT_FACE_LEGTH, DEFAULT_FACE_LEGTH,0).Dot(invert)));
+        face->corner.push_back(new CPoint(Pos(-DEFAULT_FACE_LEGTH,-DEFAULT_FACE_LEGTH,0).Dot(invert)));
+        face->corner.push_back(new CPoint(Pos( DEFAULT_FACE_LEGTH,-DEFAULT_FACE_LEGTH,0).Dot(invert)));
+        return face;
+    }
+
     double top=0,bottom=0,right=0,left=0;
     for(CBlock* block:this->model->GetBlocks()){
         for(int i=0;i<4;i++){
@@ -53,19 +58,21 @@ Face SolidEditController::getFrontFace_impl(Quat convert,Quat invert)const{
     right  += widht_delta *0.1;
     left   -= widht_delta *0.1;
 
-    return Face{{Pos( right ,top   ,0).Dot(invert),
-                 Pos( right ,bottom,0).Dot(invert),
-                 Pos( left  ,bottom,0).Dot(invert),
-                 Pos( left  ,top   ,0).Dot(invert)}};
+    CFace* face = new CFace();
+    face->corner.push_back(new CPoint(Pos( right ,top   ,0).Dot(invert)));
+    face->corner.push_back(new CPoint(Pos( right ,bottom,0).Dot(invert)));
+    face->corner.push_back(new CPoint(Pos( left  ,bottom,0).Dot(invert)));
+    face->corner.push_back(new CPoint(Pos( left  ,top   ,0).Dot(invert)));
+    return face;
 }
 
-Face SolidEditController::getFrontFace()const{//正面
+CFace* SolidEditController::getFrontFace()const{//正面
     return this->getFrontFace_impl(Quat::getIdentityMatrix(),Quat::getIdentityMatrix());
 }
-Face SolidEditController::getTopFace  ()const{//平面
+CFace* SolidEditController::getTopFace  ()const{//平面
     return this->getFrontFace_impl(this->getConvertFrontToTop(),this->getConvertTopToFront());
 }
-Face SolidEditController::getSideFace ()const{//右側面
+CFace* SolidEditController::getSideFace ()const{//右側面
     return this->getFrontFace_impl(this->getConvertFrontToSide(),this->getConvertSideToFront());
 }
 
@@ -83,18 +90,18 @@ CObject* SolidEditController::getHangedObject(Pos center, Pos dir)const{
     return ans;
 }
 
-Face SolidEditController::getHangedFace(Pos center, Pos dir)const{
+CFace* SolidEditController::getHangedFace(Pos center, Pos dir)const{
 
     //最も近い面を選択する
-    QVector<std::pair<double,Face>> rank;
+    QVector<std::pair<double,CFace*>> rank;
     rank.push_back(std::make_pair(Collision::GetLengthFaceToLine(this->getFrontFace(),Line{center,center+dir}),this->getFrontFace()));
     rank.push_back(std::make_pair(Collision::GetLengthFaceToLine(this->getTopFace()  ,Line{center,center+dir}),this->getTopFace()));
     rank.push_back(std::make_pair(Collision::GetLengthFaceToLine(this->getSideFace() ,Line{center,center+dir}),this->getSideFace()));
 
-    if(std::all_of(rank.begin(),rank.end(),[](std::pair<double,Face> v){return v.first==-1;})){
-        return Face();
+    if(std::all_of(rank.begin(),rank.end(),[](std::pair<double,CFace*> v){return v.first==-1;})){
+        return nullptr;
     }else{
-        return std::min_element(rank.begin(),rank.end(),[](std::pair<double,Face> lhs,std::pair<double,Face> rhs){
+        return std::min_element(rank.begin(),rank.end(),[](std::pair<double,CFace*> lhs,std::pair<double,CFace*> rhs){
             return lhs.first > rhs.first;
         })->second;
     }
@@ -109,5 +116,14 @@ SolidEditController::SolidEditController(QObject *parent):
 
 SolidEditController::~SolidEditController()
 {
+}
+
+void SolidEditController::Refresh3Face(){
+    for(int i=0;i<3;i++){
+        if(this->base[i] != nullptr) delete this->base[i];
+    }
+    this->base[0] = this->getFrontFace();
+    this->base[1] = this->getTopFace();
+    this->base[2] = this->getSideFace();
 }
 

@@ -21,7 +21,7 @@ private:
 
 private:
 
-    CREATE_RESULT MakeJoint(CObject* obj,Pos pos, CObject *merge);
+    CREATE_RESULT MakeJoint(CEdge* obj,Pos pos, CObject *merge);
     void StartMaking(MAKE_OBJECT type, Pos pos, CObject* merge = nullptr); //生成開始
     void StepMaking (Pos pos,CObject* merge = nullptr);                 //追加生成
     void EndMaking  (Pos pos,CObject* merge = nullptr);                 //生成終了

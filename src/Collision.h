@@ -2,6 +2,7 @@
 #define COLLISION_H
 
 #include "Point.h"
+#include "CObject/CFace.h"
 #include <qdebug.h>
 
 //線
@@ -10,16 +11,6 @@ struct Line{
     Pos pos2;
 };
 
-//面
-struct Face{
-    Pos corner[4];
-    bool operator==(Face f){
-        return std::equal(this->corner,this->corner+4,f.corner);
-    }
-    bool operator!=(Face f){return !(*this == f);}
-};
-
-
 class Collision
 {
 public:
@@ -27,9 +18,8 @@ public:
     static Pos GetHitPosFaceToLine(Pos face_norm,Pos face_center,Pos line_0,Pos line_s);
 
 public:
-
-    static double GetLengthFaceToLine(Face face,struct Line line);
-    static bool CheckHitFaceToLine(Face face,struct Line line);
+    static double GetLengthFaceToLine(CFace* face, struct Line line);
+    static bool   CheckHitFaceToLine (CFace* face, struct Line line);
 
     Collision();
     ~Collision();

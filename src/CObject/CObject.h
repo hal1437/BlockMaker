@@ -38,9 +38,6 @@ public:
         return (dynamic_cast<const T*>(this) != nullptr);
     }
 
-    //作成関数(完了時:true , 継続時:false)
-    virtual CREATE_RESULT Create(CPoint* pos) = 0;
-
     virtual bool Draw(QPainter& painter)const = 0;//描画関数
     virtual bool Move(const Pos& diff) = 0;//移動関数
     virtual void Lock(bool lock);//ロック

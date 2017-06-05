@@ -21,10 +21,10 @@ void SolidEditForm::MakeObject(){
 }
 
 
-void SolidEditForm::StartSketch(Face face){
-    if(this->isSketcheing())return ;
+void SolidEditForm::StartSketch(CFace* face){
+    if(this->isSketcheing())return;
     this->sketch_face = face;
-    Pos cross = face.corner[0].Cross(face.corner[1]);
+    Pos cross = face->GetNorm();
     cross = cross.GetNormalize();
 
     double theta1_ = std::atan2(cross.y(),std::sqrt(cross.x()*cross.x()+cross.z()*cross.z()));
@@ -39,12 +39,12 @@ void SolidEditForm::StartSketch(Face face){
 }
 
 bool SolidEditForm::isSketcheing(){
-    return (this->sketch_face != Face());
+    return (this->sketch_face != nullptr);
 }
 
-Face     SolidEditForm::GetHangedFace  (){
+CFace* SolidEditForm::GetHangedFace(){
     Pos  hang_center = (Pos(0,0,1) + this->screen_pos).Dot(Quat::getRotateXMatrix(theta1).Dot(Quat::getRotateYMatrix(theta2)));
-    return  this->controller->getHangedFace  (hang_center,(this->camera - this->center).GetNormalize());
+    return  this->controller->getHangedFace(hang_center,(this->camera - this->center).GetNormalize());
 }
 
 CObject* SolidEditForm::GetHangedObject(){
@@ -80,7 +80,7 @@ void SolidEditForm::keyPressEvent    (QKeyEvent *event){
     if(event->key() == Qt::Key_Escape){
         this->controller->hang_point = nullptr;
         this->make_controller->Escape();
-        this->sketch_face = Face(); //スケッチ終了
+        this->sketch_face = nullptr; //スケッチ終了
     }
 
     this->repaint();
@@ -102,8 +102,8 @@ void SolidEditForm::mousePressEvent  (QMouseEvent *event){
 void SolidEditForm::mouseReleaseEvent(QMouseEvent *event){
     //ドラッグでなければ
     if(this->first_click == Pos(event->pos().x(),event->pos().y())){
-        Face f = this->GetHangedFace();
-        if(f != Face()){
+        CFace* f = this->GetHangedFace();
+        if(f != nullptr){
             //スケッチ開始
             StartSketch(f);
         }
@@ -182,24 +182,22 @@ void SolidEditForm::paintGL(){
     glClearColor(0.7,0.7,0.7,1);//背景
 
     //描画面と色のリスト
-    QVector<std::pair<Face,QVector<int>>> faces;
+    QVector<std::pair<CFace*,QVector<int>>> faces;
     faces.push_back(std::make_pair(controller->getSideFace() ,QVector<int>({1,0,0})));//右側面
     faces.push_back(std::make_pair(controller->getTopFace()  ,QVector<int>({0,1,0})));//平面
     faces.push_back(std::make_pair(controller->getFrontFace(),QVector<int>({0,0,1})));//正面
-    if(this->drag_base == Pos(0,0)){
+    if(this->drag_base == Pos(0,0) && !this->isSketcheing()){
         faces.push_back(std::make_pair(this->GetHangedFace()     ,QVector<int>({0,1,1})));//直下面
     }
     faces.push_back(std::make_pair(this->sketch_face         ,QVector<int>({1,1,0})));//スケッチ面
-
-
     //面の描画
     glLineWidth(2);
-    for(std::pair<Face,QVector<int>>f: faces){
+    for(std::pair<CFace*,QVector<int>>f: faces){
         glBegin(GL_LINE_LOOP);
         glColor3f(f.second[0], f.second[1], f.second[2]);
-        if(f.first != Face()){
+        if(f.first != nullptr){
             for(int j=0;j<4;j++){
-                glVertex3f(f.first.corner[j].x(),f.first.corner[j].y(), f.first.corner[j].z());
+                glVertex3f(f.first->corner[j]->x(),f.first->corner[j]->y(), f.first->corner[j]->z());
             }
         }
         glEnd();

@@ -19,9 +19,10 @@ class CadModelCore:public QObject
 
 public:
     //オブジェクト定義
-    DEFINE_OBSERVER(CObject*        ,Selected)
-    DEFINE_OBSERVER(CEdge*          ,Edges)
-    DEFINE_OBSERVER(CBlock*         ,Blocks)
+    DEFINE_OBSERVER(CObject*        ,Selected  )
+    DEFINE_OBSERVER(CPoint*         ,Points    )
+    DEFINE_OBSERVER(CEdge*          ,Edges     )
+    DEFINE_OBSERVER(CBlock*         ,Blocks    )
     DEFINE_OBSERVER(Restraint*      ,Restraints)
     DEFINE_OBSERVER(SmartDimension* ,Dimensions)
 
@@ -40,6 +41,7 @@ public:
 signals:
     void SelectObjectChanged();
     void UpdateSelected  ();
+    void UpdatePoints    ();
     void UpdateEdges     ();
     void UpdateBlocks    ();
     void UpdateRestraints();

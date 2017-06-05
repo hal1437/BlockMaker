@@ -9,6 +9,7 @@
 #include "SolidEditController.h"
 #include "TimeDivider.h"
 #include "CadModelCore.h"
+#include "CObject/CFace.h"
 
 namespace Ui {
 class SolidEditForm;
@@ -27,7 +28,7 @@ private:
     Pos screen_pos; //スクリーン座標
 
     MAKE_OBJECT state = MAKE_OBJECT::Edit;    //生成種類
-    Face sketch_face;  //スケッチ平面
+    CFace* sketch_face = nullptr;  //スケッチ平面
     Quat sketch_mat;   //スケッチ生成行列
 
     Pos camera; //カメラ位置
@@ -43,13 +44,13 @@ private:
 
 private:
 
-    void MakeObject();//オブジェクト生成
+    void MakeObject(); //オブジェクト生成
 
-    void StartSketch(Face face);//スケッチ開始
-    bool isSketcheing();        //スケッチ中
-    Face     GetHangedFace  (); //直下面を取得
-    CObject* GetHangedObject(); //直下オブジェクトを取得
-    void ColorSelect(CObject* obj);//オブジェクト色選択
+    void StartSketch(CFace* face);  //スケッチ開始
+    bool isSketcheing();            //スケッチ中
+    CFace*   GetHangedFace  ();     //直下面を取得
+    CObject* GetHangedObject();     //直下オブジェクトを取得
+    void ColorSelect(CObject* obj); //オブジェクト色選択
 
 public:
     //カメラ方向セット
