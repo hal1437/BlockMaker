@@ -8,8 +8,12 @@ class CFace : public CObject
 {
 public:
     QVector<CPoint*> corner;//角
+    bool is_polygon = true;
 
 public:
+    bool isPolygon()const{return this->is_polygon;}
+    void SetPolygon(bool poly){this->is_polygon = poly;}
+
     bool isParadox()const;              //平面に矛盾がないか確認する。
     bool isComprehension(Pos pos)const; //平面上かチェックする。
     Pos  GetNorm()const ;               //法線ベクトル取得

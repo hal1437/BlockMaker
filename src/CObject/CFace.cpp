@@ -30,9 +30,27 @@ bool CFace::Draw(QPainter& painter)const{
     return true;
 }
 bool CFace::DrawGL(Pos,Pos)const{
+    if(this->isPolygon()){
+        //薄い色に変更
+        float currentColor[4];
+        glGetFloatv(GL_CURRENT_COLOR,currentColor);
+        glColor4f(currentColor[0],currentColor[1],currentColor[2], 0.1);
+
+        //中を塗る
+        glBegin(GL_TRIANGLE_FAN);
+
+        for(CPoint* c : this->corner){
+                glVertex3f(c->x(),c->y(), c->z());
+        }
+        glEnd();
+
+        //色を復元
+        glColor4f(currentColor[0],currentColor[1],currentColor[2], currentColor[3]);
+    }
+    //外側
     glBegin(GL_LINE_LOOP);
     for(CPoint* c : this->corner){
-        glVertex3f(c->x(),c->y(), c->z());
+            glVertex3f(c->x(),c->y(), c->z());
     }
     glEnd();
 
