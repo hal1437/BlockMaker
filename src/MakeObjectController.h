@@ -39,7 +39,7 @@ public:
     CPoint* GetLastPos();
 
     MakeObjectController();
-    ~MakeObjectController();
+    virtual ~MakeObjectController();
 };
 
 #endif // MAKEOBJECTCONTROLLER_H

@@ -192,7 +192,7 @@ CSpline::~CSpline()
 
 }
 //点移動コールバックオーバーライド
-void CSpline::ChangePosCallback(CPoint *new_pos, Pos old_pos){
+void CSpline::ChangePosCallback(CPoint *, Pos old_pos){
     CPoint* p;
     if(*this->start == old_pos) p = this->start;
     if(*this->end   == old_pos) p = this->end;

@@ -194,6 +194,7 @@ bool MatchRestraint::isComplete(){
         return false;
     }
     */
+    return false;
 }
 
 bool MatchHRestraint::Complete(){

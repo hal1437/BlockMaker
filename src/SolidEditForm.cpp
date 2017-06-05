@@ -229,7 +229,7 @@ void SolidEditForm::paintGL(){
 
     //ブロック描画
     for(int i=0;i<this->model->GetBlocks().size();i++){
-        CBlock* block = this->model->GetBlocks()[i];
+        //CBlock* block = this->model->GetBlocks()[i];
 
         for(int j=0;j<4;j++){
             glBegin(GL_LINE_LOOP);

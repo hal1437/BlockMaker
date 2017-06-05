@@ -146,7 +146,7 @@ CArc::~CArc()
 {
 }
 
-void CArc::ChangePosCallback(CPoint *pos, Pos old_pos){
+void CArc::ChangePosCallback(CPoint *pos, Pos ){
 
     round = (*this->center - *this->start).Length();
 

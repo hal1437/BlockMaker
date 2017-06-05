@@ -47,7 +47,8 @@ bool CEdge::DrawGL(Pos,Pos)const{
                    this->GetMiddleDivide(i).y(),
                    this->GetMiddleDivide(i).z());
     }
-    glEnd();
+    glEnd();    
+    return true;
 }
 
 

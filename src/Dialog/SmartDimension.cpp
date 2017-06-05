@@ -2,7 +2,7 @@
 
 
 double SmartDimension::currentValue()const{
-    double answer;
+    double answer=0;
 /*
     //線の長さ
     if(type == SmartDimension::length){
@@ -114,7 +114,7 @@ CObject* SmartDimension::GetTarget(int index)const{
 
 
 //描画
-bool SmartDimension::Draw(QPainter& painter)const{
+bool SmartDimension::Draw(QPainter& )const{
     //無効
     if (this->type == none)return true;
 /*

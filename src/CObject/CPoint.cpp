@@ -56,6 +56,7 @@ bool CPoint::DrawGL(Pos camera,Pos center)const{
         glVertex3f((p + *this).x(),(p + *this).y(),(p + *this).z());
     }
     glEnd();
+    return true;
 }
 
 

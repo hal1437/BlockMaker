@@ -80,7 +80,7 @@ void CadEditForm::Escape(){
 }
 
 
-void CadEditForm::MovedMouse(QMouseEvent *event, CObject *under_object){
+void CadEditForm::MovedMouse(QMouseEvent *event, CObject *){
 
     static Pos past;
     static Pos piv; //画面移動支点
@@ -563,9 +563,9 @@ void CadEditForm::ImportObjectList(QTreeWidget* list){
         }
     }
 }
-void CadEditForm::ExportObjectList(QTreeWidget* list){
+void CadEditForm::ExportObjectList(QTreeWidget*){
 }
-void CadEditForm::ImportCBoxList  (QListWidget *list){
+void CadEditForm::ImportCBoxList  (QListWidget* list){
     //selecting_blockを更新する
     this->selecting_block = -1;
     for(int i=0;i<list->count();i++){
@@ -575,7 +575,7 @@ void CadEditForm::ImportCBoxList  (QListWidget *list){
         }
     }
 }
-void CadEditForm::ExportCBoxList   (QListWidget *list){
+void CadEditForm::ExportCBoxList   (QListWidget*){
 }
 void CadEditForm::ConfigureBlock(QListWidgetItem*){
     if(this->selecting_block == -1)return;
