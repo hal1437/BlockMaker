@@ -37,6 +37,19 @@ Pos CEdge::GetNearLine(const Pos& pos1,const Pos& pos2)const{
     }
     return ans;
 }
+bool CEdge::DrawGL(Pos,Pos)const{
+    glBegin(GL_LINE_STRIP);
+    glColor3f(0,0,1);
+    //線の分割描画
+    for(double i=0;i<=1;i += 1.0/CEdge::LINE_NEAR_DIVIDE){
+        if(i+1.0/CEdge::LINE_NEAR_DIVIDE > 1)i=1;
+        glVertex3f(this->GetMiddleDivide(i).x(),
+                   this->GetMiddleDivide(i).y(),
+                   this->GetMiddleDivide(i).z());
+    }
+    glEnd();
+}
+
 
 
 

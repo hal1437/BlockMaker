@@ -2,6 +2,8 @@
 #define CEDGE_H
 #include "CObject.h"
 #include "CPoint.h"
+#include <GLUT/glut.h>
+
 
 //エッジクラス
 class CEdge :public CObject
@@ -20,6 +22,7 @@ public:
     //作成関数(完了時:true , 継続時:false)
     virtual CREATE_RESULT Create(CPoint* pos) = 0;
     virtual bool Draw(QPainter& painter)const = 0;//描画関数
+    virtual bool DrawGL(Pos camera,Pos center)const;//三次元描画関数
     virtual bool Move(const Pos& move) = 0;//移動関数
     virtual void Lock(bool lock) = 0;//ロック
 

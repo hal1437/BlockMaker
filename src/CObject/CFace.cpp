@@ -29,6 +29,16 @@ Pos CFace::GetNorm()const{
 bool CFace::Draw(QPainter& painter)const{
     return true;
 }
+bool CFace::DrawGL(Pos,Pos)const{
+    glBegin(GL_LINE_LOOP);
+    for(CPoint* c : this->corner){
+        glVertex3f(c->x(),c->y(), c->z());
+    }
+    glEnd();
+
+    return true;
+}
+
 bool CFace::Move(const Pos& diff){
     return true;
 }

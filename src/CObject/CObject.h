@@ -4,6 +4,7 @@
 #include <QPainter>
 #include <QTransform>
 #include <QDebug>
+#include <GLUT/glut.h>
 #include "Utils.h"
 #include "Point.h"
 
@@ -38,9 +39,10 @@ public:
         return (dynamic_cast<const T*>(this) != nullptr);
     }
 
-    virtual bool Draw(QPainter& painter)const = 0;//描画関数
-    virtual bool Move(const Pos& diff) = 0;//移動関数
-    virtual void Lock(bool lock);//ロック
+    virtual bool Draw  (QPainter& painter)const = 0;     //描画関数
+    virtual bool DrawGL(Pos camera,Pos center)const = 0; //三次元描画関数
+    virtual bool Move  (const Pos& diff) = 0;            //移動関数
+    virtual void Lock  (bool lock);//ロック
 
     virtual bool isLock()      const;  //固定中
     virtual bool isSelectable(Pos pos)const;  //posの位置で選択可能か

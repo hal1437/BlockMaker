@@ -15,6 +15,7 @@ public:
     Pos  GetNorm()const ;               //法線ベクトル取得
 
     virtual bool Draw(QPainter& painter)const;//描画関数
+    virtual bool DrawGL(Pos camera,Pos center)const;//三次元描画関数
     virtual bool Move(const Pos& diff);//移動関数
 
 

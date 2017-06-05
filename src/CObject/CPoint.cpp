@@ -44,6 +44,19 @@ bool CPoint::Draw(QPainter& painter)const{
 
     return true;
 }
+bool CPoint::DrawGL(Pos camera,Pos center)const{
+    glBegin(GL_LINE_LOOP);
+    Pos cc = camera- center;
+    double theta1 = std::atan2(cc.y(),std::sqrt(cc.x()*cc.x()+cc.z()*cc.z()));
+    double theta2 = std::atan2(-cc.x(),cc.z());
+    //円の描画
+    for(double k=0;k < 2*M_PI;k += M_PI/32){
+        const int length = cc.Length()*10;
+        Pos p = Pos(length*std::sin(k),length*std::cos(k),0).Dot(Quat::getRotateXMatrix(theta1).Dot(Quat::getRotateYMatrix(theta2)));
+        glVertex3f((p + *this).x(),(p + *this).y(),(p + *this).z());
+    }
+    glEnd();
+}
 
 
 bool CPoint::Move(const Pos& diff){

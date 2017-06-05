@@ -186,21 +186,17 @@ void SolidEditForm::paintGL(){
     faces.push_back(std::make_pair(controller->getSideFace() ,QVector<int>({1,0,0})));//右側面
     faces.push_back(std::make_pair(controller->getTopFace()  ,QVector<int>({0,1,0})));//平面
     faces.push_back(std::make_pair(controller->getFrontFace(),QVector<int>({0,0,1})));//正面
+    faces.push_back(std::make_pair(this->sketch_face         ,QVector<int>({1,1,0})));//スケッチ面
     if(this->drag_base == Pos(0,0) && !this->isSketcheing()){
         faces.push_back(std::make_pair(this->GetHangedFace()     ,QVector<int>({0,1,1})));//直下面
     }
-    faces.push_back(std::make_pair(this->sketch_face         ,QVector<int>({1,1,0})));//スケッチ面
     //面の描画
     glLineWidth(2);
     for(std::pair<CFace*,QVector<int>>f: faces){
-        glBegin(GL_LINE_LOOP);
-        glColor3f(f.second[0], f.second[1], f.second[2]);
         if(f.first != nullptr){
-            for(int j=0;j<4;j++){
-                glVertex3f(f.first->corner[j]->x(),f.first->corner[j]->y(), f.first->corner[j]->z());
-            }
+            glColor3f(f.second[0], f.second[1], f.second[2]);
+            f.first->DrawGL(this->camera,this->center);
         }
-        glEnd();
     }
 
     //中央線の描画
@@ -212,40 +208,25 @@ void SolidEditForm::paintGL(){
         glEnd();
     }
 
-    //直下オブジェクトの選定
-    CObject* hang_obj = this->GetHangedObject();
-
     //エッジ描画
     for(int i=0;i<this->model->GetEdges().size();i++){
         CEdge* edge = this->model->GetEdges()[i];
-
-        glBegin(GL_LINE_STRIP);
-        ColorSelect(edge);
-        //線の分割描画
-        for(double i=0;i<1;i += 1.0/CEdge::LINE_NEAR_DIVIDE){
-            glVertex3f(edge->GetMiddleDivide(i).x(),
-                       edge->GetMiddleDivide(i).y(),
-                       edge->GetMiddleDivide(i).z());
-        }
-        glEnd();
+        //描画
+        edge->DrawGL(this->camera,this->center);
 
         //端点の描画
-        QVector<CPoint*> points = {edge->start,edge->end};
-        for(int j=0;j<edge->GetMiddleCount();j++)points.push_back(edge->GetMiddle(j));
-        for(int j=0;j<points.size();j++){
-            glBegin(GL_LINE_LOOP);
-            ColorSelect(points[j]);
-
-            //円の描画
-            for(double k=0;k < 2*M_PI;k += M_PI/32){
-                const int length = 10;
-                Pos p = Pos(length*std::sin(k),length*std::cos(k),round).Dot(Quat::getRotateXMatrix(theta1).Dot(Quat::getRotateYMatrix(theta2)));
-                glVertex3f((p + *points[j]).x(),(p + *points[j]).y(),(p + *points[j]).z());
-            }
-            glEnd();
+        for(int j=0;j<edge->GetPosSequenceCount();j++){
+            edge->GetPosSequence(j)->DrawGL(this->camera,this->center);
         }
-
     }
+
+    //直下オブジェクトの描画
+    glColor3f(1,0,0);
+    CObject* hang_obj = this->GetHangedObject();
+    if(hang_obj != nullptr){
+        hang_obj->DrawGL(this->camera,this->center);
+    }
+
     //ブロック描画
     for(int i=0;i<this->model->GetBlocks().size();i++){
         CBlock* block = this->model->GetBlocks()[i];
