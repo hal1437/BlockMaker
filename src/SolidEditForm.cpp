@@ -26,6 +26,7 @@ void SolidEditForm::StartSketch(CFace* face){
     this->sketch_face = face;
     Pos cross = face->GetNorm();
     cross = cross.GetNormalize();
+    qDebug() << cross.x() << cross.y() << cross.z();
 
     double theta1_ = std::atan2(cross.y(),std::sqrt(cross.x()*cross.x()+cross.z()*cross.z()));
     double theta2_ = std::atan2(-cross.x(),cross.z());
@@ -90,7 +91,6 @@ void SolidEditForm::keyReleaseEvent  (QKeyEvent *event){
     shift_pressed = event->modifiers() & Qt::ShiftModifier;
     ctrl_pressed  = event->modifiers() & Qt::ControlModifier;
 }
-
 void SolidEditForm::mousePressEvent  (QMouseEvent *event){
     this->drag_base   = Pos(event->pos().x(),event->pos().y());
     this->first_click = Pos(event->pos().x(),event->pos().y());
@@ -104,6 +104,10 @@ void SolidEditForm::mousePressEvent  (QMouseEvent *event){
         if(hang == nullptr){
             this->model->GetSelected().clear();
         }else{
+            //単一選択
+            if(!this->shift_pressed){
+                this->model->GetSelected().clear();
+            }
             this->model->AddSelected(hang);
         }
     }
@@ -144,8 +148,7 @@ void SolidEditForm::SetModel(CadModelCore* model){
     this->model = model;
     this->controller->setModel(model);
     this->make_controller->SetModel(model);
-    connect(this->model,SIGNAL(UpdateEdges ()),this,SLOT(repaint()));
-    connect(this->model,SIGNAL(UpdateBlocks()),this,SLOT(repaint()));
+    connect(this->model,SIGNAL(UpdateAnyAction()),this,SLOT(repaint()));
 }
 
 void SolidEditForm::initializeGL(){
@@ -230,6 +233,13 @@ void SolidEditForm::paintGL(){
             edge->GetPosSequence(j)->DrawGL(this->camera,this->center);
         }
     }
+    //面描画
+    for(int i=0;i<this->model->GetFaces().size();i++){
+        CFace* edge = this->model->GetFaces()[i];
+        //描画
+        edge->DrawGL(this->camera,this->center);
+    }
+
     //選択オブジェクト描画
     glColor3f(0,1,1);
     for(CObject* p: this->model->GetSelected()){

@@ -27,6 +27,7 @@ CFace* SolidEditController::getFrontFace_impl(Quat convert,Quat invert)const{
         face->corner.push_back(new CPoint(Pos(-DEFAULT_FACE_LEGTH, DEFAULT_FACE_LEGTH,0).Dot(invert)));
         face->corner.push_back(new CPoint(Pos(-DEFAULT_FACE_LEGTH,-DEFAULT_FACE_LEGTH,0).Dot(invert)));
         face->corner.push_back(new CPoint(Pos( DEFAULT_FACE_LEGTH,-DEFAULT_FACE_LEGTH,0).Dot(invert)));
+        face->SetPolygon(false);
         return face;
     }
 
@@ -63,6 +64,7 @@ CFace* SolidEditController::getFrontFace_impl(Quat convert,Quat invert)const{
     face->corner.push_back(new CPoint(Pos( right ,bottom,0).Dot(invert)));
     face->corner.push_back(new CPoint(Pos( left  ,bottom,0).Dot(invert)));
     face->corner.push_back(new CPoint(Pos( left  ,top   ,0).Dot(invert)));
+    face->SetPolygon(false);
     return face;
 }
 
@@ -91,12 +93,16 @@ CObject* SolidEditController::getHangedObject(Pos center, Pos dir)const{
 }
 
 CFace* SolidEditController::getHangedFace(Pos center, Pos dir)const{
+    if(this->getHangedObject(center,dir) != nullptr) return nullptr;
 
     //最も近い面を選択する
     QVector<std::pair<double,CFace*>> rank;
     rank.push_back(std::make_pair(Collision::GetLengthFaceToLine(this->getFrontFace(),Line{center,center+dir}),this->getFrontFace()));
     rank.push_back(std::make_pair(Collision::GetLengthFaceToLine(this->getTopFace()  ,Line{center,center+dir}),this->getTopFace()));
     rank.push_back(std::make_pair(Collision::GetLengthFaceToLine(this->getSideFace() ,Line{center,center+dir}),this->getSideFace()));
+    for(int i=0;i<this->model->GetFaces().size();i++){
+        rank.push_back(std::make_pair(Collision::GetLengthFaceToLine(this->model->GetFaces()[i],Line{center,center+dir}),this->model->GetFaces()[i]));
+    }
 
     if(std::all_of(rank.begin(),rank.end(),[](std::pair<double,CFace*> v){return v.first==-1;})){
         return nullptr;
@@ -111,7 +117,6 @@ CFace* SolidEditController::getHangedFace(Pos center, Pos dir)const{
 SolidEditController::SolidEditController(QObject *parent):
     QObject(parent)
 {
-
 }
 
 SolidEditController::~SolidEditController()

@@ -7,6 +7,7 @@
 #include "CObject/CObject.h"
 #include "CObject/CPoint.h"
 #include "CObject/CEdge.h"
+#include "CObject/CFace.h"
 #include "CObject/CBlock.h"
 #include "Dialog/SmartDimension.h"
 #include "Restraint.h"
@@ -22,6 +23,7 @@ public:
     DEFINE_OBSERVER(CObject*        ,Selected  )
     DEFINE_OBSERVER(CPoint*         ,Points    )
     DEFINE_OBSERVER(CEdge*          ,Edges     )
+    DEFINE_OBSERVER(CFace*          ,Faces     )
     DEFINE_OBSERVER(CBlock*         ,Blocks    )
     DEFINE_OBSERVER(Restraint*      ,Restraints)
     DEFINE_OBSERVER(SmartDimension* ,Dimensions)
@@ -43,9 +45,11 @@ signals:
     void UpdateSelected  ();
     void UpdatePoints    ();
     void UpdateEdges     ();
+    void UpdateFaces     ();
     void UpdateBlocks    ();
     void UpdateRestraints();
     void UpdateDimensions();
+    void UpdateAnyAction ();
 };
 
 class CadModelCoreInterface{

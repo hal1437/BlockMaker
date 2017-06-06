@@ -36,7 +36,10 @@ bool CFace::isComprehension(Pos pos)const{
 
 Pos CFace::GetNorm()const{
     if(this->corner.size()<2)return Pos();
-    else                     return Pos(this->corner[0]->Cross(*this->corner[1])).GetNormalize();
+    else{
+        return Pos((*this->corner[                    1] - *this->corner[0]).Cross
+                   (*this->corner[this->corner.size()-1] - *this->corner[0])).GetNormalize();
+    }
 }
 
 
@@ -61,10 +64,11 @@ bool CFace::DrawGL(Pos,Pos)const{
         //色を復元
         glColor4f(currentColor[0],currentColor[1],currentColor[2], currentColor[3]);
     }
+
     //外側
     glBegin(GL_LINE_LOOP);
     for(CPoint* c : this->corner){
-            glVertex3f(c->x(),c->y(), c->z());
+        glVertex3f(c->x(),c->y(), c->z());
     }
     glEnd();
 

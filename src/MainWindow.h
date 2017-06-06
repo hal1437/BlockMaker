@@ -46,18 +46,21 @@ public slots:
     void DisconnectSignals();
     void ClearButton();
     void RefreshUI();
+
     void ToggledPoint  (bool checked);
     void ToggledLine   (bool checked);
     void ToggledArc    (bool checked);
     //void ToggledRect   (bool checked);
     void ToggledSpline (bool checked);
     void ToggleConflict(bool conflict);
+
     void ResetAllExpantion();     //拡大、移動リセット
     void ShowMoveTransform();     //移動
     void ShowGridFilter();        //グリッドフィルター
 
     void MakeRestraint();   //拘束作成
     void MakeBlock();       //ブロック作成
+    void MakeFace();        //面作成
 
     void ReciveObjectListChanged(); //オブジェクトリスト更新
     void ReciveBlockListChanged (); //ブロックリスト更新

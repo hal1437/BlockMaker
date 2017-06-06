@@ -26,6 +26,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionResetExpantion ,SIGNAL(triggered())                        ,this       ,SLOT(ResetAllExpantion()));
     connect(ui->ToolDimension        ,SIGNAL(triggered())                        ,ui->CadEdit,SLOT(MakeSmartDimension()));
     connect(ui->ToolBlocks           ,SIGNAL(triggered())                        ,this       ,SLOT(MakeBlock()));
+    connect(ui->ToolFace             ,SIGNAL(triggered())                        ,this       ,SLOT(MakeFace()));
     connect(ui->BlockList            ,SIGNAL(itemDoubleClicked(QListWidgetItem*)),ui->CadEdit,SLOT(ConfigureBlock(QListWidgetItem*)));
     connect(ui->CadEdit              ,SIGNAL(ToggleConflict(bool))               ,this       ,SLOT(ToggleConflict(bool)));
     connect(ui->ExportButton         ,SIGNAL(pressed())                          ,ui->CadEdit,SLOT(Export()));
@@ -175,10 +176,10 @@ void MainWindow::Toggled##TYPE (bool checked){  \
     if(MAKE_OBJECT::TYPE != MAKE_OBJECT::Edit)DisconnectSignals();        \
     if(checked){                                \
         ClearButton();                          \
-        emit ToggleChanged(MAKE_OBJECT::TYPE);               \
+        emit ToggleChanged(MAKE_OBJECT::TYPE);  \
         ui->Tool##TYPE->setChecked(true);       \
     }else{                                      \
-        emit ToggleChanged(MAKE_OBJECT::Edit);               \
+        emit ToggleChanged(MAKE_OBJECT::Edit);  \
     }                                           \
     ConnectSignals();                           \
 }                                               \
@@ -244,6 +245,18 @@ void MainWindow::MakeBlock(){
     this->ui->CadEdit->MakeBlock();
     RefreshUI();
 }
+void MainWindow::MakeFace(){
+    QVector<CPoint*> pos;
+    for(QObject* obj: this->model->GetSelected()){
+        pos.push_back(dynamic_cast<CPoint*>(obj));
+    }
+    CFace* face = new CFace(this);
+    face->corner = pos;
+    this->model->AddFaces(face);
+    this->model->GetSelected().clear();
+    RefreshUI();
+}
+
 
 void MainWindow::ReciveObjectListChanged(){
     this->ui->CadEdit->ImportObjectList(this->ui->ObjectList);
