@@ -1,6 +1,20 @@
 #include "CFace.h"
 
 
+bool CFace::Creatable(QVector<CObject*> pos){
+    if(std::any_of(pos.begin(),pos.end(),[](CObject* p){return !p->is<CPoint>();}))return false;
+    if(pos.size()<=2)return false;
+    if(pos.size()==3)return true;
+
+    Pos cross = (*dynamic_cast<CPoint*>(pos[1]) - *dynamic_cast<CPoint*>(pos[0])).Cross
+                (*dynamic_cast<CPoint*>(pos[2]) - *dynamic_cast<CPoint*>(pos[0]));
+    for(int i=3;i<pos.size();i++){
+        double d = dynamic_cast<CPoint*>(pos[i])->DotPos(cross);
+        if(!NearlyEqual(d,0))return false;
+    }
+    return true;
+}
+
 bool CFace::isParadox()const{
     if(this->corner.size() < 2)return false;
     else {

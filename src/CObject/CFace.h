@@ -11,6 +11,9 @@ public:
     bool is_polygon = true;
 
 public:
+    //面が作成可能か
+    static bool Creatable(QVector<CObject*> pos);
+
     bool isPolygon()const{return this->is_polygon;}
     void SetPolygon(bool poly){this->is_polygon = poly;}
 

@@ -383,6 +383,7 @@
    <addaction name="ToolSpline"/>
    <addaction name="separator"/>
    <addaction name="ToolBlocks"/>
+   <addaction name="ToolFace"/>
    <addaction name="ToolDimension"/>
    <addaction name="actionMove"/>
    <addaction name="separator"/>
@@ -574,6 +575,11 @@
    </property>
    <property name="toolTip">
     <string>GridFilter</string>
+   </property>
+  </action>
+  <action name="ToolFace">
+   <property name="text">
+    <string>ToolFace</string>
    </property>
   </action>
  </widget>

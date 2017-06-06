@@ -9,6 +9,8 @@ void MainWindow::SetModel(CadModelCore* model){
     //モデルと結合
     connect(this->model,SIGNAL(UpdateEdges   ()),this,SLOT(UpdateObjectTree        ()));
     connect(this->model,SIGNAL(UpdateSelected()),this,SLOT(UpdateObjectTreeSelected()));
+    connect(this->model,SIGNAL(UpdateSelected()),this,SLOT(RefreshUI()));
+
 }
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -16,6 +18,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    this->ui->CadEdit->hide();
     //connect(ui->actionCtrlZ          ,SIGNAL(triggered())                        ,this       ,SLOT(CtrlZ()));
     connect(ui->actionDelete         ,SIGNAL(triggered())                        ,this       ,SLOT(Delete()));
     connect(ui->actionMove           ,SIGNAL(triggered())                        ,this       ,SLOT(ShowMoveTransform()));
@@ -157,6 +160,8 @@ void MainWindow::RefreshUI(){
     ui->CadEdit->RefreshRestraints();
     //ブロック生成可否判定
     ui->ToolBlocks->setEnabled(CBlock::Creatable(this->model->GetSelected()));
+    //ブロック生成可否判定
+    ui->ToolFace->setEnabled(CFace::Creatable(this->model->GetSelected()));
     //スマート寸法は1つから
     ui->ToolDimension->setEnabled(this->model->GetSelected().size() >= 1);
     //リスト要素数で出力ボタンの無効化を決定
