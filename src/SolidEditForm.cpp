@@ -4,14 +4,7 @@
 
 void SolidEditForm::MakeObject(){
     CObject* hanged = this->GetHangedObject();
-    if(state == MAKE_OBJECT::Edit){
-        //シフト状態
-        if(!shift_pressed)this->model->GetSelected().clear();//選択解除
-
-        //選択状態をトグル
-        if(exist(this->model->GetSelected(),hanged))this->model->RemoveSelected(hanged);
-        else if(hanged != nullptr)this->model->AddSelected(hanged);
-    }else{
+    if(state != MAKE_OBJECT::Edit){
         //生成
         this->make_controller->Making(state,this->mouse_pos,hanged);
         //最終点を保持
@@ -23,10 +16,11 @@ void SolidEditForm::MakeObject(){
 
 void SolidEditForm::StartSketch(CFace* face){
     if(this->isSketcheing())return;
+    this->model->GetSelected().clear();//選択解除
+
     this->sketch_face = face;
     Pos cross = face->GetNorm();
     cross = cross.GetNormalize();
-    qDebug() << cross.x() << cross.y() << cross.z();
 
     double theta1_ = std::atan2(cross.y(),std::sqrt(cross.x()*cross.x()+cross.z()*cross.z()));
     double theta2_ = std::atan2(-cross.x(),cross.z());
@@ -99,26 +93,32 @@ void SolidEditForm::mousePressEvent  (QMouseEvent *event){
     if(this->state != MAKE_OBJECT::Edit && this->isSketcheing()){
         MakeObject();
     }
-    if(this->state == MAKE_OBJECT::Edit){
-        CObject* hang = this->GetHangedObject();
-        if(hang == nullptr){
-            this->model->GetSelected().clear();
-        }else{
-            //単一選択
-            if(!this->shift_pressed){
-                this->model->GetSelected().clear();
-            }
-            this->model->AddSelected(hang);
-        }
-    }
 }
 void SolidEditForm::mouseReleaseEvent(QMouseEvent *event){
     //ドラッグでなければ
     if(this->first_click == Pos(event->pos().x(),event->pos().y())){
-        CFace* f = this->GetHangedFace();
-        if(f != nullptr){
+        //右クリック
+        if(event->button() == Qt::RightButton){
             //スケッチ開始
-            StartSketch(f);
+            CFace* f = this->GetHangedFace();
+            if(f != nullptr){
+                StartSketch(f);
+            }
+        }else{
+            //選択
+            if(state == MAKE_OBJECT::Edit && !this->isSketcheing()){
+                CObject* objects[] = {this->GetHangedObject(),this->GetHangedFace()};
+                //シフト状態
+                if(!shift_pressed)this->model->GetSelected().clear();//選択解除
+
+                for(int i=0;i<2;i++){
+                    if(objects[i] == nullptr)continue;
+                    //選択状態をトグル
+                    if(exist(this->model->GetSelected(),objects[i]))this->model->RemoveSelected(objects[i]);
+                    else this->model->AddSelected(objects[i]);
+                    break;
+                }
+            }
         }
     }
     this->drag_base = Pos(0,0);
@@ -128,7 +128,7 @@ void SolidEditForm::mouseMoveEvent   (QMouseEvent *event){
     //スクリーン位置を取得
     this->screen_pos =  Pos(event->pos().x() - this->width()/2,-(event->pos().y() - this->height()/2)) * 2 * round;
     if(this->isSketcheing()){
-        //スケッチ中であれば
+        //スケッチ中であれば平面上に点を配置
         Pos Line_base1 = this->screen_pos.Dot(Quat::getRotateXMatrix(theta1).Dot(Quat::getRotateYMatrix(theta2)));
         Pos Line_base2 = Pos(0,0,1)      .Dot(Quat::getRotateXMatrix(theta1).Dot(Quat::getRotateYMatrix(theta2)));
         this->mouse_pos  =  Collision::GetHitPosFaceToLine(this->sketch_face->GetNorm(),*this->sketch_face->corner[0],
@@ -212,9 +212,6 @@ void SolidEditForm::paintGL(){
     faces.push_back(std::make_pair(controller->getTopFace()  ,QVector<int>({0,1,0})));//平面
     faces.push_back(std::make_pair(controller->getFrontFace(),QVector<int>({0,0,1})));//正面
     faces.push_back(std::make_pair(this->sketch_face         ,QVector<int>({1,1,0})));//スケッチ面
-    if(this->drag_base == Pos(0,0) && !this->isSketcheing()){
-        faces.push_back(std::make_pair(this->GetHangedFace()     ,QVector<int>({0,1,1})));//直下面
-    }
     //面の描画
     glLineWidth(2);
     for(std::pair<CFace*,QVector<int>>f: faces){
@@ -234,21 +231,16 @@ void SolidEditForm::paintGL(){
     }
 
     //エッジ描画
-    for(int i=0;i<this->model->GetEdges().size();i++){
-        CEdge* edge = this->model->GetEdges()[i];
-        //描画
+    for(CEdge* edge:this->model->GetEdges()){
         edge->DrawGL(this->camera,this->center);
-
         //端点の描画
         for(int j=0;j<edge->GetPosSequenceCount();j++){
             edge->GetPosSequence(j)->DrawGL(this->camera,this->center);
         }
     }
     //面描画
-    for(int i=0;i<this->model->GetFaces().size();i++){
-        CFace* edge = this->model->GetFaces()[i];
-        //描画
-        edge->DrawGL(this->camera,this->center);
+    for(CFace* face : this->model->GetFaces()){
+        face->DrawGL(this->camera,this->center);
     }
 
     //選択オブジェクト描画
@@ -258,10 +250,10 @@ void SolidEditForm::paintGL(){
     }
 
     //直下オブジェクトの描画
-    glColor3f(1,0,0);
-    CObject* hang_obj = this->GetHangedObject();
-    if(hang_obj != nullptr){
-        hang_obj->DrawGL(this->camera,this->center);
+    glColor3f(1,1,1);
+    CObject* hang_obj[] = {this->GetHangedObject(),this->GetHangedFace()} ;
+    for(CObject* p: hang_obj){
+        if(p != nullptr)p->DrawGL(this->camera,this->center);
     }
 
     //ブロック描画
