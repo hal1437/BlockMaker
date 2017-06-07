@@ -16,14 +16,16 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    ui->ObjectDock->resize(ui->ObjectDock->minimumSize());
+    ui->BoxDock   ->resize(ui->BoxDock->minimumSize());
+
+    //ボタン関係
+    connect(this ,SIGNAL(ToggleChanged(MAKE_OBJECT)),ui->SolidEdit ,SLOT(SetState(MAKE_OBJECT)));
     connect(ui->actionDelete         ,SIGNAL(triggered())                        ,this       ,SLOT(Delete()));
     connect(ui->actionMove           ,SIGNAL(triggered())                        ,this       ,SLOT(ShowMoveTransform()));
     connect(ui->actionGridFilter     ,SIGNAL(triggered())                        ,this       ,SLOT(ShowGridFilter()));
     connect(ui->ToolBlocks           ,SIGNAL(triggered())                        ,this       ,SLOT(MakeBlock()));
     connect(ui->ToolFace             ,SIGNAL(triggered())                        ,this       ,SLOT(MakeFace()));
-
-    //CadEditFoam関連
-    connect(this          ,SIGNAL(ToggleChanged(MAKE_OBJECT)),ui->SolidEdit ,SLOT(SetState(MAKE_OBJECT)));
 
     //リスト変更系
     connect(ui->RestraintList ,SIGNAL(itemSelectionChanged()) ,this ,SLOT(MakeRestraint()));
@@ -47,10 +49,7 @@ void MainWindow::keyPressEvent  (QKeyEvent* event){
     this->ui->SolidEdit->keyPressEvent(event);
 
     //ESC押下時
-    if(event->key() == Qt::Key_Escape){
-        ClearButton();
-    }
-    RefreshUI();
+    if(event->key() == Qt::Key_Escape)ClearButton();
 }
 
 void MainWindow::keyReleaseEvent(QKeyEvent* event){
@@ -59,20 +58,9 @@ void MainWindow::keyReleaseEvent(QKeyEvent* event){
 
 
 void MainWindow::CtrlZ(){
-    /*
-    if(!log.empty()){
-        ui->CadEdit->RemoveObject(log.back());
-        log.erase(log.end()-1);
-        creating_count=0;
-    }*/
 }
 void MainWindow::Delete(){
-
-    //ランダム回転関数に置き換え中
-    static int c = 0;
-    std::random_device rd;
-    this->ui->SolidEdit->setCameraRotate(Mod((double)rd(),M_PI)-M_PI/2,Mod((double)rd(),2*M_PI));
-    c++;
+    ui->ObjectDock->adjustSize();
 
     repaint();
     RefreshUI();
@@ -286,16 +274,16 @@ void MainWindow::UpdateObjectTreeSelected(){
     for(int i=0;i<list->topLevelItemCount();i++){
         if(i == 0){
             //原点
-            //list->topLevelItem(0)->setSelected(this->model->origin->isSelected());
+            list->topLevelItem(0)->setSelected(exist(this->model->GetSelected(),this->model->origin));
         }else{
             //Edge自身
-            //list->topLevelItem(i)->setSelected(this->model->GetEdges()[i-1]->isSelected());
+            list->topLevelItem(i)->setSelected(exist(this->model->GetSelected(),this->model->GetEdges()[i-1]));
 
             //端点
-            //list->topLevelItem(i)->child(0)->setSelected(this->model->GetEdges()[i-1]->start->isSelected());
-            //list->topLevelItem(i)->child(1)->setSelected(this->model->GetEdges()[i-1]->end->isSelected());
+            list->topLevelItem(i)->child(0)->setSelected(exist(this->model->GetSelected(),this->model->GetEdges()[i-1]->start));
+            list->topLevelItem(i)->child(1)->setSelected(exist(this->model->GetSelected(),this->model->GetEdges()[i-1]->end));
             for(int j=0;j<this->model->GetEdges()[i-1]->GetMiddleCount() && j<list->topLevelItem(i)->childCount()-2;j++){
-                //list->topLevelItem(i)->child(j+2)->setSelected(this->model->GetEdges()[i-1]->GetMiddle(j)->isSelected());
+                list->topLevelItem(i)->child(j+2)->setSelected(exist(this->model->GetSelected(),this->model->GetEdges()[i-1]->GetMiddle(j)));
             }
         }
     }
