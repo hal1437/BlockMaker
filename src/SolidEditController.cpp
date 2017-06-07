@@ -19,7 +19,7 @@ Quat SolidEditController::getConvertTopToSide()const{
     return this->getConvertTopToFront().Dot(this->getConvertFrontToSide());
 }
 
-CFace* SolidEditController::getFrontFace_impl(Quat convert,Quat invert)const{
+CFace* SolidEditController::getFrontFace_impl(Quat invert)const{
     //正面を軸として変換を通し各平面の大きさを取得する関数
     if(this->model->GetBlocks().empty()){
         CFace* face = new CFace();
@@ -69,13 +69,13 @@ CFace* SolidEditController::getFrontFace_impl(Quat convert,Quat invert)const{
 }
 
 CFace* SolidEditController::getFrontFace()const{//正面
-    return this->getFrontFace_impl(Quat::getIdentityMatrix(),Quat::getIdentityMatrix());
+    return this->getFrontFace_impl(Quat::getIdentityMatrix());
 }
 CFace* SolidEditController::getTopFace  ()const{//平面
-    return this->getFrontFace_impl(this->getConvertFrontToTop(),this->getConvertTopToFront());
+    return this->getFrontFace_impl(this->getConvertTopToFront());
 }
 CFace* SolidEditController::getSideFace ()const{//右側面
-    return this->getFrontFace_impl(this->getConvertFrontToSide(),this->getConvertSideToFront());
+    return this->getFrontFace_impl(this->getConvertSideToFront());
 }
 
 
@@ -84,10 +84,21 @@ CObject* SolidEditController::getHangedObject(Pos center, Pos dir)const{
     CObject* ans = nullptr;
 
     //点の選択
-    for(int i=0;i<this->model->GetEdges().size();i++){
-        CEdge* e = this->model->GetEdges()[i];
+    for(CEdge* e : this->model->GetEdges()){
         if((Pos::LineNearPoint(line.pos1,line.pos2, *e->start) - *e->start).Length() < CPoint::COLLISION_SIZE && hang_point != e->start)ans = e->start;
-        if((Pos::LineNearPoint(line.pos1,line.pos2, *e->end  ) - *e->end  ).Length() < CPoint::COLLISION_SIZE && hang_point != e->end  )ans = e->end;
+        if((Pos::LineNearPoint(line.pos1,line.pos2, *e->end  ) - *e->end  ).Length() < CPoint::COLLISION_SIZE && hang_point != e->end  )ans = e->end;        
+    }
+    if(ans == nullptr){
+        //エッジの選択
+        for(CEdge* e : this->model->GetEdges()){
+            if(hang_point == e->start || hang_point == e->end)continue;
+            //近似点選択
+            const double DIVIDE = 100;
+            for(int i=0;i<=DIVIDE;i++){
+                Pos p = e->GetMiddleDivide(i/DIVIDE);
+                if((Pos::LineNearPoint(line.pos1,line.pos2, p) - p).Length() < CPoint::COLLISION_SIZE)ans = e;
+            }
+        }
     }
     return ans;
 }

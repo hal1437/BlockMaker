@@ -38,6 +38,7 @@ bool SolidEditForm::isSketcheing(){
 }
 
 CFace* SolidEditForm::GetHangedFace(){
+    if(this->isSketcheing())return nullptr;
     Pos  hang_center = (Pos(0,0,1) + this->screen_pos).Dot(Quat::getRotateXMatrix(theta1).Dot(Quat::getRotateYMatrix(theta2)));
     return  this->controller->getHangedFace(hang_center,(this->camera - this->center).GetNormalize());
 }
@@ -90,8 +91,16 @@ void SolidEditForm::mousePressEvent  (QMouseEvent *event){
     this->first_click = Pos(event->pos().x(),event->pos().y());
 
     //操作
-    if(this->state != MAKE_OBJECT::Edit && this->isSketcheing()){
-        MakeObject();
+    if(this->isSketcheing()){
+        if(this->state == MAKE_OBJECT::Edit){
+            //移動
+            if(this->GetHangedObject()->is<CPoint>()){
+                this->controller->hang_point = dynamic_cast<CPoint*>(this->GetHangedObject());
+            }
+        }else{
+            //追加操作
+            MakeObject();
+        }
     }
 }
 void SolidEditForm::mouseReleaseEvent(QMouseEvent *event){
@@ -106,20 +115,27 @@ void SolidEditForm::mouseReleaseEvent(QMouseEvent *event){
             }
         }else{
             //選択
-            if(state == MAKE_OBJECT::Edit && !this->isSketcheing()){
-                CObject* objects[] = {this->GetHangedObject(),this->GetHangedFace()};
-                //シフト状態
-                if(!shift_pressed)this->model->GetSelected().clear();//選択解除
+            if(state == MAKE_OBJECT::Edit){
+                if(!this->isSketcheing()){
+                    CObject* objects[] = {this->GetHangedObject(),this->GetHangedFace()};
+                    //シフト状態
+                    if(!shift_pressed)this->model->GetSelected().clear();//選択解除
 
-                for(int i=0;i<2;i++){
-                    if(objects[i] == nullptr)continue;
-                    //選択状態をトグル
-                    if(exist(this->model->GetSelected(),objects[i]))this->model->RemoveSelected(objects[i]);
-                    else this->model->AddSelected(objects[i]);
-                    break;
+                    for(int i=0;i<2;i++){
+                        if(objects[i] == nullptr)continue;
+                        //選択状態をトグル
+                        if(exist(this->model->GetSelected(),objects[i]))this->model->RemoveSelected(objects[i]);
+                        else this->model->AddSelected(objects[i]);
+                        break;
+                    }
                 }
             }
         }
+    }
+
+    //保持点手放し
+    if(state == MAKE_OBJECT::Edit){
+        this->controller->hang_point = nullptr;
     }
     this->drag_base = Pos(0,0);
 }
