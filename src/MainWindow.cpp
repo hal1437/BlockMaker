@@ -4,13 +4,11 @@
 
 void MainWindow::SetModel(CadModelCore* model){
     this->model = model;
-    this->ui->CadEdit  ->SetModel(model);
     this->ui->SolidEdit->SetModel(model);
     //モデルと結合
     connect(this->model,SIGNAL(UpdateEdges   ()),this,SLOT(UpdateObjectTree        ()));
     connect(this->model,SIGNAL(UpdateSelected()),this,SLOT(UpdateObjectTreeSelected()));
     connect(this->model,SIGNAL(UpdateSelected()),this,SLOT(RefreshUI()));
-
 }
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -18,42 +16,21 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    this->ui->CadEdit->hide();
-    //connect(ui->actionCtrlZ          ,SIGNAL(triggered())                        ,this       ,SLOT(CtrlZ()));
     connect(ui->actionDelete         ,SIGNAL(triggered())                        ,this       ,SLOT(Delete()));
     connect(ui->actionMove           ,SIGNAL(triggered())                        ,this       ,SLOT(ShowMoveTransform()));
     connect(ui->actionGridFilter     ,SIGNAL(triggered())                        ,this       ,SLOT(ShowGridFilter()));
-    connect(ui->actionResetExpantion ,SIGNAL(triggered())                        ,this       ,SLOT(ResetAllExpantion()));
-    connect(ui->ToolDimension        ,SIGNAL(triggered())                        ,ui->CadEdit,SLOT(MakeSmartDimension()));
     connect(ui->ToolBlocks           ,SIGNAL(triggered())                        ,this       ,SLOT(MakeBlock()));
     connect(ui->ToolFace             ,SIGNAL(triggered())                        ,this       ,SLOT(MakeFace()));
-    connect(ui->BlockList            ,SIGNAL(itemDoubleClicked(QListWidgetItem*)),ui->CadEdit,SLOT(ConfigureBlock(QListWidgetItem*)));
-    connect(ui->CadEdit              ,SIGNAL(ToggleConflict(bool))               ,this       ,SLOT(ToggleConflict(bool)));
-    connect(ui->ExportButton         ,SIGNAL(pressed())                          ,ui->CadEdit,SLOT(Export()));
-    connect(ui->DepthSpin            ,SIGNAL(valueChanged(double))               ,ui->CadEdit,SLOT(SetDepth(double)));
 
     //CadEditFoam関連
-    connect(this          ,SIGNAL(ToggleChanged(MAKE_OBJECT)),ui->CadEdit   ,SLOT(SetState(MAKE_OBJECT)));
     connect(this          ,SIGNAL(ToggleChanged(MAKE_OBJECT)),ui->SolidEdit ,SLOT(SetState(MAKE_OBJECT)));
-    connect(ui->CadEdit   ,SIGNAL(ScaleChanged(double)),ui->ScaleSpin ,SLOT(setValue(double)));
-    connect(ui->CadEdit   ,SIGNAL(DepthChanged(double)),ui->DepthSpin ,SLOT(setValue(double)));
-    connect(ui->CadEdit   ,SIGNAL(RequireRefreshUI())  ,this          ,SLOT(RefreshUI()));
-    connect(ui->CadEdit   ,SIGNAL(MouseMoved(Pos))     ,this          ,SLOT(RefreshStatusBar(Pos)));
-    connect(ui->actionSave,SIGNAL(triggered())         ,ui->CadEdit   ,SLOT(Save()));
-    connect(ui->actionLoad,SIGNAL(triggered())         ,ui->CadEdit   ,SLOT(Load()));
 
     //リスト変更系
     connect(ui->RestraintList ,SIGNAL(itemSelectionChanged()) ,this ,SLOT(MakeRestraint()));
-    connect(ui->ObjectList    ,SIGNAL(itemSelectionChanged()) ,this ,SLOT(ReciveObjectListChanged()));
-    connect(ui->BlockList     ,SIGNAL(itemSelectionChanged()) ,this ,SLOT(ReciveBlockListChanged ()));
 
     //CadEditFoamにイベントフィルター導入
-    this->installEventFilter(ui->CadEdit);
     this->installEventFilter(ui->SolidEdit);
 
-    //RefreshUI();
-    //ReciveObjectListChanged();
-    //ReciveBlockListChanged();
     ConnectSignals();
     ui->ToolBlocks->setEnabled(false);
     ui->ObjectList->setSelectionMode(QAbstractItemView::ExtendedSelection);
@@ -67,19 +44,17 @@ MainWindow::~MainWindow()
 }
 
 void MainWindow::keyPressEvent  (QKeyEvent* event){
-    this->ui->CadEdit->keyPressEvent(event);
     this->ui->SolidEdit->keyPressEvent(event);
 
     //ESC押下時
     if(event->key() == Qt::Key_Escape){
-        this->ui->CadEdit->Escape();
         ClearButton();
-        RefreshUI();
     }
+    RefreshUI();
 }
 
 void MainWindow::keyReleaseEvent(QKeyEvent* event){
-    this->ui->CadEdit->keyReleaseEvent(event);
+    this->ui->SolidEdit->keyReleaseEvent(event);
 }
 
 
@@ -120,7 +95,6 @@ void MainWindow::DisconnectSignals(){
 }
 
 void MainWindow::ClearButton(){
-    //if(make_obj != nullptr && make_obj->isCreating())make_obj->Create(nullptr,-1);
     if(ui->ToolPoint ->isChecked())ui->ToolPoint ->setChecked(false);
     if(ui->ToolLine  ->isChecked())ui->ToolLine  ->setChecked(false);
     if(ui->ToolArc   ->isChecked())ui->ToolArc   ->setChecked(false);
@@ -130,7 +104,6 @@ void MainWindow::ClearButton(){
 void MainWindow::RefreshUI(){
 
     ui->RestraintList->clear();
-    //ui->BlockList->clear();
 
     QVector<RestraintType> able = Restraint::Restraintable(this->model->GetSelected());
     for(RestraintType r:able){
@@ -149,16 +122,12 @@ void MainWindow::RefreshUI(){
     }
 
     disconnect(ui->RestraintList ,SIGNAL(itemSelectionChanged()) ,this ,SLOT(MakeRestraint()));
-    disconnect(ui->ObjectList    ,SIGNAL(itemSelectionChanged()) ,this ,SLOT(ReciveObjectListChanged()));
-    disconnect(ui->BlockList     ,SIGNAL(itemSelectionChanged()) ,this ,SLOT(ReciveBlockListChanged ()));
-    this->ui->CadEdit->ExportObjectList(this->ui->ObjectList);
-    this->ui->CadEdit->ExportCBoxList  (this->ui->BlockList);
+    //this->ui->CadEdit->ExportObjectList(this->ui->ObjectList);
+    //this->ui->CadEdit->ExportCBoxList  (this->ui->BlockList);
     connect(ui->RestraintList ,SIGNAL(itemSelectionChanged()) ,this ,SLOT(MakeRestraint()));
-    connect(ui->ObjectList    ,SIGNAL(itemSelectionChanged()) ,this ,SLOT(ReciveObjectListChanged()));
-    connect(ui->BlockList     ,SIGNAL(itemSelectionChanged()) ,this ,SLOT(ReciveBlockListChanged ()));
 
     //拘束更新
-    ui->CadEdit->RefreshRestraints();
+    //ui->CadEdit->RefreshRestraints();
     //ブロック生成可否判定
     ui->ToolBlocks->setEnabled(CBlock::Creatable(this->model->GetSelected()));
     //ブロック生成可否判定
@@ -166,7 +135,7 @@ void MainWindow::RefreshUI(){
     //スマート寸法は1つから
     ui->ToolDimension->setEnabled(this->model->GetSelected().size() >= 1);
     //リスト要素数で出力ボタンの無効化を決定
-    ui->ExportButton->setEnabled(this->ui->BlockList->count() > 0);
+    //ui->ExportButton->setEnabled(this->ui->BlockList->count() > 0);
 
     this->repaint();
 }
@@ -191,22 +160,14 @@ ToggledToolDefinition(Arc)
 ToggledToolDefinition(Spline)
 
 void MainWindow::ToggleConflict(bool conflict){
-    if(conflict){
-        this->ui->actionCheckConflict->setIcon(QIcon(":/Others/Conflict.png"));
-    }else{
-        this->ui->actionCheckConflict->setIcon(QIcon(":/Others/NotConflict.png"));
-    }
-}
-void MainWindow::ResetAllExpantion(){
-    CObject::drawing_scale = 1.0;
-    this->ui->ScaleSpin->setValue(1.0);
-    this->ui->CadEdit->ResetAllExpantion();
+    if(conflict)this->ui->actionCheckConflict->setIcon(QIcon(":/Others/Conflict.png"));
+    else        this->ui->actionCheckConflict->setIcon(QIcon(":/Others/NotConflict.png"));
 }
 
 void MainWindow::ShowMoveTransform(){
     static MoveTransformDialog* diag = new MoveTransformDialog(this);
     connect(diag,SIGNAL(RepaintRequest()),this,SLOT(repaint()));
-    connect(diag,SIGNAL(RepaintRequest()),ui->CadEdit  ,SLOT(repaint()));
+    //connect(diag,SIGNAL(RepaintRequest()),ui->CadEdit  ,SLOT(repaint()));
     connect(diag,SIGNAL(RepaintRequest()),ui->SolidEdit,SLOT(repaint()));
     diag->SetModel(this->model);
     diag->setWindowTitle("MoveTransform");
@@ -215,7 +176,7 @@ void MainWindow::ShowMoveTransform(){
 }
 void MainWindow::ShowGridFilter(){
     static GridFilterDialog* diag = new GridFilterDialog(this);
-    connect(diag,SIGNAL(ChangeGridStatus(double,double)),ui->CadEdit,SLOT(SetGridFilterStatus(double,double)));
+    //connect(diag,SIGNAL(ChangeGridStatus(double,double)),ui->CadEdit,SLOT(SetGridFilterStatus(double,double)));
     diag->setWindowTitle("GridFilter");
     diag->setWindowFlags(Qt::Dialog | Qt::WindowStaysOnTopHint);
     diag->show();
@@ -231,18 +192,11 @@ void MainWindow::MakeRestraint(){
     if(ui->RestraintList->currentItem()->text() == "正接")type = TANGENT;
     if(ui->RestraintList->currentItem()->text() == "固定")type = LOCK;
     if(ui->RestraintList->currentItem()->text() == "固定解除")type = UNLOCK;
-    if(type != Paradox){
-        ui->CadEdit->MakeRestraint(type);
-    }
-    if(ui->RestraintList->currentItem()->text() == "マージ"){
-        ui->CadEdit->MergePoints();
-    }
     ui->RestraintList->clear();
     this->RefreshUI();
 }
 
 void MainWindow::MakeBlock(){
-    this->ui->CadEdit->MakeBlock();
     RefreshUI();
 }
 void MainWindow::MakeFace(){
@@ -253,33 +207,13 @@ void MainWindow::MakeFace(){
     CFace* face = new CFace(this);
     face->corner = pos;
     this->model->AddFaces(face);
-    this->model->GetSelected().clear();
-    RefreshUI();
+    this->model->GetSelected().clear();//選択解除
 }
 
-
-void MainWindow::ReciveObjectListChanged(){
-    this->ui->CadEdit->ImportObjectList(this->ui->ObjectList);
-    this->ui->CadEdit->repaint();
-    RefreshUI();
-}
-void MainWindow::ReciveBlockListChanged(){
-    this->ui->CadEdit->ImportCBoxList  (this->ui->BlockList);
-    RefreshUI();
-}
-void MainWindow::RefreshStatusBar(Pos){
-    Pos out;
-    CObject* hanged = this->ui->CadEdit->getHanged();
-    if(hanged == nullptr){
-        //マウス位置のローカル座標
-        out = this->ui->CadEdit->getMousePos();
-    }else{
-        //選択オブジェクトの最近点
-        out = hanged->GetNearPos(this->ui->CadEdit->getMousePos());
-    }
-    this->ui->statusBar->showMessage(QString("(") + QString::number(out.x()) + "," +
-                                                    QString::number(out.y()) + "," +
-                                                    QString::number(out.z()) + ")");
+void MainWindow::RefreshStatusBar(Pos pos){
+    this->ui->statusBar->showMessage(QString("(") + QString::number(pos.x()) + "," +
+                                                    QString::number(pos.y()) + "," +
+                                                    QString::number(pos.z()) + ")");
 }
 
 void MainWindow::UpdateObjectTree(){

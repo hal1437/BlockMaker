@@ -16,7 +16,6 @@ INCLUDEPATH += ./src/
 
 SOURCES += src/main.cpp\
         src/MainWindow.cpp \
-    src/CadEditForm.cpp \
     src/Restraint.cpp \
     src/FoamFile.cpp \
     src/CObject/CPoint.cpp \
@@ -43,7 +42,6 @@ SOURCES += src/main.cpp\
 
 HEADERS  += src/MainWindow.h \
     src/Point.h \
-    src/CadEditForm.h \
     src/Utils.h \
     src/Restraint.h \
     src/FoamFile.h \
@@ -73,7 +71,6 @@ HEADERS  += src/MainWindow.h \
     src/CObject/CFace.h
 
 FORMS    += src/MainWindow.ui \
-    src/CadEditForm.ui \
     src/Dialog/SmartDimensionDialog.ui \
     src/Dialog/ExportDialog.ui \
     src/Dialog/CBoxDefineDialog.ui \

@@ -5,13 +5,14 @@
 #include <QMouseEvent>
 #include <QListWidget>
 #include <limits>
+#include <random>
 #include "CadModelCore.h"
+#include "SolidEditForm.h"
 
 #include "Dialog/SmartDimensionDialog.h"
 #include "Dialog/CBoxDefineDialog.h"
 #include "Dialog/MoveTransformDialog.h"
 #include "Dialog/ExportDialog.h"
-#include "CadEditForm.h"
 #include "Dialog/GridFilter.h"
 #include "Dialog/GridFilterDialog.h"
 
@@ -40,12 +41,12 @@ signals:
 public slots:
     void SetModel(CadModelCore* model);
 
-    void CtrlZ();
-    void Delete();
-    void ConnectSignals();
-    void DisconnectSignals();
-    void ClearButton();
-    void RefreshUI();
+    void CtrlZ();             //1手戻る
+    void Delete();            //削除
+    void ConnectSignals();    //シグナル接続
+    void DisconnectSignals(); //シグナル切断
+    void ClearButton();       //全ボタンリセット
+    void RefreshUI();         //UI更新
 
     void ToggledPoint  (bool checked);
     void ToggledLine   (bool checked);
@@ -54,17 +55,14 @@ public slots:
     void ToggledSpline (bool checked);
     void ToggleConflict(bool conflict);
 
-    void ResetAllExpantion();     //拡大、移動リセット
-    void ShowMoveTransform();     //移動
-    void ShowGridFilter();        //グリッドフィルター
+    void ShowMoveTransform();     //移動ダイアログ表示
+    void ShowGridFilter();        //グリッドフィルター表示
 
     void MakeRestraint();   //拘束作成
     void MakeBlock();       //ブロック作成
     void MakeFace();        //面作成
 
-    void ReciveObjectListChanged(); //オブジェクトリスト更新
-    void ReciveBlockListChanged (); //ブロックリスト更新
-    void RefreshStatusBar(Pos);        //ステータスバー更新
+    void RefreshStatusBar(Pos pos);        //ステータスバー更新
 
     void UpdateObjectTree        ();  //エッジ表示
     void UpdateObjectTreeSelected();       //選択情報表示
