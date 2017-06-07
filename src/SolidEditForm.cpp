@@ -124,8 +124,19 @@ void SolidEditForm::mouseReleaseEvent(QMouseEvent *event){
     this->drag_base = Pos(0,0);
 }
 void SolidEditForm::mouseMoveEvent   (QMouseEvent *event){
+
+    //スクリーン位置を取得
     this->screen_pos =  Pos(event->pos().x() - this->width()/2,-(event->pos().y() - this->height()/2)) * 2 * round;
-    this->mouse_pos  =  this->screen_pos.Dot(Quat::getRotateXMatrix(theta1).Dot(Quat::getRotateYMatrix(theta2)));
+    if(this->isSketcheing()){
+        //スケッチ中であれば
+        Pos Line_base1 = this->screen_pos.Dot(Quat::getRotateXMatrix(theta1).Dot(Quat::getRotateYMatrix(theta2)));
+        Pos Line_base2 = Pos(0,0,1)      .Dot(Quat::getRotateXMatrix(theta1).Dot(Quat::getRotateYMatrix(theta2)));
+        this->mouse_pos  =  Collision::GetHitPosFaceToLine(this->sketch_face->GetNorm(),*this->sketch_face->corner[0],
+                                                           Line_base1,Line_base2);
+    }else{
+        //カメラ角度から算出
+        this->mouse_pos  =  this->screen_pos.Dot(Quat::getRotateXMatrix(theta1).Dot(Quat::getRotateYMatrix(theta2)));
+    }
     if(this->drag_base != Pos(0,0) && !this->isSketcheing()){
         //カメラ角度変更
         this->theta1 += static_cast<double>(event->pos().y() - this->drag_base.y())/SENSITIVITY;

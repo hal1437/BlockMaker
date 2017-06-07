@@ -9,8 +9,11 @@ bool CFace::Creatable(QVector<CObject*> pos){
     Pos cross = (*dynamic_cast<CPoint*>(pos[1]) - *dynamic_cast<CPoint*>(pos[0])).Cross
                 (*dynamic_cast<CPoint*>(pos[2]) - *dynamic_cast<CPoint*>(pos[0]));
     for(int i=3;i<pos.size();i++){
-        double d = dynamic_cast<CPoint*>(pos[i])->DotPos(cross);
-        if(!NearlyEqual(d,0))return false;
+        double d = (*dynamic_cast<CPoint*>(pos[1]) - *dynamic_cast<CPoint*>(pos[0])).DotPos(cross);
+        if(!NearlyEqual(d,0)){
+            qDebug() << "mismatch:" << d;
+            return false;
+        }
     }
     return true;
 }
