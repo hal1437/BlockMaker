@@ -69,6 +69,9 @@ public slots:
     void UpdateBlocksTree        (); //箱表示
     //void UpdateBLocksTreeSelected(); //選択箱表示
 
+    void ShowObjectList();
+    void ShowBoxList();
+
 
 };
 

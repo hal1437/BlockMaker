@@ -55,8 +55,16 @@
     <addaction name="separator"/>
     <addaction name="actionResetExpantion"/>
    </widget>
+   <widget class="QMenu" name="menuWindow">
+    <property name="title">
+     <string>Window</string>
+    </property>
+    <addaction name="actionShowObjectList"/>
+    <addaction name="actionShowBoxList"/>
+   </widget>
    <addaction name="menu"/>
    <addaction name="menuEdit"/>
+   <addaction name="menuWindow"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <property name="enabled">
@@ -149,7 +157,7 @@
   <widget class="QDockWidget" name="ObjectDock">
    <property name="minimumSize">
     <size>
-     <width>100</width>
+     <width>149</width>
      <height>317</height>
     </size>
    </property>
@@ -447,6 +455,22 @@
   <action name="ToolFace">
    <property name="text">
     <string>ToolFace</string>
+   </property>
+  </action>
+  <action name="actionShowObjectList">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>ShowObjectList</string>
+   </property>
+  </action>
+  <action name="actionShowBoxList">
+   <property name="text">
+    <string>ShowBoxList</string>
    </property>
   </action>
  </widget>

@@ -32,6 +32,11 @@ MainWindow::MainWindow(QWidget *parent) :
 
     //CadEditFoamにイベントフィルター導入
     this->installEventFilter(ui->SolidEdit);
+    connect(this->ui->SolidEdit,SIGNAL(MousePosChanged(Pos)),this,SLOT(RefreshStatusBar(Pos)));
+
+    //ドック関係
+    connect(this->ui->actionShowObjectList,SIGNAL(triggered()),this,SLOT(ShowObjectList()));
+    connect(this->ui->actionShowBoxList   ,SIGNAL(triggered()),this,SLOT(ShowBoxList()));
 
     ConnectSignals();
     ui->ToolBlocks->setEnabled(false);
@@ -199,9 +204,9 @@ void MainWindow::MakeFace(){
 }
 
 void MainWindow::RefreshStatusBar(Pos pos){
-    this->ui->statusBar->showMessage(QString("(") + QString::number(pos.x()) + "," +
-                                                    QString::number(pos.y()) + "," +
-                                                    QString::number(pos.z()) + ")");
+    this->ui->statusBar->showMessage(QString("( %1,%2,%3)").arg(QString::number(pos.x() ,'f',3))
+                                                           .arg(QString::number(pos.y() ,'f',3))
+                                                           .arg(QString::number(pos.z() ,'f',3)));
 }
 
 void MainWindow::UpdateObjectTree(){
@@ -306,3 +311,13 @@ void MainWindow::UpdateBlocksTree(){
 /*
 void MainWindow::UpdateBLocksTreeSelected(){
 }*/
+
+void MainWindow::ShowObjectList(){
+    this->ui->ObjectDock->show();
+}
+
+void MainWindow::ShowBoxList(){
+    this->ui->BoxDock->show();
+}
+
+

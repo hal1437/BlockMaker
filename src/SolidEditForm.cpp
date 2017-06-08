@@ -116,18 +116,16 @@ void SolidEditForm::mouseReleaseEvent(QMouseEvent *event){
         }else{
             //選択
             if(state == MAKE_OBJECT::Edit){
-                if(!this->isSketcheing()){
-                    CObject* objects[] = {this->GetHangedObject(),this->GetHangedFace()};
-                    //シフト状態
-                    if(!shift_pressed)this->model->GetSelected().clear();//選択解除
+                CObject* objects[] = {this->GetHangedObject(),this->GetHangedFace()};
+                //シフト状態
+                if(!shift_pressed)this->model->GetSelected().clear();//選択解除
 
-                    for(int i=0;i<2;i++){
-                        if(objects[i] == nullptr)continue;
-                        //選択状態をトグル
-                        if(exist(this->model->GetSelected(),objects[i]))this->model->RemoveSelected(objects[i]);
-                        else this->model->AddSelected(objects[i]);
-                        break;
-                    }
+                for(int i=0;i<2;i++){
+                    if(objects[i] == nullptr)continue;
+                    //選択状態をトグル
+                    if(exist(this->model->GetSelected(),objects[i]))this->model->RemoveSelected(objects[i]);
+                    else this->model->AddSelected(objects[i]);
+                    break;
                 }
             }
         }
@@ -153,6 +151,8 @@ void SolidEditForm::mouseMoveEvent   (QMouseEvent *event){
         //カメラ角度から算出
         this->mouse_pos  =  this->screen_pos.Dot(Quat::getRotateXMatrix(theta1).Dot(Quat::getRotateYMatrix(theta2)));
     }
+    emit MousePosChanged(this->mouse_pos);
+
     if(this->drag_base != Pos(0,0) && !this->isSketcheing()){
         //カメラ角度変更
         this->theta1 += static_cast<double>(event->pos().y() - this->drag_base.y())/SENSITIVITY;
