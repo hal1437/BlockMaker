@@ -116,15 +116,17 @@ void SolidEditForm::mouseReleaseEvent(QMouseEvent *event){
         }else{
             //選択
             if(state == MAKE_OBJECT::Edit){
-                CObject* objects[] = {this->GetHangedObject(),this->GetHangedFace()};
+                QVector<CObject*> objects;
+                objects.push_back(this->GetHangedObject());
+                objects.push_back(this->GetHangedFace());
                 //シフト状態
                 if(!shift_pressed)this->model->GetSelected().clear();//選択解除
 
-                for(int i=0;i<2;i++){
-                    if(objects[i] == nullptr)continue;
+                for(CObject* obj:objects){
+                    if(obj == nullptr)continue;
                     //選択状態をトグル
-                    if(exist(this->model->GetSelected(),objects[i]))this->model->RemoveSelected(objects[i]);
-                    else this->model->AddSelected(objects[i]);
+                    if(exist(this->model->GetSelected(),obj))this->model->RemoveSelected(obj);
+                    else this->model->AddSelected(obj);
                     break;
                 }
             }

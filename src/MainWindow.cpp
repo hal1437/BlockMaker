@@ -204,9 +204,10 @@ void MainWindow::MakeFace(){
 }
 
 void MainWindow::RefreshStatusBar(Pos pos){
-    this->ui->statusBar->showMessage(QString("( %1,%2,%3)").arg(QString::number(pos.x() ,'f',3))
-                                                           .arg(QString::number(pos.y() ,'f',3))
-                                                           .arg(QString::number(pos.z() ,'f',3)));
+    this->ui->statusBar->showMessage(QString("( %1,%2,%3,%4)").arg(QString::number(pos.x() ,'f',3))
+                                                              .arg(QString::number(pos.y() ,'f',3))
+                                                              .arg(QString::number(pos.z() ,'f',3))
+                                                              .arg(QString::number(pos.w() ,'f',3)));
 }
 
 void MainWindow::UpdateObjectTree(){

@@ -181,10 +181,10 @@ public:
     T& x(){return this->mat[0];}
     T& y(){return this->mat[1];}
     T& z(){return this->mat[2];}
-    T& w()const{return this->mat[3];}
     T x()const{return this->mat[0];}
     T y()const{return this->mat[1];}
     T z()const{return this->mat[2];}
+    T w()const{return this->mat[3];}
 
     current operator-()                       const{current ans = (-(*static_cast<const base*>(this)));                       ans.mat[3] = 1; return ans;}
     current operator+(current rhs)            const{current ans = (*static_cast<const base*>(this) + static_cast<base>(rhs)); ans.mat[3] = 1; return ans;}
