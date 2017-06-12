@@ -142,6 +142,11 @@ CArc::CArc(QObject* parent):
     this->end   = nullptr;
     this->center = nullptr;
 }
+CArc::CArc(CPoint* start,CPoint* end,QObject* parent):
+    CEdge(parent){
+    this->SetStartPos(start);
+    this->SetEndPos(end);
+}
 CArc::~CArc()
 {
 }

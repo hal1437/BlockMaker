@@ -2,19 +2,19 @@
 
 
 void ObjectList::SetModel(CadModelCore* m){
-    this->model = m;
-    connect(this->model,SIGNAL(UpdatePoints  ()),this,SLOT(UpdateObject()));
-    connect(this->model,SIGNAL(UpdateEdges   ()),this,SLOT(UpdateObject()));
-    connect(this->model,SIGNAL(UpdateFaces   ()),this,SLOT(UpdateObject()));
-    connect(this->model,SIGNAL(UpdateBlocks  ()),this,SLOT(UpdateObject()));
-    connect(this->model,SIGNAL(UpdateSelected()),this,SLOT(UpdateSelected()));
+    this->CadModelCoreInterface::model = m;
+    connect(this->CadModelCoreInterface::model,SIGNAL(UpdatePoints  ()),this,SLOT(UpdateObject()));
+    connect(this->CadModelCoreInterface::model,SIGNAL(UpdateEdges   ()),this,SLOT(UpdateObject()));
+    connect(this->CadModelCoreInterface::model,SIGNAL(UpdateFaces   ()),this,SLOT(UpdateObject()));
+    connect(this->CadModelCoreInterface::model,SIGNAL(UpdateBlocks  ()),this,SLOT(UpdateObject()));
+    connect(this->CadModelCoreInterface::model,SIGNAL(UpdateSelected()),this,SLOT(UpdateSelected()));
 }
 
 void ObjectList::UpdateObject  (){
-    QVector<CPoint*> points = this->model->GetPoints();
-    QVector<CEdge *> edges  = this->model->GetEdges();
-    QVector<CFace *> faces  = this->model->GetFaces();
-    QVector<CBlock*> blocks = this->model->GetBlocks();
+    QVector<CPoint*> points = this->CadModelCoreInterface::model->GetPoints();
+    QVector<CEdge *> edges  = this->CadModelCoreInterface::model->GetEdges();
+    QVector<CFace *> faces  = this->CadModelCoreInterface::model->GetFaces();
+    QVector<CBlock*> blocks = this->CadModelCoreInterface::model->GetBlocks();
 
     //排他処理
     for(CEdge* edge: edges){
@@ -31,13 +31,10 @@ void ObjectList::UpdateSelected(){
 }
 
 ObjectList::ObjectList(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::ObjectList)
+    QTreeWidget(parent)
 {
-    ui->setupUi(this);
 }
 
 ObjectList::~ObjectList()
 {
-    delete ui;
 }

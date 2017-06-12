@@ -63,6 +63,12 @@ CEdge::CEdge(QObject* parent):
 CEdge::~CEdge()
 {
 }
+CEdge::CEdge(CPoint* start,CPoint* end,QObject* parent):
+    CEdge(parent){
+    this->SetStartPos(start);
+    this->SetEndPos(end);
+}
+
 
 //点移動コールバック
 void CEdge::ChangePosCallback(CPoint* ,Pos ){

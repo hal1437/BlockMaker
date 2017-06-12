@@ -177,6 +177,12 @@ CSpline::CSpline(QObject *parent):
     CEdge(parent)
 {
 }
+CSpline::CSpline(CPoint* start,CPoint* end,QObject* parent):
+    CEdge(parent){
+    this->SetStartPos(start);
+    this->SetEndPos(end);
+}
+
 CEdge* CSpline::Clone()const{
     CSpline* ptr = new CSpline(this->parent());
     ptr->start   = new CPoint(*this->start ,ptr);

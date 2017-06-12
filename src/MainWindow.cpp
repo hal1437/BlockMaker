@@ -192,12 +192,12 @@ void MainWindow::MakeBlock(){
     RefreshUI();
 }
 void MainWindow::MakeFace(){
-    QVector<CPoint*> pos;
+    QVector<CEdge*> pos;
     for(QObject* obj: this->model->GetSelected()){
-        pos.push_back(dynamic_cast<CPoint*>(obj));
+        pos.push_back(dynamic_cast<CEdge*>(obj));
     }
     CFace* face = new CFace(this);
-    face->corner = pos;
+    face->edges = pos;
     this->model->AddFaces(face);
     this->model->GetSelected().clear();//選択解除
 }
@@ -232,10 +232,6 @@ void MainWindow::UpdateObjectTree(){
             list->addTopLevelItem(new QTreeWidgetItem());
             list->topLevelItem(list->topLevelItemCount()-1)->setText(0,p.first.c_str());
             list->topLevelItem(list->topLevelItemCount()-1)->setIcon(0,QIcon(p.second.c_str()));
-
-            if(!list->topLevelItem(list->topLevelItemCount()-1)->isSelected()){
-                //list->topLevelItem(list->topLevelItemCount()-1)->setSelected(edges[i]->isSelected());
-            }
         }
     }
 

@@ -7,12 +7,12 @@
 class CFace : public CObject
 {
 public:
-    QVector<CPoint*> corner;//角
+    QVector<CEdge*> edges;//構成線
     bool is_polygon = true;
 
 public:
     //面が作成可能か
-    static bool Creatable(QVector<CObject*> pos);
+    static bool Creatable(QVector<CObject*> lines);
 
     bool isPolygon()const{return this->is_polygon;}
     void SetPolygon(bool poly){this->is_polygon = poly;}
@@ -20,6 +20,8 @@ public:
     bool isParadox()const;              //平面に矛盾がないか確認する。
     bool isComprehension(Pos pos)const; //平面上かチェックする。
     Pos  GetNorm()const ;               //法線ベクトル取得
+    QVector<CPoint*> GetPoint(); //構成点取得
+    QVector<CPoint*> GetPoint()const; //構成点取得
 
     virtual bool Draw(QPainter& painter)const;//描画関数
     virtual bool DrawGL(Pos camera,Pos center)const;//三次元描画関数

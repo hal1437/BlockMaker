@@ -23,10 +23,15 @@ CFace* SolidEditController::getFrontFace_impl(Quat invert)const{
     //正面を軸として変換を通し各平面の大きさを取得する関数
     if(this->model->GetBlocks().empty()){
         CFace* face = new CFace();
-        face->corner.push_back(new CPoint(Pos( DEFAULT_FACE_LEGTH, DEFAULT_FACE_LEGTH,0).Dot(invert)));
-        face->corner.push_back(new CPoint(Pos(-DEFAULT_FACE_LEGTH, DEFAULT_FACE_LEGTH,0).Dot(invert)));
-        face->corner.push_back(new CPoint(Pos(-DEFAULT_FACE_LEGTH,-DEFAULT_FACE_LEGTH,0).Dot(invert)));
-        face->corner.push_back(new CPoint(Pos( DEFAULT_FACE_LEGTH,-DEFAULT_FACE_LEGTH,0).Dot(invert)));
+        QVector<CPoint*> poses;
+        poses.push_back(new CPoint(Pos( DEFAULT_FACE_LEGTH, DEFAULT_FACE_LEGTH,0).Dot(invert)));
+        poses.push_back(new CPoint(Pos(-DEFAULT_FACE_LEGTH, DEFAULT_FACE_LEGTH,0).Dot(invert)));
+        poses.push_back(new CPoint(Pos(-DEFAULT_FACE_LEGTH,-DEFAULT_FACE_LEGTH,0).Dot(invert)));
+        poses.push_back(new CPoint(Pos( DEFAULT_FACE_LEGTH,-DEFAULT_FACE_LEGTH,0).Dot(invert)));
+        face->edges.push_back(new CLine(poses[0],poses[1]));
+        face->edges.push_back(new CLine(poses[1],poses[2]));
+        face->edges.push_back(new CLine(poses[2],poses[3]));
+        face->edges.push_back(new CLine(poses[3],poses[0]));
         face->SetPolygon(false);
         return face;
     }
@@ -60,10 +65,15 @@ CFace* SolidEditController::getFrontFace_impl(Quat invert)const{
     left   -= widht_delta *0.1;
 
     CFace* face = new CFace();
-    face->corner.push_back(new CPoint(Pos( right ,top   ,0).Dot(invert)));
-    face->corner.push_back(new CPoint(Pos( right ,bottom,0).Dot(invert)));
-    face->corner.push_back(new CPoint(Pos( left  ,bottom,0).Dot(invert)));
-    face->corner.push_back(new CPoint(Pos( left  ,top   ,0).Dot(invert)));
+    QVector<CPoint*> poses;
+    poses.push_back(new CPoint(Pos( right ,top   ,0).Dot(invert)));
+    poses.push_back(new CPoint(Pos( right ,bottom,0).Dot(invert)));
+    poses.push_back(new CPoint(Pos( left  ,bottom,0).Dot(invert)));
+    poses.push_back(new CPoint(Pos( left  ,top   ,0).Dot(invert)));
+    face->edges.push_back(new CLine(poses[0],poses[1]));
+    face->edges.push_back(new CLine(poses[1],poses[2]));
+    face->edges.push_back(new CLine(poses[2],poses[3]));
+    face->edges.push_back(new CLine(poses[3],poses[0]));
     face->SetPolygon(false);
     return face;
 }

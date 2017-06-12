@@ -42,6 +42,7 @@ public:
     virtual CEdge* Clone()const;
 
     CArc(QObject* parent=nullptr);
+    CArc(CPoint* start,CPoint* end,QObject* parent = nullptr);
     ~CArc();
 
 public slots:

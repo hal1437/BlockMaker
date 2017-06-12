@@ -70,6 +70,12 @@ CLine::CLine(QObject *parent):
     CEdge(parent)
 {
 }
+CLine::CLine(CPoint* start,CPoint* end,QObject* parent):
+    CEdge(parent){
+    this->SetStartPos(start);
+    this->SetEndPos(end);
+}
+
 
 
 CLine::~CLine()

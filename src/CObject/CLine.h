@@ -28,6 +28,7 @@ public:
     virtual CEdge* Clone()const;
 
     CLine(QObject* parent=nullptr);
+    CLine(CPoint* start,CPoint* end,QObject* parent=nullptr);
     ~CLine();
 };
 

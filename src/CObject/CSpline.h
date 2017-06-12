@@ -58,6 +58,7 @@ public:
     void RefreshNodes();
 
     CSpline(QObject* parent = nullptr);
+    CSpline(CPoint* start,CPoint* end,QObject* parent = nullptr);
     ~CSpline();
 
 public slots:

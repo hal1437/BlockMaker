@@ -147,7 +147,7 @@ void SolidEditForm::mouseMoveEvent   (QMouseEvent *event){
         //スケッチ中であれば平面上に点を配置
         Pos Line_base1 = this->screen_pos.Dot(Quat::getRotateXMatrix(theta1).Dot(Quat::getRotateYMatrix(theta2)));
         Pos Line_base2 = Pos(0,0,1)      .Dot(Quat::getRotateXMatrix(theta1).Dot(Quat::getRotateYMatrix(theta2)));
-        this->mouse_pos  =  Collision::GetHitPosFaceToLine(this->sketch_face->GetNorm(),*this->sketch_face->corner[0],
+        this->mouse_pos  =  Collision::GetHitPosFaceToLine(this->sketch_face->GetNorm(),*this->sketch_face->GetPoint()[0],
                                                            Line_base1,Line_base2);
     }else{
         //カメラ角度から算出
