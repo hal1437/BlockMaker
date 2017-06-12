@@ -38,7 +38,8 @@ SOURCES += src/main.cpp\
     src/SolidEditController.cpp \
     src/Collision.cpp \
     src/MakeObjectController.cpp \
-    src/CObject/CFace.cpp
+    src/CObject/CFace.cpp \
+    src/ObjectList.cpp
 
 HEADERS  += src/MainWindow.h \
     src/Point.h \
@@ -68,7 +69,8 @@ HEADERS  += src/MainWindow.h \
     src/SolidEditController.h \
     src/Collision.h \
     src/MakeObjectController.h \
-    src/CObject/CFace.h
+    src/CObject/CFace.h \
+    src/ObjectList.h
 
 FORMS    += src/MainWindow.ui \
     src/Dialog/SmartDimensionDialog.ui \

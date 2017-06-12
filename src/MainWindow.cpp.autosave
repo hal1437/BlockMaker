@@ -232,10 +232,6 @@ void MainWindow::UpdateObjectTree(){
             list->addTopLevelItem(new QTreeWidgetItem());
             list->topLevelItem(list->topLevelItemCount()-1)->setText(0,p.first.c_str());
             list->topLevelItem(list->topLevelItemCount()-1)->setIcon(0,QIcon(p.second.c_str()));
-
-            if(!list->topLevelItem(list->topLevelItemCount()-1)->isSelected()){
-                //list->topLevelItem(list->topLevelItemCount()-1)->setSelected(edges[i]->isSelected());
-            }
         }
     }
 
