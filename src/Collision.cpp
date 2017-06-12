@@ -15,12 +15,12 @@ double Collision::GetLengthFaceToLine(CFace* face, Line line){
     if((line.pos2 - line.pos1).DotPos(norm) == 0)return false;
 
     //交点を取得
-    Pos p = GetHitPosFaceToLine(norm,*face->GetPoint()[0],line.pos1,line.pos2-line.pos1);
+    Pos p = GetHitPosFaceToLine(norm,*face->GetPoint(0),line.pos1,line.pos2-line.pos1);
 
     //四角形内であるか
     double sum=0;
-    for(int i=0;i<face->GetPoint().size();i++){
-        sum += Pos::Angle(*face->GetPoint()[i]-p,*face->GetPoint()[(i+1)%face->GetPoint().size()]-p);
+    for(int i=0;i<face->edges.size();i++){
+        sum += Pos::Angle(*face->GetPoint(i)-p,*face->GetPoint((i+1)%face->edges.size())-p);
     }
     if(std::abs(sum-360) > 0.000001)return -1;
     else return (line.pos1 - p).Length();

@@ -36,8 +36,8 @@ bool CFace::isParadox()const{
     if(this->edges.size() < 3)return false;
     else {
         //矛盾がないか確認する。
-        for(int i=2;i<this->GetPoint().size();i++){
-            if(this->isComprehension(*this->GetPoint()[i]) == false)return false;
+        for(int i=2;i<this->edges.size();i++){
+            if(this->isComprehension(*this->GetPoint(i)) == false)return false;
         }
     }
     return true;
@@ -54,33 +54,65 @@ bool CFace::isComprehension(Pos pos)const{
 Pos CFace::GetNorm()const{
     if(this->edges.size()<2)return Pos();
     else{
-        return Pos((*this->GetPoint()[                   1] - *this->GetPoint()[0]).Cross
-                   (*this->GetPoint()[this->edges.size()-1] - *this->GetPoint()[0])).GetNormalize();
+        return Pos((*this->GetPoint(                   1) - *this->GetPoint(0)).Cross
+                   (*this->GetPoint(this->edges.size()-1) - *this->GetPoint(0))).GetNormalize();
     }
 }
-QVector<CPoint*> CFace::GetPoint(){
-    //点に変換
-    QVector<CPoint*> points;
-    for(CEdge* line : this->edges){
-        for(int i=0;i<line->GetPosSequenceCount();i++){
-            points.push_back(line->GetPosSequence(i));
+CPoint* CFace::GetPoint(int index)const{
+    QVector<CPoint*> pp;
+    //点を集結
+    for(CEdge* line:this->edges){
+        if(!exist(pp,line->start))pp.push_back(line->start);
+        if(!exist(pp,line->end  ))pp.push_back(line->end);
+    }
+    //左下の探索
+    QVector<CPoint*> hit;
+    CPoint* corner;//左下
+    std::sort(pp.begin(),pp.end(),[](CPoint* p1,CPoint* p2){return std::tie(p1->x(),p1->y()) < std::tie(p2->x(),p2->y());});//X座標が小さい順
+    hit.push_back(pp[0]);hit.push_back(pp[1]);//一番目と二番目にX座標の小さいもの
+    std::sort(pp.begin(),pp.end(),[](CPoint* p1,CPoint* p2){return std::tie(p1->y(),p1->x()) < std::tie(p2->y(),p2->x());});//Y座標が小さい順
+    hit.push_back(pp[0]);hit.push_back(pp[1]);//一番目と二番目にY座標の小さいもの
+    //hitに二回入った奴が左下
+    for(int i=0;i<4;i++){
+        CPoint* piv = hit[i];
+        for(int j=i+1;j<4;j++){
+            if(piv == hit[j]){
+                corner = piv;
+                i=4;//即座に終了
+                break;
+            }
         }
     }
-    std::sort(points.begin(),points.end());
-    points.erase(std::unique(points.begin(),points.end()),points.end());
-    return points;
-}
-QVector<CPoint*> CFace::GetPoint()const{
-    //点に変換
-    QVector<CPoint*> points;
-    for(CEdge* line : this->edges){
-        for(int i=0;i<line->GetPosSequenceCount();i++){
-            points.push_back(line->GetPosSequence(i));
+    //index回だけ連鎖させる
+    CPoint* ans = corner;
+    CPoint* old = corner; //反復連鎖防止
+    QVector<CPoint*> candidate;//連鎖候補
+    for(int i=0;i<index%4;i++){
+        //ansを含むlineを探す
+        for(CEdge* line:this->edges){
+            if(ans == line->start && old != line->end){
+                candidate.push_back(line->end);
+            }else if(ans == line->end && old != line->start){
+                candidate.push_back(line->start);
+            }
         }
+        //選定
+        old = ans;
+        if(candidate.size() == 2){
+            //二択
+            if(Pos::Angle(*candidate[0]-*corner,*candidate[1]-*corner) > Pos::Angle(*candidate[1]-*corner,*candidate[0]-*corner)){
+                ans = candidate[0];
+            }else{
+                ans = candidate[1];
+            }
+        }else if(candidate.size() == 1){
+            ans = candidate[0];
+        }else{
+            ans = corner;
+        }
+        candidate.clear();
     }
-    std::sort(points.begin(),points.end());
-    points.erase(std::unique(points.begin(),points.end()),points.end());
-    return points;
+    return ans;
 }
 
 
@@ -97,8 +129,8 @@ bool CFace::DrawGL(Pos,Pos)const{
         //中を塗る
         glBegin(GL_TRIANGLE_FAN);
 
-        for(CPoint* c : this->GetPoint()){
-            glVertex3f(c->x(),c->y(), c->z());
+        for(int i=0;i<this->edges.size();i++){
+            glVertex3f(this->GetPoint(i)->x(),this->GetPoint(i)->y(), this->GetPoint(i)->z());
         }
         glEnd();
 
@@ -108,13 +140,27 @@ bool CFace::DrawGL(Pos,Pos)const{
 
     //外側
     glBegin(GL_LINE_LOOP);
-    for(CPoint* c : this->GetPoint()){
-        glVertex3f(c->x(),c->y(), c->z());
+    for(int i=0;i<this->edges.size();i++){
+        glVertex3f(this->GetPoint(i)->x(),this->GetPoint(i)->y(), this->GetPoint(i)->z());
     }
     glEnd();
 
     return true;
 }
+bool CFace::DrawNormArrowGL()const{
+    Pos center;
+    for(int i=0;i<this->edges.size();i++){
+        center += *this->GetPoint(i);
+    }
+    center /= this->edges.size();
+
+    glBegin(GL_LINES);
+    glVertex3f(center.x(),center.y(), center.z());
+    glVertex3f((center+this->GetNorm()*100).x(),(center+this->GetNorm()*100).y(), (center+this->GetNorm()*100).z());
+    glEnd();
+
+}
+
 
 bool CFace::Move(const Pos& diff){
     return true;

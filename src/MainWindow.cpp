@@ -177,6 +177,7 @@ void MainWindow::ShowGridFilter(){
 void MainWindow::MakeRestraint(){
     //qDebug() << text;
     RestraintType type = Paradox;
+    /*
     if(ui->RestraintList->currentItem()->text() == "一致")type = MATCH;
     if(ui->RestraintList->currentItem()->text() == "並行")type = CONCURRENT;
     if(ui->RestraintList->currentItem()->text() == "垂直")type = VERTICAL;
@@ -186,6 +187,7 @@ void MainWindow::MakeRestraint(){
     if(ui->RestraintList->currentItem()->text() == "固定解除")type = UNLOCK;
     ui->RestraintList->clear();
     this->RefreshUI();
+    */
 }
 
 void MainWindow::MakeBlock(){

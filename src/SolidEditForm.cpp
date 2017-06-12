@@ -147,7 +147,7 @@ void SolidEditForm::mouseMoveEvent   (QMouseEvent *event){
         //スケッチ中であれば平面上に点を配置
         Pos Line_base1 = this->screen_pos.Dot(Quat::getRotateXMatrix(theta1).Dot(Quat::getRotateYMatrix(theta2)));
         Pos Line_base2 = Pos(0,0,1)      .Dot(Quat::getRotateXMatrix(theta1).Dot(Quat::getRotateYMatrix(theta2)));
-        this->mouse_pos  =  Collision::GetHitPosFaceToLine(this->sketch_face->GetNorm(),*this->sketch_face->GetPoint()[0],
+        this->mouse_pos  =  Collision::GetHitPosFaceToLine(this->sketch_face->GetNorm(),*this->sketch_face->GetPoint(0),
                                                            Line_base1,Line_base2);
     }else{
         //カメラ角度から算出
@@ -230,6 +230,7 @@ void SolidEditForm::paintGL(){
     faces.push_back(std::make_pair(controller->getTopFace()  ,QVector<int>({0,1,0})));//平面
     faces.push_back(std::make_pair(controller->getFrontFace(),QVector<int>({0,0,1})));//正面
     faces.push_back(std::make_pair(this->sketch_face         ,QVector<int>({1,1,0})));//スケッチ面
+
     //面の描画
     glLineWidth(2);
     for(std::pair<CFace*,QVector<int>>f: faces){
@@ -265,6 +266,11 @@ void SolidEditForm::paintGL(){
     glColor3f(0,1,1);
     for(CObject* p: this->model->GetSelected()){
         p->DrawGL(this->camera,this->center);
+
+
+        if(p->is<CFace>() && exist(this->model->GetSelected(),p)){
+            dynamic_cast<CFace*>(p)->DrawNormArrowGL();
+        }
     }
 
     //直下オブジェクトの描画

@@ -8,6 +8,7 @@
 #include <type_traits>
 #include <iostream>
 #include <limits>
+#include <tuple>
 #include "Utils.h"
 
 template<class T,std::size_t W,std::size_t H>
@@ -145,8 +146,10 @@ public:
     }
     bool operator!=(cr_current rhs)const{return !(*this == rhs);}
     bool operator<(cr_current rhs)const{
-        for(std::size_t i=0;i<H;i++)for(std::size_t j=0;j<W;j++){
-            if(this->access(i,j) != rhs.access(i,j))return this->access(i,j) < rhs.access(i,j);
+        for(std::size_t i=0;i<H;i++){
+            for(std::size_t j=0;j<W;j++){
+                if(this->access(i,j) != rhs.access(i,j))return(this->access(i,j) < rhs.access(i,j));
+            }
         }
         return false;
     }
