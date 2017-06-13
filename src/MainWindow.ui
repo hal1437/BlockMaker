@@ -99,61 +99,6 @@
    <addaction name="actionGridFilter"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
-  <widget class="QDockWidget" name="BoxDock">
-   <attribute name="dockWidgetArea">
-    <number>2</number>
-   </attribute>
-   <widget class="QWidget" name="dockWidgetContents_2">
-    <layout class="QGridLayout" name="gridLayout">
-     <item row="0" column="0">
-      <widget class="QGroupBox" name="groupBox_3">
-       <property name="maximumSize">
-        <size>
-         <width>150</width>
-         <height>16777215</height>
-        </size>
-       </property>
-       <property name="title">
-        <string>Box</string>
-       </property>
-       <layout class="QVBoxLayout" name="verticalLayout_4">
-        <property name="leftMargin">
-         <number>0</number>
-        </property>
-        <property name="topMargin">
-         <number>0</number>
-        </property>
-        <property name="rightMargin">
-         <number>0</number>
-        </property>
-        <property name="bottomMargin">
-         <number>0</number>
-        </property>
-        <item>
-         <widget class="QListWidget" name="BlockList">
-          <property name="showDropIndicator" stdset="0">
-           <bool>true</bool>
-          </property>
-          <property name="selectionMode">
-           <enum>QAbstractItemView::SingleSelection</enum>
-          </property>
-          <property name="selectionBehavior">
-           <enum>QAbstractItemView::SelectItems</enum>
-          </property>
-          <property name="isWrapping" stdset="0">
-           <bool>false</bool>
-          </property>
-          <property name="spacing">
-           <number>0</number>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-     </item>
-    </layout>
-   </widget>
-  </widget>
   <widget class="QDockWidget" name="ObjectDock">
    <property name="minimumSize">
     <size>
@@ -193,7 +138,7 @@
            <number>0</number>
           </property>
           <item>
-           <widget class="QTreeWidget" name="ObjectList">
+           <widget class="ObjectList" name="ObjectTree">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
               <horstretch>0</horstretch>
@@ -479,7 +424,12 @@
   <customwidget>
    <class>SolidEditForm</class>
    <extends>QOpenGLWidget</extends>
-   <header>solideditform.h</header>
+   <header>SolidEditForm.h</header>
+  </customwidget>
+  <customwidget>
+   <class>ObjectList</class>
+   <extends>QTreeWidget</extends>
+   <header>ObjectList.h</header>
   </customwidget>
  </customwidgets>
  <resources>

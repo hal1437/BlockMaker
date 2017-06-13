@@ -7,6 +7,7 @@
 #include "CLine.h"
 #include "CArc.h"
 #include "CSpline.h"
+#include "CFace.h"
 
 //面の方向
 enum BoundaryDir{
@@ -37,9 +38,9 @@ enum GradingType{
 };
 
 
-class CBlock{
-private:
-    QVector<CEdge*> lines;
+class CBlock : public CObject{
+public:
+    QVector<CFace*> faces;
 public:
     BoundaryType boundery[6]; // 境界タイプ
     QString name[6];          // 境界名
@@ -57,22 +58,25 @@ public:
     //高さ取得
     double GetHeight();
 
+    bool Draw  (QPainter& painter)const;     //描画関数
+    bool DrawGL(Pos camera,Pos center)const; //三次元描画関数
+    bool Move  (const Pos& diff);            //移動関数
+
+    //近接点
+    Pos GetNearPos (const Pos& hand)const;
+    Pos GetNearLine(const Pos& pos1,const Pos& pos2)const;
+
 public:
 
     static bool Creatable(QVector<CObject* > values);//BOX定義可能か
     bool isParadox()const;//矛盾確認
 
-    //描画
-    void Draw(QPainter& painter)const;
-
-    void SetEdgeAll(QVector<CEdge*> lines);
-    void SetEdge(int index, CEdge *line);
     CEdge* GetEdge(int index)const;
     QVector<Pos> GetVerticesPos()const;
     Pos GetClockworksPos(int index) const;//時計回り番号取得
 
     CBlock();
-    CBlock(QVector<CEdge *> lines);
+    CBlock(QVector<CFace*> faces);
     ~CBlock();
 };
 

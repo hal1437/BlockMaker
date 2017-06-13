@@ -134,20 +134,20 @@ QString CBoxDefineDialog::FormatError()const{
 }
 
 //出力
-CBlock CBoxDefineDialog::ExportCBlock()const{
-    CBlock blocks;
+CBlock* CBoxDefineDialog::ExportCBlock()const{
+    CBlock* blocks = new CBlock;
     for(int i=0;i<6;i++){
         BoundaryDir dir = static_cast<BoundaryDir>(i);
-        blocks.boundery[i] = this->GetBoundaryType(dir);
-        blocks.name[i]     = this->GetBoundaryName(dir);
+        blocks->boundery[i] = this->GetBoundaryType(dir);
+        blocks->name[i]     = this->GetBoundaryName(dir);
     }
-    blocks.div[0] = this->ui->XspinBox->value();
-    blocks.div[1] = this->ui->YspinBox->value();
-    blocks.div[2] = this->ui->ZspinBox->value();
-    blocks.depth  = this->ui->DepthSpinBox->value();
-    blocks.grading   = this->GetGradigngType();
+    blocks->div[0] = this->ui->XspinBox->value();
+    blocks->div[1] = this->ui->YspinBox->value();
+    blocks->div[2] = this->ui->ZspinBox->value();
+    blocks->depth  = this->ui->DepthSpinBox->value();
+    blocks->grading   = this->GetGradigngType();
     for(int i=0;i<(this->GetGradigngType() == GradingType::SimpleGrading ? 3 : 12);i++){
-        blocks.grading_args.push_back(this->grading_args[i]->value());
+        blocks->grading_args.push_back(this->grading_args[i]->value());
     }
     return blocks;
 }

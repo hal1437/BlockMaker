@@ -267,7 +267,6 @@ void SolidEditForm::paintGL(){
     for(CObject* p: this->model->GetSelected()){
         p->DrawGL(this->camera,this->center);
 
-
         if(p->is<CFace>() && exist(this->model->GetSelected(),p)){
             dynamic_cast<CFace*>(p)->DrawNormArrowGL();
         }

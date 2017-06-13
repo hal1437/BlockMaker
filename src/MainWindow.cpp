@@ -4,7 +4,8 @@
 
 void MainWindow::SetModel(CadModelCore* model){
     this->model = model;
-    this->ui->SolidEdit->SetModel(model);
+    this->ui->SolidEdit ->SetModel(model);
+    this->ui->ObjectTree->SetModel(model);
     //モデルと結合
     connect(this->model,SIGNAL(UpdateEdges   ()),this,SLOT(UpdateObjectTree        ()));
     connect(this->model,SIGNAL(UpdateSelected()),this,SLOT(UpdateObjectTreeSelected()));
@@ -17,7 +18,6 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->ObjectDock->resize(ui->ObjectDock->minimumSize());
-    ui->BoxDock   ->resize(ui->BoxDock->minimumSize());
 
     //ボタン関係
     connect(this ,SIGNAL(ToggleChanged(MAKE_OBJECT)),ui->SolidEdit ,SLOT(SetState(MAKE_OBJECT)));
@@ -29,7 +29,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     //リスト変更系
     connect(ui->RestraintList ,SIGNAL(itemSelectionChanged()) ,this ,SLOT(MakeRestraint()));
-    connect(ui->ObjectList    ,SIGNAL(itemSelectionChanged()) ,this ,SLOT(MakeRestraint()));
 
     //CadEditFoamにイベントフィルター導入
     this->installEventFilter(ui->SolidEdit);
@@ -41,7 +40,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ConnectSignals();
     ui->ToolBlocks->setEnabled(false);
-    ui->ObjectList->setSelectionMode(QAbstractItemView::ExtendedSelection);
     CObject::drawing_scale = 1.0;
 
 }
@@ -212,98 +210,15 @@ void MainWindow::RefreshStatusBar(Pos pos){
 }
 
 void MainWindow::UpdateObjectTree(){
-    //オブジェクトツリーの設定
-    QVector<CEdge*> edges = this->model->GetEdges();
-
-    QTreeWidget* list = this->ui->ObjectList;
-    if(list->topLevelItemCount() != edges.size()+1){
-        list->clear();
-
-        //原点を追加
-        list->addTopLevelItem(new QTreeWidgetItem());
-        list->topLevelItem(list->topLevelItemCount()-1)->setText(0,"Origin");
-        list->topLevelItem(list->topLevelItemCount()-1)->setIcon(0,QIcon(":/ToolImages/Dot.png"));
-
-        for(int i=0;i<edges.size();i++){
-            std::pair<std::string,std::string> p;
-            if(edges[i]->is<CLine>  ())p = std::make_pair("Line"  ,":/ToolImages/Line.png");
-            if(edges[i]->is<CArc>   ())p = std::make_pair("Arc"   ,":/ToolImages/Arc.png");
-            if(edges[i]->is<CSpline>())p = std::make_pair("Spline",":/ToolImages/Spline.png");
-
-            //オブジェクト追加
-            list->addTopLevelItem(new QTreeWidgetItem());
-            list->topLevelItem(list->topLevelItemCount()-1)->setText(0,p.first.c_str());
-            list->topLevelItem(list->topLevelItemCount()-1)->setIcon(0,QIcon(p.second.c_str()));
-        }
-    }
-
-    //子の設定
-    for(int i=0;i<edges.size();i++){
-        if(edges[i]->GetMiddleCount()+2 != list->topLevelItem(i+1)->childCount()){
-            for(int j=0;j<edges[i]->GetMiddleCount()+2;j++){
-                QTreeWidgetItem* child;
-                if(j < list->topLevelItem(i+1)->childCount()){
-                    child = list->topLevelItem(i+1)->child(j);
-                }else{
-                    child = new QTreeWidgetItem();
-                }
-
-                child->setIcon(0,QIcon(":/ToolImages/Dot.png"));
-                if(j == 0){
-                    child->setText(0,"Start");
-                }
-                else if(j == 1){
-                    child->setText(0,"End");
-                }
-                else{
-                    child->setText(0,QString("Middle_") + QString::number(j) + ")");
-                }
-
-                if(j >= list->topLevelItem(i+1)->childCount()){
-                    if(j==0 || j == edges[i]->GetMiddleCount()+1){
-                        list->topLevelItem(i+1)->addChild(child);
-                    }else{
-                        list->topLevelItem(i+1)->insertChild(1,child);
-                    }
-                }
-            }
-        }
-    }
 }
 
 void MainWindow::UpdateObjectTreeSelected(){
-    //選択状態の反映
-    QTreeWidget* list = this->ui->ObjectList;
-    for(int i=0;i<list->topLevelItemCount();i++){
-        if(i == 0){
-            //原点
-            list->topLevelItem(0)->setSelected(exist(this->model->GetSelected(),this->model->origin));
-        }else{
-            //Edge自身
-            list->topLevelItem(i)->setSelected(exist(this->model->GetSelected(),this->model->GetEdges()[i-1]));
-
-            //端点
-            list->topLevelItem(i)->child(0)->setSelected(exist(this->model->GetSelected(),this->model->GetEdges()[i-1]->start));
-            list->topLevelItem(i)->child(1)->setSelected(exist(this->model->GetSelected(),this->model->GetEdges()[i-1]->end));
-            for(int j=0;j<this->model->GetEdges()[i-1]->GetMiddleCount() && j<list->topLevelItem(i)->childCount()-2;j++){
-                list->topLevelItem(i)->child(j+2)->setSelected(exist(this->model->GetSelected(),this->model->GetEdges()[i-1]->GetMiddle(j)));
-            }
-        }
-    }
 }
 
 void MainWindow::UpdateBlocksTree(){
     QVector<CBlock*> blocks = this->model->GetBlocks();
     //数が一致しなければ、全て削除し再度代入する
-    QListWidget* list = this->ui->BlockList;
-    if(list->count() != blocks.size()){
-        list->clear();
-        for(int i=0;i<blocks.size();i++) {
-            list->addItem(new QListWidgetItem("CBox"));
-            list->item(list->count()-1)->setIcon(QIcon(":/ToolImages/Blocks.png"));
-            //list->item(list->count()-1)->setSelected(selecting_block == i);
-        }
-    }
+
 }
 
 /*
@@ -315,7 +230,6 @@ void MainWindow::ShowObjectList(){
 }
 
 void MainWindow::ShowBoxList(){
-    this->ui->BoxDock->show();
 }
 
 

@@ -61,7 +61,7 @@ bool CadModelCore::ExportFoamFile(QString filename)const{
         }
         out << std::endl;
     }
-
+/*
     //ブロック
     out << Blocks.size() << std::endl;
     for(CBlock* b : Blocks){
@@ -85,7 +85,7 @@ bool CadModelCore::ExportFoamFile(QString filename)const{
                 }
             }
         }
-    }
+    }*/
     return true;
 }
 
@@ -148,7 +148,7 @@ bool CadModelCore::ImportFoamFile(QString filename){
             Edges.push_back(make);
         }
     }
-
+/*
     int block_num;
     in >> block_num;
     for(int i=0;i<block_num;i++){
@@ -183,9 +183,10 @@ bool CadModelCore::ImportFoamFile(QString filename){
             in >> j;
             ed.push_back(Edges[j]);
         }
+
         block->SetEdgeAll(ed);
         this->AddBlocks(block);
-    }
+    }*/
     return false;
 }
 

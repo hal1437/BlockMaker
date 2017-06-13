@@ -46,7 +46,7 @@ public:
     QString FormatError()const;
 
     //入出力
-    CBlock ExportCBlock()const;
+    CBlock* ExportCBlock()const;
     void   ImportCBlock(const CBlock& block);
 
     explicit CBoxDefineDialog(QWidget *parent = 0);
