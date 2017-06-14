@@ -23,6 +23,10 @@ private:
     void pullSelectedFace (CFace*  face ,QTreeWidgetItem* current);
     void pullSelectedEdge (CEdge*  edge ,QTreeWidgetItem* current);
     void pullSelectedPoint(CPoint* point,QTreeWidgetItem* current);
+    void pushSelectedBlock(CBlock* block,QTreeWidgetItem* current);
+    void pushSelectedFace (CFace*  face ,QTreeWidgetItem* current);
+    void pushSelectedEdge (CEdge*  edge ,QTreeWidgetItem* current);
+    void pushSelectedPoint(CPoint* point,QTreeWidgetItem* current);
 
 public:
     void SetModel(CadModelCore* m);

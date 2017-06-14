@@ -52,34 +52,57 @@ void ObjectList::AddPointToTree(CPoint* point,QTreeWidgetItem* parent,int index)
     if(parent == nullptr)this->addTopLevelItem(item);
     else                 parent->addChild(item);
 }
-void ObjectList::pullSelectedBlock(CBlock* block,QTreeWidgetItem* current){
+void ObjectList::pushSelectedBlock(CBlock* block,QTreeWidgetItem* current){
     if(current->isSelected())this->CadModelCoreInterface::model->AddSelected(block);
     else                     this->CadModelCoreInterface::model->RemoveSelected(block);
     for(int i=0;i<current->childCount();i++){
-        pullSelectedFace(block->faces[i],current->child(i));
+        pushSelectedFace(block->faces[i],current->child(i));
     }
 }
-void ObjectList::pullSelectedFace (CFace*  face ,QTreeWidgetItem* current){
+void ObjectList::pushSelectedFace (CFace*  face ,QTreeWidgetItem* current){
     if(current->isSelected())this->CadModelCoreInterface::model->AddSelected(face);
     else                     this->CadModelCoreInterface::model->RemoveSelected(face);
     for(int i=0;i<current->childCount();i++){
-        pullSelectedEdge(face->edges[i],current->child(i));
+        pushSelectedEdge(face->edges[i],current->child(i));
     }
 }
-void ObjectList::pullSelectedEdge (CEdge*  edge ,QTreeWidgetItem* current){
+void ObjectList::pushSelectedEdge (CEdge*  edge ,QTreeWidgetItem* current){
     if(current->isSelected()){
         this->CadModelCoreInterface::model->AddSelected(edge);
     }else{
         this->CadModelCoreInterface::model->RemoveSelected(edge);
     }
     for(int i=0;i<current->childCount();i++){
+        pushSelectedPoint(edge->GetPosSequence(i),current->child(i));
+    }
+}
+void ObjectList::pushSelectedPoint(CPoint* point,QTreeWidgetItem* current){
+    if(current->isSelected()){
+        this->CadModelCoreInterface::model->AddSelected(point);
+    }
+}
+void ObjectList::pullSelectedBlock(CBlock* block,QTreeWidgetItem* current){
+    current->setSelected(exist(this->CadModelCoreInterface::model->GetSelected(),block));
+    for(int i=0;i<current->childCount();i++){
+        pullSelectedFace(block->faces[i],current->child(i));
+    }
+}
+void ObjectList::pullSelectedFace (CFace*  face ,QTreeWidgetItem* current){
+    current->setSelected(exist(this->CadModelCoreInterface::model->GetSelected(),face));
+    for(int i=0;i<current->childCount();i++){
+        pullSelectedEdge(face->edges[i],current->child(i));
+    }
+}
+void ObjectList::pullSelectedEdge (CEdge*  edge ,QTreeWidgetItem* current){
+    current->setSelected(exist(this->CadModelCoreInterface::model->GetSelected(),edge));
+    for(int i=0;i<current->childCount();i++){
         pullSelectedPoint(edge->GetPosSequence(i),current->child(i));
     }
 }
 void ObjectList::pullSelectedPoint(CPoint* point,QTreeWidgetItem* current){
-    if(current->isSelected())this->CadModelCoreInterface::model->AddSelected(point);
-    else                     this->CadModelCoreInterface::model->RemoveSelected(point);
+    current->setSelected(exist(this->CadModelCoreInterface::model->GetSelected(),point));
 }
+
 
 void ObjectList::SetModel(CadModelCore* m){
     this->CadModelCoreInterface::model = m;
@@ -117,22 +140,8 @@ void ObjectList::UpdateObject  (){
 
 void ObjectList::PullSelected(){
     //this <- model
-    //ツリーにセット
-    disconnect(this->CadModelCoreInterface::model,SIGNAL(UpdateSelected()),this,SLOT(PullSelected()));//一時的にコネクト解除
-    disconnect(this,SIGNAL(itemSelectionChanged()),this,SLOT(PushSelected()));
-    this->clear();
-    for(int i=0;i<this->blocks.size();i++)AddBlockToTree(this->blocks[i],nullptr,i);
-    for(int i=0;i<this->faces .size();i++)AddFaceToTree (this->faces [i],nullptr,i);
-    for(int i=0;i<this->edges .size();i++)AddEdgeToTree (this->edges [i],nullptr,i);
-    for(int i=0;i<this->points.size();i++)AddPointToTree(this->points[i],nullptr,i);
-    connect(this->CadModelCoreInterface::model,SIGNAL(UpdateSelected()),this,SLOT(PullSelected()));//再コネクト
-    connect(this,SIGNAL(itemSelectionChanged()),this,SLOT(PushSelected()));
-}
 
-void ObjectList::PushSelected(){
-    //this -> model
     int count = 0;
-
     disconnect(this->CadModelCoreInterface::model,SIGNAL(UpdateSelected()),this,SLOT(PullSelected()));//一時的にコネクト解除
     disconnect(this,SIGNAL(itemSelectionChanged()),this,SLOT(PushSelected()));
     for(int i=0;i<this->blocks.size();i++,count++)pullSelectedBlock(this->blocks[i],this->topLevelItem(count));
@@ -143,9 +152,25 @@ void ObjectList::PushSelected(){
     connect(this,SIGNAL(itemSelectionChanged()),this,SLOT(PushSelected()));
 }
 
+void ObjectList::PushSelected(){
+    //this -> model
+
+    int count = 0;
+    disconnect(this->CadModelCoreInterface::model,SIGNAL(UpdateSelected()),this,SLOT(PullSelected()));//一時的にコネクト解除
+    disconnect(this,SIGNAL(itemSelectionChanged()),this,SLOT(PushSelected()));
+    this->CadModelCoreInterface::model->SelectedClear();
+    for(int i=0;i<this->blocks.size();i++,count++)pushSelectedBlock(this->blocks[i],this->topLevelItem(count));
+    for(int i=0;i<this->faces .size();i++,count++)pushSelectedFace (this->faces [i],this->topLevelItem(count));
+    for(int i=0;i<this->edges .size();i++,count++)pushSelectedEdge (this->edges [i],this->topLevelItem(count));
+    for(int i=0;i<this->points.size();i++,count++)pushSelectedPoint(this->points[i],this->topLevelItem(count));
+    connect(this->CadModelCoreInterface::model,SIGNAL(UpdateSelected()),this,SLOT(PullSelected()));//再コネクト
+    connect(this,SIGNAL(itemSelectionChanged()),this,SLOT(PushSelected()));
+}
+
 ObjectList::ObjectList(QWidget *parent) :
     QTreeWidget(parent)
 {
+    this->setSelectionMode(QTreeWidget::ExtendedSelection);
     connect(this,SIGNAL(itemSelectionChanged()),this,SLOT(PushSelected()));
 }
 

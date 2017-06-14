@@ -36,6 +36,9 @@ public:
     bool ExportFoamFile(QString filename)const;
     bool ImportFoamFile(QString filename);
 
+    //選択解除
+    bool SelectedClear();
+
 public:
     explicit CadModelCore(QWidget *parent = 0);
     ~CadModelCore();

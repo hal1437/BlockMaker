@@ -16,7 +16,7 @@ void SolidEditForm::MakeObject(){
 
 void SolidEditForm::StartSketch(CFace* face){
     if(this->isSketcheing())return;
-    this->model->GetSelected().clear();//選択解除
+    this->model->SelectedClear();//選択解除
 
     this->sketch_face = face;
     Pos cross = face->GetNorm();
@@ -120,7 +120,7 @@ void SolidEditForm::mouseReleaseEvent(QMouseEvent *event){
                 objects.push_back(this->GetHangedObject());
                 objects.push_back(this->GetHangedFace());
                 //シフト状態
-                if(!shift_pressed)this->model->GetSelected().clear();//選択解除
+                if(!shift_pressed)this->model->SelectedClear();//選択解除
 
                 for(CObject* obj:objects){
                     if(obj == nullptr)continue;

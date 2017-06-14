@@ -190,6 +190,12 @@ bool CadModelCore::ImportFoamFile(QString filename){
     return false;
 }
 
+bool CadModelCore::SelectedClear(){
+    this->Selected.clear();
+    emit UpdateSelected();
+}
+
+
 
 CadModelCore::CadModelCore(QWidget *parent):
     QObject(parent)
