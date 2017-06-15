@@ -75,8 +75,7 @@ public:
     QVector<Pos> GetVerticesPos()const;
     Pos GetClockworksPos(int index) const;//時計回り番号取得
 
-    CBlock();
-    CBlock(QVector<CFace*> faces);
+    CBlock(QObject* parent=nullptr);
     ~CBlock();
 };
 

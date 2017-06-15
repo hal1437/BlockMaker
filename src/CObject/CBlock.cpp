@@ -82,27 +82,19 @@ CEdge* CBlock::GetEdge(int index)const{
 
 bool CBlock::Creatable(QVector<CObject*> values){
     if(std::any_of(values.begin(),values.end(),[](CObject* p){return !p->is<CFace>();}))return false;
-    if(values.size() <= 6)return false;
+    if(values.size() < 6)return false;
 
 
     //閉じた立体テスト
     std::map<CPoint*,int> point_maps;
-    QVector<CPoint*> points;
     for(CObject* v: values){
-        CFace* face = dynamic_cast<CFace*>(v);
-        for(CEdge* e : face->edges){
-            for(int i=0;i<e->GetPosSequenceCount();i++){
-                point_maps[e->GetPosSequence(i)]++;
-                points.push_back(e->GetPosSequence(i));
-            }
+        for(CEdge* e : dynamic_cast<CFace*>(v)->edges){
+            point_maps[e->start]++;
+            point_maps[e->end]++;
         }
     }
-
-    //全て3
-    if(!std::all_of(point_maps.begin(),point_maps.end(),[](std::pair<CObject*,int> c){return c.second==3;}))return false;
-    //重複削除
-    std::sort(points.begin(),points.end());
-    points.erase(std::unique(points.begin(),points.end()),points.end());
+    //全て6
+    if(!std::all_of(point_maps.begin(),point_maps.end(),[](std::pair<CObject*,int> c){return c.second==6;}))return false;
 
     return true;
 }
@@ -152,11 +144,8 @@ Pos CBlock::GetClockworksPos(int index)const{
 }
 
 
-CBlock::CBlock()
-{
-}
-CBlock::CBlock(QVector<CFace*> faces):
-    faces(faces)
+CBlock::CBlock(QObject* parent):
+    CObject(parent)
 {
 }
 

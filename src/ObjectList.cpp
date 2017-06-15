@@ -2,11 +2,11 @@
 
 void ObjectList::AddBlockToTree(CBlock* block,QTreeWidgetItem* parent,int index){
     QTreeWidgetItem* item = new QTreeWidgetItem();
-    item->setText(0,QString("Face:") + QString::number(index));
-    item->setIcon(0,QIcon(":/ToolImages/Rect.png"));
+    item->setText(0,QString("Block:") + QString::number(index));
+    item->setIcon(0,QIcon(":/ToolImages/Blocks.png"));
 
     for(int i = 0;i<block->faces.size();i++){
-        AddFaceToTree(block->faces[i],parent,index+1);
+        AddFaceToTree(block->faces[i],item,index+1);
     }
     item->setSelected(exist(this->CadModelCoreInterface::model->GetSelected(),block));
     if(parent == nullptr)this->addTopLevelItem(item);

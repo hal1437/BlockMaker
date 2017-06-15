@@ -113,11 +113,6 @@ void MainWindow::RefreshUI(){
         ui->RestraintList->item(ui->RestraintList->count()-1)->setIcon(QIcon(p.second.c_str()));
     }
 
-    disconnect(ui->RestraintList ,SIGNAL(itemSelectionChanged()) ,this ,SLOT(MakeRestraint()));
-    //this->ui->CadEdit->ExportObjectList(this->ui->ObjectList);
-    //this->ui->CadEdit->ExportCBoxList  (this->ui->BlockList);
-    connect(ui->RestraintList ,SIGNAL(itemSelectionChanged()) ,this ,SLOT(MakeRestraint()));
-
     //ブロック生成可否判定
     ui->ToolBlocks->setEnabled(CBlock::Creatable(this->model->GetSelected()));
     //ブロック生成可否判定
@@ -189,15 +184,18 @@ void MainWindow::MakeRestraint(){
 }
 
 void MainWindow::MakeBlock(){
-    RefreshUI();
+    CBlock* block = new CBlock(this);
+    for(QObject* obj: this->model->GetSelected()){
+        block->faces.push_back(dynamic_cast<CFace*>(obj));
+    }
+    this->model->AddBlocks(block);
+    this->model->GetSelected().clear();//選択解除
 }
 void MainWindow::MakeFace(){
-    QVector<CEdge*> pos;
-    for(QObject* obj: this->model->GetSelected()){
-        pos.push_back(dynamic_cast<CEdge*>(obj));
-    }
     CFace* face = new CFace(this);
-    face->edges = pos;
+    for(QObject* obj: this->model->GetSelected()){
+        face->edges.push_back(dynamic_cast<CEdge*>(obj));
+    }
     this->model->AddFaces(face);
     this->model->GetSelected().clear();//選択解除
 }
