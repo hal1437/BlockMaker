@@ -53,7 +53,6 @@ void SolidEditForm::ColorSelect(CObject* obj){
     else                                          glColor3f(0,0,1);
 }
 
-
 //カメラ方向セット
 void SolidEditForm::setCameraRotate(double theta1,double theta2){
     TimeDivider *p1,*p2;
@@ -66,10 +65,12 @@ void SolidEditForm::setCameraRotate(double theta1,double theta2){
 
 void SolidEditForm::keyPressEvent    (QKeyEvent *event){
     //キーイベント
-    if(event->key() == Qt::Key_Up    )setCameraRotate(M_PI/2,0);
-    if(event->key() == Qt::Key_Left  )setCameraRotate(0,0);
-    if(event->key() == Qt::Key_Right )setCameraRotate(0,-M_PI/2);
-    if(event->key() == Qt::Key_Down  )setCameraRotate(M_PI/4,-M_PI/4);
+    if(!this->isSketcheing()){
+        if(event->key() == Qt::Key_Up    )setCameraRotate(M_PI/2,0);
+        if(event->key() == Qt::Key_Left  )setCameraRotate(0,0);
+        if(event->key() == Qt::Key_Right )setCameraRotate(0,-M_PI/2);
+        if(event->key() == Qt::Key_Down  )setCameraRotate(M_PI/4,-M_PI/4);
+    }
     shift_pressed = event->modifiers() & Qt::ShiftModifier;
     ctrl_pressed  = event->modifiers() & Qt::ControlModifier;
 
@@ -249,18 +250,10 @@ void SolidEditForm::paintGL(){
         glEnd();
     }
 
-    //エッジ描画
-    for(CEdge* edge:this->model->GetEdges()){
-        edge->DrawGL(this->camera,this->center);
-        //端点の描画
-        for(int j=0;j<edge->GetPosSequenceCount();j++){
-            edge->GetPosSequence(j)->DrawGL(this->camera,this->center);
-        }
-    }
-    //面描画
-    for(CFace* face : this->model->GetFaces()){
-        face->DrawGL(this->camera,this->center);
-    }
+    //描画
+    for(CPoint* pos  : this->model->GetPoints())pos ->DrawGL(this->camera,this->center);
+    for(CEdge*  edge : this->model->GetEdges ())edge->DrawGL(this->camera,this->center);
+    for(CFace*  face : this->model->GetFaces ())face->DrawGL(this->camera,this->center);
 
     //選択オブジェクト描画
     glColor3f(0,1,1);

@@ -5,87 +5,44 @@ bool CadModelCore::ExportFoamFile(QString filename)const{
     std::ofstream out(filename.toStdString().c_str());
     if(!out)return false;
 
-    QVector<Pos> points;//全ての頂点
-    for(CEdge* edge : Edges){
-        points.push_back(*edge->start);
-        points.push_back(*edge->end);
-        for(int j=0;j<edge->GetMiddleCount();j++){
-            points.push_back(*edge->GetMiddle(j));
-        }
+    //頂点リスト出力
+    out << this->Points.size() << std::endl;
+    for(CPoint* pos: this->Points){
+        out << *pos << std::endl;
     }
+    //エッジリスト出力
+    out << this->Edges.size() << std::endl;
+    for(CEdge* edge: this->Edges){
+        std::string name;
+        if(edge->is<CLine>  ())name = "CLine";
+        if(edge->is<CArc>   ())name = "CArc";
+        if(edge->is<CSpline>())name = "CSpline";
 
-    //並び替え&同一排除
-    std::sort(points.begin(),points.end());
-    points.erase(std::unique(points.begin(),points.end()),points.end());
-
-    //オブジェクトリスト作成
-    QVector<std::pair<QString,QVector<int>>> pairs;//(名前,頂点番号)
-    for(int i =0;i<Edges.size();i++){
-        QString name = "Unknown";
-        QVector<int> vertex;
-        if(Edges[i]->is<CPoint>()){
-            vertex.push_back(IndexOf(points,*dynamic_cast<CPoint*>(Edges[i])));
-            name = "CPoint";
-        }
-        if(Edges[i]->is<CEdge>()){
-            if(Edges[i]->is<CLine>  ())name = "CLine";
-            if(Edges[i]->is<CArc>   ())name = "CArc";
-            if(Edges[i]->is<CSpline>())name = "CSpline";
-
-            //始点終点を追加
-            vertex.push_back(IndexOf(points,*Edges[i]->start));
-            vertex.push_back(IndexOf(points,*Edges[i]->end));
-            //中継点を追加
-            for(int j=0;j<Edges[i]->GetMiddleCount();j++){
-                vertex.push_back(IndexOf(points,*Edges[i]->GetMiddle(j)));
-            }
-        }
-        //登録
-        pairs.push_back(std::make_pair(name,vertex));
-    }
-
-    //頂点数
-    out << points.size() << std::endl;
-    //頂点
-    for(Pos p : points){
-        out << p << std::endl;
-    }
-
-    //オブジェクト数
-    out << pairs.size() << std::endl;
-    //オブジェクト
-    for(std::pair<QString,QVector<int>> p : pairs){
-        out << p.first.toStdString();
-        for(int i=0;i<p.second.size();i++){
-            out << "," << p.second[i];
+        out << name.c_str() << "," << IndexOf(this->Points,edge->start)
+                            << "," << IndexOf(this->Points,edge->end);
+        for(int i=0;i<edge->GetPosSequenceCount();i++){
+            out << "," << IndexOf(this->Points,edge->GetPosSequence(i));
         }
         out << std::endl;
     }
-/*
-    //ブロック
-    out << Blocks.size() << std::endl;
-    for(CBlock* b : Blocks){
-        out << b->depth << std::endl;
-        out << b->grading << std::endl;
-
-        for(double d : b->grading_args)out << d << " ";
-        out << std::endl;
-        for(BoundaryType t : b->boundery)out << t << " ";
-        out << std::endl;
-        for(QString n : b->name)out << n.toStdString() << " ";
-        out << std::endl;
-        for(int d : b->div)out << d << " ";
-        out << std::endl;
-
-        for(int i=0;i<4;i++){
-            for(int j=0;j<Edges.size();j++){
-                if(Edges[j] == b->GetEdge(i)){
-                    out << j << " ";
-                    break;
-                }
-            }
+    //面リスト出力
+    out << this->Faces.size() << std::endl;
+    for(CFace* face: this->Faces){
+        out << "CFace";
+        for(int i=0;i< face->edges.size();i++){
+            out << "," << IndexOf(this->Edges,face->edges[i]);
         }
-    }*/
+        out << std::endl;
+    }
+    //立体リスト出力
+    out << this->Blocks.size() << std::endl;
+    for(CBlock* block: this->Blocks){
+        out << "CBlock";
+        for(int i=0;i< block->faces.size();i++){
+            out << "," << IndexOf(this->Faces,block->faces[i]);
+        }
+        out << std::endl;
+    }
     return true;
 }
 
