@@ -18,8 +18,7 @@ bool CadModelCore::ExportFoamFile(QString filename)const{
         if(edge->is<CArc>   ())name = "CArc";
         if(edge->is<CSpline>())name = "CSpline";
 
-        out << name.c_str() << "," << IndexOf(this->Points,edge->start)
-                            << "," << IndexOf(this->Points,edge->end);
+        out << name;
         for(int i=0;i<edge->GetPosSequenceCount();i++){
             out << "," << IndexOf(this->Points,edge->GetPosSequence(i));
         }
@@ -51,31 +50,26 @@ bool CadModelCore::ImportFoamFile(QString filename){
     std::ifstream in(filename.toStdString().c_str());
     if(!in)return false;
 
-    //オブジェクトをクリア
+    //オブジェクトを全て削除
+    this->Points.clear();
     this->Edges.clear();
-
-    //頂点数取得
-    int vertex_num;
-    in >> vertex_num;
+    this->Faces.clear();
+    this->Blocks.clear();
+    this->Selected.clear();
 
     //頂点取得
-    QVector<CPoint*> points;
+    int vertex_num;
+    in >> vertex_num;
     for(int i=0;i<vertex_num;i++){
         Pos p;
         in >> p;
-        if(p != Pos()){
-            points.push_back(new CPoint(p));
-        }else{
-            points.push_back(this->origin);
-        }
+        this->Points.push_back(new CPoint(p));
     }
 
-    //オブジェクト数取得
-    int object_num;
-    in >> object_num;
-
-    //オブジェクト復元
-    for(int i=0;i<object_num;i++){
+    //エッジ取得
+    int edge_num;
+    in >> edge_num;
+    for(int i=0;i<edge_num;i++){
         std::string str;
         in >> str;
 
@@ -83,68 +77,64 @@ bool CadModelCore::ImportFoamFile(QString filename){
         CEdge* make = nullptr;
         QStringList sl = QString(str.c_str()).split(',');
 
-        //if(sl[0] == "CPoint" )make = new CPoint();
         if(sl[0] == "CLine"  )make = new CLine();
         if(sl[0] == "CArc"   )make = new CArc();
         if(sl[0] == "CSpline")make = new CSpline();
+
         //オブジェクト生成
         if(make != nullptr){
 
-            CREATE_RESULT res = make->Create(points[sl[1].toInt()]);
+            CREATE_RESULT res = make->Create(this->Points[sl[1].toInt()]);
 
             if(res == CREATE_RESULT::ENDLESS){
                 for(int j=3;j<sl.size();j++){
-                    make->Create(points[sl[j].toInt()]);
+                    make->Create(this->Points[sl[j].toInt()]);
                 }
-                make->Create(points[sl[2].toInt()]);
+                make->Create(this->Points[sl[2].toInt()]);
             }else{
                 for(int j=2;j<sl.size();j++){
-                    make->Create(points[sl[j].toInt()]);
+                    make->Create(this->Points[sl[j].toInt()]);
                 }
             }
             Edges.push_back(make);
         }
     }
-/*
+    //面取得
+    int face_num;
+    in >> face_num;
+    for(int i=0;i<face_num;i++){
+        std::string str;
+        in >> str;
+
+        CFace* make = new CFace();
+        QStringList sl = QString(str.c_str()).split(',');
+        //エッジ判定
+        for(int j = 1;j<sl.size();j++){
+            make->edges.push_back(this->Edges[sl[j].toInt()]);
+        }
+        this->Faces.push_back(make);
+    }
+    //立体取得
     int block_num;
     in >> block_num;
     for(int i=0;i<block_num;i++){
-        CBlock* block = new CBlock();
-        int g;
-        in >> block->depth;
-        in >> g;
-        block->grading = static_cast<GradingType>(g);
+        std::string str;
+        in >> str;
 
-        if(block->grading == GradingType::SimpleGrading)block->grading_args.resize(3);
-        else                                           block->grading_args.resize(12);
-
-        for(int j=0;j<block->grading_args.size();j++){
-            in >> block->grading_args[j];
+        CBlock* make = new CBlock();
+        QStringList sl = QString(str.c_str()).split(',');
+        //エッジ判定
+        for(int j = 1;j<sl.size();j++){
+            make->faces.push_back(this->Faces[sl[j].toInt()]);
         }
-        for(int j=0;j<6;j++){
-            int b;
-            in >> b;
-            block->boundery[j] = static_cast<BoundaryType>(b);
-        }
-        for(int j=0;j<6;j++){
-            std::string str;
-            in >> str;
-            block->name[j] = str.c_str();
-        }
-        for(int j=0;j<3;j++){
-            in >> block->div[j];
-        }
-        QVector<CEdge*> ed;
-        for(int i=0;i<4;i++){
-            int j;
-            in >> j;
-            ed.push_back(Edges[j]);
-        }
-
-        block->SetEdgeAll(ed);
-        this->AddBlocks(block);
-    }*/
-    return false;
+        this->Blocks.push_back(make);
+    }
+    emit UpdatePoints();
+    emit UpdateEdges();
+    emit UpdateFaces();
+    emit UpdateBlocks();
+    emit UpdateSelected();
+    return true;
 }
 
 bool CadModelCore::SelectedClear(){

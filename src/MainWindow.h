@@ -64,15 +64,11 @@ public slots:
 
     void RefreshStatusBar(Pos pos);        //ステータスバー更新
 
-    void UpdateObjectTree        ();  //エッジ表示
-    void UpdateObjectTreeSelected();       //選択情報表示
-    void UpdateBlocksTree        (); //箱表示
-    //void UpdateBLocksTreeSelected(); //選択箱表示
-
     void ShowObjectList();
     void ShowBoxList();
 
-
+    void Save();
+    void Load();
 };
 
 #endif // MAINWINDOW_H

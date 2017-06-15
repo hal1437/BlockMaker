@@ -7,8 +7,6 @@ void MainWindow::SetModel(CadModelCore* model){
     this->ui->SolidEdit ->SetModel(model);
     this->ui->ObjectTree->SetModel(model);
     //モデルと結合
-    connect(this->model,SIGNAL(UpdateEdges   ()),this,SLOT(UpdateObjectTree        ()));
-    connect(this->model,SIGNAL(UpdateSelected()),this,SLOT(UpdateObjectTreeSelected()));
     connect(this->model,SIGNAL(UpdateSelected()),this,SLOT(RefreshUI()));
 }
 
@@ -21,11 +19,13 @@ MainWindow::MainWindow(QWidget *parent) :
 
     //ボタン関係
     connect(this ,SIGNAL(ToggleChanged(MAKE_OBJECT)),ui->SolidEdit ,SLOT(SetState(MAKE_OBJECT)));
-    connect(ui->actionDelete         ,SIGNAL(triggered())                        ,this       ,SLOT(Delete()));
-    connect(ui->actionMove           ,SIGNAL(triggered())                        ,this       ,SLOT(ShowMoveTransform()));
-    connect(ui->actionGridFilter     ,SIGNAL(triggered())                        ,this       ,SLOT(ShowGridFilter()));
-    connect(ui->ToolBlocks           ,SIGNAL(triggered())                        ,this       ,SLOT(MakeBlock()));
-    connect(ui->ToolFace             ,SIGNAL(triggered())                        ,this       ,SLOT(MakeFace()));
+    connect(ui->actionDelete     ,SIGNAL(triggered()) ,this,SLOT(Delete()));
+    connect(ui->actionMove       ,SIGNAL(triggered()) ,this,SLOT(ShowMoveTransform()));
+    connect(ui->actionGridFilter ,SIGNAL(triggered()) ,this,SLOT(ShowGridFilter()));
+    connect(ui->ToolBlocks       ,SIGNAL(triggered()) ,this,SLOT(MakeBlock()));
+    connect(ui->ToolFace         ,SIGNAL(triggered()) ,this,SLOT(MakeFace()));
+    connect(ui->actionSave       ,SIGNAL(triggered()) ,this,SLOT(Save()));
+    connect(ui->actionLoad       ,SIGNAL(triggered()) ,this,SLOT(Load()));
 
     //リスト変更系
     connect(ui->RestraintList ,SIGNAL(itemSelectionChanged()) ,this ,SLOT(MakeRestraint()));
@@ -166,7 +166,7 @@ void MainWindow::ShowMoveTransform(){
 }
 void MainWindow::ShowGridFilter(){
     static GridFilterDialog* diag = new GridFilterDialog(this);
-    //connect(diag,SIGNAL(ChangeGridStatus(double,double)),ui->CadEdit,SLOT(SetGridFilterStatus(double,double)));
+    //connect(diag,SIGNAL(ChangeGri dStatus(double,double)),ui->CadEdit,SLOT(SetGridFilterStatus(double,double)));
     diag->setWindowTitle("GridFilter");
     diag->setWindowFlags(Qt::Dialog | Qt::WindowStaysOnTopHint);
     diag->show();
@@ -203,27 +203,10 @@ void MainWindow::MakeFace(){
 }
 
 void MainWindow::RefreshStatusBar(Pos pos){
-    this->ui->statusBar->showMessage(QString("( %1,%2,%3,%4)").arg(QString::number(pos.x() ,'f',3))
-                                                              .arg(QString::number(pos.y() ,'f',3))
-                                                              .arg(QString::number(pos.z() ,'f',3))
-                                                              .arg(QString::number(pos.w() ,'f',3)));
+    this->ui->statusBar->showMessage(QString("( %1,%2,%3)").arg(QString::number(pos.x() ,'f',3))
+                                                           .arg(QString::number(pos.y() ,'f',3))
+                                                           .arg(QString::number(pos.z() ,'f',3)));
 }
-
-void MainWindow::UpdateObjectTree(){
-}
-
-void MainWindow::UpdateObjectTreeSelected(){
-}
-
-void MainWindow::UpdateBlocksTree(){
-    QVector<CBlock*> blocks = this->model->GetBlocks();
-    //数が一致しなければ、全て削除し再度代入する
-
-}
-
-/*
-void MainWindow::UpdateBLocksTreeSelected(){
-}*/
 
 void MainWindow::ShowObjectList(){
     this->ui->ObjectDock->show();
@@ -231,5 +214,23 @@ void MainWindow::ShowObjectList(){
 
 void MainWindow::ShowBoxList(){
 }
+
+void MainWindow::Save(){
+    QString filepath = QFileDialog::getSaveFileName(this,
+                                                    "Save file",
+                                                    "",
+                                                    "FoamCAD File(*.foamcad);;All Files (*)");
+    this->model->ExportFoamFile(filepath);
+}
+
+void MainWindow::Load(){
+    QString filepath = QFileDialog::getOpenFileName(this,
+                                                    "Load file",
+                                                    "",
+                                                    "FoamCAD File(*.foamcad);;All Files (*)");
+    this->model->ImportFoamFile(filepath);
+
+}
+
 
 
