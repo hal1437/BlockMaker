@@ -131,11 +131,15 @@ void ObjectList::UpdateObject  (){
     }
 
     //ツリーにセット
+    disconnect(this->CadModelCoreInterface::model,SIGNAL(UpdateSelected()),this,SLOT(PullSelected()));//一時的にコネクト解除
+    disconnect(this,SIGNAL(itemSelectionChanged()),this,SLOT(PushSelected()));
     this->clear();
     for(int i=0;i<this->blocks.size();i++)AddBlockToTree(this->blocks[i],nullptr,i);
     for(int i=0;i<this->faces .size();i++)AddFaceToTree (this->faces [i],nullptr,i);
     for(int i=0;i<this->edges .size();i++)AddEdgeToTree (this->edges [i],nullptr,i);
     for(int i=0;i<this->points.size();i++)AddPointToTree(this->points[i],nullptr,i);
+    connect(this->CadModelCoreInterface::model,SIGNAL(UpdateSelected()),this,SLOT(PullSelected()));//再コネクト
+    connect(this,SIGNAL(itemSelectionChanged()),this,SLOT(PushSelected()));
 }
 
 void ObjectList::PullSelected(){
