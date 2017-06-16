@@ -31,7 +31,7 @@ public:
     CFace* base[3];//正面,平面,右側面
 
     //正面を取得
-    CFace* getFrontFace_impl(Quat invert)const;
+    CFace* getFrontFace_impl(Quat convert,Quat invert)const;
 
 public:
     void setModel(CadModelCore* model){this->model = model;}

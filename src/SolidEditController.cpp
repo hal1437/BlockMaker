@@ -4,13 +4,13 @@ Quat SolidEditController::getConvertFrontToSide()const{
     return Quat::getRotateYMatrix(M_PI/2);
 }
 Quat SolidEditController::getConvertFrontToTop ()const{
-    return Quat::getRotateXMatrix(-M_PI/2);
+    return Quat::getRotateXMatrix(M_PI/2);
 }
 Quat SolidEditController::getConvertSideToFront()const{
     return Quat::getRotateYMatrix(-M_PI/2);
 }
 Quat SolidEditController::getConvertTopToFront ()const{
-    return Quat::getRotateXMatrix(M_PI/2);
+    return Quat::getRotateXMatrix(-M_PI/2);
 }
 Quat SolidEditController::getConvertSideToTop  ()const{
     return this->getConvertSideToFront().Dot(this->getConvertFrontToTop());
@@ -19,7 +19,7 @@ Quat SolidEditController::getConvertTopToSide()const{
     return this->getConvertTopToFront().Dot(this->getConvertFrontToSide());
 }
 
-CFace* SolidEditController::getFrontFace_impl(Quat invert)const{
+CFace* SolidEditController::getFrontFace_impl(Quat convert,Quat invert)const{
     //正面を軸として変換を通し各平面の大きさを取得する関数
     if(this->model->GetBlocks().empty()){
         CFace* face = new CFace();
@@ -38,12 +38,14 @@ CFace* SolidEditController::getFrontFace_impl(Quat invert)const{
 
     double top=0,bottom=0,right=0,left=0;
     for(CBlock* block:this->model->GetBlocks()){
-        for(int i=0;i<4;i++){
-            for(int j=0;j<block->GetEdge(i)->GetPosSequenceCount();j++){
-                top    = std::max(top   ,((*block->GetEdge(i)->GetPosSequence(j)).Dot(invert)).mat[1]);
-                bottom = std::min(bottom,((*block->GetEdge(i)->GetPosSequence(j)).Dot(invert)).mat[1]);
-                right  = std::max(right ,((*block->GetEdge(i)->GetPosSequence(j)).Dot(invert)).mat[0]);
-                left   = std::min(left  ,((*block->GetEdge(i)->GetPosSequence(j)).Dot(invert)).mat[0]);
+        for(CFace* face:block->faces){
+            for(CEdge* edge:face->edges){
+                for(int j=0;j<edge->GetPosSequenceCount();j++){
+                    right  = std::max(right ,((*edge->GetPosSequence(j)).Dot(convert)).mat[0]);
+                    left   = std::min(left  ,((*edge->GetPosSequence(j)).Dot(convert)).mat[0]);
+                    top    = std::max(top   ,((*edge->GetPosSequence(j)).Dot(convert)).mat[1]);
+                    bottom = std::min(bottom,((*edge->GetPosSequence(j)).Dot(convert)).mat[1]);
+                }
             }
         }
     }
@@ -79,13 +81,13 @@ CFace* SolidEditController::getFrontFace_impl(Quat invert)const{
 }
 
 CFace* SolidEditController::getFrontFace()const{//正面
-    return this->getFrontFace_impl(Quat::getIdentityMatrix());
+    return this->getFrontFace_impl(Quat::getIdentityMatrix(),Quat::getIdentityMatrix());
 }
 CFace* SolidEditController::getTopFace  ()const{//平面
-    return this->getFrontFace_impl(this->getConvertTopToFront());
+    return this->getFrontFace_impl(this->getConvertTopToFront(),this->getConvertFrontToTop());
 }
 CFace* SolidEditController::getSideFace ()const{//右側面
-    return this->getFrontFace_impl(this->getConvertSideToFront());
+    return this->getFrontFace_impl(this->getConvertFrontToSide(),this->getConvertSideToFront());
 }
 
 
