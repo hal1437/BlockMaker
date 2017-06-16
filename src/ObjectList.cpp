@@ -6,7 +6,7 @@ void ObjectList::AddBlockToTree(CBlock* block,QTreeWidgetItem* parent,int index)
     item->setIcon(0,QIcon(":/ToolImages/Blocks.png"));
 
     for(int i = 0;i<block->faces.size();i++){
-        AddFaceToTree(block->faces[i],item,index+1);
+        AddFaceToTree(block->faces[i],item,i+1);
     }
     item->setSelected(exist(this->CadModelCoreInterface::model->GetSelected(),block));
     if(parent == nullptr)this->addTopLevelItem(item);
@@ -18,7 +18,7 @@ void ObjectList::AddFaceToTree(CFace*  face ,QTreeWidgetItem* parent,int index){
     item->setIcon(0,QIcon(":/ToolImages/Rect.png"));
 
     for(int i = 0;i<face->edges.size();i++){
-        AddEdgeToTree(face->edges[i],item,index+1);
+        AddEdgeToTree(face->edges[i],item,i+1);
     }
     item->setSelected(exist(this->CadModelCoreInterface::model->GetSelected(),face));
     if(parent == nullptr)this->addTopLevelItem(item);
@@ -34,7 +34,7 @@ void ObjectList::AddEdgeToTree(CEdge* edge,QTreeWidgetItem* parent,int index){
     item->setIcon(0,QIcon(p.second.c_str()));
 
     for(int i=0;i<edge->GetPosSequenceCount();i++){
-        AddPointToTree(edge->GetPosSequence(i),item,index+1);
+        AddPointToTree(edge->GetPosSequence(i),item,i+1);
     }
     if(exist(this->CadModelCoreInterface::model->GetSelected(),edge)){
         item->setSelected(true);
@@ -134,10 +134,10 @@ void ObjectList::UpdateObject  (){
     disconnect(this->CadModelCoreInterface::model,SIGNAL(UpdateSelected()),this,SLOT(PullSelected()));//一時的にコネクト解除
     disconnect(this,SIGNAL(itemSelectionChanged()),this,SLOT(PushSelected()));
     this->clear();
-    for(int i=0;i<this->blocks.size();i++)AddBlockToTree(this->blocks[i],nullptr,i);
-    for(int i=0;i<this->faces .size();i++)AddFaceToTree (this->faces [i],nullptr,i);
-    for(int i=0;i<this->edges .size();i++)AddEdgeToTree (this->edges [i],nullptr,i);
-    for(int i=0;i<this->points.size();i++)AddPointToTree(this->points[i],nullptr,i);
+    for(int i=0;i<this->blocks.size();i++)AddBlockToTree(this->blocks[i],nullptr,i+1);
+    for(int i=0;i<this->faces .size();i++)AddFaceToTree (this->faces [i],nullptr,i+1);
+    for(int i=0;i<this->edges .size();i++)AddEdgeToTree (this->edges [i],nullptr,i+1);
+    for(int i=0;i<this->points.size();i++)AddPointToTree(this->points[i],nullptr,i+1);
     connect(this->CadModelCoreInterface::model,SIGNAL(UpdateSelected()),this,SLOT(PullSelected()));//再コネクト
     connect(this,SIGNAL(itemSelectionChanged()),this,SLOT(PushSelected()));
 }

@@ -55,7 +55,26 @@ double CBlock::GetHeight(){
     return top-bottom;
 }
 
-bool CBlock::DrawGL(Pos camera,Pos center)const{
+bool CBlock::DrawGL(Pos,Pos)const{
+    //薄い色に変更
+    float currentColor[4];
+    glGetFloatv(GL_CURRENT_COLOR,currentColor);
+    glColor4f(0.5,
+              0.5,
+              0.5,
+              1);
+
+    for(CFace* face:this->faces){
+        //中を塗る
+        glBegin(GL_TRIANGLE_FAN);
+        for(int i=0;i<face->edges.size();i++){
+            glVertex3f(face->GetPoint(i)->x(),face->GetPoint(i)->y(), face->GetPoint(i)->z());
+        }
+        glEnd();
+    }
+    //色を復元
+    glColor4f(currentColor[0],currentColor[1],currentColor[2], currentColor[3]);
+
 }
 bool CBlock::Move  (const Pos& diff){
 }

@@ -224,6 +224,17 @@ void SolidEditForm::paintGL(){
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glClearColor(0.7,0.7,0.7,1);//背景
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glDepthFunc(GL_LEQUAL);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    //オブジェクト描画
+    glColor3f(0,0,1);
+    for(CBlock* block : this->model->GetBlocks())block->DrawGL(this->camera,this->center);
+    for(CFace*  face  : this->model->GetFaces ())face ->DrawGL(this->camera,this->center);
+    for(CEdge*  edge  : this->model->GetEdges ())edge ->DrawGL(this->camera,this->center);
+    for(CPoint* pos   : this->model->GetPoints())pos  ->DrawGL(this->camera,this->center);
 
     //描画面と色のリスト
     QVector<std::pair<CFace*,QVector<int>>> faces;
@@ -250,11 +261,6 @@ void SolidEditForm::paintGL(){
         glEnd();
     }
 
-    //描画
-    for(CPoint* pos  : this->model->GetPoints())pos ->DrawGL(this->camera,this->center);
-    for(CEdge*  edge : this->model->GetEdges ())edge->DrawGL(this->camera,this->center);
-    for(CFace*  face : this->model->GetFaces ())face->DrawGL(this->camera,this->center);
-
     //選択オブジェクト描画
     glColor3f(0,1,1);
     for(CObject* p: this->model->GetSelected()){
@@ -270,18 +276,6 @@ void SolidEditForm::paintGL(){
     CObject* hang_obj[] = {this->GetHangedObject(),this->GetHangedFace()} ;
     for(CObject* p: hang_obj){
         if(p != nullptr)p->DrawGL(this->camera,this->center);
-    }
-
-    //ブロック描画
-    for(int i=0;i<this->model->GetBlocks().size();i++){
-        //CBlock* block = this->model->GetBlocks()[i];
-
-        for(int j=0;j<4;j++){
-            glBegin(GL_LINE_LOOP);
-            glColor3f(0,0,0);
-            //glVertex3f(block->GetEdge(j)->start,block->GetEdge(j)->start,block->GetEdge(j)->start);
-            glEnd();
-        }
     }
 
     glFlush();

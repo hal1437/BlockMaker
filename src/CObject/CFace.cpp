@@ -125,6 +125,7 @@ bool CFace::DrawGL(Pos,Pos)const{
         float currentColor[4];
         glGetFloatv(GL_CURRENT_COLOR,currentColor);
         glColor4f(currentColor[0],currentColor[1],currentColor[2], 0.1);
+        glDepthMask(GL_FALSE);
 
         //中を塗る
         glBegin(GL_TRIANGLE_FAN);
@@ -133,15 +134,17 @@ bool CFace::DrawGL(Pos,Pos)const{
             glVertex3f(this->GetPoint(i)->x(),this->GetPoint(i)->y(), this->GetPoint(i)->z());
         }
         glEnd();
+        glDepthMask(GL_TRUE);
 
         //色を復元
         glColor4f(currentColor[0],currentColor[1],currentColor[2], currentColor[3]);
-    }
+    }else{
 
-    //外側
-    glBegin(GL_LINE_LOOP);
-    for(int i=0;i<this->edges.size();i++){
-        glVertex3f(this->GetPoint(i)->x(),this->GetPoint(i)->y(), this->GetPoint(i)->z());
+        //外側
+        glBegin(GL_LINE_LOOP);
+        for(int i=0;i<this->edges.size();i++){
+            glVertex3f(this->GetPoint(i)->x(),this->GetPoint(i)->y(), this->GetPoint(i)->z());
+        }
     }
     glEnd();
 
@@ -158,17 +161,20 @@ bool CFace::DrawNormArrowGL()const{
     glVertex3f(center.x(),center.y(), center.z());
     glVertex3f((center+this->GetNorm()*100).x(),(center+this->GetNorm()*100).y(), (center+this->GetNorm()*100).z());
     glEnd();
-
+    return true;
 }
 
 
 bool CFace::Move(const Pos& diff){
+    for(int i=0;i<this->edges.size();i++){
+      this->GetPoint(i)->Move(diff);
+    }
     return true;
 }
 
 
 //近接点
-Pos CFace::GetNearPos (const Pos& hand)const{
+Pos CFace::GetNearPos (const Pos&)const{
     return Pos();
 }
 Pos CFace::GetNearLine(const Pos& pos1,const Pos& pos2)const{
