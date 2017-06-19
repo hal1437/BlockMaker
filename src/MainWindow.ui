@@ -40,9 +40,8 @@
     <property name="title">
      <string>File</string>
     </property>
-    <addaction name="actionNanika"/>
+    <addaction name="actionOpen"/>
     <addaction name="actionSave"/>
-    <addaction name="actionLoad"/>
     <addaction name="separator"/>
     <addaction name="actionExit"/>
    </widget>
@@ -335,7 +334,7 @@
     <string>Blocks</string>
    </property>
   </action>
-  <action name="actionNanika">
+  <action name="actionOpen">
    <property name="text">
     <string>Open</string>
    </property>

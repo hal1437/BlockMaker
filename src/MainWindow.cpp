@@ -25,7 +25,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->ToolBlocks       ,SIGNAL(triggered()) ,this,SLOT(MakeBlock()));
     connect(ui->ToolFace         ,SIGNAL(triggered()) ,this,SLOT(MakeFace()));
     connect(ui->actionSave       ,SIGNAL(triggered()) ,this,SLOT(Save()));
-    connect(ui->actionLoad       ,SIGNAL(triggered()) ,this,SLOT(Load()));
+    connect(ui->actionOpen       ,SIGNAL(triggered()) ,this,SLOT(Load()));
 
     //リスト変更系
     connect(ui->RestraintList ,SIGNAL(itemSelectionChanged()) ,this ,SLOT(MakeRestraint()));
