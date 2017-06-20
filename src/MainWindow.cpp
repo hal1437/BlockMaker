@@ -184,12 +184,23 @@ void MainWindow::MakeRestraint(){
 }
 
 void MainWindow::MakeBlock(){
-    CBlock* block = new CBlock(this);
-    for(QObject* obj: this->model->GetSelected()){
-        block->faces.push_back(dynamic_cast<CFace*>(obj));
+    CBoxDefineDialog* diag = new CBoxDefineDialog();
+    if(this->model->GetSelected().size() == 1 && this->model->GetSelected()[0]->is<CBlock>()){
+        diag->block = dynamic_cast<CBlock*>(this->model->GetSelected()[0]);
+    }else{
+        CBlock* block = new CBlock(this);
+        for(QObject* obj: this->model->GetSelected()){
+            block->faces.push_back(dynamic_cast<CFace*>(obj));
+        }
+        diag->block = block;
     }
-    this->model->AddBlocks(block);
-    this->model->GetSelected().clear();//選択解除
+    if(diag->exec()){
+        if(!exist(this->model->GetBlocks(),diag->block)){
+            this->model->AddBlocks(diag->block);
+        }
+        this->model->GetSelected().clear();//選択解除
+    }
+
 }
 void MainWindow::MakeFace(){
     CFace* face = new CFace(this);

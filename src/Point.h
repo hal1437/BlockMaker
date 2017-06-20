@@ -333,5 +333,11 @@ namespace std {
 
 typedef Point<double> Pos;
 
+//角方向
+enum class CORNER_LIM{
+    MIN,
+    MAX,
+};
+
 #endif // POINT_H
 

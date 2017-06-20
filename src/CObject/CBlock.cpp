@@ -3,7 +3,7 @@
 //分割点取得
 Pos CBlock::GetDivisionPoint(int edge_index,int count_index)const{
     double A,B,sum=0,p,d,L;
-    Pos start,end;
+    CPoint *start,*end;
 
     //各パラメータ取得
     if(edge_index == 0 || edge_index == 2 || edge_index == 4  || edge_index == 6 ){ //X
@@ -14,16 +14,30 @@ Pos CBlock::GetDivisionPoint(int edge_index,int count_index)const{
         p = this->grading_args[1];
         d = this->div[1];
     }
+    if(edge_index == 8 || edge_index == 9 || edge_index == 10 || edge_index == 11){ //Z
+        p = this->grading_args[2];
+        d = this->div[2];
+    }
     //EdgeGradingならばpを上書き
     if(grading == GradingType::EdgeGrading){
         p = this->grading_args[edge_index];
     }
     //始点と終点を取得
-    if((edge_index % 4) == 0)start = this->GetClockworksPos(0),end = this->GetClockworksPos(1);
-    if((edge_index % 4) == 1)start = this->GetClockworksPos(1),end = this->GetClockworksPos(2);
-    if((edge_index % 4) == 2)start = this->GetClockworksPos(3),end = this->GetClockworksPos(2);
-    if((edge_index % 4) == 3)start = this->GetClockworksPos(0),end = this->GetClockworksPos(3);
-    L = (end-start).Length();
+    QVector<QVector<int>> edge_comb = {{0,1}, //0
+                                       {1,2}, //1
+                                       {3,2}, //2
+                                       {0,3}, //3
+                                       {4,5}, //4
+                                       {5,6}, //5
+                                       {7,6}, //6
+                                       {4,7}, //7
+                                       {0,4}, //8
+                                       {1,5}, //9
+                                       {2,6}, //10
+                                       {3,7}};//11
+    start = this->GetClockworksPos(edge_comb[edge_index][0]);
+    end   = this->GetClockworksPos(edge_comb[edge_index][1]);
+    L = (*end-*start).Length();
 
     //指数関数パラメータ計算
     B = log(p) / (d-1);
@@ -35,30 +49,38 @@ Pos CBlock::GetDivisionPoint(int edge_index,int count_index)const{
     for(int i=1;i<=count_index;i++){
         sum_rate += A*exp(B*i);
     }
-    Pos ans = (end-start).GetNormalize() * sum_rate;
-    return ans + start;
+    Pos ans = (*end-*start).GetNormalize() * sum_rate;
+    return ans + *start;
 }
 
-double CBlock::GetWidth(){
-    QVector<Pos> pp;
+double CBlock::GetLength_impl(Quat convert){
+    QVector<CPoint*> pp;
     pp = this->GetVerticesPos();
-    double left   = std::min_element(pp.begin(),pp.end(),[](const Pos& lhs,const Pos& rhs){return lhs.x() < rhs.x();})->x();
-    double right  = std::max_element(pp.begin(),pp.end(),[](const Pos& lhs,const Pos& rhs){return lhs.x() < rhs.x();})->x();
-    return right-left;
+    std::for_each(pp.begin(),pp.end(),[&](CPoint* pos){*pos = pos->Dot(convert);});
+    double begin = (*std::min_element(pp.begin(),pp.end(),[](CPoint* lhs,CPoint* rhs){return lhs->mat[0] < rhs->mat[0];}))->mat[0];
+    double end   = (*std::max_element(pp.begin(),pp.end(),[](CPoint* lhs,CPoint* rhs){return lhs->mat[0] < rhs->mat[0];}))->mat[0];
+    return end - begin;
 }
-
-double CBlock::GetHeight(){
-    QVector<Pos> pp;
-    pp = this->GetVerticesPos();
-    double top    = std::min_element(pp.begin(),pp.end(),[](const Pos& lhs,const Pos& rhs){return lhs.y() < rhs.y();})->y();
-    double bottom = std::max_element(pp.begin(),pp.end(),[](const Pos& lhs,const Pos& rhs){return lhs.y() < rhs.y();})->y();
-    return top-bottom;
+double CBlock::GetLengthX(){
+    return this->GetLength_impl(Quat::getIdentityMatrix());
+}
+double CBlock::GetLengthY(){
+    return this->GetLength_impl(Quat({0,0,0,0,
+                                      1,0,0,0,
+                                      0,0,0,0,
+                                      0,0,0,0}));
+}
+double CBlock::GetLengthZ(){
+    return this->GetLength_impl(Quat({0,0,0,0,
+                                      0,0,0,0,
+                                      1,0,0,0,
+                                      0,0,0,0}));
 }
 
 bool CBlock::DrawGL(Pos,Pos)const{
     //薄い色に変更
-    float currentColor[4];
-    glGetFloatv(GL_CURRENT_COLOR,currentColor);
+    float oldColor[4];
+    glGetFloatv(GL_CURRENT_COLOR,oldColor);
     glColor4f(0.5,
               0.5,
               0.5,
@@ -72,8 +94,31 @@ bool CBlock::DrawGL(Pos,Pos)const{
         }
         glEnd();
     }
+
+    //分割線を描画
+    glColor4f(0.1,
+              0.1,
+              0.1,
+              1);
+    if(this->grading == GradingType::SimpleGrading){
+        int edge_index[3][4] = {{0,2,6,4},{1,3,7,5},{8,9,10,11}};
+        for(int i=0;i<3;i++){
+            for(int j=0;j<this->div[i];j++){
+                glBegin(GL_LINE_LOOP);
+                for(int k=0;k<4;k++){
+                    //線の分割描画
+                    Pos p = this->GetDivisionPoint(edge_index[i][k],j);
+                    glVertex3f(p.x(),p.y(),p.z());
+                }
+                glEnd();
+            }
+        }
+    }
+
+
+
     //色を復元
-    glColor4f(currentColor[0],currentColor[1],currentColor[2], currentColor[3]);
+    glColor4f(oldColor[0],oldColor[1],oldColor[2], oldColor[3]);
 
 }
 bool CBlock::Move  (const Pos& diff){
@@ -100,6 +145,8 @@ CEdge* CBlock::GetEdge(int index)const{
 
 
 bool CBlock::Creatable(QVector<CObject*> values){
+    if(values.size()==1 && values[0]->is<CBlock>())return true;
+
     if(std::any_of(values.begin(),values.end(),[](CObject* p){return !p->is<CFace>();}))return false;
     if(values.size() < 6)return false;
 
@@ -123,7 +170,7 @@ bool CBlock::Draw(QPainter& painter)const{
     double top,bottom,left,right;
     QVector<Pos> pp;
     for(int i=0;i<4;i++){
-        pp.push_back(this->GetClockworksPos(i));
+        pp.push_back(*this->GetClockworksPos(i));
     }
     top    = std::min_element(pp.begin(),pp.end(),[](const Pos& lhs,const Pos& rhs){return lhs.y() < rhs.y();})->y();
     bottom = std::max_element(pp.begin(),pp.end(),[](const Pos& lhs,const Pos& rhs){return lhs.y() < rhs.y();})->y();
@@ -149,17 +196,44 @@ bool CBlock::Draw(QPainter& painter)const{
 }
 
 
-QVector<Pos> CBlock::GetVerticesPos()const{
-    //0~4で巡回するように
-    QVector<Pos> pp;
-    for(int i=0;i<4;i++){
-        pp.push_back(this->GetClockworksPos(i));
+QVector<CPoint*> CBlock::GetVerticesPos()const{
+    QVector<CPoint*>pp;
+    for(CFace* face:faces){
+        for(int i=0;i<4;i++){
+            pp.push_back(face->GetPoint(i));
+        }
     }
+    //重複を削除
+    std::sort(pp.begin(),pp.end());
+    pp.erase(std::unique(pp.begin(),pp.end()),pp.end());
     return pp;
 }
-Pos CBlock::GetClockworksPos(int index)const{
+CPoint* CBlock::GetClockworksPos(int index)const{
+    //極大値
+    QVector<CPoint*> vertex = this->GetVerticesPos();
+    double LIMIT_LENGTH = 0;
+    for(CPoint* pos:vertex){
+        QVector<double> vs = {pos->x(),pos->y(),pos->z(),LIMIT_LENGTH};
+        LIMIT_LENGTH = *std::max_element(vs.begin(),vs.end());
+    }
 
-    return Pos();
+    CORNER_LIM x_lim,y_lim,z_lim;
+    if(index == 0 || index == 3 || index == 4 || index == 7)x_lim = CORNER_LIM::MIN;
+    else                                                    x_lim = CORNER_LIM::MAX;
+    if(index == 0 || index == 1 || index == 4 || index == 5)y_lim = CORNER_LIM::MIN;
+    else                                                    y_lim = CORNER_LIM::MAX;
+    if(index == 0 || index == 1 || index == 2 || index == 3)z_lim = CORNER_LIM::MIN;
+    else                                                    z_lim = CORNER_LIM::MAX;
+
+    //極値
+    Pos limit = Pos(((x_lim == CORNER_LIM::MAX) ? 1 : -1),
+                    ((y_lim == CORNER_LIM::MAX) ? 1 : -1),
+                    ((z_lim == CORNER_LIM::MAX) ? 1 : -1)) * LIMIT_LENGTH;
+
+    CPoint* ans = *std::min_element(vertex.begin(),vertex.end(),[&](CPoint* lhs,CPoint* rhs){
+        return ((*lhs-limit).Length() < (*rhs-limit).Length());
+    });
+    return ans;
 }
 
 

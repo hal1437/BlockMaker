@@ -49,14 +49,18 @@ public:
     GradingType grading;      // 分割間隔タイプ
     QVector<double> grading_args; // 分割パラメータ
 
+private:
+    //各軸長さ取得関数
+    double GetLength_impl(Quat convert);
+
 public:
     //分割点取得(辺の番号)
     Pos GetDivisionPoint(int edge_index, int count_index)const;
 
     //幅取得
-    double GetWidth();
-    //高さ取得
-    double GetHeight();
+    double GetLengthX();
+    double GetLengthY();
+    double GetLengthZ();
 
     bool Draw  (QPainter& painter)const;     //描画関数
     bool DrawGL(Pos camera,Pos center)const; //三次元描画関数
@@ -72,8 +76,8 @@ public:
     bool isParadox()const;//矛盾確認
 
     CEdge* GetEdge(int index)const;
-    QVector<Pos> GetVerticesPos()const;
-    Pos GetClockworksPos(int index) const;//時計回り番号取得
+    QVector<CPoint *> GetVerticesPos()const;
+    CPoint *GetClockworksPos(int index) const;//時計回り番号取得
 
     CBlock(QObject* parent=nullptr);
     ~CBlock();

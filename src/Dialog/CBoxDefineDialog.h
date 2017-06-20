@@ -7,6 +7,16 @@
 #include <QSpinBox>
 #include "CObject/CBlock.h"
 
+#define DEFINE_BOX_DIALOG_NAME_SLOTS(DIR,INDEX)   \
+    void Set##DIR##Name(QString name){            \
+        this->block->name[INDEX] = name;          \
+    }
+#define DEFINE_BOX_DIALOG_TYPE_SLOTS(DIR,INDEX)                       \
+    void Set##DIR##Type(QString name){                                \
+        this->block->boundery[INDEX] = this->ConvertStringToBoundary(name); \
+    }
+
+
 namespace Ui {
 class CBoxDefineDialog;
 }
@@ -15,7 +25,12 @@ class CBoxDefineDialog;
 class CBoxDefineDialog : public QDialog
 {
     Q_OBJECT
+
+public:
+    CBlock* block;
+
 private:
+    Ui::CBoxDefineDialog *ui;
     QVector<QDoubleSpinBox*> grading_args;
     BoundaryType types_log[6];
 
@@ -26,9 +41,7 @@ protected:
     BoundaryType ConvertStringToBoundary(QString      str)const;
     QString      ConvertGradingToString (GradingType  dir)const;
     GradingType  ConvertStringToGrading (QString      str)const;
-
 public:
-
     //UI操作
     QString      GetBoundaryName(BoundaryDir dir)const;
     BoundaryType GetBoundaryType(BoundaryDir dir)const;
@@ -45,10 +58,6 @@ public:
     //エラー判定
     QString FormatError()const;
 
-    //入出力
-    CBlock* ExportCBlock()const;
-    void   ImportCBlock(const CBlock& block);
-
     explicit CBoxDefineDialog(QWidget *parent = 0);
     ~CBoxDefineDialog();
 
@@ -56,12 +65,24 @@ public slots:
     void AcceptProxy();
     void GradigngComboChanged(QString text);
 
+    DEFINE_BOX_DIALOG_NAME_SLOTS(Up    ,0)
+    DEFINE_BOX_DIALOG_NAME_SLOTS(Right ,1)
+    DEFINE_BOX_DIALOG_NAME_SLOTS(Left  ,2)
+    DEFINE_BOX_DIALOG_NAME_SLOTS(Down  ,3)
+    DEFINE_BOX_DIALOG_NAME_SLOTS(Front ,4)
+    DEFINE_BOX_DIALOG_NAME_SLOTS(Back  ,5)
+    DEFINE_BOX_DIALOG_TYPE_SLOTS(Up    ,0)
+    DEFINE_BOX_DIALOG_TYPE_SLOTS(Right ,1)
+    DEFINE_BOX_DIALOG_TYPE_SLOTS(Left  ,2)
+    DEFINE_BOX_DIALOG_TYPE_SLOTS(Down  ,3)
+    DEFINE_BOX_DIALOG_TYPE_SLOTS(Front ,4)
+    DEFINE_BOX_DIALOG_TYPE_SLOTS(Back  ,5)
+
+
 
     //境界名と境界タイプを一致させる
     void SyncOtherCombo(int);
 
-private:
-    Ui::CBoxDefineDialog *ui;
 
 };
 
