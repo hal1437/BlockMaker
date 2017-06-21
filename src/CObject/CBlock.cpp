@@ -107,16 +107,13 @@ bool CBlock::DrawGL(Pos,Pos)const{
                 glBegin(GL_LINE_LOOP);
                 for(int k=0;k<4;k++){
                     //線の分割描画
-                    Pos p = this->GetDivisionPoint(edge_index[i][k],j);
+                    Pos p = this->div_pos[edge_index[i][k]][j];
                     glVertex3f(p.x(),p.y(),p.z());
                 }
                 glEnd();
             }
         }
     }
-
-
-
     //色を復元
     glColor4f(oldColor[0],oldColor[1],oldColor[2], oldColor[3]);
 
@@ -245,5 +242,22 @@ CBlock::CBlock(QObject* parent):
 CBlock::~CBlock()
 {
 
+}
+void CBlock::RefreshDividePoint(){
+
+    //更新
+    this->div_pos.clear();
+    this->div_pos.resize(12);
+    if(this->grading == GradingType::SimpleGrading){
+        for(int i=0;i<12;i++){
+            QVector<Pos> pos;
+            int div_index[] = {0,1,0,1,0,1,0,1,2,2,2,2};
+            for(int j=0;j<this->div[div_index[i]];j++){
+                //線の分割描画
+                 pos.push_back(this->GetDivisionPoint(i,j));
+            }
+            this->div_pos[i] = pos;
+        }
+    }
 }
 

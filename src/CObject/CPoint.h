@@ -18,9 +18,9 @@ public:
 
     virtual CREATE_RESULT Create(CPoint* pos); //作成関数
 
-    virtual bool Draw(QPainter& painter)const ;      //描画関数
+    virtual bool Draw  (QPainter& painter)const ;      //描画関数
     virtual bool DrawGL(Pos camera,Pos center)const; //三次元描画関数
-    virtual bool Move(const Pos& diff);              //移動関数
+    virtual bool Move  (const Pos& diff);              //移動関数
 
 
     virtual bool isLock()const;  //固定点
@@ -42,6 +42,7 @@ public:
 
 signals:
     //座標移動シグナル
+    void PosChanged();
     void PosChanged(CPoint* pos,Pos old_pos);
 
 public slots:

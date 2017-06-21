@@ -166,7 +166,7 @@ bool CFace::DrawNormArrowGL()const{
 
 
 bool CFace::Move(const Pos& diff){
-    QVector<CPoint*>pp;
+    QVector<CPoint*> pp;
     for(int i=0;i<this->edges.size();i++){
         pp.push_back(this->edges[i]->start);
         pp.push_back(this->edges[i]->end);

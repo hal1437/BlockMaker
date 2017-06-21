@@ -192,6 +192,10 @@ void MainWindow::MakeBlock(){
         for(QObject* obj: this->model->GetSelected()){
             block->faces.push_back(dynamic_cast<CFace*>(obj));
         }
+        //コネクト
+        for(int i=0;i<12;i++){
+            connect(block->GetClockworksPos(i),SIGNAL(PosChanged()),block,SLOT(RefreshDividePoint()));
+        }
         diag->block = block;
     }
     if(diag->exec()){
@@ -200,7 +204,7 @@ void MainWindow::MakeBlock(){
         }
         this->model->GetSelected().clear();//選択解除
     }
-
+    RefreshUI();
 }
 void MainWindow::MakeFace(){
     CFace* face = new CFace(this);

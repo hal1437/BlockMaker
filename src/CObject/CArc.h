@@ -4,6 +4,7 @@
 
 class CArc : public CEdge
 {
+    Q_OBJECT
 protected:
     double round = 0;//半径
 

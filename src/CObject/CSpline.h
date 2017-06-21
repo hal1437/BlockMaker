@@ -18,6 +18,7 @@ public:
 //CAD上の点
 class CSpline : public CEdge
 {
+    Q_OBJECT
 private:
     const static int DIVISION = 10;//分解数
     const static int DRAWING_LINE_SIZE = 3;//線の太さ

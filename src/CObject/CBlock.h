@@ -39,6 +39,7 @@ enum GradingType{
 
 
 class CBlock : public CObject{
+    Q_OBJECT
 public:
     QVector<CFace*> faces;
 public:
@@ -48,6 +49,8 @@ public:
     double depth;             // Z軸方向奥行き
     GradingType grading;      // 分割間隔タイプ
     QVector<double> grading_args; // 分割パラメータ
+private:
+    QVector<QVector<Pos>> div_pos; //分割位置 (エッジ番号,分割数)
 
 private:
     //各軸長さ取得関数
@@ -80,7 +83,10 @@ public:
     CPoint *GetClockworksPos(int index) const;//時計回り番号取得
 
     CBlock(QObject* parent=nullptr);
-    ~CBlock();
+    virtual ~CBlock();
+
+public slots:
+    void RefreshDividePoint();//div_pos再計算
 };
 
 #endif // CBLOCK_H

@@ -21,6 +21,7 @@ enum CREATE_RESULT{
 //CADオブジェクト
 class CObject:public QObject
 {
+    Q_OBJECT
 public:
     static constexpr double COLLISION_SIZE = 6; //当たり判定半径
     static constexpr double DRAWING_LINE_SIZE = 3; //描画線幅

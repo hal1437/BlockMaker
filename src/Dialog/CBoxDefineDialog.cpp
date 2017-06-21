@@ -226,9 +226,12 @@ void CBoxDefineDialog::AcceptProxy(){
         this->block->div[2] = this->ui->ZspinBox->value();
         this->block->depth  = this->ui->DepthSpinBox->value();
         this->block->grading   = this->GetGradigngType();
-        for(int i=0;i<(this->GetGradigngType() == GradingType::SimpleGrading ? 3 : 12);i++){
-            this->block->grading_args.push_back(this->grading_args[i]->value());
+        this->block->grading_args.resize(this->GetGradigngType() == GradingType::SimpleGrading ? 3 : 12);
+        for(int i=0;i<this->block->grading_args.size();i++){
+            this->block->grading_args[i] = this->grading_args[i]->value();
         }
+        this->block->RefreshDividePoint();
+
         accept();
     }
 }

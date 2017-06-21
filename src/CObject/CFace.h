@@ -6,6 +6,7 @@
 //平面オブジェクト
 class CFace : public CObject
 {
+    Q_OBJECT
 public:
     QVector<CEdge*> edges;//構成線
     bool is_polygon = true;

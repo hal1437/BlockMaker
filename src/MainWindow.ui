@@ -85,7 +85,6 @@
    <addaction name="ToolPoint"/>
    <addaction name="ToolLine"/>
    <addaction name="ToolArc"/>
-   <addaction name="ToolRect"/>
    <addaction name="ToolSpline"/>
    <addaction name="separator"/>
    <addaction name="ToolBlocks"/>
@@ -397,6 +396,10 @@
    </property>
   </action>
   <action name="ToolFace">
+   <property name="icon">
+    <iconset resource="../Resource/images.qrc">
+     <normaloff>:/ToolImages/Rect.png</normaloff>:/ToolImages/Rect.png</iconset>
+   </property>
    <property name="text">
     <string>ToolFace</string>
    </property>
