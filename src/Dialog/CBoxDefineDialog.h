@@ -57,6 +57,8 @@ public:
 
     //エラー判定
     QString FormatError()const;
+    void ExportCBlock();
+    void ImportCBlock();
 
     explicit CBoxDefineDialog(QWidget *parent = 0);
     ~CBoxDefineDialog();

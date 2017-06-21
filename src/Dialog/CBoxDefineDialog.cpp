@@ -132,6 +132,38 @@ QString CBoxDefineDialog::FormatError()const{
     }
     return failed;
 }
+//出力
+void CBoxDefineDialog::ExportCBlock(){
+    for(int i=0;i<6;i++){
+        BoundaryDir dir = static_cast<BoundaryDir>(i);
+        this->block->boundery[i] = this->GetBoundaryType(dir);
+        this->block->name[i]     = this->GetBoundaryName(dir);
+    }
+    this->block->div[0] = this->ui->XspinBox->value();
+    this->block->div[1] = this->ui->YspinBox->value();
+    this->block->div[2] = this->ui->ZspinBox->value();
+    this->block->depth  = this->ui->DepthSpinBox->value();
+    this->block->grading   = this->GetGradigngType();
+    for(int i=0;i<(this->GetGradigngType() == GradingType::SimpleGrading ? 3 : 12);i++){
+        this->block->grading_args.push_back(this->grading_args[i]->value());
+    }
+}
+void CBoxDefineDialog::ImportCBlock(){
+    //面の設定
+    for(int i = 0;i<6;i++){
+        this->ConvertDirToNameEdit(static_cast<BoundaryDir>(i))->setText(this->block->name[i]);
+        this->ConvertDirToCombo   (static_cast<BoundaryDir>(i))->setCurrentText(this->ConvertBoundaryToString(this->block->boundery[i]));
+        types_log[i] = this->block->boundery[i];
+    }
+    this->ui->XspinBox->setValue(this->block->div[0]);
+    this->ui->YspinBox->setValue(this->block->div[1]);
+    this->ui->ZspinBox->setValue(this->block->div[2]);
+    this->ui->DepthSpinBox->setValue(this->block->depth);
+    this->SetGradigngType(this->block->grading);
+    for(int i=0;i<(this->GetGradigngType() == GradingType::SimpleGrading ? 3 : 12);i++){
+        this->grading_args[i]->setValue(this->block->grading_args[i]);
+    }
+}
 
 void CBoxDefineDialog::GradigngComboChanged(QString text){
     if(text == "simpleGrading"){
