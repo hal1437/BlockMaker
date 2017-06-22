@@ -187,6 +187,7 @@ void MainWindow::MakeBlock(){
     CBoxDefineDialog* diag = new CBoxDefineDialog();
     if(this->model->GetSelected().size() == 1 && this->model->GetSelected()[0]->is<CBlock>()){
         diag->block = dynamic_cast<CBlock*>(this->model->GetSelected()[0]);
+        diag->ImportCBlock();
     }else{
         CBlock* block = new CBlock(this);
         for(QObject* obj: this->model->GetSelected()){
@@ -199,10 +200,11 @@ void MainWindow::MakeBlock(){
         diag->block = block;
     }
     if(diag->exec()){
+        diag->ExportCBlock();
         if(!exist(this->model->GetBlocks(),diag->block)){
             this->model->AddBlocks(diag->block);
         }
-        this->model->GetSelected().clear();//選択解除
+        this->model->SelectedClear();//選択解除
     }
     RefreshUI();
 }

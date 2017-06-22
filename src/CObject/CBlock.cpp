@@ -147,7 +147,6 @@ bool CBlock::Creatable(QVector<CObject*> values){
     if(std::any_of(values.begin(),values.end(),[](CObject* p){return !p->is<CFace>();}))return false;
     if(values.size() < 6)return false;
 
-
     //閉じた立体テスト
     std::map<CPoint*,int> point_maps;
     for(CObject* v: values){
