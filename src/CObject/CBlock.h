@@ -78,9 +78,11 @@ public:
     static bool Creatable(QVector<CObject* > values);//BOX定義可能か
     bool isParadox()const;//矛盾確認
 
-    CEdge* GetEdge(int index)const;
-    QVector<CPoint *> GetVerticesPos()const;
-    CPoint *GetClockworksPos(int index) const;//時計回り番号取得
+    CPoint* GetBasePos()const;//基準点取得
+    QVector<CPoint*> GetAllPos()const;
+    QVector<CEdge* > GetAllEdges()const;
+    CPoint *GetClockworksPos (int index) const;//番号順点取得
+    CPoint *GetClockworksEdge(int index) const;//番号順線取得
 
     CBlock(QObject* parent=nullptr);
     virtual ~CBlock();

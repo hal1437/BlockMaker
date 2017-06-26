@@ -52,10 +52,13 @@ bool CFace::isComprehension(Pos pos)const{
 }
 
 Pos CFace::GetNorm()const{
-    if(this->edges.size()<2)return Pos();
+    Pos vec1,vec2;
+    vec1 = *this->GetPoint(1) - *this->GetPoint(0);
+    vec2 = *this->GetPoint(this->edges.size()-1) - *this->GetPoint(0);
+
+    if(this->edges.size() < 2 || (vec1-vec2).Length()<SAME_POINT_EPS)return Pos();
     else{
-        return Pos((*this->GetPoint(                   1) - *this->GetPoint(0)).Cross
-                   (*this->GetPoint(this->edges.size()-1) - *this->GetPoint(0))).GetNormalize();
+        return Pos(vec1.Cross(vec2)).GetNormalize();
     }
 }
 CPoint* CFace::GetPoint(int index)const{

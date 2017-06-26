@@ -78,6 +78,7 @@ void ExportDialog::Export(QString filename)const{
     QVector<CEdge*> edges;
 
     //全ての辺を抽出
+    /*
     for(CBlock* block : this->blocks){
         for(int i=0;i<4;i++){
             edges.push_back(block->GetEdge(i));
@@ -88,7 +89,7 @@ void ExportDialog::Export(QString filename)const{
                 *edges.back()->GetMiddle(j) += Pos(0,0,block->depth);
             }
         }
-    }
+    }*/
 
     //BlockMeshDict出力
     FoamFile file(filename+"/blockMeshDict");
