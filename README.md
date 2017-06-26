@@ -5,7 +5,7 @@
 
 
 ▼FoamCADメインウインドウ  
-![screenshot1](https://github.com/hal1437/FoamCAD/blob/master/Resource/screenshot/screenshot1.png)
+![screenshot1](https://raw.githubusercontent.com/hal1437/FoamCAD/4cc28c43a0ad2fd0097e316e84a26cdf66ba7d83/Resource/screenshot/screenshot2.png)
 数値流体力学のツールボックスとして知られるOpenFOAMの『メッシュ生成』を行うソフトウェア。
 本来は各頂点と辺の定義はテキストで行わなければならないが、
 このソフトは視覚的に頂点の配置と辺の定義を行うことができる。
