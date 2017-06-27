@@ -92,12 +92,12 @@ CFace* SolidEditController::getSideFace ()const{//右側面
 
 
 CObject* SolidEditController::getHangedObject(Pos center, Pos dir)const{
-    Line line = Line{center,center+dir};
     CObject* ans = nullptr;
+
 
     //点の選択
     for(CPoint* p:this->model->GetPoints()){
-        if((Pos::LineNearPoint(line.pos1,line.pos2, *p) - *p).Length() < CPoint::COLLISION_SIZE && hang_point != p)ans = p;
+        if((Pos::LineNearPoint(center,center+dir, *p) - *p).Length() < CPoint::COLLISION_SIZE && hang_point != p)ans = p;
     }
     if(ans == nullptr){
         //エッジの選択
@@ -107,31 +107,52 @@ CObject* SolidEditController::getHangedObject(Pos center, Pos dir)const{
             const double DIVIDE = 100;
             for(int i=0;i<=DIVIDE;i++){
                 Pos p = e->GetMiddleDivide(i/DIVIDE);
-                if((Pos::LineNearPoint(line.pos1,line.pos2, p) - p).Length() < CPoint::COLLISION_SIZE)ans = e;
+                if((Pos::LineNearPoint(center,center+dir, p) - p).Length() < CPoint::COLLISION_SIZE)ans = e;
             }
         }
     }
     return ans;
 }
 
-CFace* SolidEditController::getHangedFace(Pos center, Pos dir)const{
-    if(this->getHangedObject(center,dir) != nullptr) return nullptr;
+CFace* SolidEditController::getHangedFace(Pos center,Pos camera_pos)const{
+    if(this->getHangedObject(center,camera_pos-center) != nullptr) return nullptr;
 
     //最も近い面を選択する
     QVector<std::pair<double,CFace*>> rank;
-    rank.push_back(std::make_pair(Collision::GetLengthFaceToLine(this->getFrontFace(),Line{center,center+dir}),this->getFrontFace()));
-    rank.push_back(std::make_pair(Collision::GetLengthFaceToLine(this->getTopFace()  ,Line{center,center+dir}),this->getTopFace()));
-    rank.push_back(std::make_pair(Collision::GetLengthFaceToLine(this->getSideFace() ,Line{center,center+dir}),this->getSideFace()));
+    rank.push_back(std::make_pair(Collision::GetLengthFaceToLine(this->getFrontFace(),camera_pos,camera_pos-center),this->getFrontFace()));
+    rank.push_back(std::make_pair(Collision::GetLengthFaceToLine(this->getTopFace()  ,camera_pos,camera_pos-center),this->getTopFace()));
+    rank.push_back(std::make_pair(Collision::GetLengthFaceToLine(this->getSideFace() ,camera_pos,camera_pos-center),this->getSideFace()));
     for(int i=0;i<this->model->GetFaces().size();i++){
-        rank.push_back(std::make_pair(Collision::GetLengthFaceToLine(this->model->GetFaces()[i],Line{center,center+dir}),this->model->GetFaces()[i]));
+        rank.push_back(std::make_pair(Collision::GetLengthFaceToLine(this->model->GetFaces()[i],camera_pos,camera_pos-center),this->model->GetFaces()[i]));
     }
+    /*
+    //表示
+    qDebug() << center << camera_pos;
+    for(int i=0;i<rank.size();i++){
+        if(Collision::CheckHitFaceToLine(rank[i].second,center,camera_pos-center)){
+            Pos c = Collision::GetHitPosFaceToLine( rank[i].second->GetNorm(),
+                                                   *rank[i].second->GetPoint(0),
+                                                    center,camera_pos-center);
+            Pos n = rank[i].second->GetNorm()*50;
+            qDebug() << c;
+            glBegin(GL_LINE_LOOP);
+            glVertex3f((c+n).x(),(c+n).y(),(c+n).z());
+            glVertex3f((c-n).x(),(c-n).y(),(c-n).z());
+            glEnd();
+        }
+    }*/
 
     if(std::all_of(rank.begin(),rank.end(),[](std::pair<double,CFace*> v){return v.first==-1;})){
         return nullptr;
     }else{
-        return std::min_element(rank.begin(),rank.end(),[](std::pair<double,CFace*> lhs,std::pair<double,CFace*> rhs){
-            return lhs.first > rhs.first;
-        })->second;
+        rank.erase(std::remove_if(rank.begin(),rank.end(),[](std::pair<double,CFace*> v){
+            return v.first==-1;
+        }),rank.end());
+        std::pair<double,CFace*> a = *std::min_element(rank.begin(),rank.end(),[](std::pair<double,CFace*> lhs,std::pair<double,CFace*> rhs){
+            return lhs.first < rhs.first;
+        });
+        //qDebug() << a.first;
+        return a.second;
     }
 
 }

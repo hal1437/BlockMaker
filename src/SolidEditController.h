@@ -41,7 +41,7 @@ public:
     CFace* getSideFace ()const;//右側面
 
     CObject* getHangedObject(Pos center, Pos dir)const;
-    CFace* getHangedFace(Pos center, Pos dir)const;//直下面
+    CFace* getHangedFace(Pos center, Pos camera_pos)const;//直下面
 
     explicit SolidEditController(QObject *parent = 0);
     ~SolidEditController();

@@ -40,7 +40,7 @@ bool SolidEditForm::isSketcheing(){
 CFace* SolidEditForm::GetHangedFace(){
     if(this->isSketcheing())return nullptr;
     Pos  hang_center = (Pos(0,0,1) + this->screen_pos).Dot(Quat::getRotateXMatrix(theta1).Dot(Quat::getRotateYMatrix(theta2)));
-    return  this->controller->getHangedFace(hang_center,(this->camera - this->center).GetNormalize());
+    return  this->controller->getHangedFace(hang_center,this->camera*this->round*1000 + hang_center);
 }
 CObject* SolidEditForm::GetHangedObject(){
     Pos  hang_center = (Pos(0,0,1) + this->screen_pos).Dot(Quat::getRotateXMatrix(theta1).Dot(Quat::getRotateYMatrix(theta2)));

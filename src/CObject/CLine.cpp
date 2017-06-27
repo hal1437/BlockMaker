@@ -10,7 +10,8 @@ CREATE_RESULT CLine::Create(CPoint *pos){
 }
 bool CLine::Draw(QPainter& painter)const{
     //描画
-    painter.drawLine(*this->start,*this->end);
+    painter.drawLine(QPointF(this->start->x(),this->start->y()),
+                     QPointF(this->end->x(),this->end->y()));
     return true;
 }
 bool CLine::Move(const Pos& diff){

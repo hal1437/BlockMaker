@@ -53,7 +53,11 @@ bool CFace::isComprehension(Pos pos)const{
 
 Pos CFace::GetNorm()const{
     Pos vec1,vec2;
-    vec1 = *this->GetPoint(1) - *this->GetPoint(0);
+    Pos p1,p2,p3,p4;
+    p1 = *this->GetPoint(0);
+    p2 = *this->GetPoint(1);
+
+    vec1 = p2 - p1;
     vec2 = *this->GetPoint(this->edges.size()-1) - *this->GetPoint(0);
 
     if(this->edges.size() < 2 || (vec1-vec2).Length()<SAME_POINT_EPS)return Pos();

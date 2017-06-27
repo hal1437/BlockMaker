@@ -6,10 +6,6 @@
 #include <qdebug.h>
 
 //線
-struct Line{
-    Pos pos1;
-    Pos pos2;
-};
 
 class Collision
 {
@@ -18,8 +14,8 @@ public:
     static Pos GetHitPosFaceToLine(Pos face_norm,Pos face_center,Pos line_0,Pos line_s);
 
 public:
-    static double GetLengthFaceToLine(CFace* face, struct Line line);
-    static bool   CheckHitFaceToLine (CFace* face, struct Line line);
+    static double GetLengthFaceToLine(CFace* face, Pos camera,Pos dir);
+    static bool   CheckHitFaceToLine (CFace* face, Pos camera,Pos dir);
 
     Collision();
     ~Collision();

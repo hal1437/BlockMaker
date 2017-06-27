@@ -291,8 +291,10 @@ public:
         return (*this);
     }
 
-    operator QPointF(){
-        return QPointF(this->x(),this->y());
+    operator QString(){
+        return QString("(") + QString::number(this->x()) + ","
+                            + QString::number(this->y()) + ","
+                            + QString::number(this->z()) + ")";
     }
 };
 
