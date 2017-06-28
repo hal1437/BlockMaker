@@ -1,5 +1,11 @@
 #include "ObjectList.h"
 
+void ObjectList::mouseReleaseEvent(QMouseEvent* event){
+    if(event->button() == Qt::RightButton){
+        this->menu->exec(event->globalPos());
+    }
+}
+
 void ObjectList::AddBlockToTree(CBlock* block,QTreeWidgetItem* parent,int index){
     QTreeWidgetItem* item = new QTreeWidgetItem();
     item->setText(0,QString("Block:") + QString::number(index));
@@ -174,6 +180,9 @@ void ObjectList::PushSelected(){
 ObjectList::ObjectList(QWidget *parent) :
     QTreeWidget(parent)
 {
+    this->menu = new QMenu(this);
+    this->visible_action = this->menu->addAction("visible");
+    this->delete_action  = this->menu->addAction("delete");
     this->setSelectionMode(QTreeWidget::ExtendedSelection);
     connect(this,SIGNAL(itemSelectionChanged()),this,SLOT(PushSelected()));
 }

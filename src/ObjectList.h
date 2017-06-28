@@ -2,6 +2,8 @@
 #define OBJECTLIST_H
 
 #include <QTreeWidget>
+#include <QMouseEvent>
+#include <QMenu>
 #include "CadModelCore.h"
 
 class ObjectList : public QTreeWidget, public CadModelCoreInterface
@@ -13,6 +15,12 @@ private:
     QVector<CEdge *> edges ;
     QVector<CFace *> faces ;
     QVector<CBlock*> blocks;
+    QMenu* menu;
+    QAction* visible_action;
+    QAction* delete_action;
+
+protected:
+    void mouseReleaseEvent(QMouseEvent* event);
 
 private:
     void AddBlockToTree(CBlock* block,QTreeWidgetItem* parent,int index);
