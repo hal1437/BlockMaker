@@ -196,8 +196,9 @@ CPoint* CBlock::GetBasePos()const{
 QVector<CPoint*> CBlock::GetAllPos()const{
     QVector<CPoint*>pp;
     for(CFace* face:faces){
-        for(int i=0;i<4;i++){
-            pp.push_back(face->GetPoint(i));
+        for(CEdge* edge:face->edges){
+            pp.push_back(edge->start);
+            pp.push_back(edge->end);
         }
     }
     //重複を削除

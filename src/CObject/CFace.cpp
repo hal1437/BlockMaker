@@ -53,11 +53,11 @@ bool CFace::isComprehension(Pos pos)const{
 
 Pos CFace::GetNorm()const{
     Pos vec1,vec2;
-    Pos p1,p2,p3,p4;
-    p1 = *this->GetPoint(0);
-    p2 = *this->GetPoint(1);
+    CPoint *p1,*p2,*p3,*p4;
+    p1 = this->GetPoint(0);
+    p2 = this->GetPoint(1);
 
-    vec1 = p2 - p1;
+    vec1 = *p2 - *p1;
     vec2 = *this->GetPoint(this->edges.size()-1) - *this->GetPoint(0);
 
     if(this->edges.size() < 2 || (vec1-vec2).Length()<SAME_POINT_EPS)return Pos();
@@ -74,22 +74,19 @@ CPoint* CFace::GetPoint(int index)const{
     }
     //左下の探索
     QVector<CPoint*> hit;
-    CPoint* corner;//左下
-    std::sort(pp.begin(),pp.end(),[](CPoint* p1,CPoint* p2){return std::tie(p1->x(),p1->y()) < std::tie(p2->x(),p2->y());});//X座標が小さい順
-    hit.push_back(pp[0]);hit.push_back(pp[1]);//一番目と二番目にX座標の小さいもの
-    std::sort(pp.begin(),pp.end(),[](CPoint* p1,CPoint* p2){return std::tie(p1->y(),p1->x()) < std::tie(p2->y(),p2->x());});//Y座標が小さい順
-    hit.push_back(pp[0]);hit.push_back(pp[1]);//一番目と二番目にY座標の小さいもの
-    //hitに二回入った奴が左下
-    for(int i=0;i<4;i++){
-        CPoint* piv = hit[i];
-        for(int j=i+1;j<4;j++){
-            if(piv == hit[j]){
-                corner = piv;
-                i=4;//即座に終了
-                break;
-            }
-        }
+    CPoint* corner = nullptr;//左下
+
+    double LIMIT_LENGTH = 0;
+    for(CPoint* pos:pp){
+        QVector<double> vs = {pos->x(),pos->y(),pos->z(),LIMIT_LENGTH};
+        LIMIT_LENGTH = *std::max_element(vs.begin(),vs.end());
     }
+    //角の算出
+    Pos limit(-LIMIT_LENGTH,-LIMIT_LENGTH,-LIMIT_LENGTH);//最果て
+    corner =  *std::min_element(pp.begin(),pp.end(),[&](CPoint* lhs,CPoint* rhs){
+        return ((*lhs-limit).Length() < (*rhs-limit).Length());
+    });
+
     //index回だけ連鎖させる
     CPoint* ans = corner;
     CPoint* old = corner; //反復連鎖防止
@@ -118,6 +115,9 @@ CPoint* CFace::GetPoint(int index)const{
             ans = corner;
         }
         candidate.clear();
+    }
+    if(ans == nullptr){
+        qDebug() << "CFace::GetPoint(" << index << ") error. answer is nullptr.";
     }
     return ans;
 }
