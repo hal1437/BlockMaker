@@ -38,6 +38,7 @@ Pos CEdge::GetNearLine(const Pos& pos1,const Pos& pos2)const{
     return ans;
 }
 bool CEdge::DrawGL(Pos,Pos)const{
+    if(!this->isVisible())return true;
     glBegin(GL_LINE_STRIP);
     //線の分割描画
     for(double i=0;i<=1;i += 1.0/CEdge::LINE_NEAR_DIVIDE){

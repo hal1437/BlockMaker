@@ -32,6 +32,7 @@ CREATE_RESULT CArc::Create(CPoint *pos){
     return CREATE_RESULT::THREESHOT; //終了
 }
 bool CArc::Draw(QPainter& painter)const{
+    if(!this->isVisible())return true;
     if(this->start == nullptr && this->end == nullptr && this->center == nullptr)return false;
     QRectF rect(this->center->x() - round,
                 this->center->y() - round,

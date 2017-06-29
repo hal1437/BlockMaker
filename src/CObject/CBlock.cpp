@@ -1,5 +1,17 @@
 #include "CBlock.h"
 
+
+bool CBlock::isVisibleFrame()const{
+    return this->visible;
+}
+void CBlock::VisibleFrame(bool flag){
+    this->visible = flag;
+    if(flag == true){
+        this->RefreshDividePoint();
+    }
+}
+
+
 //分割点取得
 Pos CBlock::GetDivisionPoint(int edge_index,int count_index)const{
     double A,B,sum=0,p,d,L;
@@ -78,6 +90,7 @@ double CBlock::GetLengthZ(){
 }
 
 bool CBlock::DrawGL(Pos,Pos)const{
+    if(!this->isVisible())return true;
     //薄い色に変更
     float oldColor[4];
     glGetFloatv(GL_CURRENT_COLOR,oldColor);
@@ -95,28 +108,30 @@ bool CBlock::DrawGL(Pos,Pos)const{
         glEnd();
     }
 
-    //分割線を描画
-    glColor4f(0.1,
-              0.1,
-              0.1,
-              1);
-    if(this->grading == GradingType::SimpleGrading){
-        int edge_index[3][4] = {{0,2,6,4},{1,3,7,5},{8,9,10,11}};
-        for(int i=0;i<3;i++){
-            for(int j=0;j<this->div[i];j++){
-                glBegin(GL_LINE_LOOP);
-                for(int k=0;k<4;k++){
-                    //線の分割描画
-                    Pos p = this->div_pos[edge_index[i][k]][j];
-                    glVertex3f(p.x(),p.y(),p.z());
+    if(this->isVisibleFrame()){
+        //分割線を描画
+        glColor4f(0.1,
+                  0.1,
+                  0.1,
+                  1);
+        if(this->grading == GradingType::SimpleGrading){
+            int edge_index[3][4] = {{0,2,6,4},{1,3,7,5},{8,9,10,11}};
+            for(int i=0;i<3;i++){
+                for(int j=0;j<this->div[i];j++){
+                    glBegin(GL_LINE_LOOP);
+                    for(int k=0;k<4;k++){
+                        //線の分割描画
+                        Pos p = this->div_pos[edge_index[i][k]][j];
+                        glVertex3f(p.x(),p.y(),p.z());
+                    }
+                    glEnd();
                 }
-                glEnd();
             }
         }
     }
     //色を復元
     glColor4f(oldColor[0],oldColor[1],oldColor[2], oldColor[3]);
-
+    return true;
 }
 bool CBlock::Move  (const Pos& diff){
 }

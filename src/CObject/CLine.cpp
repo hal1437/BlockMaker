@@ -9,6 +9,7 @@ CREATE_RESULT CLine::Create(CPoint *pos){
     return CREATE_RESULT::TWOSHOT;//完結
 }
 bool CLine::Draw(QPainter& painter)const{
+    if(!this->isVisible())return true;
     //描画
     painter.drawLine(QPointF(this->start->x(),this->start->y()),
                      QPointF(this->end->x(),this->end->y()));

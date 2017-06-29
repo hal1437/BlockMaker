@@ -7,6 +7,7 @@ CREATE_RESULT CPoint::Create(CPoint *pos){
 }
 
 bool CPoint::Draw(QPainter& painter)const{
+    if(!this->isVisible())return true;
     Pos center;
     QTransform conv;
 
@@ -45,6 +46,7 @@ bool CPoint::Draw(QPainter& painter)const{
     return true;
 }
 bool CPoint::DrawGL(Pos camera,Pos center)const{
+    if(!this->isVisible())return true;
     glBegin(GL_LINE_LOOP);
     Pos cc = camera- center;
     double theta1 = std::atan2(cc.y(),std::sqrt(cc.x()*cc.x()+cc.z()*cc.z()));

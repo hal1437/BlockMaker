@@ -79,6 +79,7 @@ void CSpline::Lock(bool lock){
 }
 
 bool CSpline::Draw(QPainter& painter)const{
+    if(!this->isVisible())return true;
     if(pos.size() >= 1){
         QPainterPath path;
         double t, m;

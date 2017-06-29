@@ -16,8 +16,11 @@ private:
     QVector<CFace *> faces ;
     QVector<CBlock*> blocks;
     QMenu* menu;
-    QAction* visible_action;
     QAction* delete_action;
+    QAction* visible_action;
+    QAction* invisible_action;
+    QAction* visible_frame_action;
+    QAction* invisible_frame_action;
 
 protected:
     void mouseReleaseEvent(QMouseEvent* event);
@@ -44,6 +47,11 @@ public slots:
     void UpdateObject();    //オブジェクト更新
     void PullSelected();    //選択情報取得
     void PushSelected();    //選択情報同期
+
+    void SetVisible(bool);//可視設定
+    void SetInvisible(bool);//不可視設定
+    void SetVisibleFrame(bool);//可視フレーム設定
+    void SetInvisibleFrame(bool);//不可視フレーム設定
 
 public:
     explicit ObjectList(QWidget *parent = 0);

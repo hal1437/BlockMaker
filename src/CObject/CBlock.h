@@ -51,6 +51,7 @@ public:
     QVector<double> grading_args; // 分割パラメータ
 private:
     QVector<QVector<Pos>> div_pos; //分割位置 (エッジ番号,分割数)
+    bool visible_frame; //分割フレーム表示
 
 private:
     //各軸長さ取得関数
@@ -68,6 +69,9 @@ public:
     bool Draw  (QPainter& painter)const;     //描画関数
     bool DrawGL(Pos camera,Pos center)const; //三次元描画関数
     bool Move  (const Pos& diff);            //移動関数
+
+    bool isVisibleFrame()const;//フレーム表示
+    void VisibleFrame(bool flag);
 
     //近接点
     Pos GetNearPos (const Pos& hand)const;

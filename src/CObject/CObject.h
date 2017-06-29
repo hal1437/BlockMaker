@@ -30,7 +30,8 @@ public:
     static double drawing_scale;           //描画スケール
 
 protected:
-    bool lock  = false; //ロック状態
+    bool lock  = false;  //ロック状態
+    bool visible = true; //可視
 
 public:
 
@@ -43,9 +44,12 @@ public:
     virtual bool Draw  (QPainter& painter)const = 0;     //描画関数
     virtual bool DrawGL(Pos camera,Pos center)const = 0; //三次元描画関数
     virtual bool Move  (const Pos& diff) = 0;            //移動関数
-    virtual void Lock  (bool lock);//ロック
 
-    virtual bool isLock()      const;  //固定中
+    virtual void Lock     (bool flag); //ロック
+    virtual void Visible  (bool flag); //可視
+    virtual bool isLock   ()const; //固定中
+    virtual bool isVisible()const; //可視中
+
     virtual bool isSelectable(Pos pos)const;  //posの位置で選択可能か
 
     //近接点
