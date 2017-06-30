@@ -166,9 +166,18 @@
             </attribute>
             <column>
              <property name="text">
-              <string notr="true">1</string>
+              <string>1</string>
              </property>
             </column>
+            <item>
+             <property name="text">
+              <string>Point</string>
+             </property>
+             <property name="icon">
+              <iconset resource="../Resource/images.qrc">
+               <normaloff>:/ToolImages/Dot.png</normaloff>:/ToolImages/Dot.png</iconset>
+             </property>
+            </item>
            </widget>
           </item>
          </layout>

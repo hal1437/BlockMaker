@@ -1,5 +1,44 @@
 #include "ObjectList.h"
 
+QIcon ObjectList::getIcon(CObject *obj){
+    QIcon ans;
+    QString filepath;
+    if(obj->is<CBlock>()){
+        if(dynamic_cast<CBlock*>(obj)->isVisibleFrame()){
+            filepath = ":/ToolImages/BlocksFrame.png";
+        }else{
+            filepath = ":/ToolImages/Blocks.png";
+        }
+    }
+    if(obj->is<CFace>()){
+        filepath = ":/ToolImages/Rect.png";
+    }
+    if(obj->is<CEdge>()){
+        if(obj->is<CLine>  ())filepath = ":/ToolImages/Line.png";
+        if(obj->is<CArc>   ())filepath = ":/ToolImages/Arc.png";
+        if(obj->is<CSpline>())filepath = ":/ToolImages/Spline.png";
+    }
+    if(obj->is<CPoint>()){
+        filepath = ":/ToolImages/Dot.png";
+    }
+    QImage image(filepath);
+
+    //不可視は薄くする
+    if(!obj->isVisible()){
+        for(int i=0;i<image.size().height();i++){
+            for(int j=0;j<image.size().width();j++){
+                image.setPixel(j, i,qRgba(qRed  (image.pixel(j,i)),
+                                          qGreen(image.pixel(j,i)),
+                                          qBlue (image.pixel(j,i)),
+                                          50));
+            }
+        }
+    }
+
+    ans.addPixmap(QPixmap::fromImage(image),QIcon::Disabled);
+    return ans;
+}
+
 void ObjectList::mouseReleaseEvent(QMouseEvent* event){
     if(event->button() == Qt::RightButton){
         this->menu->exec(event->globalPos());
@@ -9,19 +48,22 @@ void ObjectList::mouseReleaseEvent(QMouseEvent* event){
 void ObjectList::AddBlockToTree(CBlock* block,QTreeWidgetItem* parent,int index){
     QTreeWidgetItem* item = new QTreeWidgetItem();
     item->setText(0,QString("Block:") + QString::number(index));
-    item->setIcon(0,QIcon(":/ToolImages/Blocks.png"));
+    QIcon icon;
+
+    item->setIcon(0,getIcon(block));
 
     for(int i = 0;i<block->faces.size();i++){
         AddFaceToTree(block->faces[i],item,i+1);
     }
     item->setSelected(exist(this->CadModelCoreInterface::model->GetSelected(),block));
+
     if(parent == nullptr)this->addTopLevelItem(item);
     else                 parent->addChild(item);
 }
 void ObjectList::AddFaceToTree(CFace*  face ,QTreeWidgetItem* parent,int index){
     QTreeWidgetItem* item = new QTreeWidgetItem();
     item->setText(0,QString("Face:") + QString::number(index));
-    item->setIcon(0,QIcon(":/ToolImages/Rect.png"));
+    item->setIcon(0,getIcon(face));
 
     for(int i = 0;i<face->edges.size();i++){
         AddEdgeToTree(face->edges[i],item,i+1);
@@ -32,12 +74,12 @@ void ObjectList::AddFaceToTree(CFace*  face ,QTreeWidgetItem* parent,int index){
 }
 void ObjectList::AddEdgeToTree(CEdge* edge,QTreeWidgetItem* parent,int index){
     QTreeWidgetItem* item = new QTreeWidgetItem();
-    std::pair<std::string,std::string> p;
-    if(edge->is<CLine>  ())p = std::make_pair("Line"  ,":/ToolImages/Line.png");
-    if(edge->is<CArc>   ())p = std::make_pair("Arc"   ,":/ToolImages/Arc.png");
-    if(edge->is<CSpline>())p = std::make_pair("Spline",":/ToolImages/Spline.png");
-    item->setText(0,QString(p.first.c_str()) + ":" + QString::number(index));
-    item->setIcon(0,QIcon(p.second.c_str()));
+    std::string s;
+    if(edge->is<CLine>  ())s = "Line";
+    if(edge->is<CArc>   ())s = "Arc";
+    if(edge->is<CSpline>())s = "Spline";
+    item->setText(0,QString(s.c_str()) + ":" + QString::number(index));
+    item->setIcon(0,getIcon(edge));
 
     for(int i=0;i<edge->GetPosSequenceCount();i++){
         AddPointToTree(edge->GetPosSequence(i),item,i+1);
@@ -53,12 +95,13 @@ void ObjectList::AddEdgeToTree(CEdge* edge,QTreeWidgetItem* parent,int index){
 void ObjectList::AddPointToTree(CPoint* point,QTreeWidgetItem* parent,int index){
     QTreeWidgetItem* item = new QTreeWidgetItem();
     item->setText(0,QString("Point:") + QString::number(index));
-    item->setIcon(0,QIcon(":/ToolImages/Dot.png"));
+    item->setIcon(0,getIcon(point));
     item->setSelected(exist(this->CadModelCoreInterface::model->GetSelected(),point));
     if(parent == nullptr)this->addTopLevelItem(item);
     else                 parent->addChild(item);
 }
 void ObjectList::pushSelectedBlock(CBlock* block,QTreeWidgetItem* current){
+    current->setIcon(0,this->getIcon(block));
     if(current->isSelected())this->CadModelCoreInterface::model->AddSelected(block);
     else                     this->CadModelCoreInterface::model->RemoveSelected(block);
     for(int i=0;i<current->childCount();i++){
@@ -66,6 +109,7 @@ void ObjectList::pushSelectedBlock(CBlock* block,QTreeWidgetItem* current){
     }
 }
 void ObjectList::pushSelectedFace (CFace*  face ,QTreeWidgetItem* current){
+    current->setIcon(0,this->getIcon(face));
     if(current->isSelected())this->CadModelCoreInterface::model->AddSelected(face);
     else                     this->CadModelCoreInterface::model->RemoveSelected(face);
     for(int i=0;i<current->childCount();i++){
@@ -73,6 +117,7 @@ void ObjectList::pushSelectedFace (CFace*  face ,QTreeWidgetItem* current){
     }
 }
 void ObjectList::pushSelectedEdge (CEdge*  edge ,QTreeWidgetItem* current){
+    current->setIcon(0,this->getIcon(edge));
     if(current->isSelected()){
         this->CadModelCoreInterface::model->AddSelected(edge);
     }else{
@@ -83,29 +128,34 @@ void ObjectList::pushSelectedEdge (CEdge*  edge ,QTreeWidgetItem* current){
     }
 }
 void ObjectList::pushSelectedPoint(CPoint* point,QTreeWidgetItem* current){
+    current->setIcon(0,this->getIcon(point));
     if(current->isSelected()){
         this->CadModelCoreInterface::model->AddSelected(point);
     }
 }
 void ObjectList::pullSelectedBlock(CBlock* block,QTreeWidgetItem* current){
+    current->setIcon(0,this->getIcon(block));
     current->setSelected(exist(this->CadModelCoreInterface::model->GetSelected(),block));
     for(int i=0;i<current->childCount();i++){
         pullSelectedFace(block->faces[i],current->child(i));
     }
 }
 void ObjectList::pullSelectedFace (CFace*  face ,QTreeWidgetItem* current){
+    current->setIcon(0,this->getIcon(face));
     current->setSelected(exist(this->CadModelCoreInterface::model->GetSelected(),face));
     for(int i=0;i<current->childCount();i++){
         pullSelectedEdge(face->edges[i],current->child(i));
     }
 }
 void ObjectList::pullSelectedEdge (CEdge*  edge ,QTreeWidgetItem* current){
+    current->setIcon(0,this->getIcon(edge));
     current->setSelected(exist(this->CadModelCoreInterface::model->GetSelected(),edge));
     for(int i=0;i<current->childCount();i++){
         pullSelectedPoint(edge->GetPosSequence(i),current->child(i));
     }
 }
 void ObjectList::pullSelectedPoint(CPoint* point,QTreeWidgetItem* current){
+    current->setIcon(0,this->getIcon(point));
     current->setSelected(exist(this->CadModelCoreInterface::model->GetSelected(),point));
 }
 

@@ -2,10 +2,10 @@
 
 
 bool CBlock::isVisibleFrame()const{
-    return this->visible;
+    return this->visible_frame;
 }
 void CBlock::VisibleFrame(bool flag){
-    this->visible = flag;
+    this->visible_frame = flag;
     if(flag == true){
         this->RefreshDividePoint();
     }

@@ -51,7 +51,7 @@ public:
     QVector<double> grading_args; // 分割パラメータ
 private:
     QVector<QVector<Pos>> div_pos; //分割位置 (エッジ番号,分割数)
-    bool visible_frame; //分割フレーム表示
+    bool visible_frame = true; //分割フレーム表示
 
 private:
     //各軸長さ取得関数

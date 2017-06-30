@@ -4,6 +4,8 @@
 #include <QTreeWidget>
 #include <QMouseEvent>
 #include <QMenu>
+#include <QLabel>
+#include <QImage>
 #include "CadModelCore.h"
 
 class ObjectList : public QTreeWidget, public CadModelCoreInterface
@@ -23,6 +25,7 @@ private:
     QAction* invisible_frame_action;
 
 protected:
+    QIcon getIcon(CObject* obj);
     void mouseReleaseEvent(QMouseEvent* event);
 
 private:
