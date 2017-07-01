@@ -5,9 +5,16 @@
         <file>Dimension.png</file>
         <file>Dot.png</file>
         <file>Line.png</file>
-        <file>Rect.png</file>
         <file>Spline.png</file>
         <file>BlocksFrame.png</file>
+        <file>Arc_disabled.png</file>
+        <file>Blocks_disabled.png</file>
+        <file>BlocksFrame_disabled.png</file>
+        <file>Face_disabled.png</file>
+        <file>Face.png</file>
+        <file>Spline_diabled.png</file>
+        <file>Dot_disabled.png</file>
+        <file>Line_disabled.png</file>
     </qresource>
     <qresource prefix="/Restraint">
         <file>ConcurrentRestraint.png</file>

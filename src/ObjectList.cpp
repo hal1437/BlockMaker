@@ -1,42 +1,31 @@
 #include "ObjectList.h"
 
 QIcon ObjectList::getIcon(CObject *obj){
-    QIcon ans;
     QString filepath;
     if(obj->is<CBlock>()){
         if(dynamic_cast<CBlock*>(obj)->isVisibleFrame()){
-            filepath = ":/ToolImages/BlocksFrame.png";
+            filepath = ":/ToolImages/BlocksFrame";
         }else{
-            filepath = ":/ToolImages/Blocks.png";
+            filepath = ":/ToolImages/Blocks";
         }
     }
     if(obj->is<CFace>()){
-        filepath = ":/ToolImages/Rect.png";
+        filepath = ":/ToolImages/Face";
     }
     if(obj->is<CEdge>()){
-        if(obj->is<CLine>  ())filepath = ":/ToolImages/Line.png";
-        if(obj->is<CArc>   ())filepath = ":/ToolImages/Arc.png";
-        if(obj->is<CSpline>())filepath = ":/ToolImages/Spline.png";
+        if(obj->is<CLine>  ())filepath = ":/ToolImages/Line";
+        if(obj->is<CArc>   ())filepath = ":/ToolImages/Arc";
+        if(obj->is<CSpline>())filepath = ":/ToolImages/Spline";
     }
     if(obj->is<CPoint>()){
-        filepath = ":/ToolImages/Dot.png";
+        filepath = ":/ToolImages/Dot";
     }
-    QImage image(filepath);
 
     //不可視は薄くする
-    if(!obj->isVisible()){
-        for(int i=0;i<image.size().height();i++){
-            for(int j=0;j<image.size().width();j++){
-                image.setPixel(j, i,qRgba(qRed  (image.pixel(j,i)),
-                                          qGreen(image.pixel(j,i)),
-                                          qBlue (image.pixel(j,i)),
-                                          50));
-            }
-        }
-    }
+    if(obj->isVisible())filepath += ".png";
+    else                filepath += "_disabled.png";
 
-    ans.addPixmap(QPixmap::fromImage(image),QIcon::Disabled);
-    return ans;
+    return QIcon(filepath);
 }
 
 void ObjectList::mouseReleaseEvent(QMouseEvent* event){

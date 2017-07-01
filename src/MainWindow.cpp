@@ -90,7 +90,6 @@ void MainWindow::ClearButton(){
     if(ui->ToolPoint ->isChecked())ui->ToolPoint ->setChecked(false);
     if(ui->ToolLine  ->isChecked())ui->ToolLine  ->setChecked(false);
     if(ui->ToolArc   ->isChecked())ui->ToolArc   ->setChecked(false);
-    if(ui->ToolRect  ->isChecked())ui->ToolRect  ->setChecked(false);
     if(ui->ToolSpline->isChecked())ui->ToolSpline->setChecked(false);
 }
 void MainWindow::RefreshUI(){

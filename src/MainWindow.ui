@@ -169,15 +169,6 @@
               <string>1</string>
              </property>
             </column>
-            <item>
-             <property name="text">
-              <string>Point</string>
-             </property>
-             <property name="icon">
-              <iconset resource="../Resource/images.qrc">
-               <normaloff>:/ToolImages/Dot.png</normaloff>:/ToolImages/Dot.png</iconset>
-             </property>
-            </item>
            </widget>
           </item>
          </layout>
@@ -321,18 +312,6 @@
     <string>Spline</string>
    </property>
   </action>
-  <action name="ToolRect">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="icon">
-    <iconset resource="../Resource/images.qrc">
-     <normaloff>:/ToolImages/Rect.png</normaloff>:/ToolImages/Rect.png</iconset>
-   </property>
-   <property name="text">
-    <string>Rect</string>
-   </property>
-  </action>
   <action name="ToolBlocks">
    <property name="icon">
     <iconset resource="../Resource/images.qrc">
@@ -407,7 +386,7 @@
   <action name="ToolFace">
    <property name="icon">
     <iconset resource="../Resource/images.qrc">
-     <normaloff>:/ToolImages/Rect.png</normaloff>:/ToolImages/Rect.png</iconset>
+     <normaloff>:/ToolImages/Face.png</normaloff>:/ToolImages/Face.png</iconset>
    </property>
    <property name="text">
     <string>ToolFace</string>
