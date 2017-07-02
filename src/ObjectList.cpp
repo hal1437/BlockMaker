@@ -29,7 +29,40 @@ QIcon ObjectList::getIcon(CObject *obj){
 }
 
 void ObjectList::mouseReleaseEvent(QMouseEvent* event){
+
     if(event->button() == Qt::RightButton){
+        this->menu = new QMenu(this);
+        this->delete_action          = this->menu->addAction("削除");
+
+        for(CObject* obj:this->CadModelCoreInterface::model->GetSelected()){
+            if(!obj->isVisible()){
+                this->visible_action         = this->menu->addAction("表示");
+                connect(this->visible_action        ,SIGNAL(triggered(bool)),this,SLOT(SetVisible(bool)));
+                break;
+            }
+        }
+        for(CObject* obj:this->CadModelCoreInterface::model->GetSelected()){
+            if(obj->isVisible()){
+                this->invisible_action       = this->menu->addAction("非表示");
+                connect(this->invisible_action      ,SIGNAL(triggered(bool)),this,SLOT(SetInvisible(bool)));
+                break;
+            }
+        }
+        for(CObject* obj:this->CadModelCoreInterface::model->GetSelected()){
+            if(obj->is<CBlock>() && !dynamic_cast<CBlock*>(obj)->isVisibleFrame()){
+                this->visible_frame_action   = this->menu->addAction("フレーム表示");
+                connect(this->visible_frame_action  ,SIGNAL(triggered(bool)),this,SLOT(SetVisibleFrame(bool)));
+                break;
+            }
+        }
+        for(CObject* obj:this->CadModelCoreInterface::model->GetSelected()){
+            if(obj->is<CBlock>() && dynamic_cast<CBlock*>(obj)->isVisibleFrame()){
+                this->invisible_frame_action = this->menu->addAction("フレーム非表示");
+                connect(this->invisible_frame_action,SIGNAL(triggered(bool)),this,SLOT(SetInvisibleFrame(bool)));
+                break;
+            }
+        }
+        this->setSelectionMode(QTreeWidget::ExtendedSelection);
         this->menu->exec(event->globalPos());
     }
 }
@@ -242,19 +275,6 @@ void ObjectList::SetInvisibleFrame(bool){
 ObjectList::ObjectList(QWidget *parent) :
     QTreeWidget(parent)
 {
-    this->menu = new QMenu(this);
-    this->delete_action          = this->menu->addAction("削除");
-    this->visible_action         = this->menu->addAction("表示");
-    this->invisible_action       = this->menu->addAction("非表示");
-    this->visible_frame_action   = this->menu->addAction("フレーム表示");
-    this->invisible_frame_action = this->menu->addAction("フレーム非表示");
-    this->setSelectionMode(QTreeWidget::ExtendedSelection);
-
-
-    connect(this->visible_action        ,SIGNAL(triggered(bool)),this,SLOT(SetVisible(bool)));
-    connect(this->invisible_action      ,SIGNAL(triggered(bool)),this,SLOT(SetInvisible(bool)));
-    connect(this->visible_frame_action  ,SIGNAL(triggered(bool)),this,SLOT(SetVisibleFrame(bool)));
-    connect(this->invisible_frame_action,SIGNAL(triggered(bool)),this,SLOT(SetInvisibleFrame(bool)));
     connect(this,SIGNAL(itemSelectionChanged()),this,SLOT(PushSelected()));
 }
 
