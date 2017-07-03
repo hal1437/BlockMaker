@@ -127,6 +127,7 @@ bool CFace::Draw(QPainter& painter)const{
     return true;
 }
 bool CFace::DrawGL(Pos,Pos)const{
+    if(!this->isVisible())return true;
     if(this->isPolygon()){
         //薄い色に変更
         float currentColor[4];

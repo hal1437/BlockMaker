@@ -97,12 +97,14 @@ CObject* SolidEditController::getHangedObject(Pos center, Pos dir)const{
 
     //点の選択
     for(CPoint* p:this->model->GetPoints()){
-        if((Pos::LineNearPoint(center,center+dir, *p) - *p).Length() < CPoint::COLLISION_SIZE && hang_point != p)ans = p;
+        if(p->isVisible()){
+            if((Pos::LineNearPoint(center,center+dir, *p) - *p).Length() < CPoint::COLLISION_SIZE && hang_point != p)ans = p;
+        }
     }
     if(ans == nullptr){
         //エッジの選択
         for(CEdge* e : this->model->GetEdges()){
-            if(hang_point == e->start || hang_point == e->end)continue;
+            if(hang_point == e->start || hang_point == e->end || !e->isVisible())continue;
             //近似点選択
             const double DIVIDE = 100;
             for(int i=0;i<=DIVIDE;i++){
@@ -122,25 +124,11 @@ CFace* SolidEditController::getHangedFace(Pos center,Pos camera_pos)const{
     rank.push_back(std::make_pair(Collision::GetLengthFaceToLine(this->getFrontFace(),camera_pos,camera_pos-center),this->getFrontFace()));
     rank.push_back(std::make_pair(Collision::GetLengthFaceToLine(this->getTopFace()  ,camera_pos,camera_pos-center),this->getTopFace()));
     rank.push_back(std::make_pair(Collision::GetLengthFaceToLine(this->getSideFace() ,camera_pos,camera_pos-center),this->getSideFace()));
-    for(int i=0;i<this->model->GetFaces().size();i++){
-        rank.push_back(std::make_pair(Collision::GetLengthFaceToLine(this->model->GetFaces()[i],camera_pos,camera_pos-center),this->model->GetFaces()[i]));
-    }
-    /*
-    //表示
-    qDebug() << center << camera_pos;
-    for(int i=0;i<rank.size();i++){
-        if(Collision::CheckHitFaceToLine(rank[i].second,center,camera_pos-center)){
-            Pos c = Collision::GetHitPosFaceToLine( rank[i].second->GetNorm(),
-                                                   *rank[i].second->GetPoint(0),
-                                                    center,camera_pos-center);
-            Pos n = rank[i].second->GetNorm()*50;
-            qDebug() << c;
-            glBegin(GL_LINE_LOOP);
-            glVertex3f((c+n).x(),(c+n).y(),(c+n).z());
-            glVertex3f((c-n).x(),(c-n).y(),(c-n).z());
-            glEnd();
+    for(CFace* f:this->model->GetFaces()){
+        if(f->isVisible()){
+            rank.push_back(std::make_pair(Collision::GetLengthFaceToLine(f,camera_pos,camera_pos-center),f));
         }
-    }*/
+    }
 
     if(std::all_of(rank.begin(),rank.end(),[](std::pair<double,CFace*> v){return v.first==-1;})){
         return nullptr;
