@@ -8,10 +8,10 @@ bool CFace::Creatable(QVector<CObject*> lines){
     std::map<CPoint*,int> point_maps;
     QVector<CPoint*> points;
     for(CObject* line: lines){
-        for(int i=0;i<dynamic_cast<CEdge*>(line)->GetPosSequenceCount();i++){
-            point_maps[dynamic_cast<CEdge*>(line)->GetPosSequence(i)]++;
-            points.push_back(dynamic_cast<CEdge*>(line)->GetPosSequence(i));
-        }
+        point_maps[dynamic_cast<CEdge*>(line)->start]++;
+        points.push_back(dynamic_cast<CEdge*>(line)->start);
+        point_maps[dynamic_cast<CEdge*>(line)->end]++;
+        points.push_back(dynamic_cast<CEdge*>(line)->end);
     }
     //全ての点の数が2である
     if(!std::all_of(point_maps.begin(),point_maps.end(),[](std::pair<CObject*,int> c){return c.second==2;}))return false;
@@ -65,7 +65,7 @@ Pos CFace::GetNorm()const{
         return Pos(vec1.Cross(vec2)).GetNormalize();
     }
 }
-CPoint* CFace::GetPoint(int index)const{
+CPoint* CFace::GetBasePoint()const{
     QVector<CPoint*> pp;
     //点を集結
     for(CEdge* line:this->edges){
@@ -73,7 +73,6 @@ CPoint* CFace::GetPoint(int index)const{
         if(!exist(pp,line->end  ))pp.push_back(line->end);
     }
     //左下の探索
-    QVector<CPoint*> hit;
     CPoint* corner = nullptr;//左下
 
     double LIMIT_LENGTH = 0;
@@ -86,12 +85,15 @@ CPoint* CFace::GetPoint(int index)const{
     corner =  *std::min_element(pp.begin(),pp.end(),[&](CPoint* lhs,CPoint* rhs){
         return ((*lhs-limit).Length() < (*rhs-limit).Length());
     });
-
+    return corner;
+}
+CPoint* CFace::GetPoint(int index)const{
     //index回だけ連鎖させる
+    CPoint* corner = this->GetBasePoint();
     CPoint* ans = corner;
     CPoint* old = corner; //反復連鎖防止
     QVector<CPoint*> candidate;//連鎖候補
-    for(int i=0;i<index%4;i++){
+    for(int i=0;i<index%this->edges.size();i++){
         //ansを含むlineを探す
         for(CEdge* line:this->edges){
             if(ans == line->start && old != line->end){
@@ -122,6 +124,15 @@ CPoint* CFace::GetPoint(int index)const{
     return ans;
 }
 
+CEdge* CFace::GetEdgeSeqence(int index){
+    //index番目の点とindex+1番目の点を含む点を持つエッジを探す
+    return *std::find_if(this->edges.begin(),this->edges.end(),[&](CEdge* edge){
+        CPoint*  p1 = this->GetPoint(index);
+        CPoint*  p2 = this->GetPoint(index+1);
+        return (edge->start == p1 && edge->start == p2) ||
+               (edge->start == p2 && edge->start == p1);
+    });
+}
 
 bool CFace::Draw(QPainter& painter)const{
     return true;
@@ -136,10 +147,26 @@ bool CFace::DrawGL(Pos,Pos)const{
         glDepthMask(GL_FALSE);
 
         //中を塗る
-        glBegin(GL_TRIANGLE_FAN);
-
+        glBegin(GL_POLYGON);
         for(int i=0;i<this->edges.size();i++){
-            glVertex3f(this->GetPoint(i)->x(),this->GetPoint(i)->y(), this->GetPoint(i)->z());
+            CPoint* p1 = this->GetPoint(i);
+            CPoint* p2 = this->GetPoint((i+1)%this->edges.size());
+            //エッジを特定
+            CEdge* current = *std::find_if(this->edges.begin(),this->edges.end(),[&](CEdge* v){
+                return (v->start==p1 &&v->end==p2)||(v->start==p2 &&v->end==p1);
+            });
+            //正方向ループ
+            if(p1 == current->start){
+                for(double j=0;j<=1;j+=1.0/CEdge::LINE_NEAR_DIVIDE){
+                    Pos p = current->GetMiddleDivide(j);
+                    glVertex3f(p.x(),p.y(), p.z());
+                }
+            }else{
+                for(double j=1;j>=0;j-=1.0/CEdge::LINE_NEAR_DIVIDE){
+                    Pos p = current->GetMiddleDivide(j);
+                    glVertex3f(p.x(),p.y(), p.z());
+                }
+            }
         }
         glEnd();
         glDepthMask(GL_TRUE);
@@ -176,19 +203,20 @@ bool CFace::DrawNormArrowGL()const{
 bool CFace::Move(const Pos& diff){
     QVector<CPoint*> pp;
     for(int i=0;i<this->edges.size();i++){
-        pp.push_back(this->edges[i]->start);
-        pp.push_back(this->edges[i]->end);
+        for(int j=0;j<this->edges[i]->GetPosSequenceCount();j++){
+            pp.push_back(this->edges[i]->GetPosSequence(j));
+        }
     }
     //排他
     std::sort(pp.begin(),pp.end());
     pp.erase(std::unique(pp.begin(),pp.end()),pp.end());
+
+    //移動
     for(CPoint* p:pp){
         p->Move(diff);
     }
-
-    return true ;
+    return true;
 }
-
 
 //近接点
 Pos CFace::GetNearPos (const Pos&)const{
@@ -197,8 +225,6 @@ Pos CFace::GetNearPos (const Pos&)const{
 Pos CFace::GetNearLine(const Pos& pos1,const Pos& pos2)const{
     return Pos();
 }
-
-
 
 CFace::CFace(QObject* parent):
     CObject(parent)

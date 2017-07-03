@@ -85,14 +85,15 @@ public:
     CPoint* GetBasePos()const;//基準点取得
     QVector<CPoint*> GetAllPos()const;
     QVector<CEdge* > GetAllEdges()const;
-    CPoint *GetClockworksPos (int index) const;//番号順点取得
-    CPoint *GetClockworksEdge(int index) const;//番号順線取得
+    CPoint* GetClockworksPos (int index) const;//番号順点取得
+    CEdge* GetClockworksEdge(int index) const;//番号順線取得
 
     CBlock(QObject* parent=nullptr);
     virtual ~CBlock();
 
 public slots:
     void RefreshDividePoint();//div_pos再計算
+    void ReorderEdges();
 };
 
 #endif // CBLOCK_H

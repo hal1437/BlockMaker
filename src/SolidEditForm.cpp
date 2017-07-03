@@ -103,6 +103,10 @@ void SolidEditForm::mousePressEvent  (QMouseEvent *event){
     }
 }
 void SolidEditForm::mouseReleaseEvent(QMouseEvent *event){
+    //保持点手放し
+    if(state == MAKE_OBJECT::Edit){
+        this->controller->hang_point = nullptr;
+    }
     //ドラッグでなければ
     if(this->first_click == Pos(event->pos().x(),event->pos().y())){
         //右クリック
@@ -132,10 +136,6 @@ void SolidEditForm::mouseReleaseEvent(QMouseEvent *event){
         }
     }
 
-    //保持点手放し
-    if(state == MAKE_OBJECT::Edit){
-        this->controller->hang_point = nullptr;
-    }
     this->drag_base = Pos(0,0);
 }
 void SolidEditForm::mouseMoveEvent   (QMouseEvent *event){

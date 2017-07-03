@@ -21,7 +21,9 @@ public:
     bool isParadox()const;              //平面に矛盾がないか確認する。
     bool isComprehension(Pos pos)const; //平面上かチェックする。
     Pos  GetNorm()const ;               //法線ベクトル取得
-    CPoint *GetPoint(int index)const; //構成点取得
+    CPoint* GetBasePoint()const;        //基準点取得
+    CPoint* GetPoint(int index)const;   //構成点取得
+    CEdge*  GetEdgeSeqence(int index);   //ループエッジ取得
 
     virtual bool Draw(QPainter& painter)const;//描画関数
     virtual bool DrawGL(Pos camera,Pos center)const;//三次元描画関数

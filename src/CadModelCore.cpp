@@ -84,16 +84,23 @@ bool CadModelCore::ImportFoamFile(QString filename){
         //オブジェクト生成
         if(make != nullptr){
 
-            CREATE_RESULT res = make->Create(this->Points[sl[1].toInt()]);
-
-            if(res == CREATE_RESULT::ENDLESS){
-                for(int j=3;j<sl.size();j++){
-                    make->Create(this->Points[sl[j].toInt()]);
-                }
+            if(sl[0] == "CArc"){
+                //例外
                 make->Create(this->Points[sl[2].toInt()]);
+                make->Create(this->Points[sl[1].toInt()]);
+                make->Create(this->Points[sl[3].toInt()]);
             }else{
-                for(int j=2;j<sl.size();j++){
-                    make->Create(this->Points[sl[j].toInt()]);
+
+                CREATE_RESULT res = make->Create(this->Points[sl[1].toInt()]);
+                if(res == CREATE_RESULT::ENDLESS){
+                    for(int j=3;j<sl.size();j++){
+                        make->Create(this->Points[sl[j].toInt()]);
+                    }
+                    make->Create(this->Points[sl[2].toInt()]);
+                }else{
+                    for(int j=2;j<sl.size();j++){
+                        make->Create(this->Points[sl[j].toInt()]);
+                    }
                 }
             }
             Edges.push_back(make);

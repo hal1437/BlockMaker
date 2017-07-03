@@ -118,7 +118,6 @@ void CArc::SetMiddle(CPoint* pos,int index){
 }
 Pos CArc::GetMiddleDivide(double t)const{
     double angle = Pos::Angle(*this->start-*this->center,*this->end-*this->center)*PI/180;
-    qDebug() << angle*180/PI;
     Pos center_base = (*this->start-*this->center).Cross(*this->end-*this->center);
     Pos ans = Pos::RodriguesRotate(*this->start-*this->center,center_base,angle*t)+*this->center; //要検討
     return ans;
@@ -157,7 +156,6 @@ void CArc::ChangePosCallback(CPoint *pos, Pos ){
     round = (*this->center - *this->start).Length();
 
     //中心の移動
-
     if(pos == this->center){
         if(this->start->isLock()){
             round = (*this->start - *this->center).Length();

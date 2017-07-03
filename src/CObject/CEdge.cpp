@@ -47,7 +47,27 @@ bool CEdge::DrawGL(Pos,Pos)const{
                    this->GetMiddleDivide(i).y(),
                    this->GetMiddleDivide(i).z());
     }
-    glEnd();    
+    glEnd();
+
+    //矢印
+    Pos cc = (this->GetMiddleDivide(0.81) - this->GetMiddleDivide(0.8));
+    double theta1 = std::atan2(cc.y(),std::sqrt(cc.x()*cc.x()+cc.z()*cc.z()));
+    double theta2 = std::atan2(-cc.x(),cc.z());
+    glBegin(GL_POLYGON);
+    const int ARROW_ROUND = 10;
+    Pos p = this->GetMiddleDivide(0.8);
+    glVertex3f(this->GetMiddleDivide(0.9).x(),
+               this->GetMiddleDivide(0.9).y(),
+               this->GetMiddleDivide(0.9).z());
+    for(double i=0;i<2*M_PI;i+= M_PI/32){
+        Pos c = Pos(ARROW_ROUND*std::sin(i),ARROW_ROUND*std::cos(i),0).Dot(Quat::getRotateXMatrix(theta1).Dot(Quat::getRotateYMatrix(theta2)));
+        Pos pp = p+c;
+        glVertex3f(pp.x(),
+                   pp.y(),
+                   pp.z());
+    }
+    glEnd();
+
     return true;
 }
 

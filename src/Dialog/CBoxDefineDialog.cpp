@@ -147,6 +147,8 @@ void CBoxDefineDialog::ExportCBlock(){
     for(int i=0;i<(this->GetGradigngType() == GradingType::SimpleGrading ? 3 : 12);i++){
         this->block->grading_args.push_back(this->grading_args[i]->value());
     }
+    this->block->ReorderEdges();
+    this->block->RefreshDividePoint();
 }
 void CBoxDefineDialog::ImportCBlock(){
     //面の設定

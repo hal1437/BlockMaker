@@ -34,22 +34,8 @@ Pos CBlock::GetDivisionPoint(int edge_index,int count_index)const{
     if(grading == GradingType::EdgeGrading){
         p = this->grading_args[edge_index];
     }
-    //始点と終点を取得
-    QVector<QVector<int>> edge_comb = {{0,1}, //0
-                                       {1,2}, //1
-                                       {3,2}, //2
-                                       {0,3}, //3
-                                       {4,5}, //4
-                                       {5,6}, //5
-                                       {7,6}, //6
-                                       {4,7}, //7
-                                       {0,4}, //8
-                                       {1,5}, //9
-                                       {2,6}, //10
-                                       {3,7}};//11
-    start = this->GetClockworksPos(edge_comb[edge_index][0]);
-    end   = this->GetClockworksPos(edge_comb[edge_index][1]);
-    L = (*end-*start).Length();
+    CEdge *edge =  this->GetClockworksEdge(edge_index);
+    L = (*edge->end - *edge->start).Length();
 
     //指数関数パラメータ計算
     B = log(p) / (d-1);
@@ -58,11 +44,11 @@ Pos CBlock::GetDivisionPoint(int edge_index,int count_index)const{
 
     //指定番号までの総和
     double sum_rate=0;
-    for(int i=1;i<=count_index;i++){
+    for(int i = 1;i <= count_index;i++){
         sum_rate += A*exp(B*i);
     }
-    Pos ans = (*end-*start).GetNormalize() * sum_rate;
-    return ans + *start;
+    Pos ans = edge->GetMiddleDivide(sum_rate/L);
+    return ans;
 }
 
 double CBlock::GetLength_impl(Quat convert){
@@ -312,6 +298,27 @@ CPoint* CBlock::GetClockworksPos(int index)const{
 
     return ans[6];
 }
+CEdge* CBlock::GetClockworksEdge(int index) const{
+    //始点と終点を取得
+    QVector<QVector<int>> edge_comb = {{0,1}, //0
+                                       {1,2}, //1
+                                       {3,2}, //2
+                                       {0,3}, //3
+                                       {4,5}, //4
+                                       {5,6}, //5
+                                       {7,6}, //6
+                                       {4,7}, //7
+                                       {0,4}, //8
+                                       {1,5}, //9
+                                       {2,6}, //10
+                                       {3,7}};//11
+    QVector<CEdge*> edges = this->GetAllEdges();
+    CPoint* p1 = this->GetClockworksPos(edge_comb[index][0]);
+    CPoint* p2 = this->GetClockworksPos(edge_comb[index][1]);
+    return *std::find_if(edges.begin(),edges.end(),[&](CEdge* e){
+        return (e->start == p1 && e->end == p2) || (e->start == p2 && e->end == p1);
+    });
+}
 
 
 CBlock::CBlock(QObject* parent):
@@ -340,4 +347,18 @@ void CBlock::RefreshDividePoint(){
         }
     }
 }
+void CBlock::ReorderEdges(){
+    //エッジ並び替え
+    for(int i=0;i<12;i++){
+        CEdge* edge = this->GetClockworksEdge(i);
+        Pos base;
+        if(i==0 || i==2 || i==4 || i==6)base = Pos(1,0,0);
+        if(i==1 || i==3 || i==5 || i==7)base = Pos(0,1,0);
+        if(i>=8)                        base = Pos(0,0,1);
+        if((*edge->end - *edge->start).DotPos(base) < 0){
+            std::swap(edge->start , edge->end);
+        }
+    }
+}
+
 
