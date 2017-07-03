@@ -142,7 +142,6 @@ void CBoxDefineDialog::ExportCBlock(){
     this->block->div[0] = this->ui->XspinBox->value();
     this->block->div[1] = this->ui->YspinBox->value();
     this->block->div[2] = this->ui->ZspinBox->value();
-    this->block->depth  = this->ui->DepthSpinBox->value();
     this->block->grading   = this->GetGradigngType();
     for(int i=0;i<(this->GetGradigngType() == GradingType::SimpleGrading ? 3 : 12);i++){
         this->block->grading_args.push_back(this->grading_args[i]->value());
@@ -160,7 +159,6 @@ void CBoxDefineDialog::ImportCBlock(){
     this->ui->XspinBox->setValue(this->block->div[0]);
     this->ui->YspinBox->setValue(this->block->div[1]);
     this->ui->ZspinBox->setValue(this->block->div[2]);
-    this->ui->DepthSpinBox->setValue(this->block->depth);
     this->SetGradigngType(this->block->grading);
     for(int i=0;i<(this->GetGradigngType() == GradingType::SimpleGrading ? 3 : 12);i++){
         this->grading_args[i]->setValue(this->block->grading_args[i]);
@@ -258,7 +256,6 @@ void CBoxDefineDialog::AcceptProxy(){
         this->block->div[0] = this->ui->XspinBox->value();
         this->block->div[1] = this->ui->YspinBox->value();
         this->block->div[2] = this->ui->ZspinBox->value();
-        this->block->depth  = this->ui->DepthSpinBox->value();
         this->block->grading   = this->GetGradigngType();
         this->block->grading_args.resize(this->GetGradigngType() == GradingType::SimpleGrading ? 3 : 12);
         for(int i=0;i<this->block->grading_args.size();i++){

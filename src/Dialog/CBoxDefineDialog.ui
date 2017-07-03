@@ -96,54 +96,6 @@
        </layout>
       </widget>
      </item>
-     <item row="3" column="2" rowspan="2">
-      <layout class="QVBoxLayout" name="verticalLayout_3">
-       <item>
-        <widget class="QComboBox" name="GradingCombo">
-         <item>
-          <property name="text">
-           <string>simpleGrading</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>edgeGrading</string>
-          </property>
-         </item>
-        </widget>
-       </item>
-       <item>
-        <layout class="QGridLayout" name="GradingArgsLayout"/>
-       </item>
-      </layout>
-     </item>
-     <item row="2" column="2">
-      <layout class="QHBoxLayout" name="horizontalLayout">
-       <item>
-        <widget class="QLabel" name="label_2">
-         <property name="text">
-          <string>Z軸方向長さ</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QDoubleSpinBox" name="DepthSpinBox">
-         <property name="decimals">
-          <number>3</number>
-         </property>
-         <property name="minimum">
-          <double>-10000.000000000000000</double>
-         </property>
-         <property name="maximum">
-          <double>10000.000000000000000</double>
-         </property>
-         <property name="value">
-          <double>1.000000000000000</double>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
      <item row="0" column="2">
       <widget class="QGroupBox" name="BackGroup">
        <property name="maximumSize">
@@ -829,6 +781,27 @@
         </layout>
        </widget>
       </widget>
+     </item>
+     <item row="2" column="2" rowspan="3">
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <item>
+        <widget class="QComboBox" name="GradingCombo">
+         <item>
+          <property name="text">
+           <string>simpleGrading</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>edgeGrading</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item>
+        <layout class="QGridLayout" name="GradingArgsLayout"/>
+       </item>
+      </layout>
      </item>
     </layout>
    </item>

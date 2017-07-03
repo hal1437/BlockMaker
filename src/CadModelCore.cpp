@@ -37,8 +37,17 @@ bool CadModelCore::ExportFoamFile(QString filename)const{
     out << this->Blocks.size() << std::endl;
     for(CBlock* block: this->Blocks){
         out << "CBlock";
-        for(int i=0;i< block->faces.size();i++){
-            out << "," << IndexOf(this->Faces,block->faces[i]);
+        //平面番号
+        for(int i=0;i< 6;i++)out << "," << IndexOf(this->Faces,block->faces[i]);
+        //境界タイプ
+        for(int i=0;i< 6;i++)out << "," << block->boundery[i];
+        //分割数
+        for(int i=0;i< 3;i++)out << "," << block->div[i];
+        //分割間隔タイプ
+        out << "," << block->grading;
+        //分割間隔タイプ
+        for(double d:block->grading_args){
+            out << "," << d;
         }
         out << std::endl;
     }
@@ -130,10 +139,28 @@ bool CadModelCore::ImportFoamFile(QString filename){
 
         CBlock* make = new CBlock();
         QStringList sl = QString(str.c_str()).split(',');
-        //エッジ判定
-        for(int j = 1;j<sl.size();j++){
+        int j=1;
+        //平面判定
+        for(int i=0;i<6;i++,j++){
             make->faces.push_back(this->Faces[sl[j].toInt()]);
         }
+        //境界タイプ
+        for(int i=0;i<6;i++,j++){
+            make->boundery[i] = static_cast<BoundaryType>(sl[j].toInt());
+        }
+        //分割数
+        for(int i=0;i<3;i++,j++){
+            make->div[i] = sl[j].toInt();
+        }
+        //分割間隔タイプ
+        make->grading = static_cast<GradingType>(sl[j].toInt());
+        j++;
+        //分割間隔タイプ
+        for(;j<sl.length();j++){
+            make->grading_args.push_back(sl[j].toDouble());
+        }
+        make->RefreshDividePoint();
+        make->ReorderEdges();
         this->Blocks.push_back(make);
     }
     emit UpdatePoints();

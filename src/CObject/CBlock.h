@@ -46,7 +46,6 @@ public:
     BoundaryType boundery[6]; // 境界タイプ
     QString name[6];          // 境界名
     int div[3];               // 分割数
-    double depth;             // Z軸方向奥行き
     GradingType grading;      // 分割間隔タイプ
     QVector<double> grading_args; // 分割パラメータ
 private:
