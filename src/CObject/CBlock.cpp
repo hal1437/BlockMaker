@@ -324,6 +324,12 @@ CEdge* CBlock::GetClockworksEdge(int index) const{
 CBlock::CBlock(QObject* parent):
     CObject(parent)
 {
+    this->name[0] = "Top";
+    this->name[1] = "Right";
+    this->name[2] = "Left";
+    this->name[3] = "Bottom";
+    this->name[4] = "Front";
+    this->name[5] = "Back";
 }
 
 CBlock::~CBlock()

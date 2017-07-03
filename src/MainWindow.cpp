@@ -30,13 +30,13 @@ MainWindow::MainWindow(QWidget *parent) :
     //リスト変更系
     connect(ui->RestraintList ,SIGNAL(itemSelectionChanged()) ,this ,SLOT(MakeRestraint()));
 
-    //CadEditFoamにイベントフィルター導入
+    //SolidEditFoamにイベントフィルター導入
     this->installEventFilter(ui->SolidEdit);
     connect(this->ui->SolidEdit,SIGNAL(MousePosChanged(Pos)),this,SLOT(RefreshStatusBar(Pos)));
 
     //ドック関係
     connect(this->ui->actionShowObjectList,SIGNAL(triggered()),this,SLOT(ShowObjectList()));
-    connect(this->ui->actionShowBoxList   ,SIGNAL(triggered()),this,SLOT(ShowBoxList()));
+    connect(this->ui->actionExport        ,SIGNAL(triggered()),this,SLOT(Export()));
 
     ConnectSignals();
     ui->ToolBlocks->setEnabled(false);
@@ -226,9 +226,6 @@ void MainWindow::ShowObjectList(){
     this->ui->ObjectDock->show();
 }
 
-void MainWindow::ShowBoxList(){
-}
-
 void MainWindow::Save(){
     QString filepath = QFileDialog::getSaveFileName(this,
                                                     "Save file",
@@ -246,5 +243,11 @@ void MainWindow::Load(){
 
 }
 
+void MainWindow::Export(){
+    ExportDialog* diag = new ExportDialog();
+    diag->SetModel(this->model);
+    diag->exec();
+
+}
 
 

@@ -94,7 +94,7 @@ void SolidEditForm::mousePressEvent  (QMouseEvent *event){
     //操作
     if(this->state == MAKE_OBJECT::Edit){
         //移動
-        if(this->GetHangedObject()->is<CPoint>()){
+        if(this->GetHangedObject()->is<CPoint>() && this->isSketcheing()){
             this->controller->hang_point = dynamic_cast<CPoint*>(this->GetHangedObject());
         }
     }else{

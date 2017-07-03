@@ -42,6 +42,7 @@
     </property>
     <addaction name="actionOpen"/>
     <addaction name="actionSave"/>
+    <addaction name="actionExport"/>
     <addaction name="separator"/>
     <addaction name="actionExit"/>
    </widget>
@@ -52,14 +53,12 @@
     <addaction name="actionCopy"/>
     <addaction name="actionPaste"/>
     <addaction name="separator"/>
-    <addaction name="actionResetExpantion"/>
    </widget>
    <widget class="QMenu" name="menuWindow">
     <property name="title">
      <string>Window</string>
     </property>
     <addaction name="actionShowObjectList"/>
-    <addaction name="actionShowBoxList"/>
    </widget>
    <addaction name="menu"/>
    <addaction name="menuEdit"/>
@@ -364,11 +363,6 @@
     <string>CheckConflict</string>
    </property>
   </action>
-  <action name="actionResetExpantion">
-   <property name="text">
-    <string>ResetExpantion</string>
-   </property>
-  </action>
   <action name="actionMove">
    <property name="icon">
     <iconset resource="../Resource/images.qrc">
@@ -406,9 +400,9 @@
     <string>ShowObjectList</string>
    </property>
   </action>
-  <action name="actionShowBoxList">
+  <action name="actionExport">
    <property name="text">
-    <string>ShowBoxList</string>
+    <string>Export</string>
    </property>
   </action>
  </widget>

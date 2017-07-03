@@ -65,10 +65,10 @@ public slots:
     void RefreshStatusBar(Pos pos);        //ステータスバー更新
 
     void ShowObjectList();
-    void ShowBoxList();
 
     void Save();
     void Load();
+    void Export();
 };
 
 #endif // MAINWINDOW_H

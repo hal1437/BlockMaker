@@ -13,32 +13,26 @@
 #include <QMessageBox>
 #include <QTextCodec>
 #include <QSettings>
+#include "CadModelCore.h"
 #include "FoamFile.h"
 
 namespace Ui {
 class ExportDialog;
 }
 
-class ExportDialog : public QDialog
+class ExportDialog : public QDialog ,public CadModelCoreInterface
 {
     Q_OBJECT
 private:
-    QVector<CObject*> objects;
-    QVector<CBlock*> blocks;
     void Export(QString filename)const;
 
     //座標から番号へ変換
     int GetPosIndex(CPoint *p)const;
 
-    //全頂点リストを取得
-    QVector<CPoint *> GetVerticesPos()const;
-
     //境界面の座標を取得
     QVector<CPoint *> GetBoundaryPos(CBlock *block, BoundaryDir dir)const;
 
 public:
-    void SetBlocks(QVector<CBlock *> blocks);
-
     explicit ExportDialog(QWidget *parent = 0);
     ~ExportDialog();
 
