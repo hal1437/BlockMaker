@@ -92,16 +92,14 @@ void SolidEditForm::mousePressEvent  (QMouseEvent *event){
     this->first_click = Pos(event->pos().x(),event->pos().y());
 
     //操作
-    if(this->isSketcheing()){
-        if(this->state == MAKE_OBJECT::Edit){
-            //移動
-            if(this->GetHangedObject()->is<CPoint>()){
-                this->controller->hang_point = dynamic_cast<CPoint*>(this->GetHangedObject());
-            }
-        }else{
-            //追加操作
-            MakeObject();
+    if(this->state == MAKE_OBJECT::Edit){
+        //移動
+        if(this->GetHangedObject()->is<CPoint>()){
+            this->controller->hang_point = dynamic_cast<CPoint*>(this->GetHangedObject());
         }
+    }else{
+        //追加操作
+        MakeObject();
     }
 }
 void SolidEditForm::mouseReleaseEvent(QMouseEvent *event){

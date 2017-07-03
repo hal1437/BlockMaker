@@ -152,6 +152,9 @@
             <property name="autoFillBackground">
              <bool>false</bool>
             </property>
+            <property name="selectionMode">
+             <enum>QAbstractItemView::ExtendedSelection</enum>
+            </property>
             <property name="animated">
              <bool>false</bool>
             </property>
