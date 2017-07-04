@@ -158,6 +158,8 @@ void SolidEditForm::mouseMoveEvent   (QMouseEvent *event){
         //カメラ角度変更
         this->theta1 += static_cast<double>(event->pos().y() - this->drag_base.y())/SENSITIVITY;
         this->theta2 += static_cast<double>(event->pos().x() - this->drag_base.x())/SENSITIVITY;
+        this->theta1 = Mod(this->theta1,2*M_PI);
+        this->theta2 = Mod(this->theta2,2*M_PI);
         this->drag_base = Pos(event->pos().x(),event->pos().y());
     }
 
