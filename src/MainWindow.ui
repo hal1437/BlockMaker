@@ -284,6 +284,9 @@
    </property>
   </action>
   <action name="actionDelete">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Delete</string>
    </property>
@@ -359,6 +362,9 @@
    </property>
   </action>
   <action name="actionCheckConflict">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>CheckConflict</string>
    </property>
@@ -373,6 +379,9 @@
    </property>
   </action>
   <action name="actionGridFilter">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>GridFilter</string>
    </property>
