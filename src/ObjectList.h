@@ -21,8 +21,8 @@ private:
     QAction* delete_action;
     QAction* visible_action;
     QAction* invisible_action;
-    QAction* visible_frame_action;
-    QAction* invisible_frame_action;
+    QAction* visible_mesh_action;
+    QAction* invisible_mesh_action;
 
 protected:
     QIcon getIcon(CObject* obj);
@@ -53,8 +53,8 @@ public slots:
 
     void SetVisible(bool);//可視設定
     void SetInvisible(bool);//不可視設定
-    void SetVisibleFrame(bool);//可視フレーム設定
-    void SetInvisibleFrame(bool);//不可視フレーム設定
+    void SetVisibleMesh(bool);//可視フレーム設定
+    void SetInvisibleMesh(bool);//不可視フレーム設定
 
 public:
     explicit ObjectList(QWidget *parent = 0);

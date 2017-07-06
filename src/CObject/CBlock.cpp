@@ -1,11 +1,11 @@
 #include "CBlock.h"
 
 
-bool CBlock::isVisibleFrame()const{
-    return this->visible_frame;
+bool CBlock::isVisibleMesh()const{
+    return this->visible_Mesh;
 }
-void CBlock::VisibleFrame(bool flag){
-    this->visible_frame = flag;
+void CBlock::VisibleMesh(bool flag){
+    this->visible_Mesh = flag;
     if(flag == true){
         this->RefreshDividePoint();
     }
@@ -94,7 +94,7 @@ bool CBlock::DrawGL(Pos,Pos)const{
         glEnd();
     }
 
-    if(this->isVisibleFrame()){
+    if(this->isVisibleMesh()){
         //分割線を描画
         glColor4f(0.1,
                   0.1,

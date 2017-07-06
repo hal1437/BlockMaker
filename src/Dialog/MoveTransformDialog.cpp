@@ -34,6 +34,9 @@ void MoveTransformDialog::Accept(){
             obj->Move(value - p);
         }
     }
+    for(CBlock* block:this->model->GetBlocks()){
+        block->RefreshDividePoint();
+    }
     emit RepaintRequest();
 }
 

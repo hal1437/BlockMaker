@@ -3,8 +3,8 @@
 QIcon ObjectList::getIcon(CObject *obj){
     QString filepath;
     if(obj->is<CBlock>()){
-        if(dynamic_cast<CBlock*>(obj)->isVisibleFrame()){
-            filepath = ":/ToolImages/BlocksFrame";
+        if(dynamic_cast<CBlock*>(obj)->isVisibleMesh()){
+            filepath = ":/ToolImages/BlocksMesh";
         }else{
             filepath = ":/ToolImages/Blocks";
         }
@@ -49,16 +49,16 @@ void ObjectList::mouseReleaseEvent(QMouseEvent* event){
             }
         }
         for(CObject* obj:this->CadModelCoreInterface::model->GetSelected()){
-            if(obj->is<CBlock>() && !dynamic_cast<CBlock*>(obj)->isVisibleFrame()){
-                this->visible_frame_action   = this->menu->addAction("フレーム表示");
-                connect(this->visible_frame_action  ,SIGNAL(triggered(bool)),this,SLOT(SetVisibleFrame(bool)));
+            if(obj->is<CBlock>() && !dynamic_cast<CBlock*>(obj)->isVisibleMesh()){
+                this->visible_mesh_action   = this->menu->addAction("メッシュ表示");
+                connect(this->visible_mesh_action  ,SIGNAL(triggered(bool)),this,SLOT(SetVisibleMesh(bool)));
                 break;
             }
         }
         for(CObject* obj:this->CadModelCoreInterface::model->GetSelected()){
-            if(obj->is<CBlock>() && dynamic_cast<CBlock*>(obj)->isVisibleFrame()){
-                this->invisible_frame_action = this->menu->addAction("フレーム非表示");
-                connect(this->invisible_frame_action,SIGNAL(triggered(bool)),this,SLOT(SetInvisibleFrame(bool)));
+            if(obj->is<CBlock>() && dynamic_cast<CBlock*>(obj)->isVisibleMesh()){
+                this->invisible_mesh_action = this->menu->addAction("メッシュ非表示");
+                connect(this->invisible_mesh_action,SIGNAL(triggered(bool)),this,SLOT(SetInvisibleMesh(bool)));
                 break;
             }
         }
@@ -256,17 +256,17 @@ void ObjectList::SetVisible(bool){
 void ObjectList::SetInvisible(bool){
     for(CObject* obj:this->CadModelCoreInterface::model->GetSelected())obj->Visible(false);
 }
-void ObjectList::SetVisibleFrame(bool){
+void ObjectList::SetVisibleMesh(bool){
     for(CObject* obj:this->CadModelCoreInterface::model->GetSelected()){
         if(obj->is<CBlock>()){
-            dynamic_cast<CBlock*>(obj)->VisibleFrame(true);
+            dynamic_cast<CBlock*>(obj)->VisibleMesh(true);
         }
     }
 }
-void ObjectList::SetInvisibleFrame(bool){
+void ObjectList::SetInvisibleMesh(bool){
     for(CObject* obj:this->CadModelCoreInterface::model->GetSelected()){
         if(obj->is<CBlock>()){
-            dynamic_cast<CBlock*>(obj)->VisibleFrame(false);
+            dynamic_cast<CBlock*>(obj)->VisibleMesh(false);
         }
     }
 }
