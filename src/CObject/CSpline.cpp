@@ -160,7 +160,7 @@ void CSpline::RefreshNodes(){
     std::vector<double> x,y,z;
     x.push_back(this->start->x());
     y.push_back(this->start->y());
-    z.push_back(this->start->y());
+    z.push_back(this->start->z());
     for(CPoint* p : this->pos){
         x.push_back(p->x());
         y.push_back(p->y());
