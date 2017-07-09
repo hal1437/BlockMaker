@@ -37,7 +37,13 @@ Pos CEdge::GetNearLine(const Pos& pos1,const Pos& pos2)const{
     }
     return ans;
 }
-bool CEdge::DrawGL(Pos,Pos)const{
+void CEdge::SetPosSequence(CPoint* pos,int index){
+    if     (index == 0                        )this->SetStartPos(pos);
+    else if(index == GetPosSequenceCount() - 1)this->SetEndPos(pos);
+    else if(index > 0 && index < GetPosSequenceCount() - 1)this->SetMiddle(pos,index-1);
+}
+
+bool CEdge::DrawGL(Pos camera,Pos center)const{
     if(!this->isVisible())return true;
     glBegin(GL_LINE_STRIP);
     //線の分割描画
@@ -50,15 +56,16 @@ bool CEdge::DrawGL(Pos,Pos)const{
     glEnd();
 
     //矢印
-    Pos cc = (this->GetMiddleDivide(0.81) - this->GetMiddleDivide(0.8));
+    Pos cc = (this->GetMiddleDivide(0.90) - this->GetMiddleDivide(0.89));
     double theta1 = std::atan2(cc.y(),std::sqrt(cc.x()*cc.x()+cc.z()*cc.z()));
     double theta2 = std::atan2(-cc.x(),cc.z());
+    double length = (camera- center).Length();
     glBegin(GL_POLYGON);
-    Pos p = this->GetMiddleDivide(0.8);
+    Pos p = this->GetMiddleDivide(0.91)+cc*(-10);
     glVertex3f(this->GetMiddleDivide(0.9).x(),
                this->GetMiddleDivide(0.9).y(),
                this->GetMiddleDivide(0.9).z());
-    int ARROW_ROUND = (*this->end - *this->start).Length()/50;
+    int ARROW_ROUND = length*10;
     for(double i=0;i<2*M_PI;i+= M_PI/32){
         Pos c = Pos(ARROW_ROUND*std::sin(i),ARROW_ROUND*std::cos(i),0).Dot(Quat::getRotateXMatrix(theta1).Dot(Quat::getRotateYMatrix(theta2)));
         Pos pp = p+c;

@@ -18,6 +18,7 @@ private:
     CPoint*  last_point    = nullptr;  //最終生成点
     CEdge*   making_object = nullptr;  //生成オブジェクト
     int      making_step   = COMPLETE; //生成段階
+    int      making_count  = 0;        //生成番号
 
 private:
 

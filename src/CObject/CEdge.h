@@ -35,6 +35,7 @@ public:
     //全ノード取得
     int     GetPosSequenceCount()const;
     CPoint* GetPosSequence(int index)const;
+    void    SetPosSequence(CPoint* pos,int index);
 
     //近接点
     virtual Pos GetNearPos (const Pos& hand)const = 0;
