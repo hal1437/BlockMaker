@@ -13,37 +13,13 @@ void SolidEditForm::MakeObject(){
     this->repaint();
 }
 
-
-void SolidEditForm::StartSketch(CFace* face){
-    if(this->isSketcheing())return;
-    this->model->SelectedClear();//選択解除
-
-    this->sketch_face = face;
-    Pos cross = face->GetNorm();
-    cross = cross.GetNormalize();
-
-    double theta1_ = std::atan2(cross.y(),std::sqrt(cross.x()*cross.x()+cross.z()*cross.z()));
-    double theta2_ = std::atan2(-cross.x(),cross.z());
-
-    TimeDivider *p1,*p2;
-    //カメラ向き占有
-    p1 = TimeDivider::TimeDivide(this->theta1,theta1_,500);
-    p2 = TimeDivider::TimeDivide(this->theta2,theta2_,500);
-    connect(p1,SIGNAL(PerTime()),this,SLOT(repaint()));
-    connect(p2,SIGNAL(PerTime()),this,SLOT(repaint()));
-}
-
-bool SolidEditForm::isSketcheing(){
-    return (this->sketch_face != nullptr);
-}
-
 CFace* SolidEditForm::GetHangedFace(){
-    if(this->isSketcheing())return nullptr;
-    Pos  hang_center = (Pos(0,0,1) + this->screen_pos).Dot(Quat::getRotateXMatrix(theta1).Dot(Quat::getRotateYMatrix(theta2)));
+    if(this->controller->isSketcheing())return nullptr;
+    Pos  hang_center = (Pos(0,0,1) + this->screen_pos).Dot(this->controller->getCameraMatrix());
     return  this->controller->getHangedFace(hang_center,this->camera*this->round*1000 + hang_center);
 }
 CObject* SolidEditForm::GetHangedObject(){
-    Pos  hang_center = (Pos(0,0,1) + this->screen_pos).Dot(Quat::getRotateXMatrix(theta1).Dot(Quat::getRotateYMatrix(theta2)));
+    Pos  hang_center = (Pos(0,0,1) + this->screen_pos).Dot(this->controller->getCameraMatrix());
     return this->controller->getHangedObject(hang_center,(this->camera - this->center).GetNormalize());
 }
 void SolidEditForm::ColorSelect(CObject* obj){
@@ -54,22 +30,15 @@ void SolidEditForm::ColorSelect(CObject* obj){
 }
 
 //カメラ方向セット
-void SolidEditForm::setCameraRotate(double theta1,double theta2){
-    TimeDivider *p1,*p2;
-    p1 = TimeDivider::TimeDivide(this->theta1  ,theta1,500);
-    p2 = TimeDivider::TimeDivide(this->theta2  ,theta2,500);
-    connect(p1,SIGNAL(PerTime()),this,SLOT(repaint()));
-    connect(p2,SIGNAL(PerTime()),this,SLOT(repaint()));
-    repaint();
-}
+
 
 void SolidEditForm::keyPressEvent    (QKeyEvent *event){
     //キーイベント
-    if(!this->isSketcheing()){
-        if(event->key() == Qt::Key_Up    )setCameraRotate(M_PI/2,0);
-        if(event->key() == Qt::Key_Left  )setCameraRotate(0,0);
-        if(event->key() == Qt::Key_Right )setCameraRotate(0,-M_PI/2);
-        if(event->key() == Qt::Key_Down  )setCameraRotate(M_PI/4,-M_PI/4);
+    if(!this->controller->isSketcheing()){
+        if(event->key() == Qt::Key_Up    )this->setCameraRotate(M_PI/2,0);
+        if(event->key() == Qt::Key_Left  )this->setCameraRotate(0,0);
+        if(event->key() == Qt::Key_Right )this->setCameraRotate(0,-M_PI/2);
+        if(event->key() == Qt::Key_Down  )this->setCameraRotate(M_PI/4,-M_PI/4);
     }
     shift_pressed = event->modifiers() & Qt::ShiftModifier;
     ctrl_pressed  = event->modifiers() & Qt::ControlModifier;
@@ -78,10 +47,30 @@ void SolidEditForm::keyPressEvent    (QKeyEvent *event){
     if(event->key() == Qt::Key_Escape){
         this->controller->hang_point = nullptr;
         this->make_controller->Escape();
-        this->sketch_face = nullptr; //スケッチ終了
+        this->controller->sketch_face = nullptr; //スケッチ終了
     }
 
     this->repaint();
+}
+void SolidEditForm::StartSketch(CFace* face){
+    if(this->controller->isSketcheing())return;
+    this->model->SelectedClear();//選択解除
+
+    this->controller->sketch_face = face;
+    Pos cross = face->GetNorm();
+    cross = cross.GetNormalize();
+
+    double theta1_ = std::atan2(cross.y(),std::sqrt(cross.x()*cross.x()+cross.z()*cross.z()));
+    double theta2_ = std::atan2(-cross.x(),cross.z());
+
+    this->setCameraRotate(theta1_,theta2_);
+}
+void SolidEditForm::setCameraRotate(double theta1,double theta2){
+    TimeDivider *p1,*p2;
+    p1 = TimeDivider::TimeDivide(this->controller->theta1  ,theta1,500);
+    p2 = TimeDivider::TimeDivide(this->controller->theta2  ,theta2,500);
+    connect(p1,SIGNAL(PerTime()),this,SLOT(repaint()));
+    connect(p2,SIGNAL(PerTime()),this,SLOT(repaint()));
 }
 void SolidEditForm::keyReleaseEvent  (QKeyEvent *event){
     shift_pressed = event->modifiers() & Qt::ShiftModifier;
@@ -94,7 +83,7 @@ void SolidEditForm::mousePressEvent  (QMouseEvent *event){
     //操作
     if(this->state == MAKE_OBJECT::Edit){
         //移動
-        if(this->GetHangedObject()->is<CPoint>() && this->isSketcheing()){
+        if(this->GetHangedObject()->is<CPoint>() && this->controller->isSketcheing()){
             this->controller->hang_point = dynamic_cast<CPoint*>(this->GetHangedObject());
         }
     }else{
@@ -114,7 +103,7 @@ void SolidEditForm::mouseReleaseEvent(QMouseEvent *event){
             //スケッチ開始
             CFace* f = this->GetHangedFace();
             if(f != nullptr){
-                StartSketch(f);
+                this->StartSketch(f);
             }
         }else{
             //選択
@@ -142,24 +131,25 @@ void SolidEditForm::mouseMoveEvent   (QMouseEvent *event){
 
     //スクリーン位置を取得
     this->screen_pos =  Pos(event->pos().x() - this->width()/2,-(event->pos().y() - this->height()/2)) * 2 * round;
-    if(this->isSketcheing()){
+    if(this->controller->isSketcheing()){
         //スケッチ中であれば平面上に点を配置
-        Pos Line_base1 = this->screen_pos.Dot(Quat::getRotateXMatrix(theta1).Dot(Quat::getRotateYMatrix(theta2)));
-        Pos Line_base2 = Pos(0,0,1)      .Dot(Quat::getRotateXMatrix(theta1).Dot(Quat::getRotateYMatrix(theta2)));
-        this->mouse_pos  =  Collision::GetHitPosFaceToLine(this->sketch_face->GetNorm(),*this->sketch_face->GetPoint(0),
+        Pos Line_base1 = this->screen_pos.Dot(this->controller->getCameraMatrix());
+        Pos Line_base2 = Pos(0,0,1)      .Dot(this->controller->getCameraMatrix());
+        this->mouse_pos  =  Collision::GetHitPosFaceToLine(this->controller->sketch_face->GetNorm(),
+                                                           *this->controller->sketch_face->GetPoint(0),
                                                            Line_base1,Line_base2);
     }else{
         //カメラ角度から算出
-        this->mouse_pos  =  this->screen_pos.Dot(Quat::getRotateXMatrix(theta1).Dot(Quat::getRotateYMatrix(theta2)));
+        this->mouse_pos  =  this->screen_pos.Dot(this->controller->getCameraMatrix());
     }
     emit MousePosChanged(this->mouse_pos);
 
-    if(this->drag_base != Pos(0,0) && !this->isSketcheing()){
+    if(this->drag_base != Pos(0,0) && !this->controller->isSketcheing()){
         //カメラ角度変更
-        this->theta1 += static_cast<double>(event->pos().y() - this->drag_base.y())/SENSITIVITY;
-        this->theta2 += static_cast<double>(event->pos().x() - this->drag_base.x())/SENSITIVITY;
-        this->theta1 = Mod(this->theta1,2*M_PI);
-        this->theta2 = Mod(this->theta2,2*M_PI);
+        this->controller->theta1 += static_cast<double>(event->pos().y() - this->drag_base.y())/SENSITIVITY;
+        this->controller->theta2 += static_cast<double>(event->pos().x() - this->drag_base.x())/SENSITIVITY;
+        this->controller->theta1 = Mod(this->controller->theta1,2*M_PI);
+        this->controller->theta2 = Mod(this->controller->theta2,2*M_PI);
         this->drag_base = Pos(event->pos().x(),event->pos().y());
     }
 
@@ -176,7 +166,7 @@ void SolidEditForm::wheelEvent(QWheelEvent *event){
 
 void SolidEditForm::SetModel(CadModelCore* model){
     this->model = model;
-    this->controller->setModel(model);
+    this->controller->SetModel(model);
     this->make_controller->SetModel(model);
     connect(this->model,SIGNAL(UpdateAnyAction()),this,SLOT(repaint()));
 }
@@ -207,9 +197,9 @@ void SolidEditForm::resizeGL(int w, int h){
 void SolidEditForm::paintGL(){
 
     //カメラ調整
-    if(theta1 >  M_PI/2) theta1 =  M_PI/2;
-    if(theta1 < -M_PI/2) theta1 = -M_PI/2;
-    this->camera = Pos(0,0,round).Dot(Quat::getRotateXMatrix(theta1).Dot(Quat::getRotateYMatrix(theta2)));
+    if(this->controller->theta1 >  M_PI/2) this->controller->theta1 =  M_PI/2;
+    if(this->controller->theta1 < -M_PI/2) this->controller->theta1 = -M_PI/2;
+    this->camera = Pos(0,0,round).Dot(this->controller->getCameraMatrix());
     glMatrixMode(GL_PROJECTION);  //行列モード切替
     glLoadIdentity();
     glOrtho(-this->width() *(round),
@@ -238,10 +228,10 @@ void SolidEditForm::paintGL(){
 
     //描画面と色のリスト
     QVector<std::pair<CFace*,QVector<int>>> faces;
-    faces.push_back(std::make_pair(controller->getSideFace() ,QVector<int>({1,0,0})));//右側面
-    faces.push_back(std::make_pair(controller->getTopFace()  ,QVector<int>({0,1,0})));//平面
-    faces.push_back(std::make_pair(controller->getFrontFace(),QVector<int>({0,0,1})));//正面
-    faces.push_back(std::make_pair(this->sketch_face         ,QVector<int>({1,1,0})));//スケッチ面
+    faces.push_back(std::make_pair(controller->getSideFace()    ,QVector<int>({1,0,0})));//右側面
+    faces.push_back(std::make_pair(controller->getTopFace()     ,QVector<int>({0,1,0})));//平面
+    faces.push_back(std::make_pair(controller->getFrontFace()   ,QVector<int>({0,0,1})));//正面
+    faces.push_back(std::make_pair(this->controller->sketch_face,QVector<int>({1,1,0})));//スケッチ面
 
     //面の描画
     glLineWidth(2);
@@ -304,9 +294,9 @@ SolidEditForm::SolidEditForm(QWidget *parent) :
     this->controller = new SolidEditController();
     this->camera = Pos(round,0,0);
     this->center = Pos(0,0,0);
-    this->camera.x() = round * std::cos(theta2);
-    this->camera.y() = round * std::sin(theta1);
-    this->camera.z() = round * std::sin(theta2);
+    this->camera.x() = round * std::cos(this->controller->theta2);
+    this->camera.y() = round * std::sin(this->controller->theta1);
+    this->camera.z() = round * std::sin(this->controller->theta2);
 }
 
 SolidEditForm::~SolidEditForm()

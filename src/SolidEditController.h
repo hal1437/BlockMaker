@@ -6,8 +6,9 @@
 #include "Collision.h"
 #include "CadModelCore.h"
 #include "CObject/CFace.h"
+#include "TimeDivider.h"
 
-class SolidEditController:public QObject
+class SolidEditController:public QObject ,public CadModelCoreInterface
 {
     Q_OBJECT
 
@@ -16,9 +17,9 @@ class SolidEditController:public QObject
     //右側面 - YZ平面
 public:
     constexpr static int DEFAULT_FACE_LEGTH = 100;
-    CadModelCore* model;
 
     CPoint* hang_point = nullptr;//最終生成点
+    CFace* sketch_face = nullptr;  //スケッチ平面
 
     //正面を単位行列とした時の各面変換への行列
     Quat getConvertFrontToSide()const;
@@ -29,16 +30,20 @@ public:
     Quat getConvertTopToSide  ()const;
 
     CFace* base[3];//正面,平面,右側面
+    double theta1 = 0; //角度1(縦方向)
+    double theta2 = 0; //角度2(横方向)
 
     //正面を取得
     CFace* getFrontFace_impl(Quat convert,Quat invert)const;
 
 public:
-    void setModel(CadModelCore* model){this->model = model;}
 
     CFace* getFrontFace()const;//正面
     CFace* getTopFace  ()const;//平面
     CFace* getSideFace ()const;//右側面
+    Quat   getCameraMatrix()const;//カメラ変換行列取得
+
+    bool isSketcheing() const;            //スケッチ中
 
     CObject* getHangedObject(Pos center, Pos dir)const;
     CFace* getHangedFace(Pos center, Pos camera_pos)const;//直下面

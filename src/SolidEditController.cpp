@@ -89,17 +89,30 @@ CFace* SolidEditController::getTopFace  ()const{//平面
 CFace* SolidEditController::getSideFace ()const{//右側面
     return this->getFrontFace_impl(this->getConvertFrontToSide(),this->getConvertSideToFront());
 }
+Quat SolidEditController::getCameraMatrix()const{
+    return Quat::getRotateXMatrix(theta1).Dot(Quat::getRotateYMatrix(theta2));
+}
+
+bool SolidEditController::isSketcheing()const{
+    return (this->sketch_face != nullptr);
+}
 
 
 CObject* SolidEditController::getHangedObject(Pos center, Pos dir)const{
     CObject* ans = nullptr;
 
-
     //点の選択
     for(CPoint* p:this->model->GetPoints()){
         if(p->isVisible()){
             if((Pos::LineNearPoint(center,center+dir, *p) - *p).Length() < CPoint::COLLISION_SIZE && hang_point != p){
-                ans = p;
+                //スケッチ中なら、平面上に存在する条件を追加
+                if(this->isSketcheing()){
+                    if(this->sketch_face->isComprehension(*p)){
+                        ans = p;
+                    }
+                }else{
+                    ans = p;
+                }
             }
         }
     }
@@ -111,7 +124,16 @@ CObject* SolidEditController::getHangedObject(Pos center, Pos dir)const{
             const double DIVIDE = 100;
             for(int i=0;i<=DIVIDE;i++){
                 Pos p = e->GetMiddleDivide(i/DIVIDE);
-                if((Pos::LineNearPoint(center,center+dir, p) - p).Length() < CPoint::COLLISION_SIZE)ans = e;
+                if((Pos::LineNearPoint(center,center+dir, p) - p).Length() < CPoint::COLLISION_SIZE){
+                    //スケッチ中なら、平面上に存在する条件を追加
+                    if(this->isSketcheing()){
+                        if(this->sketch_face->isComprehension(*e->start) && this->sketch_face->isComprehension(*e->end)){
+                            ans = e;
+                        }
+                    }else{
+                        ans = e;
+                    }
+                }
             }
         }
     }

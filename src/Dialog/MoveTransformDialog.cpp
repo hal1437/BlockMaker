@@ -34,7 +34,7 @@ QVector<CPoint*> MoveTransformDialog::GetSelectedPoint(){
 
 void MoveTransformDialog::AbsoluteMove(Pos pos){
     QVector<CPoint*> pp = this->GetSelectedPoint();
-    for(CPoint* p :pp)*p = (pos - *p);
+    for(CPoint* p :pp)*p = pos;
 }
 
 void MoveTransformDialog::RelativeMove(Pos diff){

@@ -15,7 +15,7 @@ namespace Ui {
 class SolidEditForm;
 }
 
-class SolidEditForm : public QOpenGLWidget,public CadModelCoreInterface
+class SolidEditForm : public QOpenGLWidget ,public CadModelCoreInterface
 {
     Q_OBJECT
 
@@ -28,14 +28,10 @@ private:
     Pos screen_pos; //スクリーン座標
 
     MAKE_OBJECT state = MAKE_OBJECT::Edit;    //生成種類
-    CFace* sketch_face = nullptr;  //スケッチ平面
-    Quat sketch_mat;   //スケッチ生成行列
 
     Pos camera; //カメラ位置
     Pos center; //カメラ注意点
     double round = 1;  //半径
-    double theta1 = 0; //角度1(縦方向)
-    double theta2 = 0; //角度2(横方向)
 
     bool shift_pressed = false; //shiftボタン
     bool ctrl_pressed  = false; //ctrlボタン
@@ -46,15 +42,9 @@ private:
 
     void MakeObject(); //オブジェクト生成
 
-    void StartSketch(CFace* face);  //スケッチ開始
-    bool isSketcheing();            //スケッチ中
     CFace*   GetHangedFace  ();     //直下面を取得
     CObject* GetHangedObject();     //直下オブジェクトを取得
     void ColorSelect(CObject* obj); //オブジェクト色選択
-
-public:
-    //カメラ方向セット
-    void setCameraRotate(double theta1, double theta2);
 
 public:
     void keyPressEvent    (QKeyEvent *event);
@@ -70,6 +60,8 @@ public:
     void paintGL();             //  描画処理
 public slots:
 
+    void StartSketch(CFace* face);
+    void setCameraRotate(double theta1,double theta2);
     void SetState(MAKE_OBJECT state); //生成種類設定
     void CEdgeChanged(QVector<CEdge*> e);
     void CBlockChanged(QVector<CBlock*> e);
