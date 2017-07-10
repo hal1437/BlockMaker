@@ -89,6 +89,12 @@ bool CPoint::ControlPoint(bool f){
     control_point = f;
     return true;
 }
+QVector<CPoint*> CPoint::GetAllNodes(){
+    QVector<CPoint*> ans;
+    ans.push_back(this);
+    return ans;
+}
+
 
 Pos CPoint::GetNearPos(const Pos&)const{
     return *this;

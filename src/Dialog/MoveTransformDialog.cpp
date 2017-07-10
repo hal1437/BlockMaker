@@ -16,6 +16,32 @@ MoveTransformDialog::~MoveTransformDialog()
     delete ui;
 }
 
+QVector<CPoint*> MoveTransformDialog::GetSelectedPoint(){
+    QVector<CPoint*> ans;
+    QVector<CObject*> select = this->model->GetSelected();
+    for(CObject* s: select){
+        for(CPoint* p:s->GetAllNodes()){
+            ans.push_back(p);
+        }
+    }
+
+    //排他
+    std::sort(ans.begin(),ans.end());
+    ans.erase(std::unique(ans.begin(),ans.end()),ans.end());
+
+    return ans;
+}
+
+void MoveTransformDialog::AbsoluteMove(Pos pos){
+    QVector<CPoint*> pp = this->GetSelectedPoint();
+    for(CPoint* p :pp)*p = (pos - *p);
+}
+
+void MoveTransformDialog::RelativeMove(Pos diff){
+    QVector<CPoint*> pp = this->GetSelectedPoint();
+    for(CPoint* p :pp)*p += diff;
+}
+
 
 void MoveTransformDialog::Accept(){
     Pos value = Pos(this->ui->XSpinBox->value(),
@@ -23,16 +49,10 @@ void MoveTransformDialog::Accept(){
                     this->ui->ZSpinBox->value());
 
     if(this->ui->RelativeRadio->isChecked()){
-        for(CObject* obj : this->model->GetSelected()){
-            obj->Move(value);
-        }
+        RelativeMove(value);
     }
     if(this->ui->AbsoluteRadio->isChecked()){
-        for(CObject* obj : this->model->GetSelected()){
-            Pos p = Pos(0,0);
-            if(obj->is<CPoint>())p = *dynamic_cast<CPoint*>(obj);
-            obj->Move(value - p);
-        }
+        AbsoluteMove(value);
     }
     for(CBlock* block:this->model->GetBlocks()){
         block->RefreshDividePoint();

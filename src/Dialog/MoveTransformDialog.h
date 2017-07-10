@@ -14,13 +14,15 @@ class MoveTransformDialog : public QDialog,public CadModelCoreInterface
 
 private:
     Ui::MoveTransformDialog *ui;
-
+    QVector<CPoint*> GetSelectedPoint();
 public:
 
     explicit MoveTransformDialog(QWidget *parent = 0);
     ~MoveTransformDialog();
 
 public slots:
+    void AbsoluteMove(Pos pos);
+    void RelativeMove(Pos diff);
     void Accept();
 
 signals:

@@ -332,6 +332,21 @@ CBlock::CBlock(QObject* parent):
     this->name[5] = "Back";
 }
 
+
+QVector<CPoint*> CBlock::GetAllNodes(){
+    QVector<CPoint*> ans;
+    for(CFace* f:this->faces){
+        for(CPoint* p:f->GetAllNodes()){
+            ans.push_back(p);
+        }
+    }
+
+    std::sort(ans.begin(),ans.end());
+    ans.erase(std::unique(ans.begin(),ans.end()),ans.end());
+
+    return ans;
+}
+
 CBlock::~CBlock()
 {
 

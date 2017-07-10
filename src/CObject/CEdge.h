@@ -33,9 +33,10 @@ public:
     virtual Pos     GetMiddleDivide(double t)const = 0;    //補完点
 
     //全ノード取得
-    int     GetPosSequenceCount()const;
-    CPoint* GetPosSequence(int index)const;
-    void    SetPosSequence(CPoint* pos,int index);
+    virtual QVector<CPoint*> GetAllNodes();//全ての構成点を取得
+    virtual int     GetPosSequenceCount()const;
+    virtual CPoint* GetPosSequence(int index)const;
+    virtual void    SetPosSequence(CPoint* pos,int index);
 
     //近接点
     virtual Pos GetNearPos (const Pos& hand)const = 0;

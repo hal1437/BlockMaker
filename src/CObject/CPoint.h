@@ -26,6 +26,8 @@ public:
     virtual bool isLock()const;  //固定点
     virtual bool isControlPoint()const;  //作用点
     virtual bool ControlPoint(bool f);   //作用点設定
+    virtual QVector<CPoint*> GetAllNodes();//全ての構成点を取得
+
 
     //近接点
     virtual Pos GetNearPos (const Pos& hand)const;

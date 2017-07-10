@@ -24,11 +24,13 @@ public:
     CPoint* GetBasePoint()const;        //基準点取得
     CPoint* GetPoint(int index)const;   //構成点取得
     CEdge*  GetEdgeSeqence(int index);   //ループエッジ取得
+    virtual QVector<CPoint*> GetAllNodes();//全ての構成点を取得
 
     virtual bool Draw(QPainter& painter)const;//描画関数
     virtual bool DrawGL(Pos camera,Pos center)const;//三次元描画関数
     virtual bool DrawNormArrowGL()const;//三次元法線ベクトル描画関数
     virtual bool Move(const Pos& diff);//移動関数
+
 
 
     //近接点

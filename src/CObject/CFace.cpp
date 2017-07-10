@@ -133,6 +133,17 @@ CEdge* CFace::GetEdgeSeqence(int index){
                (edge->start == p2 && edge->start == p1);
     });
 }
+QVector<CPoint*> CFace::GetAllNodes(){
+    QVector<CPoint*> ans;
+    for(CEdge* e:this->edges){
+        for(CPoint* p:e->GetAllNodes()){
+            ans.push_back(p);
+        }
+    }
+    std::sort(ans.begin(),ans.end());
+    ans.erase(std::unique(ans.begin(),ans.end()),ans.end());
+    return ans;
+}
 
 bool CFace::Draw(QPainter& painter)const{
     return true;

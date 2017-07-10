@@ -37,6 +37,14 @@ Pos CEdge::GetNearLine(const Pos& pos1,const Pos& pos2)const{
     }
     return ans;
 }
+QVector<CPoint*> CEdge::GetAllNodes(){
+    QVector<CPoint*> ans;
+    for(int i=0;i<this->GetPosSequenceCount();i++){
+        ans.push_back(this->GetPosSequence(i));
+    }
+    return ans;
+}
+
 void CEdge::SetPosSequence(CPoint* pos,int index){
     if     (index == 0                        )this->SetStartPos(pos);
     else if(index == GetPosSequenceCount() - 1)this->SetEndPos(pos);

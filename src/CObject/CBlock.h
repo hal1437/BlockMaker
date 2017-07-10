@@ -86,6 +86,7 @@ public:
     QVector<CEdge* > GetAllEdges()const;
     CPoint* GetClockworksPos (int index) const;//番号順点取得
     CEdge* GetClockworksEdge(int index) const;//番号順線取得
+    virtual QVector<CPoint*> GetAllNodes();//全ての構成点を取得
 
     CBlock(QObject* parent=nullptr);
     virtual ~CBlock();
