@@ -174,8 +174,16 @@ bool CadModelCore::ImportFoamFile(QString filename){
 bool CadModelCore::SelectedClear(){
     this->Selected.clear();
     emit UpdateSelected();
+    emit UpdateAnyAction();
 }
 
+void CadModelCore::UpdateObject(){
+    emit UpdateAnyObject();
+}
+
+void CadModelCore::UpdateAction(){
+    emit UpdateAnyAction();
+}
 
 
 CadModelCore::CadModelCore(QWidget *parent):
@@ -183,6 +191,17 @@ CadModelCore::CadModelCore(QWidget *parent):
 {
     this->origin = new CPoint(Pos(0,0,0));
     this->origin->ControlPoint(true);
+    connect(this,SIGNAL(UpdatePoints()),this,SLOT(UpdateObject()));
+    connect(this,SIGNAL(UpdateEdges ()),this,SLOT(UpdateObject()));
+    connect(this,SIGNAL(UpdateFaces ()),this,SLOT(UpdateObject()));
+    connect(this,SIGNAL(UpdateBlocks()),this,SLOT(UpdateObject()));
+    connect(this,SIGNAL(UpdatePoints()),this,SLOT(UpdateObject()));
+    connect(this,SIGNAL(SelectObjectChanged()),this,SLOT(UpdateAction()));
+    connect(this,SIGNAL(UpdateAnyObject    ()),this,SLOT(UpdateAction()));
+    connect(this,SIGNAL(UpdateRestraints   ()),this,SLOT(UpdateAction()));
+    connect(this,SIGNAL(UpdateRestraints   ()),this,SLOT(UpdateAction()));
+    connect(this,SIGNAL(UpdateDimensions   ()),this,SLOT(UpdateAction()));
+
 }
 
 CadModelCore::~CadModelCore()

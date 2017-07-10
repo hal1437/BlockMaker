@@ -7,29 +7,33 @@ CREATE_RESULT MakeObjectController::MakeJoint(CEdge* obj,Pos pos,CObject* merge)
     if(merge == nullptr){
         //新たに作成
         new_point = new CPoint(pos,obj);
-        this->model->AddPoints(new_point);
         //生成点を持つ
         this->last_point = new_point;
     }else if(merge->is<CPoint>()){
+        //持ち手を破棄
+        this->model->RemovePoints(this->last_point);
         //mergeを点として使用
         new_point = new CPoint(pos,obj);
-        //new_point = dynamic_cast<CPoint*>(merge);
         //すり替え
         if(this->making_step == ENDLESS){
             obj->SetMiddle(dynamic_cast<CPoint*>(merge),obj->GetPosSequenceCount()-2);
         }else{
-            if(obj->is<CEdge>()){
-                dynamic_cast<CEdge*>(obj)->start = dynamic_cast<CPoint*>(merge);
-            }else{
-                obj->SetMiddle(dynamic_cast<CPoint*>(merge),this->making_count);
+            //円弧は例外
+            if(obj->is<CArc>() && this->making_count==1){
+                obj->SetStartPos(dynamic_cast<CPoint*>(merge));
+            }else if(obj->is<CArc>() && this->making_count==0){
+                obj->SetMiddle(dynamic_cast<CPoint*>(merge),0);
+            }
+            else{
+                obj->SetPosSequence(dynamic_cast<CPoint*>(merge),this->making_count);
             }
         }
         this->last_point = new_point;
     }else{
         //mergeの近接点を作成
         new_point = new CPoint(merge->GetNearPos(pos));
-        this->model->AddPoints(new_point);
     }
+    this->model->AddPoints(new_point);
 
     //実行
     return obj->Create(new_point);
@@ -46,12 +50,15 @@ void MakeObjectController::StartMaking(MAKE_OBJECT type,Pos pos,CObject* merge){
         if(type == MAKE_OBJECT::Line  )this->making_object = new CLine  ();
         if(type == MAKE_OBJECT::Arc   )this->making_object = new CArc   ();
         if(type == MAKE_OBJECT::Spline)this->making_object = new CSpline();
-        //startを作成する。
-        this->making_step = MakeJoint(this->making_object,pos,merge);
 
         //持ち点を作成
         this->last_point = new CPoint(pos,this->making_object);
         this->making_object->Create(this->last_point);
+        this->model->AddPoints(this->last_point);
+
+        //startを作成する。
+        this->making_step = MakeJoint(this->making_object,pos,merge);
+
 
         //モデルに追加
         this->model->AddPoints(this->last_point);
@@ -96,6 +103,7 @@ void MakeObjectController::Making(MAKE_OBJECT type, Pos pos, CObject* merge){
             StepMaking(pos,merge);
         }
     }
+    this->model->UpdateObject();
 }
 
 void MakeObjectController::Escape(){

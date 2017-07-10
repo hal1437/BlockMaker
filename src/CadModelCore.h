@@ -39,6 +39,13 @@ public:
     //選択解除
     bool SelectedClear();
 
+public slots:
+    //UpdateAnyObjectを呼び出す
+    void UpdateObject();
+
+    //UpdateAnyActionを呼び出す
+    void UpdateAction();
+
 public:
     explicit CadModelCore(QWidget *parent = 0);
     ~CadModelCore();
@@ -52,6 +59,7 @@ signals:
     void UpdateBlocks    ();
     void UpdateRestraints();
     void UpdateDimensions();
+    void UpdateAnyObject ();
     void UpdateAnyAction ();
 };
 

@@ -8,11 +8,11 @@ double CArc::GetRound()const{
 CREATE_RESULT CArc::Create(CPoint *pos){
     if(this->center == nullptr){
         this->SetCenterPos(pos);
-        this->start = this->center;
-    }else if(this->start == this->center){
+        this->start = nullptr;
+    }else if(this->start == nullptr){
         this->SetStartPos(pos);
-        this->end = this->start;
-    }else if(this->end == this->start){
+        this->end = nullptr;
+    }else if(this->end == nullptr){
         this->SetEndPos(pos);
         //this->center = new CPoint((*this->start - *this->end) / 2 + *this->end,this->parent());
         connect(this->start ,SIGNAL(PosChanged(CPoint*,Pos)),this,SLOT(ChangePosCallback(CPoint*,Pos)));
@@ -110,13 +110,16 @@ CPoint* CArc::GetMiddle(int index)const{
 }
 void CArc::SetMiddle(CPoint* pos,int index){
     if(index == 0){
-        ChangePosCallback(pos,*this->center);
-        disconnect(this->center,SIGNAL(PosChanged(CPoint*,Pos)),this,SLOT(ChangePosCallback(CPoint*,Pos)));
+        if(this->center != nullptr){
+            ChangePosCallback(pos,*this->center);
+            disconnect(this->center,SIGNAL(PosChanged(CPoint*,Pos)),this,SLOT(ChangePosCallback(CPoint*,Pos)));
+        }
         this->center = pos;
         connect   (this->center,SIGNAL(PosChanged(CPoint*,Pos)),this,SLOT(ChangePosCallback(CPoint*,Pos)));
     }
 }
 Pos CArc::GetMiddleDivide(double t)const{
+    if(this->start == nullptr || this->end == nullptr)return *this->center;
     double angle = Pos::Angle(*this->start-*this->center,*this->end-*this->center)*PI/180;
     Pos center_base = (*this->start-*this->center).Cross(*this->end-*this->center);
     Pos ans = Pos::RodriguesRotate(*this->start-*this->center,center_base,angle*t)+*this->center; //要検討
@@ -152,6 +155,7 @@ CArc::~CArc()
 }
 
 void CArc::ChangePosCallback(CPoint *pos, Pos ){
+    if(this->start==nullptr || this->end==nullptr)return;
 
     round = (*this->center - *this->start).Length();
 

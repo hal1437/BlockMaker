@@ -116,9 +116,13 @@ void ObjectList::AddEdgeToTree(CEdge* edge,QTreeWidgetItem* parent,int index){
 }
 void ObjectList::AddPointToTree(CPoint* point,QTreeWidgetItem* parent,int index){
     QTreeWidgetItem* item = new QTreeWidgetItem();
-    item->setText(0,QString("Point:") + QString::number(index));
-    item->setIcon(0,getIcon(point));
-    item->setSelected(exist(this->CadModelCoreInterface::model->GetSelected(),point));
+    if(point == nullptr){
+        item->setText(0,QString("NullPointer:") + QString::number(index));
+    }else{
+        item->setText(0,QString("Point:") + QString::number(index));
+        item->setIcon(0,getIcon(point));
+        item->setSelected(exist(this->CadModelCoreInterface::model->GetSelected(),point));
+    }
     if(parent == nullptr)this->addTopLevelItem(item);
     else                 parent->addChild(item);
 }
@@ -184,11 +188,8 @@ void ObjectList::pullSelectedPoint(CPoint* point,QTreeWidgetItem* current){
 
 void ObjectList::SetModel(CadModelCore* m){
     this->CadModelCoreInterface::model = m;
-    connect(this->CadModelCoreInterface::model,SIGNAL(UpdatePoints  ()),this,SLOT(UpdateObject()));
-    connect(this->CadModelCoreInterface::model,SIGNAL(UpdateEdges   ()),this,SLOT(UpdateObject()));
-    connect(this->CadModelCoreInterface::model,SIGNAL(UpdateFaces   ()),this,SLOT(UpdateObject()));
-    connect(this->CadModelCoreInterface::model,SIGNAL(UpdateBlocks  ()),this,SLOT(UpdateObject()));
-    connect(this->CadModelCoreInterface::model,SIGNAL(UpdateSelected()),this,SLOT(PullSelected()));
+    connect(this->CadModelCoreInterface::model,SIGNAL(UpdateAnyObject()),this,SLOT(UpdateObject()));
+    connect(this->CadModelCoreInterface::model,SIGNAL(UpdateSelected ()),this,SLOT(PullSelected()));
 }
 
 void ObjectList::UpdateObject  (){

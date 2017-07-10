@@ -22,12 +22,10 @@ public slots:                                    \
     inline void Add##NAME(TYPE value){           \
         NAME.push_back(value);                   \
         emit Update##NAME();                     \
-        emit UpdateAnyAction();                  \
     }                                            \
     inline void Remove##NAME(TYPE value){        \
         NAME.removeAll(value);                   \
         emit Update##NAME();                     \
-        emit UpdateAnyAction();                  \
     }                                            \
 
 
