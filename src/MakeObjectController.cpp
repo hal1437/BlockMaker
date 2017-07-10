@@ -16,15 +16,24 @@ CREATE_RESULT MakeObjectController::MakeJoint(CEdge* obj,Pos pos,CObject* merge)
         new_point = new CPoint(pos,obj);
         //すり替え
         if(this->making_step == ENDLESS){
-            obj->SetMiddle(dynamic_cast<CPoint*>(merge),obj->GetPosSequenceCount()-2);
+            //終了
+            if(obj->GetMiddleCount() > 0 && obj->GetMiddle(obj->GetMiddleCount()-1) == merge){
+                obj->SetEndPos(obj->GetMiddle(obj->GetMiddleCount()-1));
+                obj->SetMiddle(nullptr,obj->GetMiddleCount()-1);
+                this->last_point=nullptr;
+                this->making_count = -1;//手放しまで完了
+                return COMPLETE;
+            }else{
+                //追加
+                //obj->SetMiddle(dynamic_cast<CPoint*>(merge),obj->GetPosSequenceCount()-2);
+                obj->SetPosSequence(dynamic_cast<CPoint*>(merge),this->making_count);
+            }
         }else{
             //円弧は例外
-            if(obj->is<CArc>() && this->making_count==1){
-                obj->SetStartPos(dynamic_cast<CPoint*>(merge));
-            }else if(obj->is<CArc>() && this->making_count==0){
-                obj->SetMiddle(dynamic_cast<CPoint*>(merge),0);
-            }
-            else{
+            if(obj->is<CArc>() && this->making_count <= 1){
+                if(this->making_count == 0)obj->SetMiddle(dynamic_cast<CPoint*>(merge),0);
+                if(this->making_count == 1)obj->SetStartPos(dynamic_cast<CPoint*>(merge));
+            }else{
                 obj->SetPosSequence(dynamic_cast<CPoint*>(merge),this->making_count);
             }
         }
@@ -63,12 +72,13 @@ void MakeObjectController::StartMaking(MAKE_OBJECT type,Pos pos,CObject* merge){
         //モデルに追加
         this->model->AddPoints(this->last_point);
         this->model->AddEdges(this->making_object);
+        this->making_count++;
     }
 }
 void MakeObjectController::StepMaking (Pos pos,CObject* merge){
-
     //ジョイントを作成しつつ継続
-    MakeJoint(this->making_object,pos,merge);
+    this->making_step = MakeJoint(this->making_object,pos,merge);
+    this->making_count++;
 }
 void MakeObjectController::EndMaking  (Pos pos,CObject* merge){
     if(merge != nullptr){
@@ -82,26 +92,22 @@ void MakeObjectController::EndMaking  (Pos pos,CObject* merge){
             this->last_point->Move(merge->GetNearPos(pos) - *this->last_point);
         }
     }
-    this->last_point = nullptr; //手放す
+    this->last_point    = nullptr; //手放す
     this->making_object = nullptr;   //作成完了
+    this->making_count  = 0;
 }
-
 void MakeObjectController::Making(MAKE_OBJECT type, Pos pos, CObject* merge){
     if(this->making_step == COMPLETE){
-        //開始
-        StartMaking(type,pos,merge);
-    }else{
-        if(this->making_step != ENDLESS)this->making_step--;//作成過程を進める
-        this->making_count++;
-
-        if(this->making_step == COMPLETE){
-            //終了
+        if(this->making_count == 0){
+            //新規開始
+            StartMaking(type,pos,merge);
+        } else{
+            //手放し処理
             EndMaking(pos,merge);
-            this->making_count=0;
-        }else{
-            //継続
-            StepMaking(pos,merge);
         }
+    }else{
+        //継続
+        StepMaking(pos,merge);
     }
     this->model->UpdateObject();
 }

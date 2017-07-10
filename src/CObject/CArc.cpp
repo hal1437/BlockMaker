@@ -6,19 +6,22 @@ double CArc::GetRound()const{
 }
 
 CREATE_RESULT CArc::Create(CPoint *pos){
+    CREATE_RESULT result = COMPLETE;
     if(this->center == nullptr){
         this->SetCenterPos(pos);
         this->start = nullptr;
+        result = CREATE_RESULT::TWOSHOT;
     }else if(this->start == nullptr){
         this->SetStartPos(pos);
         this->end = nullptr;
+        result = CREATE_RESULT::ONESHOT;
     }else if(this->end == nullptr){
         this->SetEndPos(pos);
         //this->center = new CPoint((*this->start - *this->end) / 2 + *this->end,this->parent());
         connect(this->start ,SIGNAL(PosChanged(CPoint*,Pos)),this,SLOT(ChangePosCallback(CPoint*,Pos)));
         connect(this->end   ,SIGNAL(PosChanged(CPoint*,Pos)),this,SLOT(ChangePosCallback(CPoint*,Pos)));
         connect(this->center,SIGNAL(PosChanged(CPoint*,Pos)),this,SLOT(ChangePosCallback(CPoint*,Pos)));
-
+        result = CREATE_RESULT::COMPLETE;
     }else{
         disconnect(this->start ,SIGNAL(PosChanged(CPoint*,Pos)),this,SLOT(ChangePosCallback(CPoint*,Pos)));
         disconnect(this->end   ,SIGNAL(PosChanged(CPoint*,Pos)),this,SLOT(ChangePosCallback(CPoint*,Pos)));
@@ -28,8 +31,9 @@ CREATE_RESULT CArc::Create(CPoint *pos){
         connect(this->start ,SIGNAL(PosChanged(CPoint*,Pos)),this,SLOT(ChangePosCallback(CPoint*,Pos)));
         connect(this->end   ,SIGNAL(PosChanged(CPoint*,Pos)),this,SLOT(ChangePosCallback(CPoint*,Pos)));
         connect(this->center,SIGNAL(PosChanged(CPoint*,Pos)),this,SLOT(ChangePosCallback(CPoint*,Pos)));
+        result = CREATE_RESULT::COMPLETE;
     }
-    return CREATE_RESULT::THREESHOT; //終了
+    return result; //終了
 }
 bool CArc::Draw(QPainter& painter)const{
     if(!this->isVisible())return true;

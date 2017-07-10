@@ -3,10 +3,11 @@
 CREATE_RESULT CLine::Create(CPoint *pos){
     if(this->start == nullptr){
         this->start = pos;
+        return CREATE_RESULT::ONESHOT;//あと1回
     }else{
         this->end   = pos;
+        return CREATE_RESULT::COMPLETE;//完結
     }
-    return CREATE_RESULT::TWOSHOT;//完結
 }
 bool CLine::Draw(QPainter& painter)const{
     if(!this->isVisible())return true;

@@ -128,7 +128,12 @@ CPoint* CSpline::GetMiddle(int index)const{
     return pos[index];
 }
 void CSpline::SetMiddle(CPoint* pos,int index){
-    this->pos[index] = pos;
+    if(pos==nullptr){
+        this->pos.erase(this->pos.begin()+index);
+    }else{
+        this->pos[index] = pos;
+    }
+    RefreshNodes();
 }
 Pos  CSpline::GetMiddleDivide(double t)const{
     if(pos.size() == 0)return (*end - *start)*t + *start;
@@ -158,17 +163,21 @@ Pos CSpline::GetNearPos(const Pos& pos)const{
 
 void CSpline::RefreshNodes(){
     std::vector<double> x,y,z;
-    x.push_back(this->start->x());
-    y.push_back(this->start->y());
-    z.push_back(this->start->z());
+    if(this->start != nullptr){
+        x.push_back(this->start->x());
+        y.push_back(this->start->y());
+        z.push_back(this->start->z());
+    }
     for(CPoint* p : this->pos){
         x.push_back(p->x());
         y.push_back(p->y());
         z.push_back(p->z());
     }
-    x.push_back(this->end->x());
-    y.push_back(this->end->y());
-    z.push_back(this->end->z());
+    if(this->end != nullptr){
+        x.push_back(this->end->x());
+        y.push_back(this->end->y());
+        z.push_back(this->end->z());
+    }
     xs.init(x);
     ys.init(y);
     zs.init(z);
