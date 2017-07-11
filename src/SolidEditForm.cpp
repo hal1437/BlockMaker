@@ -142,7 +142,14 @@ void SolidEditForm::mouseMoveEvent   (QMouseEvent *event){
         //カメラ角度から算出
         this->mouse_pos  =  this->screen_pos.Dot(this->controller->getCameraMatrix());
     }
-    emit MousePosChanged(this->mouse_pos);
+    CObject* hang = this->GetHangedObject();
+    if(hang == nullptr){
+        emit MousePosChanged(this->mouse_pos);
+    }else if (!hang->is<CPoint>()){
+        emit MousePosChanged(hang->GetNearPos(this->mouse_pos));
+    }else{
+        emit MousePosChanged(*dynamic_cast<CPoint*>(hang));
+    }
 
     if(this->drag_base != Pos(0,0) && !this->controller->isSketcheing()){
         //カメラ角度変更

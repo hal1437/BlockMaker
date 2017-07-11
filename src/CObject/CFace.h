@@ -2,6 +2,7 @@
 #define CFACE_H
 
 #include "CObject/CEdge.h"
+#include "CObject/CLine.h"
 
 //平面オブジェクト
 class CFace : public CObject
@@ -23,7 +24,7 @@ public:
     Pos  GetNorm()const ;               //法線ベクトル取得
     CPoint* GetBasePoint()const;        //基準点取得
     CPoint* GetPoint(int index)const;   //構成点取得
-    CEdge*  GetEdgeSeqence(int index);   //ループエッジ取得
+    CEdge*  GetEdgeSeqence(int index) const;   //ループエッジ取得
     virtual QVector<CPoint*> GetAllNodes();//全ての構成点を取得
 
     virtual bool Draw(QPainter& painter)const;//描画関数

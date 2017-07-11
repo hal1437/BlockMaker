@@ -124,13 +124,13 @@ CPoint* CFace::GetPoint(int index)const{
     return ans;
 }
 
-CEdge* CFace::GetEdgeSeqence(int index){
+CEdge* CFace::GetEdgeSeqence(int index)const{
     //index番目の点とindex+1番目の点を含む点を持つエッジを探す
     return *std::find_if(this->edges.begin(),this->edges.end(),[&](CEdge* edge){
         CPoint*  p1 = this->GetPoint(index);
-        CPoint*  p2 = this->GetPoint(index+1);
-        return (edge->start == p1 && edge->start == p2) ||
-               (edge->start == p2 && edge->start == p1);
+        CPoint*  p2 = this->GetPoint((index+1)%this->edges.size());
+        return (edge->start == p1 && edge->end == p2) ||
+               (edge->start == p2 && edge->end == p1);
     });
 }
 QVector<CPoint*> CFace::GetAllNodes(){
@@ -158,26 +158,30 @@ bool CFace::DrawGL(Pos,Pos)const{
         glDepthMask(GL_FALSE);
 
         //中を塗る
-        glBegin(GL_POLYGON);
-        for(int i=0;i<this->edges.size();i++){
-            CPoint* p1 = this->GetPoint(i);
-            CPoint* p2 = this->GetPoint((i+1)%this->edges.size());
-            //エッジを特定
-            CEdge* current = *std::find_if(this->edges.begin(),this->edges.end(),[&](CEdge* v){
-                return (v->start==p1 &&v->end==p2)||(v->start==p2 &&v->end==p1);
-            });
-            //正方向ループ
-            if(p1 == current->start){
-                for(double j=0;j<=1;j+=1.0/CEdge::LINE_NEAR_DIVIDE){
-                    Pos p = current->GetMiddleDivide(j);
-                    glVertex3f(p.x(),p.y(), p.z());
-                }
-            }else{
-                for(double j=1;j>=0;j-=1.0/CEdge::LINE_NEAR_DIVIDE){
-                    Pos p = current->GetMiddleDivide(j);
-                    glVertex3f(p.x(),p.y(), p.z());
+        QVector<std::pair<int,int>> index;
+        const int LINE_DIVIDE = 30;
+
+        CEdge* ee[] = {this->GetEdgeSeqence(0),
+                       this->GetEdgeSeqence(1),
+                       this->GetEdgeSeqence(2),
+                       this->GetEdgeSeqence(3)};
+        glBegin(GL_QUAD_STRIP);
+        for(double i=1.0/LINE_DIVIDE;i<1.0;i += 1.0/LINE_DIVIDE){
+            if(i>1)i=1;
+            if(!ee[0]->is<CLine>() && !ee[2]->is<CLine>())index.push_back(std::make_pair(0,2));
+            if(!ee[1]->is<CLine>() && !ee[3]->is<CLine>())index.push_back(std::make_pair(1,3));
+            if(index.empty())index.push_back(std::make_pair(0,2));
+
+            for(std::pair<int,int> p : index){
+                Pos pp[] = {ee[p.first ]->GetMiddleDivide(i),
+                            ee[p.second]->GetMiddleDivide(i)};
+                for(int k=0;k<2;k++){
+                    glVertex3f(pp[k].x(),
+                               pp[k].y(),
+                               pp[k].z());
                 }
             }
+            index.clear();
         }
         glEnd();
         glDepthMask(GL_TRUE);
@@ -191,8 +195,8 @@ bool CFace::DrawGL(Pos,Pos)const{
         for(int i=0;i<this->edges.size();i++){
             glVertex3f(this->GetPoint(i)->x(),this->GetPoint(i)->y(), this->GetPoint(i)->z());
         }
+        glEnd();
     }
-    glEnd();
 
     return true;
 }

@@ -87,11 +87,32 @@ bool CBlock::DrawGL(Pos,Pos)const{
 
     for(CFace* face:this->faces){
         //中を塗る
-        glBegin(GL_TRIANGLE_FAN);
-        for(int i=0;i<face->edges.size();i++){
-            glVertex3f(face->GetPoint(i)->x(),face->GetPoint(i)->y(), face->GetPoint(i)->z());
+        QVector<std::pair<int,int>> index;
+        const int LINE_DIVIDE = 30;
+        for(double i=1.0/LINE_DIVIDE;i<1;i += 1.0/LINE_DIVIDE){
+            if(i>1)i=1;
+            CEdge* ee[] = {face->GetEdgeSeqence(0),
+                           face->GetEdgeSeqence(1),
+                           face->GetEdgeSeqence(2),
+                           face->GetEdgeSeqence(3)};
+            if(!ee[0]->is<CLine>() && !ee[2]->is<CLine>())index.push_back(std::make_pair(0,2));
+            if(!ee[1]->is<CLine>() && !ee[3]->is<CLine>())index.push_back(std::make_pair(1,3));
+            if(index.empty())index.push_back(std::make_pair(0,2));
+
+            glBegin(GL_TRIANGLE_STRIP);
+            for(std::pair<int,int>p:index){
+                Pos pp[] = {ee[p.first]->GetMiddleDivide(i),
+                            ee[p.first]->GetMiddleDivide(i - 1.0/LINE_DIVIDE),
+                            ee[p.second]->GetMiddleDivide(i - 1.0/LINE_DIVIDE),
+                            ee[p.second]->GetMiddleDivide(i)};
+                for(int k=0;k<4;k++){
+                    glVertex3f(pp[k].x(),
+                               pp[k].y(),
+                               pp[k].z());
+                }
+            }
+            glEnd();
         }
-        glEnd();
     }
 
     if(this->isVisibleMesh()){
