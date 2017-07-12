@@ -60,6 +60,11 @@ void SolidEditForm::StartSketch(CFace* face){
     Pos cross = face->GetNorm();
     cross = cross.GetNormalize();
 
+    //法線ベクトルを近い方に変更
+    if(cross.DotPos(this->camera - this->center) <  0){
+        cross = -cross;
+    }
+
     double theta1_ = std::atan2(cross.y(),std::sqrt(cross.x()*cross.x()+cross.z()*cross.z()));
     double theta2_ = std::atan2(-cross.x(),cross.z());
 
