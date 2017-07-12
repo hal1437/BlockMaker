@@ -64,8 +64,13 @@ void MainWindow::keyReleaseEvent(QKeyEvent* event){
 void MainWindow::CtrlZ(){
 }
 void MainWindow::Delete(){
-    ui->ObjectDock->adjustSize();
+    for(CObject* obj : this->model->GetSelected()){
+        this->model->Delete(obj);
+    }
 
+    this->ui->ObjectTree->UpdateObject();
+    this->ui->SolidEdit->repaint();
+    this->model->SelectedClear();
     repaint();
     RefreshUI();
 }

@@ -284,8 +284,11 @@
    </property>
   </action>
   <action name="actionDelete">
-   <property name="enabled">
+   <property name="checkable">
     <bool>false</bool>
+   </property>
+   <property name="enabled">
+    <bool>true</bool>
    </property>
    <property name="text">
     <string>Delete</string>

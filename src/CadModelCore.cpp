@@ -200,6 +200,28 @@ QVector<CEdge*>  CadModelCore::GetParent(CPoint* child)const{
     }
     return ans;
 }
+void CadModelCore::Delete(CBlock*  obj){
+    this->GetBlocks().removeAll(obj);
+}
+void CadModelCore::Delete(CFace*  obj){
+    for(CBlock* parent:this->GetParent(obj))this->Delete(parent);
+    this->GetFaces().removeAll(obj);
+}
+void  CadModelCore::Delete(CEdge*  obj){
+    for(CFace* parent:this->GetParent(obj))this->Delete(parent);
+    this->GetEdges().removeAll(obj);
+}
+void  CadModelCore::Delete(CPoint* obj){
+    for(CEdge* parent:this->GetParent(obj))this->Delete(parent);
+    this->GetPoints().removeAll(obj);
+}
+void CadModelCore::Delete(CObject* obj){
+    if(obj->is<CPoint>())this->Delete(dynamic_cast<CPoint*>(obj));
+    if(obj->is<CEdge> ())this->Delete(dynamic_cast<CEdge* >(obj));
+    if(obj->is<CFace> ())this->Delete(dynamic_cast<CFace* >(obj));
+    if(obj->is<CBlock>())this->Delete(dynamic_cast<CBlock*>(obj));
+}
+
 
 
 bool CadModelCore::SelectedClear(){

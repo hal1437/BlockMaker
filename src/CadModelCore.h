@@ -41,6 +41,13 @@ public:
     QVector<CFace*>  GetParent(CEdge*  child)const;
     QVector<CEdge*>  GetParent(CPoint* child)const;
 
+    //削除
+    void Delete(CBlock* obj);
+    void Delete(CFace*  obj);
+    void Delete(CEdge*  obj);
+    void Delete(CPoint* obj);
+    void Delete(CObject* obj);
+
     //選択解除
     bool SelectedClear();
 
