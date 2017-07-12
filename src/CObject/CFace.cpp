@@ -21,6 +21,7 @@ bool CFace::Creatable(QVector<CObject*> lines){
     points.erase(std::unique(points.begin(),points.end()),points.end());
 
     //同一平面テスト
+    /*
     Pos cross = (*points[1] - *points[0]).Cross
                 (*points[2] - *points[0]);
     for(int i=3;i<point_maps.size();i++){
@@ -28,7 +29,7 @@ bool CFace::Creatable(QVector<CObject*> lines){
         if(!NearlyEqual(d,0)){
             return false;
         }
-    }
+    }*/
     return true;
 }
 
