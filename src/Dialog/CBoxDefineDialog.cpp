@@ -99,16 +99,13 @@ void CBoxDefineDialog::SetBoundaryName(BoundaryDir dir,QString name){
 void CBoxDefineDialog::SetBoundaryType(BoundaryDir dir,BoundaryType type){
     this->ConvertDirToCombo(dir)->setCurrentText(ConvertBoundaryToString(type));
 }
-
-void CBoxDefineDialog::ConnectionLock(BoundaryDir dir,bool lock){
-    //ロック
-    if(lock == true){
-        this->ConvertDirToCombo(dir)->setCurrentText(ConvertBoundaryToString(BoundaryType::None));
-        this->ConvertDirToCombo(dir)->setEnabled(true);
-    }else{
-        this->ConvertDirToCombo(dir)->setEnabled(false);
-    }
+bool CBoxDefineDialog::GetFaceContinuous(BoundaryDir dir)const{
+    CFace* f = this->block->GetFaceFormDir(dir);
+    int count = this->model->GetParent(f).size();
+    if(exist(this->model->GetBlocks(),this->block))return count > 1;
+    else return count > 0;
 }
+
 
 //エラー判定
 QString CBoxDefineDialog::FormatError()const{
@@ -156,12 +153,22 @@ void CBoxDefineDialog::ImportCBlock(){
         this->ConvertDirToCombo   (static_cast<BoundaryDir>(i))->setCurrentText(this->ConvertBoundaryToString(this->block->boundery[i]));
         types_log[i] = this->block->boundery[i];
     }
-    this->ui->XspinBox->setValue(this->block->div[0]);
-    this->ui->YspinBox->setValue(this->block->div[1]);
-    this->ui->ZspinBox->setValue(this->block->div[2]);
+    this->ui->XspinBox->setValue(this->block->div[0] == 0 ? 10 :this->block->div[0]);
+    this->ui->YspinBox->setValue(this->block->div[1] == 0 ? 10 :this->block->div[1]);
+    this->ui->ZspinBox->setValue(this->block->div[2] == 0 ? 10 :this->block->div[2]);
     this->SetGradigngType(this->block->grading);
     for(int i=0;i<(this->GetGradigngType() == GradingType::SimpleGrading ? 3 : 12);i++){
-        this->grading_args[i]->setValue(this->block->grading_args[i]);
+        if(i >= this->block->grading_args.size())this->grading_args[i]->setValue(1.0);
+        else this->grading_args[i]->setValue(this->block->grading_args[i]);
+    }
+    for(int i=0;i<6;i++){
+        types_log[i] = static_cast<BoundaryType>(0);
+        if(this->GetFaceContinuous(static_cast<BoundaryDir>(i))){
+            this->ConvertDirToCombo(static_cast<BoundaryDir>(i))->setCurrentText(ConvertBoundaryToString(BoundaryType::None));
+            this->ConvertDirToCombo(static_cast<BoundaryDir>(i))->setEnabled(false);
+            this->ConvertDirToNameEdit(static_cast<BoundaryDir>(i))->setText("連続面");
+            this->ConvertDirToNameEdit(static_cast<BoundaryDir>(i))->setEnabled(false);
+        }
     }
 }
 
@@ -232,9 +239,6 @@ CBoxDefineDialog::CBoxDefineDialog(QWidget *parent) :
         this->ui->GradingArgsLayout->addWidget(this->grading_args[i],i/4,i%4);
         if(i >= 3)this->grading_args[i]->hide();
     }
-    for(int i=0;i<6;i++){
-        types_log[i] = static_cast<BoundaryType>(0);
-    }
 }
 
 CBoxDefineDialog::~CBoxDefineDialog()
@@ -262,6 +266,21 @@ void CBoxDefineDialog::AcceptProxy(){
             this->block->grading_args[i] = this->grading_args[i]->value();
         }
         this->block->RefreshDividePoint();
+
+        //境界条件Noneを他のBlockに伝達
+        for(int i =0;i<6;i++){
+            if(this->block->boundery[static_cast<BoundaryDir>(i)] == BoundaryType::None){
+                CFace* face = this->block->GetFaceFormDir(static_cast<BoundaryDir>(i));
+                for(CBlock* block:this->model->GetParent(face)){
+                    for(int j=0;j<6;j++){
+                        if(block->GetFaceFormDir(static_cast<BoundaryDir>(j)) == face){
+                            block->boundery[static_cast<BoundaryDir>(j)] = BoundaryType::None;
+                            block->name    [static_cast<BoundaryDir>(j)] = "連続面";
+                        }
+                    }
+                }
+            }
+        }
 
         accept();
     }

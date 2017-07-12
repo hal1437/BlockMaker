@@ -171,6 +171,37 @@ bool CadModelCore::ImportFoamFile(QString filename){
     return true;
 }
 
+QVector<CBlock*> CadModelCore::GetParent(CFace*  child)const{
+    QVector<CBlock*>ans;
+    for(CBlock* block:this->GetBlocks()){
+        for(CFace* face : block->faces){
+            if(face == child){
+                ans.push_back(block);
+                break;
+            }
+        }
+    }
+    return ans;
+}
+QVector<CFace*>  CadModelCore::GetParent(CEdge*  child)const{
+    QVector<CFace*>ans;
+    for(CFace* face:this->GetFaces()){
+        for(CEdge* edge : face->edges){
+            if(edge == child)ans.push_back(face);
+            break;
+        }
+    }
+    return ans;
+}
+QVector<CEdge*>  CadModelCore::GetParent(CPoint* child)const{
+    QVector<CEdge*>ans;
+    for(CEdge* edge:this->GetEdges()){
+        if(edge->start == child || edge->end == child)ans.push_back(edge);
+    }
+    return ans;
+}
+
+
 bool CadModelCore::SelectedClear(){
     this->Selected.clear();
     emit UpdateSelected();

@@ -36,6 +36,11 @@ public:
     bool ExportFoamFile(QString filename)const;
     bool ImportFoamFile(QString filename);
 
+    //親取得
+    QVector<CBlock*> GetParent(CFace*  child)const;
+    QVector<CFace*>  GetParent(CEdge*  child)const;
+    QVector<CEdge*>  GetParent(CPoint* child)const;
+
     //選択解除
     bool SelectedClear();
 

@@ -5,6 +5,7 @@
 #include <QComboBox>
 #include <QLineEdit>
 #include <QSpinBox>
+#include <CadModelCore.h>
 #include "CObject/CBlock.h"
 
 #define DEFINE_BOX_DIALOG_NAME_SLOTS(DIR,INDEX)   \
@@ -22,7 +23,7 @@ class CBoxDefineDialog;
 }
 
 
-class CBoxDefineDialog : public QDialog
+class CBoxDefineDialog : public QDialog,public CadModelCoreInterface
 {
     Q_OBJECT
 
@@ -52,8 +53,9 @@ public:
     void SetBoundaryType(BoundaryDir dir,BoundaryType type);
     QString GetVertices (BoundaryDir dir)const;
 
-    //接続モード
-    void ConnectionLock(BoundaryDir dir,bool lock);
+    //面取得
+    CFace* GeFaceFormDir(BoundaryDir dir);
+    bool GetFaceContinuous(BoundaryDir dir)const;
 
     //エラー判定
     QString FormatError()const;

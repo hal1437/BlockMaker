@@ -229,7 +229,11 @@ void SolidEditForm::paintGL(){
     //オブジェクト描画
     glColor3f(0,0,1);
     for(CBlock* block : this->model->GetBlocks())block->DrawGL(this->camera,this->center);
-    for(CFace*  face  : this->model->GetFaces ())face ->DrawGL(this->camera,this->center);
+    for(CFace*  face  : this->model->GetFaces ()){
+        if(this->model->GetParent(face).size()==0){
+            face ->DrawGL(this->camera,this->center);
+        }
+    }
     for(CEdge*  edge  : this->model->GetEdges ())edge ->DrawGL(this->camera,this->center);
     for(CPoint* pos   : this->model->GetPoints())pos  ->DrawGL(this->camera,this->center);
 

@@ -184,6 +184,7 @@ void MainWindow::MakeRestraint(){
 
 void MainWindow::MakeBlock(){
     CBoxDefineDialog* diag = new CBoxDefineDialog();
+    diag->SetModel(this->model);
     if(this->model->GetSelected().size() == 1 && this->model->GetSelected()[0]->is<CBlock>()){
         diag->block = dynamic_cast<CBlock*>(this->model->GetSelected()[0]);
         diag->ImportCBlock();
@@ -197,6 +198,7 @@ void MainWindow::MakeBlock(){
             connect(block->GetClockworksPos(i),SIGNAL(PosChanged()),block,SLOT(RefreshDividePoint()));
         }
         diag->block = block;
+        diag->ImportCBlock();
     }
     if(diag->exec()){
         diag->ExportCBlock();

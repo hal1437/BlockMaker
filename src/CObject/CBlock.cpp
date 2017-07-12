@@ -87,32 +87,11 @@ bool CBlock::DrawGL(Pos,Pos)const{
 
     for(CFace* face:this->faces){
         //中を塗る
-        QVector<std::pair<int,int>> index;
-        const int LINE_DIVIDE = 30;
-        for(double i=1.0/LINE_DIVIDE;i<1;i += 1.0/LINE_DIVIDE){
-            if(i>1)i=1;
-            CEdge* ee[] = {face->GetEdgeSeqence(0),
-                           face->GetEdgeSeqence(1),
-                           face->GetEdgeSeqence(2),
-                           face->GetEdgeSeqence(3)};
-            if(!ee[0]->is<CLine>() && !ee[2]->is<CLine>())index.push_back(std::make_pair(0,2));
-            if(!ee[1]->is<CLine>() && !ee[3]->is<CLine>())index.push_back(std::make_pair(1,3));
-            if(index.empty())index.push_back(std::make_pair(0,2));
-
-            glBegin(GL_TRIANGLE_STRIP);
-            for(std::pair<int,int>p:index){
-                Pos pp[] = {ee[p.first]->GetMiddleDivide(i),
-                            ee[p.first]->GetMiddleDivide(i - 1.0/LINE_DIVIDE),
-                            ee[p.second]->GetMiddleDivide(i - 1.0/LINE_DIVIDE),
-                            ee[p.second]->GetMiddleDivide(i)};
-                for(int k=0;k<4;k++){
-                    glVertex3f(pp[k].x(),
-                               pp[k].y(),
-                               pp[k].z());
-                }
-            }
-            glEnd();
+        glBegin(GL_TRIANGLE_FAN);
+        for(int i=0;i<face->edges.size();i++){
+            glVertex3f(face->GetPoint(i)->x(),face->GetPoint(i)->y(), face->GetPoint(i)->z());
         }
+        glEnd();
     }
 
     if(this->isVisibleMesh()){
@@ -240,6 +219,29 @@ QVector<CEdge*> CBlock::GetAllEdges()const{
     ee.erase(std::unique(ee.begin(),ee.end()),ee.end());
     return ee;
 }
+CFace* CBlock::GetFaceFormDir(BoundaryDir dir){
+    int edge_index[6][4]={{2,6,10,11},
+                          {1,5,9,10},
+                          {3,7,8,11},
+                          {0,4,8,9},
+                          {4,5,6,7},
+                          {0,1,2,3}};
+
+    for(CFace* face:this->faces){
+        bool check = false;
+        for(int i=0;i<4;i++){
+            if(!exist(face->edges,this->GetClockworksEdge(edge_index[static_cast<int>(dir)][i]))){
+                check = true;
+                break;
+            }
+        }
+        if(check == false){
+            return face;
+        }
+    }
+    return nullptr;
+}
+
 CPoint* CBlock::GetClockworksPos(int index)const{
     //極大値
     CPoint* ans[8];
