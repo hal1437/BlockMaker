@@ -48,7 +48,6 @@ bool CFace::isComprehension(Pos pos)const{
     if(this->edges.size()<3)return true;
     else {
         //法線ベクトルとの内積が0であれば平面上に存在する。
-        qDebug()<< this->GetNorm().DotPos(pos-*this->GetPoint(0));
         return this->GetNorm().DotPos(pos-*this->GetPoint(0)) < 1.0e-10;
     }
 }
@@ -166,9 +165,6 @@ bool CFace::DrawGL(Pos,Pos)const{
 
 
         //中を塗る
-        QVector<std::pair<int,int>> index;
-        const int LINE_DIVIDE = 30;
-
         CEdge* ee[] = {this->GetEdgeSeqence(0),
                        this->GetEdgeSeqence(1),
                        this->GetEdgeSeqence(2),

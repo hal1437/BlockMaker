@@ -87,11 +87,45 @@ bool CBlock::DrawGL(Pos,Pos)const{
 
     for(CFace* face:this->faces){
         //中を塗る
-        glBegin(GL_TRIANGLE_FAN);
-        for(int i=0;i<face->edges.size();i++){
-            glVertex3f(face->GetPoint(i)->x(),face->GetPoint(i)->y(), face->GetPoint(i)->z());
+        CEdge* ee[] = {face->GetEdgeSeqence(0),
+                       face->GetEdgeSeqence(1),
+                       face->GetEdgeSeqence(2),
+                       face->GetEdgeSeqence(3)};
+
+        //二次元エバリュエータ
+        GLfloat ctrlpoints[4][4][3];
+        for(int i=0;i<3;i++){
+            ctrlpoints[0][0][i] = ee[0]->GetMiddleDivide(0).mat[i];
+            ctrlpoints[1][0][i] = ee[0]->GetMiddleDivide(1.0/3.0).mat[i];
+            ctrlpoints[2][0][i] = ee[0]->GetMiddleDivide(2.0/3.0).mat[i];
+            ctrlpoints[3][0][i] = ee[1]->GetMiddleDivide(0).mat[i];
+            ctrlpoints[0][1][i] = ee[3]->GetMiddleDivide(2.0/3.0).mat[i];
+            ctrlpoints[3][1][i] = ee[1]->GetMiddleDivide(1.0/3.0).mat[i];
+            ctrlpoints[0][2][i] = ee[3]->GetMiddleDivide(1.0/3.0).mat[i];
+            ctrlpoints[3][2][i] = ee[1]->GetMiddleDivide(2.0/3.0).mat[i];
+            ctrlpoints[0][3][i] = ee[3]->GetMiddleDivide(0).mat[i];
+            ctrlpoints[1][3][i] = ee[2]->GetMiddleDivide(2.0/3.0).mat[i];
+            ctrlpoints[2][3][i] = ee[2]->GetMiddleDivide(1.0/3.0).mat[i];
+            ctrlpoints[3][3][i] = ee[2]->GetMiddleDivide(0).mat[i];
+
+            ctrlpoints[1][1][i] = (ctrlpoints[1][0][i] - ctrlpoints[0][0][i]) + (ctrlpoints[0][1][i] - ctrlpoints[0][0][i]) +  ctrlpoints[0][0][i];
+            ctrlpoints[2][1][i] = (ctrlpoints[2][0][i] - ctrlpoints[3][0][i]) + (ctrlpoints[3][1][i] - ctrlpoints[3][0][i]) +  ctrlpoints[3][0][i];
+            ctrlpoints[1][2][i] = (ctrlpoints[0][2][i] - ctrlpoints[0][3][i]) + (ctrlpoints[1][3][i] - ctrlpoints[0][3][i]) +  ctrlpoints[0][3][i];
+            ctrlpoints[2][2][i] = (ctrlpoints[3][2][i] - ctrlpoints[3][3][i]) + (ctrlpoints[2][3][i] - ctrlpoints[3][3][i]) +  ctrlpoints[3][3][i];
         }
-        glEnd();
+        glMap2f(GL_MAP2_VERTEX_3, 0, 1, 3, 4, 0, 1, 12, 4, &ctrlpoints[0][0][0]);
+        glEnable(GL_MAP2_VERTEX_3);
+
+        for (int j = 0; j < 30; j++){
+          glBegin(GL_QUAD_STRIP);
+          for (int i = 0; i < 30; i++){
+              glEvalCoord2f((GLfloat)i/30.0, (GLfloat)j/30.0);
+              glEvalCoord2f((GLfloat)(i+1)/30.0, (GLfloat)j/30.0);
+              glEvalCoord2f((GLfloat)i/30.0, (GLfloat)(j+1)/30.0);
+              glEvalCoord2f((GLfloat)(i+1)/30.0, (GLfloat)(j+1)/30.0);
+          }
+          glEnd();
+        }
     }
 
     if(this->isVisibleMesh()){
@@ -338,9 +372,14 @@ CEdge* CBlock::GetClockworksEdge(int index) const{
     QVector<CEdge*> edges = this->GetAllEdges();
     CPoint* p1 = this->GetClockworksPos(edge_comb[index][0]);
     CPoint* p2 = this->GetClockworksPos(edge_comb[index][1]);
-    return *std::find_if(edges.begin(),edges.end(),[&](CEdge* e){
+    CEdge* edge = *std::find_if(edges.begin(),edges.end(),[&](CEdge* e){
         return (e->start == p1 && e->end == p2) || (e->start == p2 && e->end == p1);
     });
+    //反転
+    if(edge->end == p2){
+         std::swap(edge->start,edge->end);
+    }
+    return edge;
 }
 
 
