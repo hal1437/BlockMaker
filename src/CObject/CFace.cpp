@@ -48,13 +48,14 @@ bool CFace::isComprehension(Pos pos)const{
     if(this->edges.size()<3)return true;
     else {
         //法線ベクトルとの内積が0であれば平面上に存在する。
-        return this->GetNorm().DotPos(pos) == 0;
+        qDebug()<< this->GetNorm().DotPos(pos-*this->GetPoint(0));
+        return this->GetNorm().DotPos(pos-*this->GetPoint(0)) < 1.0e-10;
     }
 }
 
 Pos CFace::GetNorm()const{
     Pos vec1,vec2;
-    CPoint *p1,*p2,*p3,*p4;
+    CPoint *p1,*p2;
     p1 = this->GetPoint(0);
     p2 = this->GetPoint(1);
 
@@ -127,12 +128,17 @@ CPoint* CFace::GetPoint(int index)const{
 
 CEdge* CFace::GetEdgeSeqence(int index)const{
     //index番目の点とindex+1番目の点を含む点を持つエッジを探す
-    return *std::find_if(this->edges.begin(),this->edges.end(),[&](CEdge* edge){
+    CEdge* ans = *std::find_if(this->edges.begin(),this->edges.end(),[&](CEdge* edge){
         CPoint*  p1 = this->GetPoint(index);
         CPoint*  p2 = this->GetPoint((index+1)%this->edges.size());
         return (edge->start == p1 && edge->end == p2) ||
                (edge->start == p2 && edge->end == p1);
     });
+    //反転
+    if(ans->end == this->GetPoint(index)){
+        std::swap(ans->start,ans->end);
+    }
+    return ans;
 }
 QVector<CPoint*> CFace::GetAllNodes(){
     QVector<CPoint*> ans;
@@ -158,6 +164,7 @@ bool CFace::DrawGL(Pos,Pos)const{
         glColor4f(currentColor[0],currentColor[1],currentColor[2], 0.1);
         glDepthMask(GL_FALSE);
 
+
         //中を塗る
         QVector<std::pair<int,int>> index;
         const int LINE_DIVIDE = 30;
@@ -166,6 +173,41 @@ bool CFace::DrawGL(Pos,Pos)const{
                        this->GetEdgeSeqence(1),
                        this->GetEdgeSeqence(2),
                        this->GetEdgeSeqence(3)};
+
+        //二次元エバリュエータ
+        GLfloat ctrlpoints[4][4][3];
+        for(int i=0;i<3;i++){
+            ctrlpoints[0][0][i] = ee[0]->GetMiddleDivide(0).mat[i];
+            ctrlpoints[1][0][i] = ee[0]->GetMiddleDivide(1.0/3.0).mat[i];
+            ctrlpoints[2][0][i] = ee[0]->GetMiddleDivide(2.0/3.0).mat[i];
+            ctrlpoints[3][0][i] = ee[1]->GetMiddleDivide(0).mat[i];
+            ctrlpoints[0][1][i] = ee[3]->GetMiddleDivide(2.0/3.0).mat[i];
+            ctrlpoints[3][1][i] = ee[1]->GetMiddleDivide(1.0/3.0).mat[i];
+            ctrlpoints[0][2][i] = ee[3]->GetMiddleDivide(1.0/3.0).mat[i];
+            ctrlpoints[3][2][i] = ee[1]->GetMiddleDivide(2.0/3.0).mat[i];
+            ctrlpoints[0][3][i] = ee[3]->GetMiddleDivide(0).mat[i];
+            ctrlpoints[1][3][i] = ee[2]->GetMiddleDivide(2.0/3.0).mat[i];
+            ctrlpoints[2][3][i] = ee[2]->GetMiddleDivide(1.0/3.0).mat[i];
+            ctrlpoints[3][3][i] = ee[2]->GetMiddleDivide(0).mat[i];
+
+            ctrlpoints[1][1][i] = (ctrlpoints[1][0][i] - ctrlpoints[0][0][i]) + (ctrlpoints[0][1][i] - ctrlpoints[0][0][i]) +  ctrlpoints[0][0][i];
+            ctrlpoints[2][1][i] = (ctrlpoints[2][0][i] - ctrlpoints[3][0][i]) + (ctrlpoints[3][1][i] - ctrlpoints[3][0][i]) +  ctrlpoints[3][0][i];
+            ctrlpoints[1][2][i] = (ctrlpoints[0][2][i] - ctrlpoints[0][3][i]) + (ctrlpoints[1][3][i] - ctrlpoints[0][3][i]) +  ctrlpoints[0][3][i];
+            ctrlpoints[2][2][i] = (ctrlpoints[3][2][i] - ctrlpoints[3][3][i]) + (ctrlpoints[2][3][i] - ctrlpoints[3][3][i]) +  ctrlpoints[3][3][i];
+        }
+        glMap2f(GL_MAP2_VERTEX_3, 0, 1, 3, 4, 0, 1, 12, 4, &ctrlpoints[0][0][0]);
+        glEnable(GL_MAP2_VERTEX_3);
+
+        for (int j = 0; j <= 30; j++){
+          glBegin(GL_LINE_STRIP);
+          for (int i = 0; i <= 30; i++)glEvalCoord2f((GLfloat)i/30.0, (GLfloat)j/30.0);
+          glEnd();
+          glBegin(GL_LINE_STRIP);
+          for (int i = 0; i <= 30; i++)glEvalCoord2f((GLfloat)j/30.0, (GLfloat)i/30.0);
+          glEnd();
+        }
+
+        /*
         glBegin(GL_QUAD_STRIP);
         for(double i=1.0/LINE_DIVIDE;i<1.0;i += 1.0/LINE_DIVIDE){
             if(i>1)i=1;
@@ -183,7 +225,7 @@ bool CFace::DrawGL(Pos,Pos)const{
                 }
             }
             index.clear();
-        }
+        }*/
         glEnd();
         glDepthMask(GL_TRUE);
 
