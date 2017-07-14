@@ -16,7 +16,7 @@ public:
     virtual bool isSelectable(Pos pos)const;//選択可能関数(再定義)
 
     //中間点操作
-    virtual int GetMiddleCount()const;
+    virtual int     GetMiddleCount()const;
     virtual CPoint* GetMiddle(int index)const;
     virtual void    SetMiddle(CPoint*,int index);
     virtual Pos     GetMiddleDivide(double t)const;    //補完点

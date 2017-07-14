@@ -1,6 +1,5 @@
 #include "CBlock.h"
 
-
 bool CBlock::isVisibleMesh()const{
     return this->visible_Mesh;
 }
@@ -11,8 +10,108 @@ void CBlock::VisibleMesh(bool flag){
     }
 }
 
+bool CBlock::Creatable(QVector<CObject*> values){
+    if(values.size()==1 && values[0]->is<CBlock>())return true;
 
-//分割点取得
+    if(std::any_of(values.begin(),values.end(),[](CObject* p){return !p->is<CFace>();}))return false;
+    if(values.size() < 6)return false;
+
+    //閉じた立体テスト
+    std::map<CPoint*,int> point_maps;
+    for(CObject* v: values){
+        for(CEdge* e : dynamic_cast<CFace*>(v)->edges){
+            point_maps[e->start]++;
+            point_maps[e->end]++;
+        }
+    }
+    //全て6
+    if(!std::all_of(point_maps.begin(),point_maps.end(),[](std::pair<CObject*,int> c){return c.second==6;}))return false;
+
+    return true;
+}
+
+CPoint* CBlock::GetBasePoint()const{
+    double LIMIT_LENGTH = 0;
+    QVector<CPoint*> vertex = this->GetAllPoints();
+    for(CPoint* pos:vertex){
+        QVector<double> vs = {pos->x(),pos->y(),pos->z(),LIMIT_LENGTH};
+        LIMIT_LENGTH = *std::max_element(vs.begin(),vs.end());
+    }
+    //角の算出
+    Pos limit(-LIMIT_LENGTH,-LIMIT_LENGTH,-LIMIT_LENGTH);
+    return *std::min_element(vertex.begin(),vertex.end(),[&](CPoint* lhs,CPoint* rhs){
+        return ((*lhs-limit).Length() < (*rhs-limit).Length());
+    });
+}
+CEdge*  CBlock::GetBaseEdge ()const{
+    CPoint* base = this->GetBasePoint();
+
+    //基準点を含むエッジ
+    QVector<CEdge*> ee;
+    for(CEdge* e :this->GetAllEdges()){
+        if(e->start == base || e->end == base){
+            ee.push_back(e);
+        }
+    }
+    //X軸方向長さが最も大きいもの
+    Pos n = Pos(1,0,0);
+    return *std::max_element(ee.begin(),ee.end(),[&](CEdge* lhs,CEdge* rhs){
+        return (*lhs->end - *lhs->start).DotPos(n) >
+               (*rhs->end - *rhs->start).DotPos(n);
+    });
+}
+QVector<CPoint*> CBlock::GetAllPoints()const{
+    QVector<CPoint*>pp;
+    for(CFace* face:faces){
+        for(CEdge* edge:face->edges){
+            pp.push_back(edge->start);
+            pp.push_back(edge->end);
+        }
+    }
+    //重複を削除
+    std::sort(pp.begin(),pp.end());
+    pp.erase(std::unique(pp.begin(),pp.end()),pp.end());
+    return pp;
+}
+QVector<CEdge*> CBlock::GetAllEdges()const{
+    QVector<CEdge*>ee;
+    for(CFace* face:faces){
+        for(CEdge* edge:face->edges){
+            ee.push_back(edge);
+        }
+    }
+    //重複を削除
+    std::sort(ee.begin(),ee.end());
+    ee.erase(std::unique(ee.begin(),ee.end()),ee.end());
+    return ee;
+}
+QVector<CFace*> CBlock::GetAllFaces()const{
+    return this->faces;
+}
+
+CFace* CBlock::GetFaceFormDir(BoundaryDir dir){
+    int edge_index[6][4]={{2,6,10,11},
+                          {1,5,9,10},
+                          {3,7,8,11},
+                          {0,4,8,9},
+                          {4,5,6,7},
+                          {0,1,2,3}};
+
+    for(CFace* face:this->faces){
+        bool check = false;
+        for(int i=0;i<4;i++){
+            if(!exist(face->edges,this->GetEdgeSequence(edge_index[static_cast<int>(dir)][i]))){
+                check = true;
+                break;
+            }
+        }
+        if(check == false){
+            return face;
+        }
+    }
+    return nullptr;
+}
+
 Pos CBlock::GetDivisionPoint(int edge_index,int count_index)const{
     double A,B,sum=0,p,d,L;
     CPoint *start,*end;
@@ -34,7 +133,7 @@ Pos CBlock::GetDivisionPoint(int edge_index,int count_index)const{
     if(grading == GradingType::EdgeGrading){
         p = this->grading_args[edge_index];
     }
-    CEdge *edge =  this->GetClockworksEdge(edge_index);
+    CEdge *edge =  this->GetEdgeSequence(edge_index);
     L = (*edge->end - *edge->start).Length();
 
     //指数関数パラメータ計算
@@ -53,7 +152,7 @@ Pos CBlock::GetDivisionPoint(int edge_index,int count_index)const{
 
 double CBlock::GetLength_impl(Quat convert){
     QVector<CPoint*> pp;
-    pp = this->GetAllPos();
+    pp = this->GetAllPoints();
     std::for_each(pp.begin(),pp.end(),[&](CPoint* pos){*pos = pos->Dot(convert);});
     double begin = (*std::min_element(pp.begin(),pp.end(),[](CPoint* lhs,CPoint* rhs){return lhs->mat[0] < rhs->mat[0];}))->mat[0];
     double end   = (*std::max_element(pp.begin(),pp.end(),[](CPoint* lhs,CPoint* rhs){return lhs->mat[0] < rhs->mat[0];}))->mat[0];
@@ -75,6 +174,36 @@ double CBlock::GetLengthZ(){
                                       0,0,0,0}));
 }
 
+bool CBlock::Draw(QPainter& painter)const{
+    //描画範囲算出
+    double top,bottom,left,right;
+    QVector<Pos> pp;
+    for(int i=0;i<4;i++){
+        pp.push_back(*this->GetPointSequence(i));
+    }
+    top    = std::min_element(pp.begin(),pp.end(),[](const Pos& lhs,const Pos& rhs){return lhs.y() < rhs.y();})->y();
+    bottom = std::max_element(pp.begin(),pp.end(),[](const Pos& lhs,const Pos& rhs){return lhs.y() < rhs.y();})->y();
+    left   = std::min_element(pp.begin(),pp.end(),[](const Pos& lhs,const Pos& rhs){return lhs.x() < rhs.x();})->x();
+    right  = std::max_element(pp.begin(),pp.end(),[](const Pos& lhs,const Pos& rhs){return lhs.x() < rhs.x();})->x();
+
+    //多角形の描画
+    QPointF vertex[4];
+    for(int i=0;i<4;i++){
+        vertex[i] = QPointF(pp[i].x(),pp[i].y());
+    }
+    painter.drawPolygon(vertex,4);
+
+    //分割線の描画
+    for(int i =0;i<=this->div[0];i++){
+        painter.drawLine(QPointF(this->GetDivisionPoint(0,i).x(),this->GetDivisionPoint(0,i).y()),
+                         QPointF(this->GetDivisionPoint(2,i).x(),this->GetDivisionPoint(2,i).y()));
+    }
+    for(int i =0;i<=this->div[1];i++){
+        painter.drawLine(QPointF(this->GetDivisionPoint(1,i).x(),this->GetDivisionPoint(1,i).y()),
+                         QPointF(this->GetDivisionPoint(3,i).x(),this->GetDivisionPoint(3,i).y()));
+    }
+    return true;
+}
 bool CBlock::DrawGL(Pos,Pos)const{
     if(!this->isVisible())return true;
     //薄い色に変更
@@ -87,10 +216,10 @@ bool CBlock::DrawGL(Pos,Pos)const{
 
     for(CFace* face:this->faces){
         //中を塗る
-        CEdge* ee[] = {face->GetEdgeSeqence(0),
-                       face->GetEdgeSeqence(1),
-                       face->GetEdgeSeqence(2),
-                       face->GetEdgeSeqence(3)};
+        CEdge* ee[] = {face->GetEdgeSequence(0),
+                       face->GetEdgeSequence(1),
+                       face->GetEdgeSequence(2),
+                       face->GetEdgeSequence(3)};
 
         //二次元エバリュエータ
         GLfloat ctrlpoints[4][4][3];
@@ -153,133 +282,21 @@ bool CBlock::DrawGL(Pos,Pos)const{
     glColor4f(oldColor[0],oldColor[1],oldColor[2], oldColor[3]);
     return true;
 }
-bool CBlock::Move  (const Pos& diff){
+bool CBlock::Move  (const Pos& ){
 }
 
 //近接点
-Pos CBlock::GetNearPos (const Pos& hand)const{
+Pos CBlock::GetNearPos (const Pos& )const{
     return Pos();
 }
-Pos CBlock::GetNearLine(const Pos& pos1,const Pos& pos2)const{
+Pos CBlock::GetNearLine(const Pos& ,const Pos& )const{
     return Pos();
 }
 
-bool CBlock::Creatable(QVector<CObject*> values){
-    if(values.size()==1 && values[0]->is<CBlock>())return true;
-
-    if(std::any_of(values.begin(),values.end(),[](CObject* p){return !p->is<CFace>();}))return false;
-    if(values.size() < 6)return false;
-
-    //閉じた立体テスト
-    std::map<CPoint*,int> point_maps;
-    for(CObject* v: values){
-        for(CEdge* e : dynamic_cast<CFace*>(v)->edges){
-            point_maps[e->start]++;
-            point_maps[e->end]++;
-        }
-    }
-    //全て6
-    if(!std::all_of(point_maps.begin(),point_maps.end(),[](std::pair<CObject*,int> c){return c.second==6;}))return false;
-
-    return true;
-}
-
-bool CBlock::Draw(QPainter& painter)const{
-    //描画範囲算出
-    double top,bottom,left,right;
-    QVector<Pos> pp;
-    for(int i=0;i<4;i++){
-        pp.push_back(*this->GetClockworksPos(i));
-    }
-    top    = std::min_element(pp.begin(),pp.end(),[](const Pos& lhs,const Pos& rhs){return lhs.y() < rhs.y();})->y();
-    bottom = std::max_element(pp.begin(),pp.end(),[](const Pos& lhs,const Pos& rhs){return lhs.y() < rhs.y();})->y();
-    left   = std::min_element(pp.begin(),pp.end(),[](const Pos& lhs,const Pos& rhs){return lhs.x() < rhs.x();})->x();
-    right  = std::max_element(pp.begin(),pp.end(),[](const Pos& lhs,const Pos& rhs){return lhs.x() < rhs.x();})->x();
-
-    //多角形の描画
-    QPointF vertex[4];
-    for(int i=0;i<4;i++){
-        vertex[i] = QPointF(pp[i].x(),pp[i].y());
-    }
-    painter.drawPolygon(vertex,4);
-
-    //分割線の描画
-    for(int i =0;i<=this->div[0];i++){
-        painter.drawLine(QPointF(this->GetDivisionPoint(0,i).x(),this->GetDivisionPoint(0,i).y()),
-                         QPointF(this->GetDivisionPoint(2,i).x(),this->GetDivisionPoint(2,i).y()));
-    }
-    for(int i =0;i<=this->div[1];i++){
-        painter.drawLine(QPointF(this->GetDivisionPoint(1,i).x(),this->GetDivisionPoint(1,i).y()),
-                         QPointF(this->GetDivisionPoint(3,i).x(),this->GetDivisionPoint(3,i).y()));
-    }
-}
-
-
-CPoint* CBlock::GetBasePos()const{
-    double LIMIT_LENGTH = 0;
-    QVector<CPoint*> vertex = this->GetAllPos();
-    for(CPoint* pos:vertex){
-        QVector<double> vs = {pos->x(),pos->y(),pos->z(),LIMIT_LENGTH};
-        LIMIT_LENGTH = *std::max_element(vs.begin(),vs.end());
-    }
-    //角の算出
-    Pos limit(-LIMIT_LENGTH,-LIMIT_LENGTH,-LIMIT_LENGTH);
-    return *std::min_element(vertex.begin(),vertex.end(),[&](CPoint* lhs,CPoint* rhs){
-        return ((*lhs-limit).Length() < (*rhs-limit).Length());
-    });
-}
-QVector<CPoint*> CBlock::GetAllPos()const{
-    QVector<CPoint*>pp;
-    for(CFace* face:faces){
-        for(CEdge* edge:face->edges){
-            pp.push_back(edge->start);
-            pp.push_back(edge->end);
-        }
-    }
-    //重複を削除
-    std::sort(pp.begin(),pp.end());
-    pp.erase(std::unique(pp.begin(),pp.end()),pp.end());
-    return pp;
-}
-QVector<CEdge*> CBlock::GetAllEdges()const{
-    QVector<CEdge*>ee;
-    for(CFace* face:faces){
-        for(CEdge* edge:face->edges){
-            ee.push_back(edge);
-        }
-    }
-    //重複を削除
-    std::sort(ee.begin(),ee.end());
-    ee.erase(std::unique(ee.begin(),ee.end()),ee.end());
-    return ee;
-}
-CFace* CBlock::GetFaceFormDir(BoundaryDir dir){
-    int edge_index[6][4]={{2,6,10,11},
-                          {1,5,9,10},
-                          {3,7,8,11},
-                          {0,4,8,9},
-                          {4,5,6,7},
-                          {0,1,2,3}};
-
-    for(CFace* face:this->faces){
-        bool check = false;
-        for(int i=0;i<4;i++){
-            if(!exist(face->edges,this->GetClockworksEdge(edge_index[static_cast<int>(dir)][i]))){
-                check = true;
-                break;
-            }
-        }
-        if(check == false){
-            return face;
-        }
-    }
-    return nullptr;
-}
-
-CPoint* CBlock::GetClockworksPos(int index)const{
+CPoint* CBlock::GetPointSequence(int index)const{
     //極大値
     CPoint* ans[8];
-    ans[0] = this->GetBasePos();
+    ans[0] = this->GetBasePoint();
     if(index == 0)return ans[0];
 
     //方向エッジ算出
@@ -347,7 +364,7 @@ CPoint* CBlock::GetClockworksPos(int index)const{
 
     //ここに到達できるのは6のみ
     //それ以外の点
-    QVector<CPoint*> pos = this->GetAllPos();
+    QVector<CPoint*> pos = this->GetAllPoints();
     for(int i=0;i<8;i++){
         if(i!=6)pos.removeAll(ans[i]);
     }
@@ -355,7 +372,7 @@ CPoint* CBlock::GetClockworksPos(int index)const{
 
     return ans[6];
 }
-CEdge* CBlock::GetClockworksEdge(int index) const{
+CEdge* CBlock::GetEdgeSequence(int index) const{
     //始点と終点を取得
     QVector<QVector<int>> edge_comb = {{0,1}, //0
                                        {1,2}, //1
@@ -370,8 +387,8 @@ CEdge* CBlock::GetClockworksEdge(int index) const{
                                        {2,6}, //10
                                        {3,7}};//11
     QVector<CEdge*> edges = this->GetAllEdges();
-    CPoint* p1 = this->GetClockworksPos(edge_comb[index][0]);
-    CPoint* p2 = this->GetClockworksPos(edge_comb[index][1]);
+    CPoint* p1 = this->GetPointSequence(edge_comb[index][0]);
+    CPoint* p2 = this->GetPointSequence(edge_comb[index][1]);
     CEdge* edge = *std::find_if(edges.begin(),edges.end(),[&](CEdge* e){
         return (e->start == p1 && e->end == p2) || (e->start == p2 && e->end == p1);
     });
@@ -394,20 +411,6 @@ CBlock::CBlock(QObject* parent):
     this->name[5] = "Back";
 }
 
-
-QVector<CPoint*> CBlock::GetAllNodes(){
-    QVector<CPoint*> ans;
-    for(CFace* f:this->faces){
-        for(CPoint* p:f->GetAllNodes()){
-            ans.push_back(p);
-        }
-    }
-
-    std::sort(ans.begin(),ans.end());
-    ans.erase(std::unique(ans.begin(),ans.end()),ans.end());
-
-    return ans;
-}
 
 CBlock::~CBlock()
 {
@@ -433,7 +436,7 @@ void CBlock::RefreshDividePoint(){
 void CBlock::ReorderEdges(){
     //エッジ並び替え
     for(int i=0;i<12;i++){
-        CEdge* edge = this->GetClockworksEdge(i);
+        CEdge* edge = this->GetEdgeSequence(i);
         Pos base;
         if(i==0 || i==2 || i==4 || i==6)base = Pos(1,0,0);
         if(i==1 || i==3 || i==5 || i==7)base = Pos(0,1,0);

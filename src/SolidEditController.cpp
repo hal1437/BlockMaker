@@ -40,11 +40,11 @@ CFace* SolidEditController::getFrontFace_impl(Quat convert,Quat invert)const{
     for(CBlock* block:this->model->GetBlocks()){
         for(CFace* face:block->faces){
             for(CEdge* edge:face->edges){
-                for(int j=0;j<edge->GetPosSequenceCount();j++){
-                    right  = std::max(right ,((*edge->GetPosSequence(j)).Dot(convert)).mat[0]);
-                    left   = std::min(left  ,((*edge->GetPosSequence(j)).Dot(convert)).mat[0]);
-                    top    = std::max(top   ,((*edge->GetPosSequence(j)).Dot(convert)).mat[1]);
-                    bottom = std::min(bottom,((*edge->GetPosSequence(j)).Dot(convert)).mat[1]);
+                for(int j=0;j<edge->GetPointSequenceCount();j++){
+                    right  = std::max(right ,((*edge->GetPointSequence(j)).Dot(convert)).mat[0]);
+                    left   = std::min(left  ,((*edge->GetPointSequence(j)).Dot(convert)).mat[0]);
+                    top    = std::max(top   ,((*edge->GetPointSequence(j)).Dot(convert)).mat[1]);
+                    bottom = std::min(bottom,((*edge->GetPointSequence(j)).Dot(convert)).mat[1]);
                 }
             }
         }

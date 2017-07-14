@@ -50,7 +50,6 @@ public:
     virtual void Visible  (bool flag); //可視
     virtual bool isLock   ()const; //固定中
     virtual bool isVisible()const; //可視中
-    virtual QVector<CPoint*> GetAllNodes() = 0;//全ての構成点を取得
 
     virtual bool isSelectable(Pos pos)const;  //posの位置で選択可能か
 

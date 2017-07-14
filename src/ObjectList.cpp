@@ -103,8 +103,8 @@ void ObjectList::AddEdgeToTree(CEdge* edge,QTreeWidgetItem* parent,int index){
     item->setText(0,QString(s.c_str()) + ":" + QString::number(index));
     item->setIcon(0,getIcon(edge));
 
-    for(int i=0;i<edge->GetPosSequenceCount();i++){
-        AddPointToTree(edge->GetPosSequence(i),item,i+1);
+    for(int i=0;i<edge->GetPointSequenceCount();i++){
+        AddPointToTree(edge->GetPointSequence(i),item,i+1);
     }
     if(exist(this->CadModelCoreInterface::model->GetSelected(),edge)){
         item->setSelected(true);
@@ -150,7 +150,7 @@ void ObjectList::pushSelectedEdge (CEdge*  edge ,QTreeWidgetItem* current){
         this->CadModelCoreInterface::model->RemoveSelected(edge);
     }
     for(int i=0;i<current->childCount();i++){
-        pushSelectedPoint(edge->GetPosSequence(i),current->child(i));
+        pushSelectedPoint(edge->GetPointSequence(i),current->child(i));
     }
 }
 void ObjectList::pushSelectedPoint(CPoint* point,QTreeWidgetItem* current){
@@ -177,7 +177,7 @@ void ObjectList::pullSelectedEdge (CEdge*  edge ,QTreeWidgetItem* current){
     current->setIcon(0,this->getIcon(edge));
     current->setSelected(exist(this->CadModelCoreInterface::model->GetSelected(),edge));
     for(int i=0;i<current->childCount();i++){
-        pullSelectedPoint(edge->GetPosSequence(i),current->child(i));
+        pullSelectedPoint(edge->GetPointSequence(i),current->child(i));
     }
 }
 void ObjectList::pullSelectedPoint(CPoint* point,QTreeWidgetItem* current){
@@ -200,7 +200,7 @@ void ObjectList::UpdateObject  (){
 
     //排他処理
     for(CEdge* edge: this->edges){
-        for(int i =0;i<edge->GetPosSequenceCount();i++)this->points.removeAll(edge->GetPosSequence(i));
+        for(int i =0;i<edge->GetPointSequenceCount();i++)this->points.removeAll(edge->GetPointSequence(i));
     }
     for(CFace* face: this->faces){
         for(CEdge* e : face->edges)this->edges.removeAll(e);

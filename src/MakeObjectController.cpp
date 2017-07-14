@@ -26,7 +26,7 @@ CREATE_RESULT MakeObjectController::MakeJoint(CEdge* obj,Pos pos,CObject* merge)
             }else{
                 //追加
                 //obj->SetMiddle(dynamic_cast<CPoint*>(merge),obj->GetPosSequenceCount()-2);
-                obj->SetPosSequence(dynamic_cast<CPoint*>(merge),this->making_count);
+                obj->SetPointSequence(dynamic_cast<CPoint*>(merge),this->making_count);
             }
         }else{
             //円弧は例外
@@ -34,7 +34,7 @@ CREATE_RESULT MakeObjectController::MakeJoint(CEdge* obj,Pos pos,CObject* merge)
                 if(this->making_count == 0)obj->SetMiddle(dynamic_cast<CPoint*>(merge),0);
                 if(this->making_count == 1)obj->SetStartPos(dynamic_cast<CPoint*>(merge));
             }else{
-                obj->SetPosSequence(dynamic_cast<CPoint*>(merge),this->making_count);
+                obj->SetPointSequence(dynamic_cast<CPoint*>(merge),this->making_count);
             }
         }
         this->last_point = new_point;

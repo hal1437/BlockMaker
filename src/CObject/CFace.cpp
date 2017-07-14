@@ -33,49 +33,47 @@ bool CFace::Creatable(QVector<CObject*> lines){
     return true;
 }
 
-bool CFace::isParadox()const{
-    if(this->edges.size() < 3)return false;
-    else {
-        //矛盾がないか確認する。
-        for(int i=2;i<this->edges.size();i++){
-            if(this->isComprehension(*this->GetPoint(i)) == false)return false;
-        }
-    }
-    return true;
-}
-
 bool CFace::isComprehension(Pos pos)const{
     if(this->edges.size()<3)return true;
     else {
         //法線ベクトルとの内積が0であれば平面上に存在する。
-        return this->GetNorm().DotPos(pos-*this->GetPoint(0)) < 1.0e-10;
+        return this->GetNorm().DotPos(pos-*this->GetPointSequence(0)) < 1.0e-10;
     }
 }
 
 Pos CFace::GetNorm()const{
     Pos vec1,vec2;
     CPoint *p1,*p2;
-    p1 = this->GetPoint(0);
-    p2 = this->GetPoint(1);
+    p1 = this->GetPointSequence(0);
+    p2 = this->GetPointSequence(1);
 
     vec1 = *p2 - *p1;
-    vec2 = *this->GetPoint(this->edges.size()-1) - *this->GetPoint(0);
+    vec2 = *this->GetPointSequence(this->edges.size()-1) - *this->GetPointSequence(0);
 
     if(this->edges.size() < 2 || (vec1-vec2).Length()<SAME_POINT_EPS)return Pos();
     else{
         return Pos(vec1.Cross(vec2)).GetNormalize();
     }
 }
+Pos CFace::GetPosFromUV(double u,double v)const{
+    CEdge* ee[]={this->GetEdgeSequence(0),
+                 this->GetEdgeSequence(1),
+                 this->GetEdgeSequence(2),
+                 this->GetEdgeSequence(3)};
+
+}
+Pos CFace::GetPosFromUVSquare(double u,double v)const{
+    CEdge* ee[]={this->GetEdgeSequence(0),
+                 this->GetEdgeSequence(1),
+                 this->GetEdgeSequence(2),
+                 this->GetEdgeSequence(3)};
+
+}
 CPoint* CFace::GetBasePoint()const{
-    QVector<CPoint*> pp;
-    //点を集結
-    for(CEdge* line:this->edges){
-        if(!exist(pp,line->start))pp.push_back(line->start);
-        if(!exist(pp,line->end  ))pp.push_back(line->end);
-    }
+    QVector<CPoint*> pp= this->GetAllPoints();
+
     //左下の探索
     CPoint* corner = nullptr;//左下
-
     double LIMIT_LENGTH = 0;
     for(CPoint* pos:pp){
         QVector<double> vs = {pos->x(),pos->y(),pos->z(),LIMIT_LENGTH};
@@ -88,7 +86,37 @@ CPoint* CFace::GetBasePoint()const{
     });
     return corner;
 }
-CPoint* CFace::GetPoint(int index)const{
+CEdge*  CFace::GetBaseEdge()const{
+    CPoint* base = this->GetBasePoint();
+
+    //基準点を含むエッジ
+    QVector<CEdge*> ee;
+    for(CEdge* e :this->edges){
+        if(e->start == base || e->end == base){
+            ee.push_back(e);
+        }
+    }
+    //X軸方向長さが最も大きいもの
+    Pos n = Pos(1,0,0);
+    return *std::max_element(ee.begin(),ee.end(),[&](CEdge* lhs,CEdge* rhs){
+        return (*lhs->end - *lhs->start).DotPos(n) >
+               (*rhs->end - *rhs->start).DotPos(n);
+    });
+}
+QVector<CPoint*> CFace::GetAllPoints()const{
+    QVector<CPoint*>ans;
+    for(CEdge* edge: this->edges){
+        for(int i=0;i<edge->GetPointSequenceCount();i++){
+            ans.push_back(edge->GetPointSequence(i));
+        }
+    }
+    unique(ans);
+    return ans;
+}
+QVector<CEdge*>  CFace::GetAllEdges ()const{
+    return this->edges;
+}
+CPoint* CFace::GetPointSequence(int index)const{
     //index回だけ連鎖させる
     CPoint* corner = this->GetBasePoint();
     CPoint* ans = corner;
@@ -120,34 +148,22 @@ CPoint* CFace::GetPoint(int index)const{
         candidate.clear();
     }
     if(ans == nullptr){
-        qDebug() << "CFace::GetPoint(" << index << ") error. answer is nullptr.";
+        qDebug() << "CFace::GetPointSequence(" << index << ") error. answer is nullptr.";
     }
     return ans;
 }
-
-CEdge* CFace::GetEdgeSeqence(int index)const{
+CEdge*  CFace::GetEdgeSequence(int index)const{
     //index番目の点とindex+1番目の点を含む点を持つエッジを探す
     CEdge* ans = *std::find_if(this->edges.begin(),this->edges.end(),[&](CEdge* edge){
-        CPoint*  p1 = this->GetPoint(index);
-        CPoint*  p2 = this->GetPoint((index+1)%this->edges.size());
+        CPoint*  p1 = this->GetPointSequence(index);
+        CPoint*  p2 = this->GetPointSequence((index+1)%this->edges.size());
         return (edge->start == p1 && edge->end == p2) ||
                (edge->start == p2 && edge->end == p1);
     });
     //反転
-    if(ans->end == this->GetPoint(index)){
+    if(ans->end == this->GetPointSequence(index)){
         std::swap(ans->start,ans->end);
     }
-    return ans;
-}
-QVector<CPoint*> CFace::GetAllNodes(){
-    QVector<CPoint*> ans;
-    for(CEdge* e:this->edges){
-        for(CPoint* p:e->GetAllNodes()){
-            ans.push_back(p);
-        }
-    }
-    std::sort(ans.begin(),ans.end());
-    ans.erase(std::unique(ans.begin(),ans.end()),ans.end());
     return ans;
 }
 
@@ -163,65 +179,32 @@ bool CFace::DrawGL(Pos,Pos)const{
         glColor4f(currentColor[0],currentColor[1],currentColor[2], 0.1);
         glDepthMask(GL_FALSE);
 
-
-        //中を塗る
-        CEdge* ee[] = {this->GetEdgeSeqence(0),
-                       this->GetEdgeSeqence(1),
-                       this->GetEdgeSeqence(2),
-                       this->GetEdgeSeqence(3)};
-
-        //二次元エバリュエータ
-        GLfloat ctrlpoints[4][4][3];
-        for(int i=0;i<3;i++){
-            ctrlpoints[0][0][i] = ee[0]->GetMiddleDivide(0).mat[i];
-            ctrlpoints[1][0][i] = ee[0]->GetMiddleDivide(1.0/3.0).mat[i];
-            ctrlpoints[2][0][i] = ee[0]->GetMiddleDivide(2.0/3.0).mat[i];
-            ctrlpoints[3][0][i] = ee[1]->GetMiddleDivide(0).mat[i];
-            ctrlpoints[0][1][i] = ee[3]->GetMiddleDivide(2.0/3.0).mat[i];
-            ctrlpoints[3][1][i] = ee[1]->GetMiddleDivide(1.0/3.0).mat[i];
-            ctrlpoints[0][2][i] = ee[3]->GetMiddleDivide(1.0/3.0).mat[i];
-            ctrlpoints[3][2][i] = ee[1]->GetMiddleDivide(2.0/3.0).mat[i];
-            ctrlpoints[0][3][i] = ee[3]->GetMiddleDivide(0).mat[i];
-            ctrlpoints[1][3][i] = ee[2]->GetMiddleDivide(2.0/3.0).mat[i];
-            ctrlpoints[2][3][i] = ee[2]->GetMiddleDivide(1.0/3.0).mat[i];
-            ctrlpoints[3][3][i] = ee[2]->GetMiddleDivide(0).mat[i];
-
-            ctrlpoints[1][1][i] = (ctrlpoints[1][0][i] - ctrlpoints[0][0][i]) + (ctrlpoints[0][1][i] - ctrlpoints[0][0][i]) +  ctrlpoints[0][0][i];
-            ctrlpoints[2][1][i] = (ctrlpoints[2][0][i] - ctrlpoints[3][0][i]) + (ctrlpoints[3][1][i] - ctrlpoints[3][0][i]) +  ctrlpoints[3][0][i];
-            ctrlpoints[1][2][i] = (ctrlpoints[0][2][i] - ctrlpoints[0][3][i]) + (ctrlpoints[1][3][i] - ctrlpoints[0][3][i]) +  ctrlpoints[0][3][i];
-            ctrlpoints[2][2][i] = (ctrlpoints[3][2][i] - ctrlpoints[3][3][i]) + (ctrlpoints[2][3][i] - ctrlpoints[3][3][i]) +  ctrlpoints[3][3][i];
-        }
-        glMap2f(GL_MAP2_VERTEX_3, 0, 1, 3, 4, 0, 1, 12, 4, &ctrlpoints[0][0][0]);
-        glEnable(GL_MAP2_VERTEX_3);
-
-        for (int j = 0; j <= 30; j++){
-          glBegin(GL_LINE_STRIP);
-          for (int i = 0; i <= 30; i++)glEvalCoord2f((GLfloat)i/30.0, (GLfloat)j/30.0);
-          glEnd();
-          glBegin(GL_LINE_STRIP);
-          for (int i = 0; i <= 30; i++)glEvalCoord2f((GLfloat)j/30.0, (GLfloat)i/30.0);
-          glEnd();
-        }
-
-        /*
-        glBegin(GL_QUAD_STRIP);
-        for(double i=1.0/LINE_DIVIDE;i<1.0;i += 1.0/LINE_DIVIDE){
-            if(i>1)i=1;
-            if(!ee[0]->is<CLine>() && !ee[2]->is<CLine>())index.push_back(std::make_pair(0,2));
-            if(!ee[1]->is<CLine>() && !ee[3]->is<CLine>())index.push_back(std::make_pair(1,3));
-            if(index.empty())index.push_back(std::make_pair(0,2));
-
-            for(std::pair<int,int> p : index){
-                Pos pp[] = {ee[p.first ]->GetMiddleDivide(i),
-                            ee[p.second]->GetMiddleDivide(i)};
-                for(int k=0;k<2;k++){
-                    glVertex3f(pp[k].x(),
-                               pp[k].y(),
-                               pp[k].z());
-                }
+        const int FACE_DIVIDE = 30;
+        for (int j = 0; j < FACE_DIVIDE; j++){
+            glBegin(GL_QUAD_STRIP);
+            for (int i = 0; i <= FACE_DIVIDE; i++){
+                Pos p[] = {this->GetPosFromUV((double)j    /FACE_DIVIDE,(double)i/FACE_DIVIDE),
+                           this->GetPosFromUV((double)(j+1)/FACE_DIVIDE,(double)i/FACE_DIVIDE)};
+                glVertex3f(p[0].x(),p[0].y(),p[0].z());
+                glVertex3f(p[1].x(),p[1].y(),p[1].z());
             }
-            index.clear();
-        }*/
+            glEnd();
+        }
+        for (int j = 0; j <= FACE_DIVIDE; j++){
+            glBegin(GL_LINE_STRIP);
+            for (int i = 0; i <= FACE_DIVIDE; i++){
+                Pos p = this->GetPosFromUV((double)j/FACE_DIVIDE,(double)i/FACE_DIVIDE);
+                glVertex3f(p.x(),p.y(),p.z());
+            }
+            glEnd();
+            glBegin(GL_LINE_STRIP);
+            for (int i = 0; i <= FACE_DIVIDE; i++){
+                Pos p = this->GetPosFromUV((double)i/FACE_DIVIDE,(double)j/FACE_DIVIDE);
+                glVertex3f(p.x(),p.y(),p.z());
+            }
+            glEnd();
+        }
+
         glEnd();
         glDepthMask(GL_TRUE);
 
@@ -232,7 +215,7 @@ bool CFace::DrawGL(Pos,Pos)const{
         //外側
         glBegin(GL_LINE_LOOP);
         for(int i=0;i<this->edges.size();i++){
-            glVertex3f(this->GetPoint(i)->x(),this->GetPoint(i)->y(), this->GetPoint(i)->z());
+            glVertex3f(this->GetPointSequence(i)->x(),this->GetPointSequence(i)->y(), this->GetPointSequence(i)->z());
         }
         glEnd();
     }
@@ -242,7 +225,7 @@ bool CFace::DrawGL(Pos,Pos)const{
 bool CFace::DrawNormArrowGL()const{
     Pos center;
     for(int i=0;i<this->edges.size();i++){
-        center += *this->GetPoint(i);
+        center += *this->GetPointSequence(i);
     }
     center /= this->edges.size();
 
@@ -252,13 +235,11 @@ bool CFace::DrawNormArrowGL()const{
     glEnd();
     return true;
 }
-
-
 bool CFace::Move(const Pos& diff){
     QVector<CPoint*> pp;
     for(int i=0;i<this->edges.size();i++){
-        for(int j=0;j<this->edges[i]->GetPosSequenceCount();j++){
-            pp.push_back(this->edges[i]->GetPosSequence(j));
+        for(int j=0;j<this->edges[i]->GetPointSequenceCount();j++){
+            pp.push_back(this->edges[i]->GetPointSequence(j));
         }
     }
     //排他
@@ -272,7 +253,14 @@ bool CFace::Move(const Pos& diff){
     return true;
 }
 
-//近接点
+void CFace::ReorderEdges(){
+    QVector<CEdge*> ans;
+    for(int i=0;i<this->edges.size();i++){
+        ans.push_back(this->GetEdgeSequence(i));
+    }
+    this->edges = ans;
+}
+
 Pos CFace::GetNearPos (const Pos&)const{
     return Pos();
 }

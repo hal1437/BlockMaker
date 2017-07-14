@@ -200,7 +200,7 @@ void MainWindow::MakeBlock(){
         }
         //コネクト
         for(int i=0;i<12;i++){
-            connect(block->GetClockworksPos(i),SIGNAL(PosChanged()),block,SLOT(RefreshDividePoint()));
+            connect(block->GetPointSequence(i),SIGNAL(PosChanged()),block,SLOT(RefreshDividePoint()));
         }
         diag->block = block;
         diag->ImportCBlock();

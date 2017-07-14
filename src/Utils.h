@@ -34,6 +34,11 @@ template<class C,class V>
 bool exist(const C& array,const V& value){
     return std::find(std::begin(array),std::end(array),value) != std::end(array);
 }
+template<class C>
+bool unique(C& array){
+    std::sort(std::begin(array),std::end(array));
+    array.erase(std::unique(std::begin(array),std::end(array)),std::end(array));
+}
 template<class C,class V>
 int IndexOf(const C& array,const V& value){
     typename C::const_iterator result = std::find(std::begin(array),std::end(array),value);

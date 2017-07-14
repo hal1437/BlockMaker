@@ -19,8 +19,8 @@ bool CadModelCore::ExportFoamFile(QString filename)const{
         if(edge->is<CSpline>())name = "CSpline";
 
         out << name;
-        for(int i=0;i<edge->GetPosSequenceCount();i++){
-            out << "," << IndexOf(this->Points,edge->GetPosSequence(i));
+        for(int i=0;i<edge->GetPointSequenceCount();i++){
+            out << "," << IndexOf(this->Points,edge->GetPointSequence(i));
         }
         out << std::endl;
     }

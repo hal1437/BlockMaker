@@ -141,7 +141,7 @@ void SolidEditForm::mouseMoveEvent   (QMouseEvent *event){
         Pos Line_base1 = this->screen_pos.Dot(this->controller->getCameraMatrix());
         Pos Line_base2 = Pos(0,0,1)      .Dot(this->controller->getCameraMatrix());
         this->mouse_pos  =  Collision::GetHitPosFaceToLine(this->controller->sketch_face->GetNorm(),
-                                                           *this->controller->sketch_face->GetPoint(0),
+                                                           *this->controller->sketch_face->GetPointSequence(0),
                                                            Line_base1,Line_base2);
     }else{
         //カメラ角度から算出

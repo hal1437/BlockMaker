@@ -16,13 +16,13 @@ void CEdge::SetEndPos(CPoint* pos){
     connect(this->end,SIGNAL(PosChanged(CPoint*,Pos)),this,SLOT(ChangePosCallback(CPoint*,Pos)));
 }
 
-int CEdge::GetPosSequenceCount()const{
+int CEdge::GetPointSequenceCount()const{
     return this->GetMiddleCount()+2;
 }
-CPoint* CEdge::GetPosSequence(int index)const{
+CPoint* CEdge::GetPointSequence(int index)const{
     if     (index == 0                        )return this->start;
-    else if(index == GetPosSequenceCount() - 1)return this->end;
-    else if(index > 0 && index < GetPosSequenceCount() - 1)return this->GetMiddle(index-1);
+    else if(index == GetPointSequenceCount() - 1)return this->end;
+    else if(index > 0 && index < GetPointSequenceCount() - 1)return this->GetMiddle(index-1);
     return nullptr;
 }
 
@@ -37,18 +37,18 @@ Pos CEdge::GetNearLine(const Pos& pos1,const Pos& pos2)const{
     }
     return ans;
 }
-QVector<CPoint*> CEdge::GetAllNodes(){
+QVector<CPoint*> CEdge::GetAllPoints()const{
     QVector<CPoint*> ans;
-    for(int i=0;i<this->GetPosSequenceCount();i++){
-        ans.push_back(this->GetPosSequence(i));
+    for(int i=0;i<this->GetPointSequenceCount();i++){
+        ans.push_back(this->GetPointSequence(i));
     }
     return ans;
 }
 
-void CEdge::SetPosSequence(CPoint* pos,int index){
+void CEdge::SetPointSequence(CPoint* pos,int index){
     if     (index == 0                        )this->SetStartPos(pos);
-    else if(index == GetPosSequenceCount() - 1)this->SetEndPos(pos);
-    else if(index > 0 && index < GetPosSequenceCount() - 1)this->SetMiddle(pos,index-1);
+    else if(index == GetPointSequenceCount() - 1)this->SetEndPos(pos);
+    else if(index > 0 && index < GetPointSequenceCount() - 1)this->SetMiddle(pos,index-1);
 }
 
 bool CEdge::DrawGL(Pos camera,Pos center)const{

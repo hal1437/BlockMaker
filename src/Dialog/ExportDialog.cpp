@@ -18,7 +18,7 @@ QVector<CPoint*> ExportDialog::GetBoundaryPos(CBlock* block,BoundaryDir dir)cons
     QVector<CPoint*> vertices;
     QVector<CPoint*> ans;
     for(int i=0;i<8;i++){
-        vertices.push_back(block->GetClockworksPos(i));
+        vertices.push_back(block->GetPointSequence(i));
     }
 
     if(dir == BoundaryDir::Front){    //前面
@@ -85,7 +85,7 @@ void ExportDialog::Export(QString filename)const{
         QVector<int> pos_indices;
 
         for(int i=0;i<8;i++){
-            pos_indices.push_back(IndexOf(all_points,block->GetClockworksPos(i)));
+            pos_indices.push_back(IndexOf(all_points,block->GetPointSequence(i)));
         }
         file.OutVectorInline(pos_indices);
 

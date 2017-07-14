@@ -57,13 +57,24 @@ private:
     double GetLength_impl(Quat convert);
 
 public:
+    //立体が作成可能か
+    static bool Creatable(QVector<CObject* > values);
+
+    virtual CPoint* GetBasePoint()const;  //基準点取得
+    virtual CEdge*  GetBaseEdge()const;   //基準線取得
+    virtual QVector<CPoint*> GetAllPoints()const;   //構成点取得
+    virtual QVector<CEdge* > GetAllEdges()const; //構成線取得
+    virtual QVector<CFace* > GetAllFaces()const; //構成面取得
+    virtual CPoint* GetPointSequence(int index) const;//番号順点取得
+    virtual CEdge*  GetEdgeSequence (int index) const;//番号順線取得
+    virtual CFace*  GetFaceFormDir(BoundaryDir dir);//BoundaryDirに基づく面の取得
+
     //分割点取得(辺の番号)
     Pos GetDivisionPoint(int edge_index, int count_index)const;
 
-    //幅取得
-    double GetLengthX();
-    double GetLengthY();
-    double GetLengthZ();
+    double GetLengthX(); //X方向幅取得
+    double GetLengthY(); //Y方向幅取得
+    double GetLengthZ(); //Z方向幅取得
 
     bool Draw  (QPainter& painter)const;     //描画関数
     bool DrawGL(Pos camera,Pos center)const; //三次元描画関数
@@ -76,25 +87,14 @@ public:
     Pos GetNearPos (const Pos& hand)const;
     Pos GetNearLine(const Pos& pos1,const Pos& pos2)const;
 
+    void ReorderEdges();//エッジ並び替え
 public:
-
-    static bool Creatable(QVector<CObject* > values);//BOX定義可能か
-    bool isParadox()const;//矛盾確認
-
-    CPoint* GetBasePos()const;//基準点取得
-    QVector<CPoint*> GetAllPos()const;
-    QVector<CEdge* > GetAllEdges()const;
-    CPoint* GetClockworksPos (int index) const;//番号順点取得
-    CEdge* GetClockworksEdge(int index) const;//番号順線取得
-    virtual QVector<CPoint*> GetAllNodes();//全ての構成点を取得    
-    CFace* GetFaceFormDir(BoundaryDir dir);//BoundaryDirに基づく面の取得
 
     CBlock(QObject* parent=nullptr);
     virtual ~CBlock();
 
 public slots:
     void RefreshDividePoint();//div_pos再計算
-    void ReorderEdges();
 };
 
 #endif // CBLOCK_H
