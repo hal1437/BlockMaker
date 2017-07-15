@@ -51,6 +51,7 @@ public slots:
     void PullSelected();    //選択情報取得
     void PushSelected();    //選択情報同期
 
+    void Delete(bool);//削除
     void SetVisible(bool);//可視設定
     void SetInvisible(bool);//不可視設定
     void SetVisibleMesh(bool);//可視フレーム設定

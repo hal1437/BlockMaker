@@ -11,6 +11,7 @@ class CFace : public CObject
 public:
     QVector<CEdge*> edges;//構成線
     bool is_polygon = true;
+    static CFace* base[3];//正面,平面,右側面
 
 public:
     //面が作成可能か

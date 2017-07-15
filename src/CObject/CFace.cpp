@@ -1,5 +1,7 @@
 #include "CFace.h"
 
+CFace* CFace::base[3];
+
 bool CFace::Creatable(QVector<CObject*> lines){
     if(std::any_of(lines.begin(),lines.end(),[](CObject* p){return !p->is<CEdge>();}))return false;
     if(lines.size() < 3)return false;

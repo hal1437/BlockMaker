@@ -180,10 +180,10 @@ SolidEditController::~SolidEditController()
 
 void SolidEditController::Refresh3Face(){
     for(int i=0;i<3;i++){
-        if(this->base[i] != nullptr) delete this->base[i];
+        if(CFace::base[i] != nullptr) delete CFace::base[i];
     }
-    this->base[0] = this->getFrontFace();
-    this->base[1] = this->getTopFace();
-    this->base[2] = this->getSideFace();
+    CFace::base[0] = this->getFrontFace();
+    CFace::base[1] = this->getTopFace();
+    CFace::base[2] = this->getSideFace();
 }
 

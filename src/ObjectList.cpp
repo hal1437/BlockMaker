@@ -33,6 +33,7 @@ void ObjectList::mouseReleaseEvent(QMouseEvent* event){
     if(event->button() == Qt::RightButton){
         this->menu = new QMenu(this);
         this->delete_action          = this->menu->addAction("削除");
+        connect(this->delete_action,SIGNAL(triggered(bool)),this,SLOT(Delete(bool)));
 
         for(CObject* obj:this->CadModelCoreInterface::model->GetSelected()){
             if(!obj->isVisible()){
@@ -250,10 +251,18 @@ void ObjectList::PushSelected(){
     connect(this,SIGNAL(itemSelectionChanged()),this,SLOT(PushSelected()));
 }
 
+
+
+void ObjectList::Delete(bool){
+    for(CObject* obj : this->CadModelCoreInterface::model->GetSelected()){
+        this->CadModelCoreInterface::model->Delete(obj);
+    }
+    this->CadModelCoreInterface::model->SelectedClear();
+    UpdateObject();
+}
 void ObjectList::SetVisible(bool){
     for(CObject* obj:this->CadModelCoreInterface::model->GetSelected())obj->Visible(true);
 }
-
 void ObjectList::SetInvisible(bool){
     for(CObject* obj:this->CadModelCoreInterface::model->GetSelected())obj->Visible(false);
 }

@@ -29,7 +29,6 @@ public:
     Quat getConvertSideToTop  ()const;
     Quat getConvertTopToSide  ()const;
 
-    CFace* base[3];//正面,平面,右側面
     double theta1 = 0; //角度1(縦方向)
     double theta2 = 0; //角度2(横方向)
 

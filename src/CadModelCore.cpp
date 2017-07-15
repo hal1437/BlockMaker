@@ -202,18 +202,22 @@ QVector<CEdge*>  CadModelCore::GetParent(CPoint* child)const{
 }
 void CadModelCore::Delete(CBlock*  obj){
     this->GetBlocks().removeAll(obj);
+    emit UpdateBlocks();
 }
 void CadModelCore::Delete(CFace*  obj){
     for(CBlock* parent:this->GetParent(obj))this->Delete(parent);
     this->GetFaces().removeAll(obj);
+    emit UpdateFaces();
 }
 void  CadModelCore::Delete(CEdge*  obj){
     for(CFace* parent:this->GetParent(obj))this->Delete(parent);
     this->GetEdges().removeAll(obj);
+    emit UpdateEdges();
 }
 void  CadModelCore::Delete(CPoint* obj){
     for(CEdge* parent:this->GetParent(obj))this->Delete(parent);
     this->GetPoints().removeAll(obj);
+    emit UpdatePoints();
 }
 void CadModelCore::Delete(CObject* obj){
     if(obj->is<CPoint>())this->Delete(dynamic_cast<CPoint*>(obj));
@@ -227,7 +231,6 @@ void CadModelCore::Delete(CObject* obj){
 bool CadModelCore::SelectedClear(){
     this->Selected.clear();
     emit UpdateSelected();
-    emit UpdateAnyAction();
 }
 
 void CadModelCore::UpdateObject(){
@@ -248,7 +251,7 @@ CadModelCore::CadModelCore(QWidget *parent):
     connect(this,SIGNAL(UpdateEdges ()),this,SLOT(UpdateObject()));
     connect(this,SIGNAL(UpdateFaces ()),this,SLOT(UpdateObject()));
     connect(this,SIGNAL(UpdateBlocks()),this,SLOT(UpdateObject()));
-    connect(this,SIGNAL(UpdatePoints()),this,SLOT(UpdateObject()));
+    //connect(this,SIGNAL(UpdateSelected()),this,SLOT(UpdateObject()));
     connect(this,SIGNAL(SelectObjectChanged()),this,SLOT(UpdateAction()));
     connect(this,SIGNAL(UpdateAnyObject    ()),this,SLOT(UpdateAction()));
     connect(this,SIGNAL(UpdateRestraints   ()),this,SLOT(UpdateAction()));
