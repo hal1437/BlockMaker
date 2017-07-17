@@ -66,6 +66,32 @@ bool CArc::Draw(QPainter& painter)const{
 
     return true;
 }
+bool CArc::DrawGL(Pos camera,Pos center)const{
+    if(!this->isVisible())return true;
+    if(this->end == nullptr){
+        glBegin(GL_LINES);
+        Pos cc = camera - center;
+        double theta1 = std::atan2(cc.y(),std::sqrt(cc.x()*cc.x()+cc.z()*cc.z()));
+        double theta2 = std::atan2(-cc.x(),cc.z());
+        //円の描画
+        for(double k=0;k < 2*M_PI;k += M_PI/32){
+            const int length = (*this->start-*this->center).Length();
+            Pos p = Pos(length*std::sin(k),length*std::cos(k),0).Dot(Quat::getRotateXMatrix(theta1).Dot(Quat::getRotateYMatrix(theta2)));
+            glVertex3f((p + *this->center).x(),(p + *this->center).y(),(p + *this->center).z());
+        }
+        glEnd();
+    }else{
+        glBegin(GL_LINE_STRIP);
+        //線の分割描画
+        for(double i=0;i<=1;i += 1.0/CEdge::LINE_NEAR_DIVIDE){
+            if(i+1.0/CEdge::LINE_NEAR_DIVIDE > 1)i=1;
+            glVertex3f(this->GetMiddleDivide(i).x(),
+                       this->GetMiddleDivide(i).y(),
+                       this->GetMiddleDivide(i).z());
+        }
+        glEnd();
+    }
+}
 bool CArc::Move(const Pos& diff){
     this->center->Move(diff);
     return true;

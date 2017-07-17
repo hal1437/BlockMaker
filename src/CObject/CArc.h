@@ -20,6 +20,7 @@ public:
     //作成関数(完了時:true , 継続時:false)
     virtual CREATE_RESULT Create(CPoint* pos);
     virtual bool Draw(QPainter& painter)const;
+    virtual bool DrawGL(Pos camera,Pos center)const;
     virtual bool Move(const Pos& diff);
     virtual void Lock(bool lock);
     virtual bool isSelectable(Pos pos) const;//選択可能オーバーライド
