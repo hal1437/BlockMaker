@@ -1,6 +1,7 @@
 
 #include "CArc.h"
 
+
 double CArc::GetRound()const{
     return this->round;
 }
@@ -91,6 +92,7 @@ bool CArc::DrawGL(Pos camera,Pos center)const{
         }
         glEnd();
     }
+    return true;
 }
 bool CArc::Move(const Pos& diff){
     this->center->Move(diff);
@@ -150,9 +152,16 @@ void CArc::SetMiddle(CPoint* pos,int index){
 }
 Pos CArc::GetMiddleDivide(double t)const{
     if(this->start == nullptr || this->end == nullptr)return *this->center;
-    double angle = Pos::Angle(*this->start-*this->center,*this->end-*this->center)*PI/180;
     Pos center_base = (*this->start-*this->center).Cross(*this->end-*this->center);
-    Pos ans = Pos::RodriguesRotate(*this->start-*this->center,center_base,angle*t)+*this->center; //要検討
+    Pos ans;
+
+    if(this->reverse==false){
+        double angle = Pos::Angle(*this->start-*this->center,*this->end-*this->center)*PI/180;
+        ans = Pos::RodriguesRotate(*this->start-*this->center,center_base,angle*t)+*this->center; //要検討
+    } else {
+        double angle = Pos::Angle(*this->start-*this->center,*this->end-*this->center)*PI/180;
+        ans = Pos::RodriguesRotate(*this->end-*this->center,center_base,(2*PI-angle)*t)+*this->center; //要検討
+    }
     return ans;
 }
 

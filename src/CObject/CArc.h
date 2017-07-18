@@ -10,12 +10,14 @@ protected:
 
 public:
     CPoint* center; //中心
-
+    bool reverse = false;
 public:
     //半径操作関数
     double GetRound()const;
 
 public:
+    void SetReverse(bool reverse){this->reverse = reverse;}
+    bool GetReverse(){return this->reverse;}
 
     //作成関数(完了時:true , 継続時:false)
     virtual CREATE_RESULT Create(CPoint* pos);
