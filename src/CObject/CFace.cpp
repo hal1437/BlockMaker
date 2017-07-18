@@ -92,7 +92,6 @@ Pos CFace::GetPosFromUV(double u,double v)const{
                  this->GetEdgeSequence(1),
                  this->GetEdgeSequence(2),
                  this->GetEdgeSequence(3)};
-
 }
 Pos CFace::GetPosFromUVSquare(double u,double v)const{
 /*
@@ -109,7 +108,12 @@ Pos CFace::GetPosFromUVSquare(double u,double v)const{
 */
 }
 CPoint* CFace::GetBasePoint()const{
-    QVector<CPoint*> pp= this->GetAllPoints();
+    QVector<CPoint*> pp;
+    for(CEdge* edge:this->edges){
+        pp.push_back(edge->start);
+        pp.push_back(edge->end);
+    }
+    unique(pp);
 
     //左下の探索
     CPoint* corner = nullptr;//左下
@@ -193,13 +197,22 @@ CPoint* CFace::GetPointSequence(int index)const{
 }
 CEdge*  CFace::GetEdgeSequence(int index)const{
     //index番目の点とindex+1番目の点を含む点を持つエッジを探す
-    CEdge* ans = *std::find_if(this->edges.begin(),this->edges.end(),[&](CEdge* edge){
+    QVector<CEdge*>::const_iterator it = std::find_if(this->edges.begin(),this->edges.end(),[&](CEdge* edge){
         CPoint*  p1 = this->GetPointSequence(index);
         CPoint*  p2 = this->GetPointSequence((index+1)%this->edges.size());
         return (edge->start == p1 && edge->end == p2) ||
                (edge->start == p2 && edge->end == p1);
     });
+    if(it == this->edges.end()){
+        //?
+        CPoint* pp[4];
+        for(int i =0;i<4;i++)pp[i] = this->GetPointSequence(i);
+        qDebug() << "?";
+        return nullptr;
+    }
+
     //反転
+    CEdge* ans = *it;
     if(ans->end == this->GetPointSequence(index)){
         std::swap(ans->start,ans->end);
     }
@@ -220,12 +233,12 @@ bool CFace::DrawGL(Pos,Pos)const{
 
         this->DefineMap2();
         for (int j = 0; j < 30; j++){
-            glBegin(GL_QUAD_STRIP);
+            glBegin(GL_QUADS);
             for (int i = 0; i < 30; i++){
-                glEvalCoord2f((GLfloat)i/30.0, (GLfloat)j/30.0);
-                glEvalCoord2f((GLfloat)(i+1)/30.0, (GLfloat)j/30.0);
-                glEvalCoord2f((GLfloat)i/30.0, (GLfloat)(j+1)/30.0);
+                glEvalCoord2f((GLfloat)    i/30.0, (GLfloat)    j/30.0);
+                glEvalCoord2f((GLfloat)(i+1)/30.0, (GLfloat)    j/30.0);
                 glEvalCoord2f((GLfloat)(i+1)/30.0, (GLfloat)(j+1)/30.0);
+                glEvalCoord2f((GLfloat)    i/30.0, (GLfloat)(j+1)/30.0);
             }
             glEnd();
         }
