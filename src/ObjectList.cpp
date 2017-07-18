@@ -271,7 +271,7 @@ void ObjectList::ReverseArc(bool){
     for(CObject* obj : this->CadModelCoreInterface::model->GetSelected()){
         if(obj->is<CArc>()){
             //反転
-            dynamic_cast<CArc*>(obj)->SetReverse(!dynamic_cast<CArc*>(obj)->GetReverse());
+            dynamic_cast<CArc*>(obj)->SetReverse( !dynamic_cast<CArc*>(obj)->GetReverse());
         }
     }
     this->CadModelCoreInterface::model->SelectedClear();

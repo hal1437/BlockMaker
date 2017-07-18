@@ -251,7 +251,7 @@ CadModelCore::CadModelCore(QWidget *parent):
     connect(this,SIGNAL(UpdateEdges ()),this,SLOT(UpdateObject()));
     connect(this,SIGNAL(UpdateFaces ()),this,SLOT(UpdateObject()));
     connect(this,SIGNAL(UpdateBlocks()),this,SLOT(UpdateObject()));
-    //connect(this,SIGNAL(UpdateSelected()),this,SLOT(UpdateObject()));
+    connect(this,SIGNAL(UpdateSelected     ()),this,SLOT(UpdateAction()));
     connect(this,SIGNAL(SelectObjectChanged()),this,SLOT(UpdateAction()));
     connect(this,SIGNAL(UpdateAnyObject    ()),this,SLOT(UpdateAction()));
     connect(this,SIGNAL(UpdateRestraints   ()),this,SLOT(UpdateAction()));
