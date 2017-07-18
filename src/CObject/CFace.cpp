@@ -57,6 +57,36 @@ Pos CFace::GetNorm()const{
         return Pos(vec1.Cross(vec2)).GetNormalize();
     }
 }
+void CFace::DefineMap2()const{
+    CEdge* ee[]={this->GetEdgeSequence(0),
+                 this->GetEdgeSequence(1),
+                 this->GetEdgeSequence(2),
+                 this->GetEdgeSequence(3)};
+    //二次元エバリュエータ
+    GLfloat ctrlpoints[4][4][3];
+    for(int i=0;i<3;i++){
+        ctrlpoints[0][0][i] = ee[0]->GetMiddleDivide(0).mat[i];
+        ctrlpoints[1][0][i] = ee[0]->GetMiddleDivide(1.0/3.0).mat[i];
+        ctrlpoints[2][0][i] = ee[0]->GetMiddleDivide(2.0/3.0).mat[i];
+        ctrlpoints[3][0][i] = ee[1]->GetMiddleDivide(0).mat[i];
+        ctrlpoints[0][1][i] = ee[3]->GetMiddleDivide(2.0/3.0).mat[i];
+        ctrlpoints[3][1][i] = ee[1]->GetMiddleDivide(1.0/3.0).mat[i];
+        ctrlpoints[0][2][i] = ee[3]->GetMiddleDivide(1.0/3.0).mat[i];
+        ctrlpoints[3][2][i] = ee[1]->GetMiddleDivide(2.0/3.0).mat[i];
+        ctrlpoints[0][3][i] = ee[3]->GetMiddleDivide(0).mat[i];
+        ctrlpoints[1][3][i] = ee[2]->GetMiddleDivide(2.0/3.0).mat[i];
+        ctrlpoints[2][3][i] = ee[2]->GetMiddleDivide(1.0/3.0).mat[i];
+        ctrlpoints[3][3][i] = ee[2]->GetMiddleDivide(0).mat[i];
+
+        ctrlpoints[1][1][i] = (ctrlpoints[1][0][i] - ctrlpoints[0][0][i]) + (ctrlpoints[0][1][i] - ctrlpoints[0][0][i]) +  ctrlpoints[0][0][i];
+        ctrlpoints[2][1][i] = (ctrlpoints[2][0][i] - ctrlpoints[3][0][i]) + (ctrlpoints[3][1][i] - ctrlpoints[3][0][i]) +  ctrlpoints[3][0][i];
+        ctrlpoints[1][2][i] = (ctrlpoints[0][2][i] - ctrlpoints[0][3][i]) + (ctrlpoints[1][3][i] - ctrlpoints[0][3][i]) +  ctrlpoints[0][3][i];
+        ctrlpoints[2][2][i] = (ctrlpoints[3][2][i] - ctrlpoints[3][3][i]) + (ctrlpoints[2][3][i] - ctrlpoints[3][3][i]) +  ctrlpoints[3][3][i];
+    }
+    glMap2f(GL_MAP2_VERTEX_3, 0, 1, 3, 4, 0, 1, 12, 4, &ctrlpoints[0][0][0]);
+    glEnable(GL_MAP2_VERTEX_3);
+}
+
 Pos CFace::GetPosFromUV(double u,double v)const{
     CEdge* ee[]={this->GetEdgeSequence(0),
                  this->GetEdgeSequence(1),
@@ -65,11 +95,18 @@ Pos CFace::GetPosFromUV(double u,double v)const{
 
 }
 Pos CFace::GetPosFromUVSquare(double u,double v)const{
-    CEdge* ee[]={this->GetEdgeSequence(0),
-                 this->GetEdgeSequence(1),
-                 this->GetEdgeSequence(2),
-                 this->GetEdgeSequence(3)};
-
+/*
+    CPoint* pp[4];
+    CEdge*  ee[4];
+    for(int i=0;i<4;i++){
+        pp[i] = this->GetPointSequence(i);
+        ee[i] = this->GetEdgeSequence(i);
+    }
+    Pos delta_u,delta_v;
+    delta_u = (pp[3] - pp[0])-(pp[2] - pp[1]);
+    delta_v = (pp[1] - pp[0])-(pp[2] - pp[3]);
+    Pos base_u,base_v;
+*/
 }
 CPoint* CFace::GetBasePoint()const{
     QVector<CPoint*> pp= this->GetAllPoints();
@@ -181,28 +218,14 @@ bool CFace::DrawGL(Pos,Pos)const{
         glColor4f(currentColor[0],currentColor[1],currentColor[2], 0.1);
         glDepthMask(GL_FALSE);
 
-        const int FACE_DIVIDE = 30;
-        for (int j = 0; j < FACE_DIVIDE; j++){
+        this->DefineMap2();
+        for (int j = 0; j < 30; j++){
             glBegin(GL_QUAD_STRIP);
-            for (int i = 0; i <= FACE_DIVIDE; i++){
-                Pos p[] = {this->GetPosFromUV((double)j    /FACE_DIVIDE,(double)i/FACE_DIVIDE),
-                           this->GetPosFromUV((double)(j+1)/FACE_DIVIDE,(double)i/FACE_DIVIDE)};
-                glVertex3f(p[0].x(),p[0].y(),p[0].z());
-                glVertex3f(p[1].x(),p[1].y(),p[1].z());
-            }
-            glEnd();
-        }
-        for (int j = 0; j <= FACE_DIVIDE; j++){
-            glBegin(GL_LINE_STRIP);
-            for (int i = 0; i <= FACE_DIVIDE; i++){
-                Pos p = this->GetPosFromUV((double)j/FACE_DIVIDE,(double)i/FACE_DIVIDE);
-                glVertex3f(p.x(),p.y(),p.z());
-            }
-            glEnd();
-            glBegin(GL_LINE_STRIP);
-            for (int i = 0; i <= FACE_DIVIDE; i++){
-                Pos p = this->GetPosFromUV((double)i/FACE_DIVIDE,(double)j/FACE_DIVIDE);
-                glVertex3f(p.x(),p.y(),p.z());
+            for (int i = 0; i < 30; i++){
+                glEvalCoord2f((GLfloat)i/30.0, (GLfloat)j/30.0);
+                glEvalCoord2f((GLfloat)(i+1)/30.0, (GLfloat)j/30.0);
+                glEvalCoord2f((GLfloat)i/30.0, (GLfloat)(j+1)/30.0);
+                glEvalCoord2f((GLfloat)(i+1)/30.0, (GLfloat)(j+1)/30.0);
             }
             glEnd();
         }

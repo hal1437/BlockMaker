@@ -23,6 +23,7 @@ public:
     virtual bool isComprehension(Pos pos)const; //平面上かチェックする。
     virtual Pos  GetNorm()const ;               //法線ベクトル取得
 
+    virtual void DefineMap2()const;
     virtual Pos  GetPosFromUV      (double u,double v)const; //UV座標取得
     virtual Pos  GetPosFromUVSquare(double u,double v)const; //UV座標取得(全て直線と仮定して)
     virtual CPoint* GetBasePoint()const;               //基準点取得
