@@ -11,6 +11,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = FoamCAD
 TEMPLATE = app
 CONFIG += c++11
+LIBS += -lGLU
 
 INCLUDEPATH += ./src/
 

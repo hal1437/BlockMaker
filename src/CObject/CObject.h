@@ -4,8 +4,8 @@
 #include <QPainter>
 #include <QTransform>
 #include <QDebug>
-#include <GLUT/glut.h>
-#include "Utils.h"
+#include <GL/gl.h>
+#include <GL/glu.h>
 #include "Point.h"
 
 class CPoint;

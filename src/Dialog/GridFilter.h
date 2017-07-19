@@ -1,7 +1,6 @@
 #ifndef GRIDFILTER_H
 #define GRIDFILTER_H
 
-#include <QObject.h>
 #include <QPainter>
 #include <Point.h>
 #include <Utils.h>

@@ -2,7 +2,6 @@
 #define CEDGE_H
 #include "CObject.h"
 #include "CPoint.h"
-#include <GLUT/glut.h>
 
 
 //エッジクラス
