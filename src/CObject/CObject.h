@@ -4,9 +4,16 @@
 #include <QPainter>
 #include <QTransform>
 #include <QDebug>
+#include "Point.h"
+
+//OpenGLのインクルード
+#ifdef MACOSX
+#include <OpenGL.h>
+#include <GLUT/glut.h>
+#elif UNIX
 #include <GL/gl.h>
 #include <GL/glu.h>
-#include "Point.h"
+#endif
 
 class CPoint;
 

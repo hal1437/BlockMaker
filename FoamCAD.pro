@@ -11,7 +11,6 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = FoamCAD
 TEMPLATE = app
 CONFIG += c++11
-LIBS += -lGLU
 
 INCLUDEPATH += ./src/
 
@@ -83,3 +82,15 @@ FORMS    += src/MainWindow.ui \
 
 RESOURCES += \
     Resource/images.qrc
+
+#MAC限定
+macx {
+    DEFINES += MACOSX
+}
+#Unix限定
+unix:!macx {
+    DEFINES += UNIX
+    LIBS += -lGLU
+}
+
+
