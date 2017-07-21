@@ -6,45 +6,6 @@ CREATE_RESULT CPoint::Create(CPoint *pos){
     return CREATE_RESULT::COMPLETE;//生成終了
 }
 
-bool CPoint::Draw(QPainter& painter)const{
-    if(!this->isVisible())return true;
-    Pos center;
-    QTransform conv;
-
-    //CPointの円の大きさ・太さは、拡大によらず常に一定である。
-    painter.save();
-    conv = painter.transform();
-    center = Pos(*this).Transform(conv);
-
-    //描画設定
-    painter.setTransform(QTransform());//変換行列解除
-    painter.setPen(QPen(painter.pen().color(), CObject::DRAWING_LINE_SIZE));
-
-    if(control_point){//制御点ならば
-        //四角
-        QLineF ps[4] = {QLineF(center.x()-DRAWING_CIRCLE_SIZE,center.y()-DRAWING_CIRCLE_SIZE,center.x()+DRAWING_CIRCLE_SIZE,center.y()-DRAWING_CIRCLE_SIZE),
-                        QLineF(center.x()+DRAWING_CIRCLE_SIZE,center.y()-DRAWING_CIRCLE_SIZE,center.x()+DRAWING_CIRCLE_SIZE,center.y()+DRAWING_CIRCLE_SIZE),
-                        QLineF(center.x()+DRAWING_CIRCLE_SIZE,center.y()+DRAWING_CIRCLE_SIZE,center.x()-DRAWING_CIRCLE_SIZE,center.y()+DRAWING_CIRCLE_SIZE),
-                        QLineF(center.x()-DRAWING_CIRCLE_SIZE,center.y()+DRAWING_CIRCLE_SIZE,center.x()-DRAWING_CIRCLE_SIZE,center.y()-DRAWING_CIRCLE_SIZE)};
-        painter.drawLines(ps,4);
-    }else{
-        QRectF rect(center.x()-DRAWING_CIRCLE_SIZE,
-                    center.y()-DRAWING_CIRCLE_SIZE,
-                    DRAWING_CIRCLE_SIZE*2,
-                    DRAWING_CIRCLE_SIZE*2);
-        //丸
-        painter.drawArc(rect,0,360*16);
-    }
-    //ロック時
-    if(this->isLock() && !this->isControlPoint()){
-        painter.drawImage(center.x()+10,center.y()-10,QImage(":/Restraint/LockRestraint.png"));
-    }
-
-    //復元
-    painter.restore();
-
-    return true;
-}
 bool CPoint::DrawGL(Pos camera,Pos center)const{
     if(!this->isVisible())return true;
     glBegin(GL_LINE_LOOP);

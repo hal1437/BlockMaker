@@ -218,10 +218,6 @@ CEdge*  CFace::GetEdgeSequence(int index)const{
     }
     return ans;
 }
-
-bool CFace::Draw(QPainter& painter)const{
-    return true;
-}
 bool CFace::DrawGL(Pos,Pos)const{
     if(!this->isVisible())return true;
     if(this->isPolygon()){

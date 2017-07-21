@@ -33,7 +33,6 @@ public:
     virtual CPoint* GetPointSequence(int index)const;   //番号順点取得
     virtual CEdge*  GetEdgeSequence (int index)const;   //番号順線取得
 
-    virtual bool Draw(QPainter& painter)const;//描画関数
     virtual bool DrawGL(Pos camera,Pos center)const;//三次元描画関数
     virtual bool DrawNormArrowGL()const;//三次元法線ベクトル描画関数
     virtual bool Move(const Pos& diff);//移動関数

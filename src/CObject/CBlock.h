@@ -76,7 +76,6 @@ public:
     double GetLengthY(); //Y方向幅取得
     double GetLengthZ(); //Z方向幅取得
 
-    bool Draw  (QPainter& painter)const;     //描画関数
     bool DrawGL(Pos camera,Pos center)const; //三次元描画関数
     bool Move  (const Pos& diff);            //移動関数
 

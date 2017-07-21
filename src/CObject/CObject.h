@@ -37,8 +37,7 @@ public:
 
     static double drawing_scale;           //描画スケール
 
-protected:
-
+    //フラグ定義
     DEFINE_FLAG(Lock   ,false)
     DEFINE_FLAG(Visible,true)
 
@@ -50,7 +49,6 @@ public:
         return (dynamic_cast<const T*>(this) != nullptr);
     }
 
-    virtual bool Draw  (QPainter& painter)const = 0;     //描画関数
     virtual bool DrawGL(Pos camera,Pos center)const = 0; //三次元描画関数
     virtual bool Move  (const Pos& diff) = 0;            //移動関数
 
@@ -64,7 +62,7 @@ public:
     virtual  CObject* Clone()const = 0;
 
     //コンストラクタ
-    CObject(QObject* parent=nullptr);
+    explicit CObject(QObject* parent=nullptr);
     virtual ~CObject();
 };
 

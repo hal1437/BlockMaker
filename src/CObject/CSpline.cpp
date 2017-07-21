@@ -78,28 +78,6 @@ void CSpline::SetLock(bool lock){
     CObject::SetLock(lock);
 }
 
-bool CSpline::Draw(QPainter& painter)const{
-    if(!this->isVisible())return true;
-    if(pos.size() >= 1){
-        QPainterPath path;
-        double t, m;
-        m = (double)(pos.size()+1);
-
-        path.moveTo(this->start->x(),this->start->y());
-        const double dt = 1.0/DIVISION;
-        for(t=0; t<=m; t += dt){
-            if(t + dt > m)t=m;
-            QPointF pos(xs.culc(t), ys.culc(t));
-            path.lineTo(pos);
-        }
-        painter.setBrush(QColor(0,0,0,0));
-        painter.drawPath(path);
-    }else{
-        painter.drawLine(QPointF(this->start->x(),this->start->y()),QPointF(this->end->x(),this->end->y()));
-    }
-    return true;
-}
-
 bool CSpline::Move(const Pos& diff){
     this->start->Move(diff);
     this->end  ->Move(diff);

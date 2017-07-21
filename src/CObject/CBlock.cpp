@@ -173,37 +173,6 @@ double CBlock::GetLengthZ(){
                                       1,0,0,0,
                                       0,0,0,0}));
 }
-
-bool CBlock::Draw(QPainter& painter)const{
-    //描画範囲算出
-    double top,bottom,left,right;
-    QVector<Pos> pp;
-    for(int i=0;i<4;i++){
-        pp.push_back(*this->GetPointSequence(i));
-    }
-    top    = std::min_element(pp.begin(),pp.end(),[](const Pos& lhs,const Pos& rhs){return lhs.y() < rhs.y();})->y();
-    bottom = std::max_element(pp.begin(),pp.end(),[](const Pos& lhs,const Pos& rhs){return lhs.y() < rhs.y();})->y();
-    left   = std::min_element(pp.begin(),pp.end(),[](const Pos& lhs,const Pos& rhs){return lhs.x() < rhs.x();})->x();
-    right  = std::max_element(pp.begin(),pp.end(),[](const Pos& lhs,const Pos& rhs){return lhs.x() < rhs.x();})->x();
-
-    //多角形の描画
-    QPointF vertex[4];
-    for(int i=0;i<4;i++){
-        vertex[i] = QPointF(pp[i].x(),pp[i].y());
-    }
-    painter.drawPolygon(vertex,4);
-
-    //分割線の描画
-    for(int i =0;i<=this->div[0];i++){
-        painter.drawLine(QPointF(this->GetDivisionPoint(0,i).x(),this->GetDivisionPoint(0,i).y()),
-                         QPointF(this->GetDivisionPoint(2,i).x(),this->GetDivisionPoint(2,i).y()));
-    }
-    for(int i =0;i<=this->div[1];i++){
-        painter.drawLine(QPointF(this->GetDivisionPoint(1,i).x(),this->GetDivisionPoint(1,i).y()),
-                         QPointF(this->GetDivisionPoint(3,i).x(),this->GetDivisionPoint(3,i).y()));
-    }
-    return true;
-}
 bool CBlock::DrawGL(Pos,Pos)const{
     if(!this->isVisible())return true;
     //薄い色に変更

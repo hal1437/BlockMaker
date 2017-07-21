@@ -36,37 +36,6 @@ CREATE_RESULT CArc::Create(CPoint *pos){
     }
     return result; //終了
 }
-bool CArc::Draw(QPainter& painter)const{
-    if(!this->isVisible())return true;
-    if(this->start == nullptr && this->end == nullptr && this->center == nullptr)return false;
-    QRectF rect(this->center->x() - round,
-                this->center->y() - round,
-                round*2,round*2);
-    Pos dir1 = (*this->start   - *this->center);
-    double angle1 = std::atan2(-dir1.y(),dir1.x()) * 180 / PI;
-
-    if(this->end == this->start){
-        //点線
-        QPen pen = painter.pen();
-        painter.save();
-        pen.setStyle(Qt::DashLine);
-        painter.setPen(pen);
-        painter.drawChord(rect,angle1*16,360*16);
-        painter.restore();
-    }else{
-        //実線
-        Pos dir2 = (*this->end - *this->center);
-        double angle1 = std::atan2(-dir1.y(),dir1.x()) * 180 / PI;
-        double angle2 = 360 - angle1 + (std::atan2(-dir2.y(),dir2.x())) * 180 / PI;
-
-        QRectF rect(this->center->x() - round,
-                    this->center->y() - round,
-                    round*2,round*2);
-        painter.drawArc (rect,angle1*16,Mod(angle2,(360))*16);
-    }
-
-    return true;
-}
 bool CArc::DrawGL(Pos camera,Pos center)const{
     if(!this->isVisible())return true;
     if(this->end == nullptr){
