@@ -35,7 +35,7 @@ public:
     virtual CREATE_RESULT Create(CPoint* pos);
     virtual bool Draw(QPainter& painter)const;//描画関数
     virtual bool Move(const Pos& move);//移動関数
-    virtual void Lock(bool lock);//ロック
+    virtual void SetLock(bool lock);//ロック
 
     //始点終点操作オーバーライド
     virtual void SetStartPos(CPoint* pos);

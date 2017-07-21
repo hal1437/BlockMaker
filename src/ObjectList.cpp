@@ -278,10 +278,10 @@ void ObjectList::ReverseArc(bool){
     UpdateObject();
 }
 void ObjectList::SetVisible(bool){
-    for(CObject* obj:this->CadModelCoreInterface::model->GetSelected())obj->Visible(true);
+    for(CObject* obj:this->CadModelCoreInterface::model->GetSelected())obj->SetVisible(true);
 }
 void ObjectList::SetInvisible(bool){
-    for(CObject* obj:this->CadModelCoreInterface::model->GetSelected())obj->Visible(false);
+    for(CObject* obj:this->CadModelCoreInterface::model->GetSelected())obj->SetVisible(false);
 }
 void ObjectList::SetVisibleMesh(bool){
     for(CObject* obj:this->CadModelCoreInterface::model->GetSelected()){

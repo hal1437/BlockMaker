@@ -23,7 +23,6 @@ public:
     virtual bool Draw(QPainter& painter)const = 0;//描画関数
     virtual bool DrawGL(Pos camera,Pos center)const;//三次元描画関数
     virtual bool Move(const Pos& move) = 0;//移動関数
-    virtual void Lock(bool lock) = 0;//ロック
 
     //中間点操作
     virtual int     GetMiddleCount()const = 0;

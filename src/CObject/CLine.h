@@ -11,7 +11,7 @@ public:
     virtual CREATE_RESULT Create(CPoint* pos);
     virtual bool Draw(QPainter& painter)const;//描画関数
     virtual bool Move(const Pos& move);//移動関数
-    virtual void Lock(bool lock);//ロック
+    virtual void SetLock(bool lock);//ロック
 
     virtual bool isSelectable(Pos pos)const;//選択可能関数(再定義)
 

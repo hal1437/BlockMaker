@@ -22,12 +22,12 @@ bool CLine::Move(const Pos& diff){
     if(!this->end  ->isLock())this->end  ->Move(diff);
     return true;
 }
-void CLine::Lock(bool lock){
+void CLine::SetLock(bool lock){
     //それぞれロック
-    this->start->Lock(lock);
-    this->end  ->Lock(lock);
+    this->start->SetLock(lock);
+    this->end  ->SetLock(lock);
     //自分もロック
-    CObject::Lock(lock);
+    CObject::SetLock(lock);
 }
 
 

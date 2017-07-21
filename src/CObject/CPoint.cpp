@@ -78,7 +78,7 @@ bool CPoint::Move(const Pos& diff){
 }
 
 bool CPoint::isLock()const{
-    return (this->lock || this->isControlPoint());
+    return (this->isLock() || this->isControlPoint());
 }
 
 bool CPoint::isControlPoint()const{

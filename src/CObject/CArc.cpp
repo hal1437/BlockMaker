@@ -98,12 +98,12 @@ bool CArc::Move(const Pos& diff){
     this->center->Move(diff);
     return true;
 }
-void CArc::Lock(bool lock){
+void CArc::SetLock(bool lock){
     //それぞれロック
-    this->start ->Lock(lock);
-    this->end   ->Lock(lock);
-    this->center->Lock(lock);
-    CObject::Lock(lock);
+    this->start ->SetLock(lock);
+    this->end   ->SetLock(lock);
+    this->center->SetLock(lock);
+    CObject::SetLock(lock);
 }
 bool CArc::isSelectable(Pos pos) const{
     //角度判定、半径判定、作成判定

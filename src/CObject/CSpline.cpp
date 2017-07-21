@@ -71,11 +71,11 @@ CREATE_RESULT CSpline::Create(CPoint *pos){
     return CREATE_RESULT::ENDLESS;
 }
 
-void CSpline::Lock(bool lock){
+void CSpline::SetLock(bool lock){
     for(int i =0;i<static_cast<int>(this->pos.size());i++){
-        pos[i]->Lock(lock);
+        pos[i]->SetLock(lock);
     }
-    CObject::Lock(lock);
+    CObject::SetLock(lock);
 }
 
 bool CSpline::Draw(QPainter& painter)const{

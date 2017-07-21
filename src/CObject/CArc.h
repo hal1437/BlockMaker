@@ -24,7 +24,7 @@ public:
     virtual bool Draw(QPainter& painter)const;
     virtual bool DrawGL(Pos camera,Pos center)const;
     virtual bool Move(const Pos& diff);
-    virtual void Lock(bool lock);
+    virtual void SetLock(bool lock);
     virtual bool isSelectable(Pos pos) const;//選択可能オーバーライド
 
     //始点終点操作オーバーライド
