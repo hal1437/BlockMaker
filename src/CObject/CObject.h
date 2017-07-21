@@ -64,6 +64,9 @@ public:
     virtual Pos GetNearPos (const Pos& hand)const=0;
     virtual Pos GetNearLine(const Pos& pos1,const Pos& pos2)const=0;
 
+    //複製
+    virtual  CObject* Clone()const = 0;
+
     //コンストラクタ
     CObject(QObject* parent=nullptr);
     virtual ~CObject();

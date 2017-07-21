@@ -46,7 +46,7 @@ public:
     virtual void SetEndPos(CPoint* pos);
 
     //複製
-    virtual CEdge* Clone()const = 0;
+    virtual CObject* Clone()const = 0;
 
     CEdge(QObject* parent=nullptr);
     CEdge(CPoint* start,CPoint* end,QObject* parent=nullptr);

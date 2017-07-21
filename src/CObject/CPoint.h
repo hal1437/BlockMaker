@@ -27,10 +27,12 @@ public:
     virtual bool isControlPoint()const;  //作用点
     virtual bool ControlPoint(bool f);   //作用点設定
 
-
     //近接点
     virtual Pos GetNearPos (const Pos& hand)const;
     virtual Pos GetNearLine(const Pos& pos1,const Pos& pos2)const;
+
+    //複製
+    virtual CObject* Clone()const;
 
     //コンストラクタ
     CPoint(QObject* parent=nullptr);

@@ -97,6 +97,10 @@ Pos CPoint::GetNearLine(const Pos&,const Pos&)const{
     return *this;
 }
 
+CObject* CPoint::Clone()const{
+    return new CPoint(static_cast<Pos>(*this));
+}
+
 
 CPoint::CPoint(QObject* parent):
     CObject(parent){

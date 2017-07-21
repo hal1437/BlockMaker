@@ -306,6 +306,14 @@ Pos CFace::GetNearLine(const Pos& pos1,const Pos& pos2)const{
     return Pos();
 }
 
+CObject* CFace::Clone()const{
+    CFace* new_obj = new CFace();
+    for(CEdge*edge:this->edges){
+        new_obj->edges.push_back(dynamic_cast<CEdge*>(edge->Clone()));
+    }
+    return new_obj;
+}
+
 CFace::CFace(QObject* parent):
     CObject(parent)
 {

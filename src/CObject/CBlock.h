@@ -90,6 +90,8 @@ public:
     void ReorderEdges();//エッジ並び替え
 public:
 
+    virtual CObject* Clone()const;
+
     CBlock(QObject* parent=nullptr);
     virtual ~CBlock();
 

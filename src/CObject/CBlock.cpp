@@ -447,4 +447,12 @@ void CBlock::ReorderEdges(){
     }
 }
 
+CObject* CBlock::Clone()const{
+    CBlock* new_obj;
+    for(CFace* face:this->faces){
+        new_obj->faces.push_back(dynamic_cast<CFace*>(face->Clone()));
+    }
+    return new_obj;
+}
+
 

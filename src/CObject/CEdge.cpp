@@ -88,6 +88,8 @@ bool CEdge::DrawGL(Pos camera,Pos center)const{
     return true;
 }
 
+
+
 CEdge::CEdge(QObject* parent):
     CObject(parent)
 {
