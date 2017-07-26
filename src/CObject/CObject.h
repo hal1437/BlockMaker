@@ -34,7 +34,6 @@ public:
     static constexpr double COLLISION_SIZE = 6; //当たり判定半径
     static constexpr double DRAWING_LINE_SIZE = 3; //描画線幅
     static constexpr double SAME_POINT_EPS = 0.001;    //同一点誤差
-
     static double drawing_scale;           //描画スケール
 
     //フラグ定義
@@ -49,10 +48,18 @@ public:
         return (dynamic_cast<const T*>(this) != nullptr);
     }
 
-    virtual bool DrawGL(Pos camera,Pos center)const = 0; //三次元描画関数
-    virtual bool Move  (const Pos& diff) = 0;            //移動関数
+    virtual void DrawGL(Pos camera,Pos center)const = 0; //三次元描画関数
+    virtual void MoveAbsolute(const Pos& diff);  //絶対移動関数
+    virtual void MoveRelative(const Pos& diff);  //相対移動関数
+    virtual bool isSelectable(Pos pos)const;     //posの位置で選択可能か
 
-    virtual bool isSelectable(Pos pos)const;  //posの位置で選択可能か
+    //子の操作
+    virtual CObject* GetChild     (int index) = 0;
+    virtual CObject* GetChild     (int index)const;
+    virtual void     SetChild     (int index,CObject* obj);
+    virtual void     InsertChild  (int index,CObject* obj);
+    virtual int      GetChildCount()const = 0;
+    virtual QVector<CObject*> GetAllChildren()const;
 
     //近接点
     virtual Pos GetNearPos (const Pos& hand)const=0;

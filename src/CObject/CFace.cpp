@@ -146,19 +146,6 @@ CEdge*  CFace::GetBaseEdge()const{
                (*rhs->end - *rhs->start).DotPos(n);
     });
 }
-QVector<CPoint*> CFace::GetAllPoints()const{
-    QVector<CPoint*>ans;
-    for(CEdge* edge: this->edges){
-        for(int i=0;i<edge->GetPointSequenceCount();i++){
-            ans.push_back(edge->GetPointSequence(i));
-        }
-    }
-    unique(ans);
-    return ans;
-}
-QVector<CEdge*>  CFace::GetAllEdges ()const{
-    return this->edges;
-}
 CPoint* CFace::GetPointSequence(int index)const{
     //index回だけ連鎖させる
     CPoint* corner = this->GetBasePoint();
@@ -218,7 +205,7 @@ CEdge*  CFace::GetEdgeSequence(int index)const{
     }
     return ans;
 }
-bool CFace::DrawGL(Pos,Pos)const{
+void CFace::DrawGL(Pos,Pos)const{
     if(!this->isVisible())return true;
     if(this->isPolygon()){
         //薄い色に変更
@@ -269,23 +256,6 @@ bool CFace::DrawNormArrowGL()const{
     glEnd();
     return true;
 }
-bool CFace::Move(const Pos& diff){
-    QVector<CPoint*> pp;
-    for(int i=0;i<this->edges.size();i++){
-        for(int j=0;j<this->edges[i]->GetPointSequenceCount();j++){
-            pp.push_back(this->edges[i]->GetPointSequence(j));
-        }
-    }
-    //排他
-    std::sort(pp.begin(),pp.end());
-    pp.erase(std::unique(pp.begin(),pp.end()),pp.end());
-
-    //移動
-    for(CPoint* p:pp){
-        p->Move(diff);
-    }
-    return true;
-}
 
 void CFace::ReorderEdges(){
     QVector<CEdge*> ans;
@@ -304,7 +274,7 @@ Pos CFace::GetNearLine(const Pos& pos1,const Pos& pos2)const{
 
 CObject* CFace::Clone()const{
     CFace* new_obj = new CFace();
-    for(CEdge*edge:this->edges){
+    for(CEdge* edge:this->edges){
         new_obj->edges.push_back(dynamic_cast<CEdge*>(edge->Clone()));
     }
     return new_obj;

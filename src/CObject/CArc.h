@@ -10,20 +10,15 @@ protected:
 
 public:
     CPoint* center; //中心
-    bool reverse = false;
+    DEFINE_FLAG(Reverse,false)
+
 public:
     //半径操作関数
     double GetRound()const;
 
-public:
-    void SetReverse(bool reverse){this->reverse = reverse;}
-    bool GetReverse(){return this->reverse;}
-
     //作成関数(完了時:true , 継続時:false)
     virtual CREATE_RESULT Create(CPoint* pos);
-    virtual bool DrawGL(Pos camera,Pos center)const;
-    virtual bool Move(const Pos& diff);
-    virtual void SetLock(bool lock);
+    virtual void DrawGL(Pos camera,Pos center)const;
     virtual bool isSelectable(Pos pos) const;//選択可能オーバーライド
 
     //始点終点操作オーバーライド
@@ -32,10 +27,10 @@ public:
     virtual void SetCenterPos(CPoint* pos);
 
     //中間点操作
-    virtual int GetMiddleCount()const;
-    virtual CPoint* GetMiddle(int index)const;
-    virtual void    SetMiddle(CPoint*,int index);
-    virtual Pos     GetMiddleDivide(double t)const;
+    virtual CObject* GetChild(int index);
+    virtual void     SetChild(int index,CObject* obj);
+    virtual int      GetChildCount()const;
+    virtual Pos      GetMiddleDivide(double t)const;    //補完点
 
     //近接点
     virtual Pos GetNearPos (const Pos& hand)const;

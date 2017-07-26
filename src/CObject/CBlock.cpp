@@ -173,7 +173,7 @@ double CBlock::GetLengthZ(){
                                       1,0,0,0,
                                       0,0,0,0}));
 }
-bool CBlock::DrawGL(Pos,Pos)const{
+void CBlock::DrawGL(Pos,Pos)const{
     if(!this->isVisible())return true;
     //薄い色に変更
     float oldColor[4];
@@ -385,6 +385,17 @@ CBlock::~CBlock()
 {
 
 }
+
+//子の操作
+CObject* CBlock::GetChild(int index){
+    return this->faces[index];
+}
+
+int CBlock::GetChildCount()const{
+    return this->faces.size();
+}
+
+
 void CBlock::RefreshDividePoint(){
 
     //更新
@@ -402,6 +413,9 @@ void CBlock::RefreshDividePoint(){
         }
     }
 }
+
+
+
 void CBlock::ReorderEdges(){
     //エッジ並び替え
     for(int i=0;i<12;i++){

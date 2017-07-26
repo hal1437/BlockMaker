@@ -71,49 +71,22 @@ CREATE_RESULT CSpline::Create(CPoint *pos){
     return CREATE_RESULT::ENDLESS;
 }
 
-void CSpline::SetLock(bool lock){
-    for(int i =0;i<static_cast<int>(this->pos.size());i++){
-        pos[i]->SetLock(lock);
-    }
-    CObject::SetLock(lock);
-}
-
-bool CSpline::Move(const Pos& diff){
-    this->start->Move(diff);
-    this->end  ->Move(diff);
-    for(int i=0;i<static_cast<int>(pos.size());i++){
-        pos[i]->Move(diff);
-    }
-    return true;
-}
-
-//始点終点操作オーバーライド
-void CSpline::SetStartPos(CPoint* pos){
-    CEdge::SetStartPos(pos);
-    RefreshNodes();
-}
-
-void CSpline::SetEndPos(CPoint* pos){
-    CEdge::SetEndPos(pos);
-    RefreshNodes();
-}
-
 //中間点操作
-int CSpline::GetMiddleCount()const{
-    return this->pos.size();
+CObject* CSpline::GetChild(int index){
+    if(index == 0)return this->start;
+    if(index > 0 && index < this->pos.size()-2)return this->pos[index-1];
+    if(index == this->pos.size()-1)return this->end;
 }
-CPoint* CSpline::GetMiddle(int index)const{
-    return pos[index];
+void     CSpline::SetChild(int index,CObject* obj){
+    if(index == 0)this->start = dynamic_cast<CPoint*>(obj);
+    if(index > 0 && index < this->pos.size()-2)this->pos[index-1] = dynamic_cast<CPoint*>(obj);
+    if(index == this->pos.size()-1)this->end = dynamic_cast<CPoint*>(obj);
 }
-void CSpline::SetMiddle(CPoint* pos,int index){
-    if(pos==nullptr){
-        this->pos.erase(this->pos.begin()+index);
-    }else{
-        this->pos[index] = pos;
-    }
-    RefreshNodes();
+
+int CSpline::GetChildCount()const{
+    return this->pos.size()+2;
 }
-Pos  CSpline::GetMiddleDivide(double t)const{
+Pos CSpline::GetMiddleDivide(double t)const{
     if(pos.size() == 0)return (*end - *start)*t + *start;
     double tt = t * (pos.size()+1);
     return Pos(xs.culc(tt),ys.culc(tt),zs.culc(tt));
@@ -167,16 +140,16 @@ CSpline::CSpline(QObject *parent):
 }
 CSpline::CSpline(CPoint* start,CPoint* end,QObject* parent):
     CEdge(parent){
-    this->SetStartPos(start);
-    this->SetEndPos(end);
+    this->SetChild(0,start);
+    this->SetChild(1,end);
 }
 
 CEdge* CSpline::Clone()const{
     CSpline* ptr = new CSpline(this->parent());
     ptr->start   = new CPoint(*this->start ,ptr);
     ptr->end     = new CPoint(*this->end   ,ptr);
-    for(int i=0;i<this->GetMiddleCount();i++){
-        ptr->pos.push_back(new CPoint(*this->GetMiddle(i),ptr));
+    for(int i=0;i<this->GetChildCount();i++){
+        ptr->pos.push_back(new CPoint(*dynamic_cast<CPoint*>(dynamic_cast<const CObject*>(this)->GetChild(i)),ptr));
     }
     return ptr;
 }
@@ -190,9 +163,9 @@ void CSpline::ChangePosCallback(CPoint *, Pos old_pos){
     CPoint* p;
     if(*this->start == old_pos) p = this->start;
     if(*this->end   == old_pos) p = this->end;
-    for(int i = 0;i < this->GetMiddleCount();i++){
-        if(*this->GetMiddle(i) == old_pos){
-            p = this->GetMiddle(i);
+    for(int i = 0;i < this->GetChildCount();i++){
+        if(*dynamic_cast<CPoint*>(this->GetChild(i)) == old_pos){
+            p = dynamic_cast<CPoint*>(this->GetChild(i));
         }
     }
     //一時的にnew_posを適用

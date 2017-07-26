@@ -21,8 +21,6 @@ class CSpline : public CEdge
     Q_OBJECT
 private:
     const static int DIVISION = 10;//分解数
-    const static int DRAWING_LINE_SIZE = 3;//線の太さ
-    const static int COLLISION_SIZE = 6;//あたり判定の大きさ
 protected:
     std::vector<CPoint*> pos;
     Spline xs;
@@ -33,19 +31,12 @@ public:
 
     //作成関数(完了時:true , 継続時:false)
     virtual CREATE_RESULT Create(CPoint* pos);
-    virtual bool Move(const Pos& move);//移動関数
-    virtual void SetLock(bool lock);//ロック
-
-    //始点終点操作オーバーライド
-    virtual void SetStartPos(CPoint* pos);
-    virtual void SetEndPos(CPoint* pos);
 
     //中間点操作
-    virtual int GetMiddleCount()const;
-    virtual CPoint* GetMiddle(int index)const;
-    virtual void    SetMiddle(CPoint*,int index);
-    virtual Pos     GetMiddleDivide(double t)const;    //補完点
-
+    virtual CObject* GetChild(int index);
+    virtual void     SetChild(int index,CObject* obj);
+    virtual int      GetChildCount()const;
+    virtual Pos      GetMiddleDivide(double t)const;    //補完点
 
     //近接点
     virtual Pos GetNearPos (const Pos& hand)const;

@@ -6,8 +6,8 @@ CREATE_RESULT CPoint::Create(CPoint *pos){
     return CREATE_RESULT::COMPLETE;//生成終了
 }
 
-bool CPoint::DrawGL(Pos camera,Pos center)const{
-    if(!this->isVisible())return true;
+void CPoint::DrawGL(Pos camera,Pos center)const{
+    if(!this->isVisible())return;
     glBegin(GL_LINE_LOOP);
     Pos cc = camera- center;
     double theta1 = std::atan2(cc.y(),std::sqrt(cc.x()*cc.x()+cc.z()*cc.z()));
@@ -19,38 +19,26 @@ bool CPoint::DrawGL(Pos camera,Pos center)const{
         glVertex3f((p + *this).x(),(p + *this).y(),(p + *this).z());
     }
     glEnd();
-    return true;
 }
 
-
-bool CPoint::Move(const Pos& diff){
-    //ロックされていなければ
-    if(isLock() == false && !isControlPoint()){
-        if(diff != Pos(0,0) && moving == false){
-            //シグナル
-            moving = true;  //再帰呼び出し制限
-            *this += diff;//単純な平行移動
-            emit PosChanged(this,*this-diff);
-            emit PosChanged();
-            moving = false; //再帰呼び出し制限
-        }
+void CPoint::MoveAbsolute(const Pos& diff){
+    this->MoveRelative(diff - *this);
+}
+void CPoint::MoveRelative(const Pos& diff){
+    if(isLock() == false && !isControlPoint() && this->isMoving() == false){
+        this->SetMoving(true);  //再帰呼び出し制限
+        *this += diff;//移動
+        emit PosChanged(this,*this-diff);
+        this->SetMoving(false); //再帰呼び出し制限解除
     }
-    return true;
 }
 
-bool CPoint::isLock()const{
-    return (this->isLock() || this->isControlPoint());
+CObject* CPoint::GetChild(int){
+    throw "CPointに子は存在しません";
 }
-
-bool CPoint::isControlPoint()const{
-    return this->control_point;
+int CPoint::GetChildCount()const{
+    return 0;
 }
-
-bool CPoint::ControlPoint(bool f){
-    control_point = f;
-    return true;
-}
-
 Pos CPoint::GetNearPos(const Pos&)const{
     return *this;
 }
@@ -74,23 +62,19 @@ CPoint::CPoint(const Pos& origin){
 CPoint::CPoint(const Pos &pos,QObject* parent):
     CObject(parent),
     Pos(pos){
-
 }
-
-CPoint::CPoint(double x, double y, double z, QObject *parent):
-    CObject(parent),
-    Pos(x,y,z){
-
-}
-
 CPoint::~CPoint()
 {
 
 }
-
 CPoint& CPoint::operator=(const Pos& rhs){
     this->x() = rhs.x();
     this->y() = rhs.y();
     this->z() = rhs.z();
     return (*this);
 }
+
+void CPoint::PosChangedHandler(CPoint*,Pos){
+    emit PosChanged();
+}
+

@@ -2,23 +2,20 @@
 #define CLINE_H
 #include "CEdge.h"
 
-//CAD上の点
+//直線
 class CLine : public CEdge
 {
     Q_OBJECT
 public:
     //作成関数(完了時:true , 継続時:false)
     virtual CREATE_RESULT Create(CPoint* pos);
-    virtual bool Move(const Pos& move);//移動関数
-    virtual void SetLock(bool lock);//ロック
-
-    virtual bool isSelectable(Pos pos)const;//選択可能関数(再定義)
+    virtual bool isSelectable(Pos pos)const;
 
     //中間点操作
-    virtual int     GetMiddleCount()const;
-    virtual CPoint* GetMiddle(int index)const;
-    virtual void    SetMiddle(CPoint*,int index);
-    virtual Pos     GetMiddleDivide(double t)const;    //補完点
+    virtual CObject* GetChild(int index);
+    virtual void     SetChild(int index,CObject* obj);
+    virtual int      GetChildCount()const;
+    virtual Pos      GetMiddleDivide(double t)const;
 
     //近接点
     virtual Pos GetNearPos (const Pos& hand)const;

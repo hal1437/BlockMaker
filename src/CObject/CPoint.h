@@ -11,19 +11,20 @@ private:
     const static int DRAWING_CIRCLE_SIZE = 5; //描画円半径
 public:
     const static int COLLISION_SIZE = 8;      //当たり判定半径
-    bool control_point = false; //作用点
-    bool moving = false;
+
+    DEFINE_FLAG(ControlPoint   ,false) //作用点
+    DEFINE_FLAG(Moving   ,false)       //移動中
 
 public:
 
-    virtual CREATE_RESULT Create(CPoint* pos); //作成関数
+    virtual CREATE_RESULT Create(CPoint* pos);       //作成関数
+    virtual void DrawGL(Pos camera,Pos center)const; //描画関数
+    virtual void MoveAbsolute(const Pos& diff);      //絶対移動関数
+    virtual void MoveRelative(const Pos& diff);      //相対移動関数
 
-    virtual bool DrawGL(Pos camera,Pos center)const; //三次元描画関数
-    virtual bool Move  (const Pos& diff);              //移動関数
-
-    virtual bool isLock()const;  //固定点
-    virtual bool isControlPoint()const;  //作用点
-    virtual bool ControlPoint(bool f);   //作用点設定
+    //子の操作
+    virtual CObject* GetChild(int index);
+    virtual int      GetChildCount()const;
 
     //近接点
     virtual Pos GetNearPos (const Pos& hand)const;
@@ -36,7 +37,6 @@ public:
     CPoint(QObject* parent=nullptr);
     CPoint(const Pos& origin);
     CPoint(const Pos& pos,QObject* parent);
-    CPoint(double x,double y,double z = 0,QObject* parent=nullptr);//初期Create済みコンストラクタ
     ~CPoint();
 
     CPoint& operator=(const Pos& rhs);
@@ -46,7 +46,10 @@ signals:
     void PosChanged();
     void PosChanged(CPoint* pos,Pos old_pos);
 
-public slots:
+
+private slots:
+    //引数有りから無しを呼び出す
+    void PosChangedHandler(CPoint* pos,Pos old_pos);
 
 };
 

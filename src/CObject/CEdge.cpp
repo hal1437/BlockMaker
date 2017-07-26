@@ -1,31 +1,5 @@
 #include "CEdge.h"
 
-void CEdge::SetStartPos(CPoint* pos){
-    if(this->start != nullptr){
-        disconnect(this->start,SIGNAL(PosChanged(CPoint*,Pos)),this,SLOT(ChangePosCallback(CPoint*,Pos)));
-    }
-    this->start = pos;
-    connect   (this->start,SIGNAL(PosChanged(CPoint*,Pos)),this,SLOT(ChangePosCallback(CPoint*,Pos)));
-}
-
-void CEdge::SetEndPos(CPoint* pos){
-    if(this->end != nullptr){
-        disconnect(this->end,SIGNAL(PosChanged(CPoint*,Pos)),this,SLOT(ChangePosCallback(CPoint*,Pos)));
-    }
-    this->end = pos;
-    connect(this->end,SIGNAL(PosChanged(CPoint*,Pos)),this,SLOT(ChangePosCallback(CPoint*,Pos)));
-}
-
-int CEdge::GetPointSequenceCount()const{
-    return this->GetMiddleCount()+2;
-}
-CPoint* CEdge::GetPointSequence(int index)const{
-    if     (index == 0                        )return this->start;
-    else if(index == GetPointSequenceCount() - 1)return this->end;
-    else if(index > 0 && index < GetPointSequenceCount() - 1)return this->GetMiddle(index-1);
-    return nullptr;
-}
-
 Pos CEdge::GetNearLine(const Pos& pos1,const Pos& pos2)const{
     //GetNearPosによる近似
     Pos ans = *this->start;
@@ -37,22 +11,8 @@ Pos CEdge::GetNearLine(const Pos& pos1,const Pos& pos2)const{
     }
     return ans;
 }
-QVector<CPoint*> CEdge::GetAllPoints()const{
-    QVector<CPoint*> ans;
-    for(int i=0;i<this->GetPointSequenceCount();i++){
-        ans.push_back(this->GetPointSequence(i));
-    }
-    return ans;
-}
-
-void CEdge::SetPointSequence(CPoint* pos,int index){
-    if     (index == 0                        )this->SetStartPos(pos);
-    else if(index == GetPointSequenceCount() - 1)this->SetEndPos(pos);
-    else if(index > 0 && index < GetPointSequenceCount() - 1)this->SetMiddle(pos,index-1);
-}
-
-bool CEdge::DrawGL(Pos camera,Pos center)const{
-    if(!this->isVisible())return true;
+void CEdge::DrawGL(Pos camera,Pos center)const{
+    if(!this->isVisible())return;
     glBegin(GL_LINE_STRIP);
     //線の分割描画
     for(double i=0;i<=1;i += 1.0/CEdge::LINE_NEAR_DIVIDE){
@@ -84,11 +44,16 @@ bool CEdge::DrawGL(Pos camera,Pos center)const{
         }
         glEnd();
     }
-
-    return true;
 }
 
-
+void  CEdge::SetChild(int index,CObject* obj){
+    //コールバック接続解除
+    if(this->GetChild(index) != nullptr)disconnect(this->GetChild(index),SIGNAL(PosChanged(CPoint*,Pos)),this,SLOT(ChangePosCallback(CPoint*,Pos)));
+    //親の関数を使用
+    CObject::SetChild(index,obj);
+    //コールバック接続解除
+    if(this->GetChild(index) != nullptr)disconnect(this->GetChild(index),SIGNAL(PosChanged(CPoint*,Pos)),this,SLOT(ChangePosCallback(CPoint*,Pos)));
+}
 
 CEdge::CEdge(QObject* parent):
     CObject(parent)
@@ -96,17 +61,9 @@ CEdge::CEdge(QObject* parent):
     this->start = this->end = nullptr;
 }
 
-CEdge::~CEdge()
-{
-}
-CEdge::CEdge(CPoint* start,CPoint* end,QObject* parent):
-    CEdge(parent){
-    this->SetStartPos(start);
-    this->SetEndPos(end);
-}
-
-
+CEdge::~CEdge(){}
 //点移動コールバック
 void CEdge::ChangePosCallback(CPoint* ,Pos ){
+    //何もしない
 }
 

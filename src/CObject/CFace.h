@@ -1,43 +1,43 @@
 #ifndef CFACE_H
 #define CFACE_H
 
-#include "CObject/CEdge.h"
-#include "CObject/CLine.h"
+#include "CEdge.h"
 
 //平面オブジェクト
 class CFace : public CObject
 {
     Q_OBJECT
 public:
-    QVector<CEdge*> edges;//構成線
-    bool is_polygon = true;
     static CFace* base[3];//正面,平面,右側面
+    QVector<CEdge*> edges;//構成線
+
+    //ポリゴン判定
+    DEFINE_FLAG(Polygon,true)
 
 public:
     //面が作成可能か
     static bool Creatable(QVector<CObject*> lines);
+    virtual void DrawGL(Pos camera,Pos center)const;//三次元描画関数
+    virtual bool DrawNormArrowGL()const;//三次元法線ベクトル描画関数
 
-    bool isPolygon()const{return this->is_polygon;}     //ポリゴン判定
-    void SetPolygon(bool poly){this->is_polygon = poly;}
-
+    virtual void ReorderEdges();//エッジ並び替え
     virtual bool isComprehension(Pos pos)const; //平面上かチェックする。
     virtual Pos  GetNorm()const ;               //法線ベクトル取得
 
-    virtual void DefineMap2()const;
+    //エバリュエータ
+    virtual void DefineMap2()const;//二次元エヴァリュエータ定義
     virtual Pos  GetPosFromUV      (double u,double v)const; //UV座標取得
     virtual Pos  GetPosFromUVSquare(double u,double v)const; //UV座標取得(全て直線と仮定して)
+
+    //インデックス取得
     virtual CPoint* GetBasePoint()const;               //基準点取得
     virtual CEdge*  GetBaseEdge ()const;               //基準線取得
-    virtual QVector<CPoint*> GetAllPoints()const;      //構成点取得
-    virtual QVector<CEdge*>  GetAllEdges ()const;      //構成線取得
     virtual CPoint* GetPointSequence(int index)const;   //番号順点取得
     virtual CEdge*  GetEdgeSequence (int index)const;   //番号順線取得
 
-    virtual bool DrawGL(Pos camera,Pos center)const;//三次元描画関数
-    virtual bool DrawNormArrowGL()const;//三次元法線ベクトル描画関数
-    virtual bool Move(const Pos& diff);//移動関数
-
-    void ReorderEdges();//エッジ並び替え
+    //子の操作
+    virtual CObject* GetChild     (int index);
+    virtual int      GetChildCount()const;
 
     //近接点
     virtual Pos GetNearPos (const Pos& hand)const;

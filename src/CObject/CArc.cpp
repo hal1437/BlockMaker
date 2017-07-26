@@ -36,8 +36,8 @@ CREATE_RESULT CArc::Create(CPoint *pos){
     }
     return result; //終了
 }
-bool CArc::DrawGL(Pos camera,Pos center)const{
-    if(!this->isVisible())return true;
+void CArc::DrawGL(Pos camera,Pos center)const{
+    if(!this->isVisible())return;
     if(this->end == nullptr){
         glBegin(GL_LINES);
         Pos cc = camera - center;
@@ -61,18 +61,6 @@ bool CArc::DrawGL(Pos camera,Pos center)const{
         }
         glEnd();
     }
-    return true;
-}
-bool CArc::Move(const Pos& diff){
-    this->center->Move(diff);
-    return true;
-}
-void CArc::SetLock(bool lock){
-    //それぞれロック
-    this->start ->SetLock(lock);
-    this->end   ->SetLock(lock);
-    this->center->SetLock(lock);
-    CObject::SetLock(lock);
 }
 bool CArc::isSelectable(Pos pos) const{
     //角度判定、半径判定、作成判定
@@ -81,50 +69,26 @@ bool CArc::isSelectable(Pos pos) const{
            (std::abs((pos - *this->center).Length() - this->round) < COLLISION_SIZE);
 }
 
-//始点終点操作オーバーライド
-void CArc::SetStartPos(CPoint* pos){
-    if(this->start!=nullptr)ChangePosCallback(pos,*this->start);
-    CEdge::SetStartPos(pos);
+CObject* CArc::GetChild     (int index){
+    if(index == 0)return this->start;
+    if(index == 1)return this->center;
+    if(index == 2)return this->end;
+}
+void     CArc::SetChild(int index,CObject* obj){
+    if(index == 0)this->start  = dynamic_cast<CPoint*>(obj);
+    if(index == 1)this->center = dynamic_cast<CPoint*>(obj);
+    if(index == 2)this->end    = dynamic_cast<CPoint*>(obj);
 }
 
-void CArc::SetEndPos(CPoint* pos){
-    if(this->end!=nullptr)ChangePosCallback(pos,*this->end);
-    CEdge::SetEndPos(pos);
-}
-void CArc::SetCenterPos(CPoint* pos){
-    if(this->center != nullptr){
-        disconnect(this->center,SIGNAL(PosChanged(CPoint*,Pos)),this,SLOT(ChangePosCallback(CPoint*,Pos)));
-    }
-    this->center = pos;
-    connect   (this->center,SIGNAL(PosChanged(CPoint*,Pos)),this,SLOT(ChangePosCallback(CPoint*,Pos)));
-}
-
-int CArc::GetMiddleCount()const{
-    return 1;
-}
-CPoint* CArc::GetMiddle(int index)const{
-    if(index == 0){
-        return this->center;
-    }else{
-        return nullptr;
-    }
-}
-void CArc::SetMiddle(CPoint* pos,int index){
-    if(index == 0){
-        if(this->center != nullptr){
-            ChangePosCallback(pos,*this->center);
-            disconnect(this->center,SIGNAL(PosChanged(CPoint*,Pos)),this,SLOT(ChangePosCallback(CPoint*,Pos)));
-        }
-        this->center = pos;
-        connect   (this->center,SIGNAL(PosChanged(CPoint*,Pos)),this,SLOT(ChangePosCallback(CPoint*,Pos)));
-    }
+int CArc::GetChildCount()const{
+    return 3;
 }
 Pos CArc::GetMiddleDivide(double t)const{
     if(this->start == nullptr || this->end == nullptr)return *this->center;
     Pos center_base = (*this->start-*this->center).Cross(*this->end-*this->center);
     Pos ans;
 
-    if(this->reverse==false){
+    if(this->isReverse()==false){
         double angle = Pos::Angle(*this->start-*this->center,*this->end-*this->center)*PI/180;
         ans = Pos::RodriguesRotate(*this->start-*this->center,center_base,angle*t)+*this->center; //要検討
     } else {
@@ -171,13 +135,13 @@ void CArc::ChangePosCallback(CPoint *pos, Pos ){
     if(pos == this->center){
         if(this->start->isLock()){
             round = (*this->start - *this->center).Length();
-            this->end->Move((*this->end - *this->center).GetNormalize() * round + *this->center - *this->end);
+            this->end->MoveRelative((*this->end - *this->center).GetNormalize() * round + *this->center - *this->end);
         }else if(this->end->isLock()){
             round = (*this->end - *this->center).Length();
-            this->start->Move((*this->start - *this->center).GetNormalize() * round + *this->center - *this->start);
+            this->start->MoveRelative((*this->start - *this->center).GetNormalize() * round + *this->center - *this->start);
         }else{
-            this->start->Move(this->GetNearPos(*this->start) - *this->start);
-            this->end  ->Move(this->GetNearPos(*this->end)   - *this->end);
+            this->start->MoveRelative(this->GetNearPos(*this->start) - *this->start);
+            this->end  ->MoveRelative(this->GetNearPos(*this->end)   - *this->end);
         }
     }else{
         round = (*pos-*this->center).Length();
@@ -188,14 +152,14 @@ void CArc::ChangePosCallback(CPoint *pos, Pos ){
             if(this->end->isLock()){
                 *this->center = (*this->start - *this->end) / 2 + *this->end;
             }else{
-                this->end  ->Move((*this->end   - *this->center).GetNormalize() * round + *this->center - *this->end);
+                this->end  ->MoveRelative((*this->end   - *this->center).GetNormalize() * round + *this->center - *this->end);
             }
         }
         if(pos == this->end){
             if(this->start->isLock()){
                 *this->center = (*this->start - *this->end) / 2 + *this->end;
             }else{
-                this->start->Move((*this->start - *this->center).GetNormalize() * round + *this->center - *this->start);
+                this->start->MoveRelative((*this->start - *this->center).GetNormalize() * round + *this->center - *this->start);
             }
         }
     }
