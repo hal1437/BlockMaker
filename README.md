@@ -1,8 +1,6 @@
 # FoamCAD
 
 流体解析ソフトOpenFOAMの付属ユーティリティBlockMesh用のCADソフト  
-*三次元操作への対応を進行中...*  
-
 
 ▼FoamCADメインウインドウ  
 ![screenshot1](https://raw.githubusercontent.com/hal1437/FoamCAD/4cc28c43a0ad2fd0097e316e84a26cdf66ba7d83/Resource/screenshot/screenshot2.png)
@@ -26,4 +24,3 @@
 + STLファイルの読み込み
 + 曲線の適切な描画
 + 幾何拘束の追加
-+ BlockMeshDict以外のファイルへの対応
