@@ -75,7 +75,7 @@ void CObject::ChangeChildCallback(CObject*){
 }
 
 void CObject::ChangeChildHandler(CObject* obj){
-    emit Moved(obj);
+    ChangeChildCallback(obj);
     emit Moved();
 }
 

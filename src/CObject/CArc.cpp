@@ -128,42 +128,25 @@ CArc::~CArc()
 {
 }
 
-void CArc::ChangePosCallback(CPoint *pos, Pos ){
+void CArc::ChangeChildCallback(CObject* child){
     if(this->start==nullptr || this->end==nullptr)return;
 
-    round = (*this->center - *this->start).Length();
-
     //中心の移動
-    if(pos == this->center){
-        if(this->start->isLock()){
-            round = (*this->start - *this->center).Length();
-            this->end->MoveRelative((*this->end - *this->center).GetNormalize() * round + *this->center - *this->end);
-        }else if(this->end->isLock()){
-            round = (*this->end - *this->center).Length();
-            this->start->MoveRelative((*this->start - *this->center).GetNormalize() * round + *this->center - *this->start);
-        }else{
-            this->start->MoveRelative(this->GetNearPos(*this->start) - *this->start);
-            this->end  ->MoveRelative(this->GetNearPos(*this->end)   - *this->end);
-        }
-    }else{
-        round = (*pos-*this->center).Length();
+    if(child == this->center){
+        //平均値
+        round = ((*this->start - *this->center).Length() + (*this->end - *this->center).Length())/2;
+        this->start->MoveAbsolute((*this->start - *this->center).GetNormalize() * round + *this->center);
+        this->end  ->MoveAbsolute((*this->end   - *this->center).GetNormalize() * round + *this->center);
     }
-    //定義済みであれば
-    if(this->end != nullptr){
-        if(pos == this->start){
-            if(this->end->isLock()){
-                *this->center = (*this->start - *this->end) / 2 + *this->end;
-            }else{
-                this->end  ->MoveRelative((*this->end   - *this->center).GetNormalize() * round + *this->center - *this->end);
-            }
-        }
-        if(pos == this->end){
-            if(this->start->isLock()){
-                *this->center = (*this->start - *this->end) / 2 + *this->end;
-            }else{
-                this->start->MoveRelative((*this->start - *this->center).GetNormalize() * round + *this->center - *this->start);
-            }
-        }
+    //始点
+    if(child == this->start){
+        round = (*this->start - *this->center).Length();
+        this->end->MoveAbsolute((*this->end   - *this->center).GetNormalize() * round + *this->center);
+    }
+    //終点
+    if(child == this->end){
+        round = (*this->end - *this->center).Length();
+        this->start->MoveAbsolute((*this->start - *this->center).GetNormalize() * round + *this->center);
     }
 }
 

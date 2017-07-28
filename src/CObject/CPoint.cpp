@@ -25,7 +25,7 @@ void CPoint::MoveAbsolute(const Pos& diff){
     this->MoveRelative(diff - *this);
 }
 void CPoint::MoveRelative(const Pos& diff){
-    if(isLock() == false && !isControlPoint() && this->isMoving() == false){
+    if(isLock() == false && !isControlPoint() && !this->isMoving()){
         this->SetMoving(true);  //再帰呼び出し制限
         *this += diff;//移動
         emit Moved(this);
