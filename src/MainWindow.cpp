@@ -6,6 +6,7 @@ void MainWindow::SetModel(CadModelCore* model){
     this->model = model;
     this->ui->SolidEdit ->SetModel(model);
     this->ui->ObjectTree->SetModel(model);
+    this->move_diag->SetModel(this->model);
     //モデルと結合
     connect(this->model,SIGNAL(UpdateSelected()),this,SLOT(RefreshUI()));
 }
@@ -33,6 +34,18 @@ MainWindow::MainWindow(QWidget *parent) :
     //SolidEditFoamにイベントフィルター導入
     this->installEventFilter(ui->SolidEdit);
     connect(this->ui->SolidEdit,SIGNAL(MousePosChanged(Pos)),this,SLOT(RefreshStatusBar(Pos)));
+
+    //SolidEditFoamにイベントフィルター導入
+    this->installEventFilter(ui->SolidEdit);
+    connect(this->ui->SolidEdit,SIGNAL(MousePosChanged(Pos)),this,SLOT(RefreshStatusBar(Pos)));
+
+    //移動ダイアログ関係
+    move_diag = new MoveTransformDialog(this);
+    this->installEventFilter(move_diag);
+    connect(move_diag,SIGNAL(RepaintRequest()),this,SLOT(repaint()));
+    connect(move_diag,SIGNAL(RepaintRequest()),ui->SolidEdit,SLOT(repaint()));
+    move_diag->setWindowTitle("MoveTransform");
+    move_diag->setWindowFlags(Qt::Dialog | Qt::WindowStaysOnTopHint);
 
     //ドック関係
     connect(this->ui->actionShowObjectList,SIGNAL(triggered()),this,SLOT(ShowObjectList()));
@@ -154,14 +167,7 @@ void MainWindow::ToggleConflict(bool conflict){
 }
 
 void MainWindow::ShowMoveTransform(){
-    static MoveTransformDialog* diag = new MoveTransformDialog(this);
-    connect(diag,SIGNAL(RepaintRequest()),this,SLOT(repaint()));
-    //connect(diag,SIGNAL(RepaintRequest()),ui->CadEdit  ,SLOT(repaint()));
-    connect(diag,SIGNAL(RepaintRequest()),ui->SolidEdit,SLOT(repaint()));
-    diag->SetModel(this->model);
-    diag->setWindowTitle("MoveTransform");
-    diag->setWindowFlags(Qt::Dialog | Qt::WindowStaysOnTopHint);
-    diag->show();
+    move_diag->show();
 }
 void MainWindow::ShowGridFilter(){
     static GridFilterDialog* diag = new GridFilterDialog(this);

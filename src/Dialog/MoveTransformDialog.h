@@ -2,6 +2,7 @@
 #define MOVETRANSFORMDIALOG_H
 
 #include <QDialog>
+#include <QKeyEvent>
 #include "CadModelCore.h"
 
 namespace Ui {
@@ -16,6 +17,9 @@ private:
     Ui::MoveTransformDialog *ui;
     QVector<CPoint*> GetSelectedPoint();
 public:
+
+    void keyPressEvent(QKeyEvent *event);
+    void keyReleaseEvent(QKeyEvent *event);
 
     explicit MoveTransformDialog(QWidget *parent = 0);
     ~MoveTransformDialog();

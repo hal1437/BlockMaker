@@ -30,6 +30,7 @@ public:
     ~MainWindow();
 private:
     Ui::MainWindow *ui;
+    MoveTransformDialog* move_diag;
 
 protected:
     void keyPressEvent  (QKeyEvent* event);

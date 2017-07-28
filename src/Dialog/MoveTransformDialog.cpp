@@ -17,6 +17,23 @@ MoveTransformDialog::~MoveTransformDialog()
     delete ui;
 }
 
+void MoveTransformDialog::keyPressEvent(QKeyEvent *event){
+    if(event->key() == Qt::Key_Shift){
+        this->ui->XSpinBox->setValue(-this->ui->XSpinBox->value());
+        this->ui->YSpinBox->setValue(-this->ui->YSpinBox->value());
+        this->ui->ZSpinBox->setValue(-this->ui->ZSpinBox->value());
+    }
+}
+
+void MoveTransformDialog::keyReleaseEvent(QKeyEvent *event){
+    if(event->key() == Qt::Key_Shift){
+        this->ui->XSpinBox->setValue(-this->ui->XSpinBox->value());
+        this->ui->YSpinBox->setValue(-this->ui->YSpinBox->value());
+        this->ui->ZSpinBox->setValue(-this->ui->ZSpinBox->value());
+    }
+}
+
+
 QVector<CPoint*> MoveTransformDialog::GetSelectedPoint(){
     QVector<CPoint*> ans;
     for(CObject* s : this->model->GetSelected()){
