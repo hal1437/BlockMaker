@@ -10,14 +10,15 @@ CREATE_RESULT MakeObjectController::MakeJoint(CEdge* obj,Pos pos,CObject* merge)
         //生成点を持つ
         this->last_point = new_point;
     }else if(merge->is<CPoint>()){
+        //すり替え
         //持ち手を破棄
         this->model->RemovePoints(this->last_point);
         //mergeを点として使用
         new_point = new CPoint(pos,obj);
-        //すり替え
         if(this->making_step == ENDLESS){
-            //終了
+            //終点と同じ点ならば終了
             if(obj->GetChildCount() > 0 && obj->GetChild(obj->GetChildCount()-1) == merge){
+                //持ち手を破棄してオブジェクトの中間点を終点に変更
                 obj->SetEndPos(obj->GetChild(obj->GetChildCount()-1));
                 obj->SetChild(obj->GetChildCount()-1,nullptr);
                 this->last_point=nullptr;
@@ -31,8 +32,8 @@ CREATE_RESULT MakeObjectController::MakeJoint(CEdge* obj,Pos pos,CObject* merge)
         }else{
             //円弧は例外
             if(obj->is<CArc>() && this->making_count <= 1){
-                if(this->making_count == 0)obj->SetChild(0,dynamic_cast<CPoint*>(merge));
-                if(this->making_count == 1)obj->SetStartPos(dynamic_cast<CPoint*>(merge));
+                if(this->making_count == 0)obj->SetChild(1,dynamic_cast<CPoint*>(merge));
+                if(this->making_count == 1)obj->SetChild(0,dynamic_cast<CPoint*>(merge));
             }else{
                 obj->SetChild(this->making_count,dynamic_cast<CPoint*>(merge));
             }
