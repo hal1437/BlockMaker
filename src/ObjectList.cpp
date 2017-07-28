@@ -111,8 +111,8 @@ void ObjectList::AddEdgeToTree(CEdge* edge,QTreeWidgetItem* parent,int index){
     item->setText(0,QString(s.c_str()) + ":" + QString::number(index));
     item->setIcon(0,getIcon(edge));
 
-    for(int i=0;i<edge->GetPointSequenceCount();i++){
-        AddPointToTree(edge->GetPointSequence(i),item,i+1);
+    for(int i=0;i<edge->GetChildCount();i++){
+        AddPointToTree(edge->GetPoint(i),item,i+1);
     }
     if(exist(this->CadModelCoreInterface::model->GetSelected(),edge)){
         item->setSelected(true);
@@ -158,7 +158,7 @@ void ObjectList::pushSelectedEdge (CEdge*  edge ,QTreeWidgetItem* current){
         this->CadModelCoreInterface::model->RemoveSelected(edge);
     }
     for(int i=0;i<current->childCount();i++){
-        pushSelectedPoint(edge->GetPointSequence(i),current->child(i));
+        pushSelectedPoint(edge->GetPoint(i),current->child(i));
     }
 }
 void ObjectList::pushSelectedPoint(CPoint* point,QTreeWidgetItem* current){
@@ -185,7 +185,7 @@ void ObjectList::pullSelectedEdge (CEdge*  edge ,QTreeWidgetItem* current){
     current->setIcon(0,this->getIcon(edge));
     current->setSelected(exist(this->CadModelCoreInterface::model->GetSelected(),edge));
     for(int i=0;i<current->childCount();i++){
-        pullSelectedPoint(edge->GetPointSequence(i),current->child(i));
+        pullSelectedPoint(edge->GetPoint(i),current->child(i));
     }
 }
 void ObjectList::pullSelectedPoint(CPoint* point,QTreeWidgetItem* current){
@@ -208,7 +208,7 @@ void ObjectList::UpdateObject  (){
 
     //排他処理
     for(CEdge* edge: this->edges){
-        for(int i =0;i<edge->GetPointSequenceCount();i++)this->points.removeAll(edge->GetPointSequence(i));
+        for(int i =0;i<edge->GetChildCount();i++)this->points.removeAll(edge->GetPoint(i));
     }
     for(CFace* face: this->faces){
         for(CEdge* e : face->edges)this->edges.removeAll(e);
@@ -271,7 +271,7 @@ void ObjectList::ReverseArc(bool){
     for(CObject* obj : this->CadModelCoreInterface::model->GetSelected()){
         if(obj->is<CArc>()){
             //反転
-            dynamic_cast<CArc*>(obj)->SetReverse( !dynamic_cast<CArc*>(obj)->GetReverse());
+            dynamic_cast<CArc*>(obj)->SetReverse(!dynamic_cast<CArc*>(obj)->isReverse());
         }
     }
     this->CadModelCoreInterface::model->SelectedClear();
@@ -286,14 +286,14 @@ void ObjectList::SetInvisible(bool){
 void ObjectList::SetVisibleMesh(bool){
     for(CObject* obj:this->CadModelCoreInterface::model->GetSelected()){
         if(obj->is<CBlock>()){
-            dynamic_cast<CBlock*>(obj)->VisibleMesh(true);
+            dynamic_cast<CBlock*>(obj)->SetVisibleMesh(true);
         }
     }
 }
 void ObjectList::SetInvisibleMesh(bool){
     for(CObject* obj:this->CadModelCoreInterface::model->GetSelected()){
         if(obj->is<CBlock>()){
-            dynamic_cast<CBlock*>(obj)->VisibleMesh(false);
+            dynamic_cast<CBlock*>(obj)->SetVisibleMesh(false);
         }
     }
 }

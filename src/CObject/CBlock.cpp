@@ -1,15 +1,5 @@
 #include "CBlock.h"
 
-bool CBlock::isVisibleMesh()const{
-    return this->visible_Mesh;
-}
-void CBlock::VisibleMesh(bool flag){
-    this->visible_Mesh = flag;
-    if(flag == true){
-        this->RefreshDividePoint();
-    }
-}
-
 bool CBlock::Creatable(QVector<CObject*> values){
     if(values.size()==1 && values[0]->is<CBlock>())return true;
 
@@ -114,7 +104,6 @@ CFace* CBlock::GetFaceFormDir(BoundaryDir dir){
 
 Pos CBlock::GetDivisionPoint(int edge_index,int count_index)const{
     double A,B,sum=0,p,d,L;
-    CPoint *start,*end;
 
     //各パラメータ取得
     if(edge_index == 0 || edge_index == 2 || edge_index == 4  || edge_index == 6 ){ //X
@@ -174,7 +163,7 @@ double CBlock::GetLengthZ(){
                                       0,0,0,0}));
 }
 void CBlock::DrawGL(Pos,Pos)const{
-    if(!this->isVisible())return true;
+    if(!this->isVisible())return;
     //薄い色に変更
     float oldColor[4];
     glGetFloatv(GL_CURRENT_COLOR,oldColor);
@@ -249,9 +238,7 @@ void CBlock::DrawGL(Pos,Pos)const{
     }
     //色を復元
     glColor4f(oldColor[0],oldColor[1],oldColor[2], oldColor[3]);
-    return true;
-}
-bool CBlock::Move  (const Pos& ){
+    return;
 }
 
 //近接点
@@ -368,27 +355,18 @@ CEdge* CBlock::GetEdgeSequence(int index) const{
     return edge;
 }
 
-
-CBlock::CBlock(QObject* parent):
-    CObject(parent)
-{
-    this->name[0] = "Top";
-    this->name[1] = "Right";
-    this->name[2] = "Left";
-    this->name[3] = "Bottom";
-    this->name[4] = "Front";
-    this->name[5] = "Back";
-}
-
-
-CBlock::~CBlock()
-{
-
-}
-
 //子の操作
-CObject* CBlock::GetChild(int index){
+CFace*   CBlock::GetFace (int index){
     return this->faces[index];
+}
+CObject* CBlock::GetChild(int index){
+    return this->GetFace(index);
+}
+void CBlock::SetChild(int index,CObject* obj){
+    if(this->GetChildCount() <= index){
+        this->faces.resize(index);
+    }
+    this->faces[index] = dynamic_cast<CFace*>(obj);
 }
 
 int CBlock::GetChildCount()const{
@@ -431,11 +409,24 @@ void CBlock::ReorderEdges(){
 }
 
 CObject* CBlock::Clone()const{
-    CBlock* new_obj;
+    CBlock* new_obj = new CBlock();
     for(CFace* face:this->faces){
         new_obj->faces.push_back(dynamic_cast<CFace*>(face->Clone()));
     }
     return new_obj;
 }
 
+CBlock::CBlock(QObject* parent):
+    CObject(parent)
+{
+    this->name[0] = "Top";
+    this->name[1] = "Right";
+    this->name[2] = "Left";
+    this->name[3] = "Bottom";
+    this->name[4] = "Front";
+    this->name[5] = "Back";
+}
 
+CBlock::~CBlock()
+{
+}

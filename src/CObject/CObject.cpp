@@ -3,25 +3,41 @@
 double   CObject::drawing_scale;
 
 
+void CObject::ObserveChild(CObject* obj){
+    //コールバック接続
+    if(obj != nullptr){
+        connect(obj,SIGNAL(Moved(CObject*)),this,SLOT(ChangeChildHandler(CObject*)));
+    }
+}
+
+void CObject::IgnoreChild(CObject* obj){
+    //コールバック接続解除
+    if(obj != nullptr){
+        disconnect(obj,SIGNAL(Moved(CObject*)),this,SLOT(ChangeChildHandler(CObject*)));
+    }
+}
+
+
+/*
 void CObject::MoveAbsolute(const Pos& diff){
-    QVector<CObject*> children = this->GetAllChildren();
+    QVector<CPoint*> children = this->GetAllChildren();
     Pos sum;//平均値
-    for(CObject* p : children){
+    for(CPoint* p : children){
         sum = sum + *reinterpret_cast<Pos*>(p);
     }
     sum /= children.size();
 
     //平均値との差分だけ移動
-    for(CObject*& p : children){
+    for(CPoint*& p : children){
         p->MoveRelative(sum - diff);
     }
 }
 void CObject::MoveRelative(const Pos& diff){
-    QVector<CObject*> children = this->GetAllChildren();
-    for(CObject*& p : children){
+    QVector<CPoint*> children = this->GetAllChildren();
+    for(CPoint*& p : children){
         p->MoveRelative(diff);
     }
-}
+}*/
 bool CObject::isSelectable(Pos pos)const{
     return Pos(this->GetNearPos(pos) - pos).Length() < CObject::COLLISION_SIZE / drawing_scale;
 }
@@ -36,17 +52,14 @@ void CObject::InsertChild  (int index,CObject* obj){
     }
     this->SetChild(index,obj);
 }
-QVector<CObject*> CObject::GetAllChildren()const{
-    QVector<CObject*> ans;
+QVector<CPoint *> CObject::GetAllChildren()const{
+    QVector<CPoint*> ans;
     for(int i=0;i<this->GetChildCount();i++){
-        QVector<CObject*> add = this->GetChild(i)->GetAllChildren();
         //追加
-        for(CObject* v:add)ans.push_back(v);
+        for(CPoint* v:this->GetChild(i)->GetAllChildren())ans.push_back(v);
     }
     return ans;
 }
-
-
 
 CObject::CObject(QObject* parent):QObject(parent)
 {
@@ -56,5 +69,13 @@ CObject::CObject(QObject* parent):QObject(parent)
 CObject::~CObject()
 {
 
+}
+
+void CObject::ChangeChildCallback(CObject*){
+}
+
+void CObject::ChangeChildHandler(CObject* obj){
+    emit Moved(obj);
+    emit Moved();
 }
 

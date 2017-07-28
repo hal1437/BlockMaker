@@ -206,7 +206,7 @@ CEdge*  CFace::GetEdgeSequence(int index)const{
     return ans;
 }
 void CFace::DrawGL(Pos,Pos)const{
-    if(!this->isVisible())return true;
+    if(!this->isVisible())return;
     if(this->isPolygon()){
         //薄い色に変更
         float currentColor[4];
@@ -240,8 +240,6 @@ void CFace::DrawGL(Pos,Pos)const{
         }
         glEnd();
     }
-
-    return true;
 }
 bool CFace::DrawNormArrowGL()const{
     Pos center;
@@ -265,10 +263,28 @@ void CFace::ReorderEdges(){
     this->edges = ans;
 }
 
+//子の操作
+CEdge*  CFace::GetEdge      (int index){
+    return this->edges[index];
+}
+CObject* CFace::GetChild     (int index){
+    return this->GetEdge(index);
+}
+void CFace::SetChild(int index,CObject* obj){
+    if(this->GetChildCount() <= index){
+        this->edges.resize(index);
+    }
+    this->edges[index] = dynamic_cast<CEdge*>(obj);
+}
+
+int      CFace::GetChildCount()const{
+    return this->edges.size();
+}
+
 Pos CFace::GetNearPos (const Pos&)const{
     return Pos();
 }
-Pos CFace::GetNearLine(const Pos& pos1,const Pos& pos2)const{
+Pos CFace::GetNearLine(const Pos& ,const Pos& )const{
     return Pos();
 }
 

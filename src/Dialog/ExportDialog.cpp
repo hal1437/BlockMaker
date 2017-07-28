@@ -137,8 +137,8 @@ void ExportDialog::Export(QString filename)const{
             file.OutStringInline(QString::number(IndexOf(all_points,edge->end  )));
 
             file.OutStringInline("(");
-            for(int i=0;i<edge->GetMiddleCount();i++){
-                file.OutVectorInline(*edge->GetMiddle(i));
+            for(int i=0;i<edge->GetChildCount();i++){
+                file.OutVectorInline(*edge->GetPoint(i));
             }
             file.OutStringInline(")");
         }

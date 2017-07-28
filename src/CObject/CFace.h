@@ -36,7 +36,9 @@ public:
     virtual CEdge*  GetEdgeSequence (int index)const;   //番号順線取得
 
     //子の操作
-    virtual CObject* GetChild     (int index);
+    virtual CEdge* GetEdge (int index);
+    virtual CObject* GetChild(int index);
+    virtual void     SetChild(int index,CObject* obj);
     virtual int      GetChildCount()const;
 
     //近接点

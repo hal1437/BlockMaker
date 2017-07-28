@@ -20,10 +20,9 @@ QVector<CPoint*> MoveTransformDialog::GetSelectedPoint(){
     QVector<CPoint*> ans;
     QVector<CObject*> select = this->model->GetSelected();
     for(CObject* s: select){
-        if(s->is<CPoint>())ans.push_back(dynamic_cast<CPoint*>(s));
-        if(s->is<CEdge >())for(CPoint* p:dynamic_cast<CEdge* >(s)->GetAllPoints())ans.push_back(p);
-        if(s->is<CFace >())for(CPoint* p:dynamic_cast<CFace* >(s)->GetAllPoints())ans.push_back(p);
-        if(s->is<CBlock>())for(CPoint* p:dynamic_cast<CBlock*>(s)->GetAllPoints())ans.push_back(p);
+        for(CPoint* p:s->GetAllChildren()){
+            ans.push_back(p);
+        }
     }
 
     //排他

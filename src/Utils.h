@@ -37,7 +37,7 @@ bool exist(const C& array,const V& value){
 }
 //配列内の重複要素を削除
 template<class C>
-bool unique(C& array){
+void unique(C& array){
     std::sort(std::begin(array),std::end(array));
     array.erase(std::unique(std::begin(array),std::end(array)),std::end(array));
 }

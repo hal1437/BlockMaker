@@ -70,7 +70,9 @@ public:
     virtual CFace*  GetFaceFormDir(BoundaryDir dir);  //BoundaryDirに基づく面の取得
 
     //子の操作
+    virtual CFace*   GetFace (int index);
     virtual CObject* GetChild(int index);
+    virtual void     SetChild(int index,CObject* obj);
     virtual int      GetChildCount()const;
 
     //分割点取得(辺の番号)

@@ -45,15 +45,14 @@ void CEdge::DrawGL(Pos camera,Pos center)const{
         glEnd();
     }
 }
-
-void  CEdge::SetChild(int index,CObject* obj){
-    //コールバック接続解除
-    if(this->GetChild(index) != nullptr)disconnect(this->GetChild(index),SIGNAL(PosChanged(CPoint*,Pos)),this,SLOT(ChangePosCallback(CPoint*,Pos)));
-    //親の関数を使用
-    CObject::SetChild(index,obj);
-    //コールバック接続解除
-    if(this->GetChild(index) != nullptr)disconnect(this->GetChild(index),SIGNAL(PosChanged(CPoint*,Pos)),this,SLOT(ChangePosCallback(CPoint*,Pos)));
+void CEdge::SetStartPos(CObject* obj){
+    this->SetChild(0,obj);
 }
+
+void CEdge::SetEndPos(CObject* obj){
+    this->SetChild(this->GetChildCount()-1,obj);
+}
+
 
 CEdge::CEdge(QObject* parent):
     CObject(parent)

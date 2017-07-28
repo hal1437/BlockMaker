@@ -72,15 +72,21 @@ CREATE_RESULT CSpline::Create(CPoint *pos){
 }
 
 //中間点操作
-CObject* CSpline::GetChild(int index){
+CPoint*  CSpline::GetPoint(int index){
     if(index == 0)return this->start;
-    if(index > 0 && index < this->pos.size()-2)return this->pos[index-1];
-    if(index == this->pos.size()-1)return this->end;
+    if(index > 0 && index < static_cast<int>(this->pos.size()) - 2)return this->pos[index-1];
+    if(index == static_cast<int>(this->pos.size())-1)return this->end;
+    return nullptr;
+}
+CObject* CSpline::GetChild(int index){
+    return this->GetPoint(index);
 }
 void     CSpline::SetChild(int index,CObject* obj){
+    IgnoreChild(this->GetChild(index));
     if(index == 0)this->start = dynamic_cast<CPoint*>(obj);
-    if(index > 0 && index < this->pos.size()-2)this->pos[index-1] = dynamic_cast<CPoint*>(obj);
-    if(index == this->pos.size()-1)this->end = dynamic_cast<CPoint*>(obj);
+    if(index > 0 && index < static_cast<int>(this->pos.size())-2)this->pos[index-1] = dynamic_cast<CPoint*>(obj);
+    if(index == static_cast<int>(this->pos.size())-1)this->end = dynamic_cast<CPoint*>(obj);
+    ObserveChild(this->GetChild(index));
 }
 
 int CSpline::GetChildCount()const{

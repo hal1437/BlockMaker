@@ -38,7 +38,11 @@ public:
 
     //フラグ定義
     DEFINE_FLAG(Lock   ,false)
-    DEFINE_FLAG(Visible,true)
+    DEFINE_FLAG(Visible,true)    
+
+protected:
+    void ObserveChild(CObject* obj);
+    void IgnoreChild (CObject* obj);
 
 public:
 
@@ -49,17 +53,17 @@ public:
     }
 
     virtual void DrawGL(Pos camera,Pos center)const = 0; //三次元描画関数
-    virtual void MoveAbsolute(const Pos& diff);  //絶対移動関数
-    virtual void MoveRelative(const Pos& diff);  //相対移動関数
+    //virtual void MoveAbsolute(const Pos& diff);  //絶対移動関数
+    //virtual void MoveRelative(const Pos& diff);  //相対移動関数
     virtual bool isSelectable(Pos pos)const;     //posの位置で選択可能か
 
     //子の操作
     virtual CObject* GetChild     (int index) = 0;
     virtual CObject* GetChild     (int index)const;
-    virtual void     SetChild     (int index,CObject* obj);
+    virtual void     SetChild     (int index,CObject* obj)=0;
     virtual void     InsertChild  (int index,CObject* obj);
     virtual int      GetChildCount()const = 0;
-    virtual QVector<CObject*> GetAllChildren()const;
+    virtual QVector<CPoint*> GetAllChildren()const;
 
     //近接点
     virtual Pos GetNearPos (const Pos& hand)const=0;
@@ -71,6 +75,19 @@ public:
     //コンストラクタ
     explicit CObject(QObject* parent=nullptr);
     virtual ~CObject();
+
+signals:
+    //移動シグナル
+    void Moved();
+    void Moved(CObject* child);
+
+public slots:
+    //子変更コールバック
+    virtual void ChangeChildCallback(CObject* child);
+
+private slots:
+    //引数有りから無しを呼び出す
+    void ChangeChildHandler(CObject* obj);
 };
 
 

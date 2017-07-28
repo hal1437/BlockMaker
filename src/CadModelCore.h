@@ -49,7 +49,7 @@ public:
     void Delete(CObject* obj);
 
     //選択解除
-    bool SelectedClear();
+    void SelectedClear();
 
 public slots:
     //UpdateAnyObjectを呼び出す

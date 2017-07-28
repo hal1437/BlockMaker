@@ -19,8 +19,8 @@ bool CadModelCore::ExportFoamFile(QString filename)const{
         if(edge->is<CSpline>())name = "CSpline";
 
         out << name;
-        for(int i=0;i<edge->GetPointSequenceCount();i++){
-            out << "," << IndexOf(this->Points,edge->GetPointSequence(i));
+        for(int i=0;i<edge->GetChildCount();i++){
+            out << "," << IndexOf(this->Points,edge->GetPoint(i));
         }
         out << std::endl;
     }
@@ -228,7 +228,7 @@ void CadModelCore::Delete(CObject* obj){
 
 
 
-bool CadModelCore::SelectedClear(){
+void CadModelCore::SelectedClear(){
     this->Selected.clear();
     emit UpdateSelected();
 }
@@ -246,7 +246,7 @@ CadModelCore::CadModelCore(QWidget *parent):
     QObject(parent)
 {
     this->origin = new CPoint(Pos(0,0,0));
-    this->origin->ControlPoint(true);
+    this->origin->SetControlPoint(true);
     connect(this,SIGNAL(UpdatePoints()),this,SLOT(UpdateObject()));
     connect(this,SIGNAL(UpdateEdges ()),this,SLOT(UpdateObject()));
     connect(this,SIGNAL(UpdateFaces ()),this,SLOT(UpdateObject()));

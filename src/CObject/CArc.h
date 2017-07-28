@@ -21,16 +21,13 @@ public:
     virtual void DrawGL(Pos camera,Pos center)const;
     virtual bool isSelectable(Pos pos) const;//選択可能オーバーライド
 
-    //始点終点操作オーバーライド
-    virtual void SetStartPos (CPoint* pos);
-    virtual void SetEndPos   (CPoint* pos);
-    virtual void SetCenterPos(CPoint* pos);
-
     //中間点操作
+    virtual CPoint*  GetPoint(int index);
     virtual CObject* GetChild(int index);
     virtual void     SetChild(int index,CObject* obj);
     virtual int      GetChildCount()const;
     virtual Pos      GetMiddleDivide(double t)const;    //補完点
+    virtual void     SetCenterPos(CPoint* pos);
 
     //近接点
     virtual Pos GetNearPos (const Pos& hand)const;

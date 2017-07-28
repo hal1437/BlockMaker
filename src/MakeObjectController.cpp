@@ -17,24 +17,24 @@ CREATE_RESULT MakeObjectController::MakeJoint(CEdge* obj,Pos pos,CObject* merge)
         //すり替え
         if(this->making_step == ENDLESS){
             //終了
-            if(obj->GetMiddleCount() > 0 && obj->GetMiddle(obj->GetMiddleCount()-1) == merge){
-                obj->SetEndPos(obj->GetMiddle(obj->GetMiddleCount()-1));
-                obj->SetMiddle(nullptr,obj->GetMiddleCount()-1);
+            if(obj->GetChildCount() > 0 && obj->GetChild(obj->GetChildCount()-1) == merge){
+                obj->SetEndPos(obj->GetChild(obj->GetChildCount()-1));
+                obj->SetChild(obj->GetChildCount()-1,nullptr);
                 this->last_point=nullptr;
                 this->making_count = -1;//手放しまで完了
                 return COMPLETE;
             }else{
                 //追加
-                //obj->SetMiddle(dynamic_cast<CPoint*>(merge),obj->GetPosSequenceCount()-2);
-                obj->SetPointSequence(dynamic_cast<CPoint*>(merge),this->making_count);
+                //obj->SetChild(dynamic_cast<CPoint*>(merge),obj->GetPosSequenceCount()-2);
+                obj->SetChild(this->making_count,dynamic_cast<CPoint*>(merge));
             }
         }else{
             //円弧は例外
             if(obj->is<CArc>() && this->making_count <= 1){
-                if(this->making_count == 0)obj->SetMiddle(dynamic_cast<CPoint*>(merge),0);
+                if(this->making_count == 0)obj->SetChild(0,dynamic_cast<CPoint*>(merge));
                 if(this->making_count == 1)obj->SetStartPos(dynamic_cast<CPoint*>(merge));
             }else{
-                obj->SetPointSequence(dynamic_cast<CPoint*>(merge),this->making_count);
+                obj->SetChild(this->making_count,dynamic_cast<CPoint*>(merge));
             }
         }
         this->last_point = new_point;
@@ -89,7 +89,7 @@ void MakeObjectController::EndMaking  (Pos pos,CObject* merge){
             this->model->RemovePoints(this->last_point);
         }else{
             //持ち手の近似移動
-            this->last_point->Move(merge->GetNearPos(pos) - *this->last_point);
+            this->last_point->MoveAbsolute(merge->GetNearPos(pos));
         }
     }
     this->last_point    = nullptr; //手放す

@@ -24,6 +24,7 @@ public:
 
     //子の操作
     virtual CObject* GetChild(int index);
+    virtual void     SetChild(int index,CObject* obj);
     virtual int      GetChildCount()const;
 
     //近接点
@@ -40,16 +41,6 @@ public:
     ~CPoint();
 
     CPoint& operator=(const Pos& rhs);
-
-signals:
-    //座標移動シグナル
-    void PosChanged();
-    void PosChanged(CPoint* pos,Pos old_pos);
-
-
-private slots:
-    //引数有りから無しを呼び出す
-    void PosChangedHandler(CPoint* pos,Pos old_pos);
 
 };
 

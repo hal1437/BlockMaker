@@ -167,7 +167,7 @@ void SolidEditForm::mouseMoveEvent   (QMouseEvent *event){
 
     //最終保持座標を更新
     if(this->controller->hang_point != nullptr){
-        this->controller->hang_point->Move(this->mouse_pos-*this->controller->hang_point);
+        this->controller->hang_point->MoveAbsolute(this->mouse_pos);
     }
     repaint();
 }

@@ -20,10 +20,13 @@ public:
     virtual void DrawGL(Pos camera,Pos center)const; //三次元描画関数
 
     //中間点操作
-    virtual CObject* GetChild(int index)  = 0;
+    virtual CPoint*  GetPoint(int index) = 0;
+    virtual CObject* GetChild(int index) = 0;
     virtual void     SetChild(int index,CObject* obj) = 0;
     virtual int      GetChildCount()const = 0;
     virtual Pos      GetMiddleDivide(double t)const = 0;//補間点取得
+    virtual void     SetStartPos(CObject* obj);
+    virtual void     SetEndPos(CObject* obj);
 
     //近接点
     virtual Pos GetNearPos (const Pos& hand)const = 0;

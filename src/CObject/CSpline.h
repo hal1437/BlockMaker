@@ -33,6 +33,7 @@ public:
     virtual CREATE_RESULT Create(CPoint* pos);
 
     //中間点操作
+    virtual CPoint*  GetPoint(int index);
     virtual CObject* GetChild(int index);
     virtual void     SetChild(int index,CObject* obj);
     virtual int      GetChildCount()const;

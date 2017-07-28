@@ -18,21 +18,11 @@ CREATE_RESULT CArc::Create(CPoint *pos){
         result = CREATE_RESULT::ONESHOT;
     }else if(this->end == nullptr){
         this->SetEndPos(pos);
-        //this->center = new CPoint((*this->start - *this->end) / 2 + *this->end,this->parent());
-        connect(this->start ,SIGNAL(PosChanged(CPoint*,Pos)),this,SLOT(ChangePosCallback(CPoint*,Pos)));
-        connect(this->end   ,SIGNAL(PosChanged(CPoint*,Pos)),this,SLOT(ChangePosCallback(CPoint*,Pos)));
-        connect(this->center,SIGNAL(PosChanged(CPoint*,Pos)),this,SLOT(ChangePosCallback(CPoint*,Pos)));
         result = CREATE_RESULT::COMPLETE;
     }else{
-        disconnect(this->start ,SIGNAL(PosChanged(CPoint*,Pos)),this,SLOT(ChangePosCallback(CPoint*,Pos)));
-        disconnect(this->end   ,SIGNAL(PosChanged(CPoint*,Pos)),this,SLOT(ChangePosCallback(CPoint*,Pos)));
-        disconnect(this->center,SIGNAL(PosChanged(CPoint*,Pos)),this,SLOT(ChangePosCallback(CPoint*,Pos)));
         this->center = pos;
         round = Pos(*this->end - *this->center).Length();
-        connect(this->start ,SIGNAL(PosChanged(CPoint*,Pos)),this,SLOT(ChangePosCallback(CPoint*,Pos)));
-        connect(this->end   ,SIGNAL(PosChanged(CPoint*,Pos)),this,SLOT(ChangePosCallback(CPoint*,Pos)));
-        connect(this->center,SIGNAL(PosChanged(CPoint*,Pos)),this,SLOT(ChangePosCallback(CPoint*,Pos)));
-        result = CREATE_RESULT::COMPLETE;
+         result = CREATE_RESULT::COMPLETE;
     }
     return result; //終了
 }
@@ -69,15 +59,23 @@ bool CArc::isSelectable(Pos pos) const{
            (std::abs((pos - *this->center).Length() - this->round) < COLLISION_SIZE);
 }
 
-CObject* CArc::GetChild     (int index){
+CPoint*  CArc::GetPoint(int index){
     if(index == 0)return this->start;
     if(index == 1)return this->center;
     if(index == 2)return this->end;
+    return nullptr;
+}
+
+CObject* CArc::GetChild     (int index){
+    return this->GetPoint(index);
 }
 void     CArc::SetChild(int index,CObject* obj){
+    IgnoreChild(this->GetChild(index));
     if(index == 0)this->start  = dynamic_cast<CPoint*>(obj);
     if(index == 1)this->center = dynamic_cast<CPoint*>(obj);
     if(index == 2)this->end    = dynamic_cast<CPoint*>(obj);
+    ObserveChild(this->GetChild(index));
+
 }
 
 int CArc::GetChildCount()const{
@@ -96,6 +94,10 @@ Pos CArc::GetMiddleDivide(double t)const{
         ans = Pos::RodriguesRotate(*this->end-*this->center,center_base,(2*PI-angle)*t)+*this->center; //要検討
     }
     return ans;
+}
+
+void CArc::SetCenterPos(CPoint *pos){
+    this->SetChild(1,pos);
 }
 
 Pos CArc::GetNearPos (const Pos& hand)const{

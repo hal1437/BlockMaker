@@ -28,12 +28,15 @@ void CPoint::MoveRelative(const Pos& diff){
     if(isLock() == false && !isControlPoint() && this->isMoving() == false){
         this->SetMoving(true);  //再帰呼び出し制限
         *this += diff;//移動
-        emit PosChanged(this,*this-diff);
+        emit Moved(this);
         this->SetMoving(false); //再帰呼び出し制限解除
     }
 }
 
 CObject* CPoint::GetChild(int){
+    throw "CPointに子は存在しません";
+}
+void CPoint::SetChild(int,CObject*){
     throw "CPointに子は存在しません";
 }
 int CPoint::GetChildCount()const{
@@ -74,7 +77,4 @@ CPoint& CPoint::operator=(const Pos& rhs){
     return (*this);
 }
 
-void CPoint::PosChangedHandler(CPoint*,Pos){
-    emit PosChanged();
-}
 

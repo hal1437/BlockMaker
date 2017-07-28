@@ -23,13 +23,20 @@ bool CLine::isSelectable(Pos pos)const{
 
 
 //中間点操作
-CObject* CLine::GetChild(int index){
+CPoint*  CLine::GetPoint(int index){
     if(index == 0)return this->start;
     if(index == 1)return this->end;
+    return nullptr;
+}
+
+CObject* CLine::GetChild(int index){
+    return this->GetPoint(index);
 }
 void     CLine::SetChild(int index,CObject* obj){
+    IgnoreChild(this->GetChild(index));
     if(index == 0)this->start = dynamic_cast<CPoint*>(obj);
     if(index == 1)this->end   = dynamic_cast<CPoint*>(obj);
+    ObserveChild(this->GetChild(index));
 }
 
 int CLine::GetChildCount()const{

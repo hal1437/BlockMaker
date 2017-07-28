@@ -173,7 +173,7 @@ void MainWindow::ShowGridFilter(){
 
 void MainWindow::MakeRestraint(){
     //qDebug() << text;
-    RestraintType type = Paradox;
+    //RestraintType type = Paradox;
     /*
     if(ui->RestraintList->currentItem()->text() == "一致")type = MATCH;
     if(ui->RestraintList->currentItem()->text() == "並行")type = CONCURRENT;
