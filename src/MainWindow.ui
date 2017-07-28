@@ -321,6 +321,9 @@
    </property>
   </action>
   <action name="ToolBlocks">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="../Resource/images.qrc">
      <normaloff>:/ToolImages/Blocks.png</normaloff>:/ToolImages/Blocks.png</iconset>
@@ -393,6 +396,9 @@
    </property>
   </action>
   <action name="ToolFace">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="../Resource/images.qrc">
      <normaloff>:/ToolImages/Face.png</normaloff>:/ToolImages/Face.png</iconset>

@@ -171,6 +171,18 @@ bool CadModelCore::ImportFoamFile(QString filename){
     return true;
 }
 
+
+void CadModelCore::AddObject(CObject* obj){
+    if(obj->is<CPoint>())this->AddPoints(dynamic_cast<CPoint*>(obj));
+    if(obj->is<CEdge >())this->AddEdges (dynamic_cast<CEdge* >(obj));
+    if(obj->is<CFace >())this->AddFaces (dynamic_cast<CFace* >(obj));
+    if(obj->is<CBlock>())this->AddBlocks(dynamic_cast<CBlock*>(obj));
+    for(int i=0;i<obj->GetChildCount();i++){
+        this->AddObject(obj->GetChild(i));
+    }
+}
+
+
 QVector<CBlock*> CadModelCore::GetParent(CFace*  child)const{
     QVector<CBlock*>ans;
     for(CBlock* block:this->GetBlocks()){

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>241</width>
-    <height>190</height>
+    <width>254</width>
+    <height>226</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -103,6 +103,31 @@
     </layout>
    </item>
    <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <widget class="QLabel" name="label_4">
+       <property name="text">
+        <string>移動タイプ</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="MovingCombo">
+       <item>
+        <property name="text">
+         <string>追従</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>強制</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
     <layout class="QHBoxLayout" name="horizontalLayout_3">
      <item>
       <spacer name="horizontalSpacer">
@@ -120,14 +145,21 @@
      <item>
       <widget class="QPushButton" name="CloseButton">
        <property name="text">
-        <string>Close</string>
+        <string>閉じる</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="DuplicateButton">
+       <property name="text">
+        <string>複製</string>
        </property>
       </widget>
      </item>
      <item>
       <widget class="QPushButton" name="ApplyButton">
        <property name="text">
-        <string>Apply</string>
+        <string>適用</string>
        </property>
        <property name="default">
         <bool>true</bool>

@@ -26,6 +26,7 @@ public:
     virtual CObject* GetChild(int index);
     virtual void     SetChild(int index,CObject* obj);
     virtual int      GetChildCount()const;
+    virtual QVector<CPoint*> GetAllChildren();
 
     //近接点
     virtual Pos GetNearPos (const Pos& hand)const;

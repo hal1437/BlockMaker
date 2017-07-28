@@ -32,6 +32,10 @@ public:
     CPoint* origin; //原点
 
 public:
+
+    //選定して追加
+    void AddObject(CObject* obj);
+
     //ファイル入出力
     bool ExportFoamFile(QString filename)const;
     bool ImportFoamFile(QString filename);

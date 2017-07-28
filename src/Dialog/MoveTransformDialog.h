@@ -24,6 +24,7 @@ public slots:
     void AbsoluteMove(Pos pos);
     void RelativeMove(Pos diff);
     void Accept();
+    void Duplicate();
 
 signals:
     void RepaintRequest();

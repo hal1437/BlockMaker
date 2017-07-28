@@ -42,6 +42,12 @@ void CPoint::SetChild(int,CObject*){
 int CPoint::GetChildCount()const{
     return 0;
 }
+QVector<CPoint*> CPoint::GetAllChildren(){
+    QVector<CPoint*>ans;
+    ans.push_back(this);
+    return ans;
+}
+
 Pos CPoint::GetNearPos(const Pos&)const{
     return *this;
 }

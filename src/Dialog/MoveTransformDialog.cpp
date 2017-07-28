@@ -7,8 +7,9 @@ MoveTransformDialog::MoveTransformDialog(QWidget *parent) :
 {
     ui->setupUi(this);
     this->setWindowTitle("MoveTransformDialog");
-    connect(this->ui->ApplyButton,SIGNAL(clicked()),this,SLOT(Accept()));
-    connect(this->ui->CloseButton ,SIGNAL(clicked()),this,SLOT(close()));
+    connect(this->ui->ApplyButton    ,SIGNAL(clicked()),this,SLOT(Accept()));
+    connect(this->ui->DuplicateButton,SIGNAL(clicked()),this,SLOT(Duplicate()));
+    connect(this->ui->CloseButton    ,SIGNAL(clicked()),this,SLOT(close()));
 }
 
 MoveTransformDialog::~MoveTransformDialog()
@@ -18,9 +19,8 @@ MoveTransformDialog::~MoveTransformDialog()
 
 QVector<CPoint*> MoveTransformDialog::GetSelectedPoint(){
     QVector<CPoint*> ans;
-    QVector<CObject*> select = this->model->GetSelected();
-    for(CObject* s: select){
-        for(CPoint* p:s->GetAllChildren()){
+    for(CObject* s : this->model->GetSelected()){
+        for(CPoint* p : s->GetAllChildren()){
             ans.push_back(p);
         }
     }
@@ -33,15 +33,18 @@ QVector<CPoint*> MoveTransformDialog::GetSelectedPoint(){
 }
 
 void MoveTransformDialog::AbsoluteMove(Pos pos){
-    QVector<CPoint*> pp = this->GetSelectedPoint();
-    for(CPoint* p :pp)*p = pos;
+    for(CPoint* p :this->GetSelectedPoint()){
+        if(this->ui->MovingCombo->currentText() == "追従")p->MoveAbsolute(pos);
+        if(this->ui->MovingCombo->currentText() == "強制")*p = pos;
+    }
 }
 
 void MoveTransformDialog::RelativeMove(Pos diff){
-    QVector<CPoint*> pp = this->GetSelectedPoint();
-    for(CPoint* p :pp)*p += diff;
+    for(CPoint* p :this->GetSelectedPoint()){
+        if(this->ui->MovingCombo->currentText() == "追従")p->MoveRelative(diff);
+        if(this->ui->MovingCombo->currentText() == "強制")*p += diff;
+    }
 }
-
 
 void MoveTransformDialog::Accept(){
     Pos value = Pos(this->ui->XSpinBox->value(),
@@ -59,4 +62,17 @@ void MoveTransformDialog::Accept(){
     }
     emit RepaintRequest();
 }
+void MoveTransformDialog::Duplicate(){
+    Pos value = Pos(this->ui->XSpinBox->value(),
+                    this->ui->YSpinBox->value(),
+                    this->ui->ZSpinBox->value());
+    for(CObject* s : this->model->GetSelected()){
+        CObject* dup = s->Clone();
+        this->model->AddObject(dup);
+        for(CPoint* pos:dup->GetAllChildren()){
+            *pos += value;
+        }
+    }
+}
+
 

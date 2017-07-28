@@ -52,7 +52,7 @@ void CObject::InsertChild  (int index,CObject* obj){
     }
     this->SetChild(index,obj);
 }
-QVector<CPoint *> CObject::GetAllChildren()const{
+QVector<CPoint *> CObject::GetAllChildren(){
     QVector<CPoint*> ans;
     for(int i=0;i<this->GetChildCount();i++){
         //追加
