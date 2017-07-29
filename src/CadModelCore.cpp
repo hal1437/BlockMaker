@@ -181,6 +181,35 @@ void CadModelCore::AddObject(CObject* obj){
         this->AddObject(obj->GetChild(i));
     }
 }
+void CadModelCore::Merge(QVector<CPoint*> points){
+    CPoint* first = points.first();
+    //全て先頭に結合
+    for(int i=1;i<points.size();i++){
+        for(CEdge* edge:this->GetEdges()){
+            for(int j=0;j<edge->GetChildCount();j++){
+                if(edge->GetPoint(j) == points[i]){
+                    CPoint* old = edge->GetPoint(j);
+                    edge->SetChild(j,first);
+                    //this->RemovePoints(old);
+                }
+            }
+        }
+    }
+}
+
+void CadModelCore::AutoMerge(){
+    for(CPoint* base:this->GetPoints()){
+        QVector<CPoint*> same;
+        same.push_back(base);
+        for(CPoint* other:this->GetPoints()){
+            if(*other == *base){
+                same.push_back(other);
+            }
+        }
+        //マージ
+        this->Merge(same);
+    }
+}
 
 
 QVector<CBlock*> CadModelCore::GetParent(CFace*  child)const{

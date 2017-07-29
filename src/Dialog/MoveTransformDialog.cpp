@@ -90,6 +90,7 @@ void MoveTransformDialog::Duplicate(){
             *pos += value;
         }
     }
+    this->model->AutoMerge();
 }
 
 

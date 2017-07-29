@@ -36,6 +36,10 @@ public:
     //選定して追加
     void AddObject(CObject* obj);
 
+    //結合
+    void Merge(QVector<CPoint*> points); //先頭のものに結合
+    void AutoMerge();                    //同一座標を自動的に結合
+
     //ファイル入出力
     bool ExportFoamFile(QString filename)const;
     bool ImportFoamFile(QString filename);
