@@ -85,6 +85,7 @@ void MoveTransformDialog::Duplicate(){
                     this->ui->ZSpinBox->value());
     for(CObject* s : this->model->GetSelected()){
         CObject* dup = s->Clone();
+        this->model->AutoMerge(dup);
         this->model->AddObject(dup);
         for(CPoint* pos:dup->GetAllChildren()){
             *pos += value;

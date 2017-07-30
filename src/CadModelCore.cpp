@@ -198,24 +198,30 @@ void CadModelCore::Merge(QVector<CPoint*> points){
     }
 }
 
-void CadModelCore::AutoMerge(){
-
-    QVector<CPoint*> points = this->GetPoints();
+void CadModelCore::AutoMerge_impl(QVector<CPoint*> points){
     for(int i=0;i<points.size();i++){
         QVector<CPoint*> same;
         same.push_back(points[i]);
         for(int j=0;j<points.size();j++){
             if(points[i] != points[j] && *points[i] == *points[j]){
                 same.push_back(points[j]);
+                points.removeAll(points[j]);
+                j--;
             }
         }
         //マージ
         if(same.size() > 1){
             this->Merge(same);
             i = 0;
-            points = this->GetPoints() ;
         }
     }
+}
+
+void CadModelCore::AutoMerge(){
+    this->AutoMerge_impl(this->GetPoints());
+}
+void CadModelCore::AutoMerge(CObject* obj){
+    this->AutoMerge_impl(obj->GetAllChildren());
 }
 
 

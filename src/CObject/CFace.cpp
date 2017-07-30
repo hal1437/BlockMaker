@@ -62,6 +62,9 @@ void CFace::DefineMap2()const{
                  this->GetEdgeSequence(1),
                  this->GetEdgeSequence(2),
                  this->GetEdgeSequence(3)};
+    if(std::any_of(ee,ee+4,[](CEdge* edge){
+        return edge == nullptr;
+    }))return;
     //二次元エバリュエータ
     GLfloat ctrlpoints[4][4][3];
     for(int i=0;i<3;i++){
