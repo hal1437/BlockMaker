@@ -14,6 +14,8 @@ public:
 public:
     CPoint* start; //エッジの始点
     CPoint* end;   //エッジの終点
+    double grading = 1.0; //エッジ寄せ
+    int    divide  = 0; //分割数(0:自動的に決定)
 
 public:
     virtual CREATE_RESULT Create(CPoint* pos) = 0;   //作成関数

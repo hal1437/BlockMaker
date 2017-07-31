@@ -7,14 +7,15 @@
 #include <QSpinBox>
 #include <CadModelCore.h>
 #include "CObject/CBlock.h"
+#include "CObject/CFace.h"
 
 #define DEFINE_BOX_DIALOG_NAME_SLOTS(DIR,INDEX)   \
     void Set##DIR##Name(QString name){            \
-        this->block->name[INDEX] = name;          \
+        this->block->GetFaceFormDir(DIR)->name = name;\
     }
 #define DEFINE_BOX_DIALOG_TYPE_SLOTS(DIR,INDEX)                       \
     void Set##DIR##Type(QString name){                                \
-        this->block->boundery[INDEX] = this->ConvertStringToBoundary(name); \
+        this->block->GetFaceFormDir(DIR)->boundary = this->ConvertStringToBoundary(name); \
     }
 
 
@@ -69,16 +70,16 @@ public slots:
     void AcceptProxy();
     void GradigngComboChanged(QString text);
 
-    DEFINE_BOX_DIALOG_NAME_SLOTS(Up    ,0)
+    DEFINE_BOX_DIALOG_NAME_SLOTS(Top   ,0)
     DEFINE_BOX_DIALOG_NAME_SLOTS(Right ,1)
     DEFINE_BOX_DIALOG_NAME_SLOTS(Left  ,2)
-    DEFINE_BOX_DIALOG_NAME_SLOTS(Down  ,3)
+    DEFINE_BOX_DIALOG_NAME_SLOTS(Bottom,3)
     DEFINE_BOX_DIALOG_NAME_SLOTS(Front ,4)
     DEFINE_BOX_DIALOG_NAME_SLOTS(Back  ,5)
-    DEFINE_BOX_DIALOG_TYPE_SLOTS(Up    ,0)
+    DEFINE_BOX_DIALOG_TYPE_SLOTS(Top   ,0)
     DEFINE_BOX_DIALOG_TYPE_SLOTS(Right ,1)
     DEFINE_BOX_DIALOG_TYPE_SLOTS(Left  ,2)
-    DEFINE_BOX_DIALOG_TYPE_SLOTS(Down  ,3)
+    DEFINE_BOX_DIALOG_TYPE_SLOTS(Bottom,3)
     DEFINE_BOX_DIALOG_TYPE_SLOTS(Front ,4)
     DEFINE_BOX_DIALOG_TYPE_SLOTS(Back  ,5)
 

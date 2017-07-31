@@ -106,22 +106,23 @@ Pos CBlock::GetDivisionPoint(int edge_index,int count_index)const{
     double A,B,sum=0,p,d,L;
 
     //各パラメータ取得
+
     if(edge_index == 0 || edge_index == 2 || edge_index == 4  || edge_index == 6 ){ //X
-        p = this->grading_args[0];
+        //p = this->grading_args[0];
         d = this->div[0];
     }
     if(edge_index == 1 || edge_index == 3 || edge_index == 5  || edge_index == 7 ){ //Y
-        p = this->grading_args[1];
+        //p = this->grading_args[1];
         d = this->div[1];
     }
     if(edge_index == 8 || edge_index == 9 || edge_index == 10 || edge_index == 11){ //Z
-        p = this->grading_args[2];
+        //p = this->grading_args[2];
         d = this->div[2];
     }
     //EdgeGradingならばpを上書き
-    if(grading == GradingType::EdgeGrading){
-        p = this->grading_args[edge_index];
-    }
+//    if(grading == GradingType::EdgeGrading){
+        p = this->GetEdgeSequence(edge_index)->grading;
+//    }
     CEdge *edge =  this->GetEdgeSequence(edge_index);
     L = (*edge->end - *edge->start).Length();
 
@@ -173,35 +174,7 @@ void CBlock::DrawGL(Pos,Pos)const{
               1);
 
     for(CFace* face:this->faces){
-        //中を塗る
-        CEdge* ee[] = {face->GetEdgeSequence(0),
-                       face->GetEdgeSequence(1),
-                       face->GetEdgeSequence(2),
-                       face->GetEdgeSequence(3)};
-
-        //二次元エバリュエータ
-        GLfloat ctrlpoints[4][4][3];
-        for(int i=0;i<3;i++){
-            ctrlpoints[0][0][i] = ee[0]->GetMiddleDivide(0).mat[i];
-            ctrlpoints[1][0][i] = ee[0]->GetMiddleDivide(1.0/3.0).mat[i];
-            ctrlpoints[2][0][i] = ee[0]->GetMiddleDivide(2.0/3.0).mat[i];
-            ctrlpoints[3][0][i] = ee[1]->GetMiddleDivide(0).mat[i];
-            ctrlpoints[0][1][i] = ee[3]->GetMiddleDivide(2.0/3.0).mat[i];
-            ctrlpoints[3][1][i] = ee[1]->GetMiddleDivide(1.0/3.0).mat[i];
-            ctrlpoints[0][2][i] = ee[3]->GetMiddleDivide(1.0/3.0).mat[i];
-            ctrlpoints[3][2][i] = ee[1]->GetMiddleDivide(2.0/3.0).mat[i];
-            ctrlpoints[0][3][i] = ee[3]->GetMiddleDivide(0).mat[i];
-            ctrlpoints[1][3][i] = ee[2]->GetMiddleDivide(2.0/3.0).mat[i];
-            ctrlpoints[2][3][i] = ee[2]->GetMiddleDivide(1.0/3.0).mat[i];
-            ctrlpoints[3][3][i] = ee[2]->GetMiddleDivide(0).mat[i];
-
-            ctrlpoints[1][1][i] = (ctrlpoints[1][0][i] - ctrlpoints[0][0][i]) + (ctrlpoints[0][1][i] - ctrlpoints[0][0][i]) +  ctrlpoints[0][0][i];
-            ctrlpoints[2][1][i] = (ctrlpoints[2][0][i] - ctrlpoints[3][0][i]) + (ctrlpoints[3][1][i] - ctrlpoints[3][0][i]) +  ctrlpoints[3][0][i];
-            ctrlpoints[1][2][i] = (ctrlpoints[0][2][i] - ctrlpoints[0][3][i]) + (ctrlpoints[1][3][i] - ctrlpoints[0][3][i]) +  ctrlpoints[0][3][i];
-            ctrlpoints[2][2][i] = (ctrlpoints[3][2][i] - ctrlpoints[3][3][i]) + (ctrlpoints[2][3][i] - ctrlpoints[3][3][i]) +  ctrlpoints[3][3][i];
-        }
-        glMap2f(GL_MAP2_VERTEX_3, 0, 1, 3, 4, 0, 1, 12, 4, &ctrlpoints[0][0][0]);
-        glEnable(GL_MAP2_VERTEX_3);
+        face->DefineMap2();
 
         for (int j = 0; j < 30; j++){
           glBegin(GL_QUAD_STRIP);
@@ -221,7 +194,7 @@ void CBlock::DrawGL(Pos,Pos)const{
                   0.1,
                   0.1,
                   1);
-        if(this->grading == GradingType::SimpleGrading){
+        /*if(this->grading == GradingType::SimpleGrading){
             int edge_index[3][4] = {{0,2,6,4},{1,3,7,5},{8,9,10,11}};
             for(int i=0;i<3;i++){
                 for(int j=0;j<this->div[i];j++){
@@ -234,7 +207,7 @@ void CBlock::DrawGL(Pos,Pos)const{
                     glEnd();
                 }
             }
-        }
+        }*/
     }
     //色を復元
     glColor4f(oldColor[0],oldColor[1],oldColor[2], oldColor[3]);
@@ -379,7 +352,7 @@ void CBlock::RefreshDividePoint(){
     //更新
     this->div_pos.clear();
     this->div_pos.resize(12);
-    if(this->grading == GradingType::SimpleGrading){
+    /*if(this->grading == GradingType::SimpleGrading){
         for(int i=0;i<12;i++){
             QVector<Pos> pos;
             int div_index[] = {0,1,0,1,0,1,0,1,2,2,2,2};
@@ -389,7 +362,7 @@ void CBlock::RefreshDividePoint(){
             }
             this->div_pos[i] = pos;
         }
-    }
+    }*/
 }
 
 
@@ -419,12 +392,6 @@ CObject* CBlock::Clone()const{
 CBlock::CBlock(QObject* parent):
     CObject(parent)
 {
-    this->name[0] = "Top";
-    this->name[1] = "Right";
-    this->name[2] = "Left";
-    this->name[3] = "Bottom";
-    this->name[4] = "Front";
-    this->name[5] = "Back";
 }
 
 CBlock::~CBlock()

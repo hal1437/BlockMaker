@@ -109,6 +109,8 @@ CEdge* CArc::Clone()const{
     ptr->start  = new CPoint(*this->start ,ptr);
     ptr->end    = new CPoint(*this->end   ,ptr);
     ptr->center = new CPoint(*this->center,ptr);
+    ptr->grading = this->grading;
+    ptr->divide  = this->divide;
     return ptr;
 }
 
@@ -135,8 +137,8 @@ void CArc::ChangeChildCallback(CObject* child){
     if(child == this->center){
         //平均値
         round = ((*this->start - *this->center).Length() + (*this->end - *this->center).Length())/2;
-        //this->start->MoveAbsolute((*this->start - *this->center).GetNormalize() * round + *this->center);
-        //this->end  ->MoveAbsolute((*this->end   - *this->center).GetNormalize() * round + *this->center);
+        this->start->MoveAbsolute((*this->start - *this->center).GetNormalize() * round + *this->center);
+        this->end  ->MoveAbsolute((*this->end   - *this->center).GetNormalize() * round + *this->center);
     }
     //始点
     if(child == this->start){

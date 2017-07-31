@@ -53,7 +53,6 @@ void CEdge::SetEndPos(CObject* obj){
     this->SetChild(this->GetChildCount()-1,obj);
 }
 
-
 CEdge::CEdge(QObject* parent):
     CObject(parent)
 {

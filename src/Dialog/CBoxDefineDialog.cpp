@@ -133,15 +133,15 @@ QString CBoxDefineDialog::FormatError()const{
 void CBoxDefineDialog::ExportCBlock(){
     for(int i=0;i<6;i++){
         BoundaryDir dir = static_cast<BoundaryDir>(i);
-        this->block->boundery[i] = this->GetBoundaryType(dir);
-        this->block->name[i]     = this->GetBoundaryName(dir);
+        this->block->GetFaceFormDir(static_cast<BoundaryDir>(i))->boundary = this->GetBoundaryType(dir);
+        this->block->GetFaceFormDir(static_cast<BoundaryDir>(i))->name     = this->GetBoundaryName(dir);
     }
     this->block->div[0] = this->ui->XspinBox->value();
     this->block->div[1] = this->ui->YspinBox->value();
     this->block->div[2] = this->ui->ZspinBox->value();
-    this->block->grading   = this->GetGradigngType();
+    //this->block->grading   = this->GetGradigngType();
     for(int i=0;i<(this->GetGradigngType() == GradingType::SimpleGrading ? 3 : 12);i++){
-        this->block->grading_args.push_back(this->grading_args[i]->value());
+        //this->block->grading_args.push_back(this->grading_args[i]->value());
     }
     this->block->ReorderEdges();
     this->block->RefreshDividePoint();
@@ -149,18 +149,22 @@ void CBoxDefineDialog::ExportCBlock(){
 void CBoxDefineDialog::ImportCBlock(){
     //面の設定
     for(int i = 0;i<6;i++){
-        this->ConvertDirToNameEdit(static_cast<BoundaryDir>(i))->setText(this->block->name[i]);
-        this->ConvertDirToCombo   (static_cast<BoundaryDir>(i))->setCurrentText(this->ConvertBoundaryToString(this->block->boundery[i]));
-        types_log[i] = this->block->boundery[i];
+        CFace* face = this->block->GetFaceFormDir(static_cast<BoundaryDir>(i));
+        this->ConvertDirToNameEdit(static_cast<BoundaryDir>(i))->setText(face->name);
+        this->ConvertDirToCombo   (static_cast<BoundaryDir>(i))->setCurrentText(this->ConvertBoundaryToString(face->boundary));
+        types_log[i] = face->boundary;
     }
     this->ui->XspinBox->setValue(this->block->div[0] == 0 ? 10 :this->block->div[0]);
     this->ui->YspinBox->setValue(this->block->div[1] == 0 ? 10 :this->block->div[1]);
     this->ui->ZspinBox->setValue(this->block->div[2] == 0 ? 10 :this->block->div[2]);
-    this->SetGradigngType(this->block->grading);
+    //this->SetGradigngType(this->block->grading);
+    /*
     for(int i=0;i<(this->GetGradigngType() == GradingType::SimpleGrading ? 3 : 12);i++){
-        if(i >= this->block->grading_args.size())this->grading_args[i]->setValue(1.0);
+        if(i >= this->block->grading_args.size()){
+            this->grading_args[i]->setValue(1.0);
+        }
         else this->grading_args[i]->setValue(this->block->grading_args[i]);
-    }
+    }*/
     for(int i=0;i<6;i++){
         types_log[i] = static_cast<BoundaryType>(0);
         if(this->GetFaceContinuous(static_cast<BoundaryDir>(i))){
@@ -254,28 +258,29 @@ void CBoxDefineDialog::AcceptProxy(){
         //値の代入
         for(int i=0;i<6;i++){
             BoundaryDir dir = static_cast<BoundaryDir>(i);
-            this->block->boundery[i] = this->GetBoundaryType(dir);
-            this->block->name[i]     = this->GetBoundaryName(dir);
+            this->block->GetFaceFormDir(static_cast<BoundaryDir>(i))->boundary = this->GetBoundaryType(dir);
+            this->block->GetFaceFormDir(static_cast<BoundaryDir>(i))->name     = this->GetBoundaryName(dir);
         }
         this->block->div[0] = this->ui->XspinBox->value();
         this->block->div[1] = this->ui->YspinBox->value();
         this->block->div[2] = this->ui->ZspinBox->value();
-        this->block->grading   = this->GetGradigngType();
-        this->block->grading_args.resize(this->GetGradigngType() == GradingType::SimpleGrading ? 3 : 12);
-        for(int i=0;i<this->block->grading_args.size();i++){
+        //this->block->grading   = this->GetGradigngType();
+        //this->block->grading_args.resize(this->GetGradigngType() == GradingType::SimpleGrading ? 3 : 12);
+        /*for(int i=0;i<this->block->grading_args.size();i++){
             this->block->grading_args[i] = this->grading_args[i]->value();
-        }
+        }*/
         this->block->RefreshDividePoint();
 
         //境界条件Noneを他のBlockに伝達
         for(int i =0;i<6;i++){
-            if(this->block->boundery[static_cast<BoundaryDir>(i)] == BoundaryType::None){
+            CFace* face = this->block->GetFace(static_cast<BoundaryDir>(i));
+            if(face->boundary == BoundaryType::None){
                 CFace* face = this->block->GetFaceFormDir(static_cast<BoundaryDir>(i));
                 for(CBlock* block:this->model->GetParent(face)){
                     for(int j=0;j<6;j++){
                         if(block->GetFaceFormDir(static_cast<BoundaryDir>(j)) == face){
-                            block->boundery[static_cast<BoundaryDir>(j)] = BoundaryType::None;
-                            block->name    [static_cast<BoundaryDir>(j)] = "連続面";
+                            face->boundary = BoundaryType::None;
+                            face->name    = "連続面";
                         }
                     }
                 }

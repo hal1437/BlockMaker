@@ -98,6 +98,7 @@ void ExportDialog::Export(QString filename)const{
 
         //分割パラメータ
         QVector<double> grading_args;
+        /*
         if(block->grading == GradingType::SimpleGrading){
             file.OutStringInline("simpleGrading");
             for(int i=0;i<3;i++){
@@ -105,12 +106,13 @@ void ExportDialog::Export(QString filename)const{
             }
             file.OutVectorInline(grading_args);
         }else if(block->grading == GradingType::EdgeGrading){
+        */
             file.OutStringInline("edgeGrading");
             for(int i=0;i<12;i++){
-                grading_args.push_back(block->grading_args[i]);
+                //grading_args.push_back(block->grading_args[i]);
             }
             file.OutVectorInline(grading_args);
-        }
+//        }
         file.OutNewline();
     }    
     file.EndScope();
@@ -153,12 +155,13 @@ void ExportDialog::Export(QString filename)const{
     QMap<QString,std::pair<BoundaryType,QVector<int>>> boundary_list; //(name ,[[index]])
     for(CBlock* block:this->model->GetBlocks()){
         for(int i=0;i<6;i++){
+            CFace* face = block->GetFaceFormDir(static_cast<BoundaryDir>(i));
             //頂点番号リスト出力
             QVector<CPoint*> vp = this->GetBoundaryPos(block,static_cast<BoundaryDir>(i));
             for(CPoint* v:vp){
-                if(block->boundery[i] == BoundaryType::None)continue;//連続は登録しない
-                boundary_list[block->name[i]].first = block->boundery[i];
-                boundary_list[block->name[i]].second.push_back(GetPosIndex(v));
+                if(face->boundary == BoundaryType::None)continue;//連続は登録しない
+                boundary_list[face->name].first = face->boundary;
+                boundary_list[face->name].second.push_back(GetPosIndex(v));
             }
         }
     }

@@ -50,12 +50,16 @@ Pos CLine::GetNearPos(const Pos& hand)const{
     //点と直線の最近点
     return Pos::LineNearPoint(*this->start,*this->end,hand);
 }
+
 CEdge* CLine::Clone()const{
     CLine* ptr = new CLine(this->parent());
     ptr->start = new CPoint(*this->start,ptr);
     ptr->end   = new CPoint(*this->end  ,ptr);
+    ptr->grading = this->grading;
+    ptr->divide  = this->divide;
     return ptr;
 }
+
 
 CLine::CLine(QObject *parent):
     CEdge(parent)

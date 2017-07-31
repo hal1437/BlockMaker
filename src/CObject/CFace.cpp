@@ -296,6 +296,8 @@ CObject* CFace::Clone()const{
     for(CEdge* edge:this->edges){
         new_obj->edges.push_back(dynamic_cast<CEdge*>(edge->Clone()));
     }
+    new_obj->name     = this->name;
+    new_obj->boundary = this->boundary;
     return new_obj;
 }
 

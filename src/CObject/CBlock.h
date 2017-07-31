@@ -17,17 +17,6 @@ enum BoundaryDir{
     Back,
 };
 
-//面の種類
-enum BoundaryType{
-    Empty         = 0,
-    Patch         = 1,
-    Wall          = 2,
-    SymmetryPlane = 3,
-    Cyclic        = 4,
-    CyclicAMI     = 5,
-    Wedge         = 6,
-    None          = 7,//連続
-};
 //格子点間隔の種類
 enum GradingType{
     EmptyGrading = 0,
@@ -41,11 +30,7 @@ class CBlock : public CObject{
 public:
     QVector<CFace*> faces;
 public:
-    BoundaryType boundery[6]; // 境界タイプ
-    QString name[6];          // 境界名
     int div[3];               // 分割数
-    GradingType grading;      // 分割間隔タイプ
-    QVector<double> grading_args; // 分割パラメータ
 private:
     QVector<QVector<Pos>> div_pos; //分割位置 (エッジ番号,分割数)
     DEFINE_FLAG(VisibleMesh,true)//分割フレーム表示

@@ -3,13 +3,28 @@
 
 #include "CEdge.h"
 
+//面の種類
+enum BoundaryType{
+    Empty         = 0,
+    Patch         = 1,
+    Wall          = 2,
+    SymmetryPlane = 3,
+    Cyclic        = 4,
+    CyclicAMI     = 5,
+    Wedge         = 6,
+    None          = 7,//連続
+};
+
 //平面オブジェクト
 class CFace : public CObject
 {
     Q_OBJECT
 public:
-    static CFace* base[3];//正面,平面,右側面
-    QVector<CEdge*> edges;//構成線
+    static CFace* base[3]; //正面,平面,右側面
+
+    QVector<CEdge*> edges;         // 構成線
+    BoundaryType boundary = Empty; // 境界タイプ
+    QString name = "Noname";       // 境界名
 
     //ポリゴン判定
     DEFINE_FLAG(Polygon,true)
