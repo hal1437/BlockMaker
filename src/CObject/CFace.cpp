@@ -217,16 +217,17 @@ void CFace::DrawGL(Pos,Pos)const{
         glColor4f(currentColor[0],currentColor[1],currentColor[2], 0.1);
         glDepthMask(GL_FALSE);
 
-        this->DefineMap2();
-        for (int j = 0; j < 30; j++){
-            glBegin(GL_QUADS);
-            for (int i = 0; i < 30; i++){
-                glEvalCoord2f((GLfloat)    i/30.0, (GLfloat)    j/30.0);
-                glEvalCoord2f((GLfloat)(i+1)/30.0, (GLfloat)    j/30.0);
-                glEvalCoord2f((GLfloat)(i+1)/30.0, (GLfloat)(j+1)/30.0);
-                glEvalCoord2f((GLfloat)    i/30.0, (GLfloat)(j+1)/30.0);
-            }
-            glEnd();
+        this->DefineMap2();//二次元エバリュエータ定義
+        const double FACE_DIVIDE = 10.0;//面分割数
+        for (int j = 0; j < FACE_DIVIDE; j++){
+          for (int i = 0; i < FACE_DIVIDE; i++){
+              glBegin(GL_QUADS);
+              glEvalCoord2f((GLfloat)i    /FACE_DIVIDE , (GLfloat)j/FACE_DIVIDE);
+              glEvalCoord2f((GLfloat)i    /FACE_DIVIDE , (GLfloat)(j+1)/FACE_DIVIDE);
+              glEvalCoord2f((GLfloat)(i+1)/FACE_DIVIDE , (GLfloat)(j+1)/FACE_DIVIDE);
+              glEvalCoord2f((GLfloat)(i+1)/FACE_DIVIDE , (GLfloat)j/FACE_DIVIDE);
+              glEnd();
+          }
         }
 
         glEnd();

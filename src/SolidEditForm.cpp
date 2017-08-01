@@ -211,6 +211,7 @@ void SolidEditForm::paintGL(){
     //カメラ調整
     if(this->controller->theta1 >  M_PI/2) this->controller->theta1 =  M_PI/2;
     if(this->controller->theta1 < -M_PI/2) this->controller->theta1 = -M_PI/2;
+    if(this->round              <  0     ) this->round = 0;
     this->camera = Pos(0,0,round).Dot(this->controller->getCameraMatrix());
     glMatrixMode(GL_PROJECTION);  //行列モード切替
     glLoadIdentity();
@@ -232,23 +233,19 @@ void SolidEditForm::paintGL(){
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     //オブジェクト描画
-    glColor3f(0,0,1);
+    glLineWidth(2);
+    glColor3f(0,0,1);//青
     for(CBlock* block : this->model->GetBlocks())block->DrawGL(this->camera,this->center);
-    for(CFace*  face  : this->model->GetFaces ()){
-        if(this->model->GetParent(face).size()==0){
-            face ->DrawGL(this->camera,this->center);
-        }
-    }
+    for(CFace*  face  : this->model->GetFaces ())face ->DrawGL(this->camera,this->center);
     for(CEdge*  edge  : this->model->GetEdges ())edge ->DrawGL(this->camera,this->center);
     for(CPoint* pos   : this->model->GetPoints())pos  ->DrawGL(this->camera,this->center);
 
-    //描画面と色のリスト
+    //描画面と色のリスト作成
     QVector<std::pair<CFace*,QVector<int>>> faces;
     faces.push_back(std::make_pair(controller->getSideFace()    ,QVector<int>({1,0,0})));//右側面
     faces.push_back(std::make_pair(controller->getTopFace()     ,QVector<int>({0,1,0})));//平面
     faces.push_back(std::make_pair(controller->getFrontFace()   ,QVector<int>({0,0,1})));//正面
     faces.push_back(std::make_pair(this->controller->sketch_face,QVector<int>({1,1,0})));//スケッチ面
-
     //面の描画
     glLineWidth(2);
     for(std::pair<CFace*,QVector<int>>f: faces){
@@ -258,31 +255,34 @@ void SolidEditForm::paintGL(){
         }
     }
 
-    //中央線の描画
-    for(int i=0;i<3;i++){
-        glBegin(GL_LINES);
-        glColor3f((i==0), (i==1), (i==2));
-        glVertex3f(0,0,0);
-        glVertex3f(50*(i==0), 50*(i==1), 50*(i==2));
-        glEnd();
-    }
-
     //選択オブジェクト描画
-    glColor3f(0,1,1);
+    glColor3f(0,1,1);//水色
     for(CObject* p: this->model->GetSelected()){
         p->DrawGL(this->camera,this->center);
-
-        if(p->is<CFace>() && exist(this->model->GetSelected(),p)){
-            dynamic_cast<CFace*>(p)->DrawNormArrowGL();
-        }
     }
 
     //直下オブジェクトの描画
-    glColor3f(1,1,1);
+    glColor3f(1,1,1);//白
     CObject* hang_obj[] = {this->GetHangedObject(),this->GetHangedFace()} ;
     for(CObject* p: hang_obj){
         if(p != nullptr)p->DrawGL(this->camera,this->center);
     }
+
+    //座標線の描画
+    glLineWidth(4);
+    glDepthFunc(GL_ALWAYS);//奥行き方向補正を無視
+    for(int i=0;i<3;i++){
+        glBegin(GL_LINES);
+        glColor3f((i==0), (i==1), (i==2));
+
+        Pos cc = (Pos(100-this->width(),100-this->height(),1)*round).Dot(this->controller->getCameraMatrix());
+        Pos ex = cc + Pos(50*(i==0)*round, 50*(i==1)*round, 50*(i==2)*round);
+
+        glVertex3f(cc.x(),cc.y(),cc.z());
+        glVertex3f(ex.x(),ex.y(),ex.z());
+        glEnd();
+    }
+
 
     glFlush();
 }

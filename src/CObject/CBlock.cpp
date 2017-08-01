@@ -106,24 +106,13 @@ Pos CBlock::GetDivisionPoint(int edge_index,int count_index)const{
     double A,B,sum=0,p,d,L;
 
     //各パラメータ取得
+    if(edge_index == 0 || edge_index == 2 || edge_index == 4  || edge_index == 6 )d = this->div[0];
+    if(edge_index == 1 || edge_index == 3 || edge_index == 5  || edge_index == 7 )d = this->div[1];
+    if(edge_index == 8 || edge_index == 9 || edge_index == 10 || edge_index == 11)d = this->div[2];
 
-    if(edge_index == 0 || edge_index == 2 || edge_index == 4  || edge_index == 6 ){ //X
-        //p = this->grading_args[0];
-        d = this->div[0];
-    }
-    if(edge_index == 1 || edge_index == 3 || edge_index == 5  || edge_index == 7 ){ //Y
-        //p = this->grading_args[1];
-        d = this->div[1];
-    }
-    if(edge_index == 8 || edge_index == 9 || edge_index == 10 || edge_index == 11){ //Z
-        //p = this->grading_args[2];
-        d = this->div[2];
-    }
-    //EdgeGradingならばpを上書き
-//    if(grading == GradingType::EdgeGrading){
-        p = this->GetEdgeSequence(edge_index)->grading;
-//    }
+    //エッジからpとLを抽出
     CEdge *edge =  this->GetEdgeSequence(edge_index);
+    p = edge->grading;
     L = (*edge->end - *edge->start).Length();
 
     //指数関数パラメータ計算
@@ -168,23 +157,20 @@ void CBlock::DrawGL(Pos,Pos)const{
     //薄い色に変更
     float oldColor[4];
     glGetFloatv(GL_CURRENT_COLOR,oldColor);
-    glColor4f(0.5,
-              0.5,
-              0.5,
-              1);
+    glColor4f(0.5,0.5,0.5,1);
 
     for(CFace* face:this->faces){
-        face->DefineMap2();
-
-        for (int j = 0; j < 30; j++){
-          glBegin(GL_QUAD_STRIP);
-          for (int i = 0; i < 30; i++){
-              glEvalCoord2f((GLfloat)i/30.0, (GLfloat)j/30.0);
-              glEvalCoord2f((GLfloat)(i+1)/30.0, (GLfloat)j/30.0);
-              glEvalCoord2f((GLfloat)i/30.0, (GLfloat)(j+1)/30.0);
-              glEvalCoord2f((GLfloat)(i+1)/30.0, (GLfloat)(j+1)/30.0);
+        face->DefineMap2();//二次元エバリュエータ定義
+        const double FACE_DIVIDE = 10.0;//面分割数
+        for (int j = 0; j < FACE_DIVIDE; j++){
+          for (int i = 0; i < FACE_DIVIDE; i++){
+              glBegin(GL_QUADS);
+              glEvalCoord2f((GLfloat)i    /FACE_DIVIDE , (GLfloat)j/FACE_DIVIDE);
+              glEvalCoord2f((GLfloat)i    /FACE_DIVIDE , (GLfloat)(j+1)/FACE_DIVIDE);
+              glEvalCoord2f((GLfloat)(i+1)/FACE_DIVIDE , (GLfloat)(j+1)/FACE_DIVIDE);
+              glEvalCoord2f((GLfloat)(i+1)/FACE_DIVIDE , (GLfloat)j/FACE_DIVIDE);
+              glEnd();
           }
-          glEnd();
         }
     }
 
@@ -194,20 +180,18 @@ void CBlock::DrawGL(Pos,Pos)const{
                   0.1,
                   0.1,
                   1);
-        //if(this->grading == GradingType::SimpleGrading){
-            int edge_index[3][4] = {{0,2,6,4},{1,3,7,5},{8,9,10,11}};
-            for(int i=0;i<3;i++){
-                for(int j=0;j<this->div[i];j++){
-                    glBegin(GL_LINE_LOOP);
-                    for(int k=0;k<4;k++){
-                        //線の分割描画
-                        Pos p = this->div_pos[edge_index[i][k]][j];
-                        glVertex3f(p.x(),p.y(),p.z());
-                    }
-                    glEnd();
+        int edge_index[3][4] = {{0,2,6,4},{1,3,7,5},{8,9,10,11}};
+        for(int i=0;i<3;i++){
+            for(int j=0;j<this->div[i];j++){
+                glBegin(GL_LINE_LOOP);
+                for(int k=0;k<4;k++){
+                    //線の分割描画
+                    Pos p = this->div_pos[edge_index[i][k]][j];
+                    glVertex3f(p.x(),p.y(),p.z());
                 }
+                glEnd();
             }
-        //}
+        }
     }
     //色を復元
     glColor4f(oldColor[0],oldColor[1],oldColor[2], oldColor[3]);
@@ -352,17 +336,15 @@ void CBlock::RefreshDividePoint(){
     //更新
     this->div_pos.clear();
     this->div_pos.resize(12);
-    //if(this->grading == GradingType::SimpleGrading){
-        for(int i=0;i<12;i++){
-            QVector<Pos> pos;
-            int div_index[] = {0,1,0,1,0,1,0,1,2,2,2,2};
-            for(int j=0;j<this->div[div_index[i]];j++){
-                //線の分割描画
-                 pos.push_back(this->GetDivisionPoint(i,j));
-            }
-            this->div_pos[i] = pos;
+    for(int i=0;i<12;i++){
+        QVector<Pos> pos;
+        int div_index[] = {0,1,0,1,0,1,0,1,2,2,2,2};
+        for(int j=0;j<this->div[div_index[i]];j++){
+            //線の分割描画
+             pos.push_back(this->GetDivisionPoint(i,j));
         }
-    //}
+        this->div_pos[i] = pos;
+    }
 }
 
 
