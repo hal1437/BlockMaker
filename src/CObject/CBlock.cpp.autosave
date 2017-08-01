@@ -359,7 +359,7 @@ void CBlock::RefreshDividePoint(){
             for(int j=0;j<this->div[div_index[i]];j++){
                 //線の分割描画
                  pos.push_back(this->GetDivisionPoint(i,j));
-            }
+            }gt 
             this->div_pos[i] = pos;
         }
     //}
