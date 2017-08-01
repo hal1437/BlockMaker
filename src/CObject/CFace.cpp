@@ -296,6 +296,15 @@ CObject* CFace::Clone()const{
     for(CEdge* edge:this->edges){
         new_obj->edges.push_back(dynamic_cast<CEdge*>(edge->Clone()));
     }
+    //構成点マージ
+    for(int i=0;i<new_obj->GetChildCount();i++){
+        for(int j=0;j<new_obj->GetChildCount();j++){
+            if(*new_obj->GetEdge(i)->start == *new_obj->GetEdge(j)->start)new_obj->GetEdge(j)->start = new_obj->GetEdge(i)->start;
+            if(*new_obj->GetEdge(i)->start == *new_obj->GetEdge(j)->end  )new_obj->GetEdge(j)->end   = new_obj->GetEdge(i)->start;
+            if(*new_obj->GetEdge(i)->end   == *new_obj->GetEdge(j)->start)new_obj->GetEdge(j)->start = new_obj->GetEdge(i)->end;
+            if(*new_obj->GetEdge(i)->end   == *new_obj->GetEdge(j)->end  )new_obj->GetEdge(j)->end   = new_obj->GetEdge(i)->end;
+        }
+    }
     new_obj->name     = this->name;
     new_obj->boundary = this->boundary;
     return new_obj;

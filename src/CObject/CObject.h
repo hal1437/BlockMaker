@@ -41,6 +41,7 @@ public:
     DEFINE_FLAG(Visible,true)    
 
 protected:
+    //子を監視対象にする
     void ObserveChild(CObject* obj);
     void IgnoreChild (CObject* obj);
 

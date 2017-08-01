@@ -3,6 +3,7 @@
 double   CObject::drawing_scale;
 
 
+
 void CObject::ObserveChild(CObject* obj){
     //コールバック接続
     if(obj != nullptr){
