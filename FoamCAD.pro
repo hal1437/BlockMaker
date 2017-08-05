@@ -39,7 +39,8 @@ SOURCES += src/main.cpp\
     src/Collision.cpp \
     src/MakeObjectController.cpp \
     src/CObject/CFace.cpp \
-    src/ObjectList.cpp
+    src/ObjectList.cpp \
+    src/CadModelMenu.cpp
 
 HEADERS  += src/MainWindow.h \
     src/Point.h \
@@ -70,7 +71,8 @@ HEADERS  += src/MainWindow.h \
     src/Collision.h \
     src/MakeObjectController.h \
     src/CObject/CFace.h \
-    src/ObjectList.h
+    src/ObjectList.h \
+    src/CadModelMenu.h
 
 FORMS    += src/MainWindow.ui \
     src/Dialog/SmartDimensionDialog.ui \

@@ -312,7 +312,6 @@ CadModelCore::CadModelCore(QWidget *parent):
     connect(this,SIGNAL(UpdateRestraints   ()),this,SLOT(UpdateAction()));
     connect(this,SIGNAL(UpdateRestraints   ()),this,SLOT(UpdateAction()));
     connect(this,SIGNAL(UpdateDimensions   ()),this,SLOT(UpdateAction()));
-
 }
 
 CadModelCore::~CadModelCore()

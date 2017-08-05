@@ -8,6 +8,7 @@
 #include "SolidEditController.h"
 #include "TimeDivider.h"
 #include "CadModelCore.h"
+#include "CadModelMenu.h"
 #include "CObject/CFace.h"
 
 namespace Ui {
@@ -22,6 +23,7 @@ class SolidEditForm : public QOpenGLWidget ,public CadModelCoreInterface
 private:
     SolidEditController* controller;
     MakeObjectController* make_controller;
+    CadModelMenu menu;
 
     Pos mouse_pos;  //マウス座標
     Pos screen_pos; //スクリーン座標
@@ -51,10 +53,11 @@ public:
     void mousePressEvent  (QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
     void mouseMoveEvent   (QMouseEvent *event);
+    void mouseDoubleClickEvent(QMouseEvent *event);
     void wheelEvent       (QWheelEvent *event);
 
     void SetModel(CadModelCore* model);
-    void initializeGL();        //  OpenGL 初期化
+    void initializeGL();        //  OpenGL初期化
     void resizeGL(int, int);    //  ウィジットリサイズ時のハンドラ
     void paintGL();             //  描画処理
 public slots:

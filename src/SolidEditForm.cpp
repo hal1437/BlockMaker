@@ -103,30 +103,26 @@ void SolidEditForm::mouseReleaseEvent(QMouseEvent *event){
     }
     //ドラッグでなければ
     if(this->first_click == Pos(event->pos().x(),event->pos().y())){
+
+        //オブジェクト選択
+        if(state == MAKE_OBJECT::Edit){
+            QVector<CObject*> objects;
+            objects.push_back(this->GetHangedObject());
+            objects.push_back(this->GetHangedFace());
+            //シフト状態
+            if(!shift_pressed)this->model->SelectedClear();//選択解除
+
+            for(CObject* obj:objects){
+                if(obj == nullptr)continue;
+                //選択状態をトグル
+                if(exist(this->model->GetSelected(),obj))this->model->RemoveSelected(obj);
+                else this->model->AddSelected(obj);
+                break;
+            }
+        }
         //右クリック
         if(event->button() == Qt::RightButton){
-            //スケッチ開始
-            CFace* f = this->GetHangedFace();
-            if(f != nullptr){
-                this->StartSketch(f);
-            }
-        }else{
-            //選択
-            if(state == MAKE_OBJECT::Edit){
-                QVector<CObject*> objects;
-                objects.push_back(this->GetHangedObject());
-                objects.push_back(this->GetHangedFace());
-                //シフト状態
-                if(!shift_pressed)this->model->SelectedClear();//選択解除
-
-                for(CObject* obj:objects){
-                    if(obj == nullptr)continue;
-                    //選択状態をトグル
-                    if(exist(this->model->GetSelected(),obj))this->model->RemoveSelected(obj);
-                    else this->model->AddSelected(obj);
-                    break;
-                }
-            }
+            menu.Show(event->globalPos());
         }
     }
 
@@ -145,8 +141,10 @@ void SolidEditForm::mouseMoveEvent   (QMouseEvent *event){
                                                            Line_base1,Line_base2);
     }else{
         //カメラ角度から算出
-        this->mouse_pos  =  this->screen_pos.Dot(this->controller->getCameraMatrix());
+        this->mouse_pos = this->screen_pos.Dot(this->controller->getCameraMatrix());
     }
+
+    //シグナル発生
     CObject* hang = this->GetHangedObject();
     if(hang == nullptr){
         emit MousePosChanged(this->mouse_pos);
@@ -171,6 +169,21 @@ void SolidEditForm::mouseMoveEvent   (QMouseEvent *event){
     }
     repaint();
 }
+void SolidEditForm::mouseDoubleClickEvent(QMouseEvent *event){
+    //左ダブルクリック
+    if(event->button() == Qt::LeftButton){
+        CFace* f = this->GetHangedFace();
+        if(f != nullptr){
+            //スケッチ開始
+            this->StartSketch(f);
+        }else{
+            this->mousePressEvent(event);
+            this->mouseReleaseEvent(event);
+
+        }
+    }
+}
+
 void SolidEditForm::wheelEvent(QWheelEvent *event){
     this->round += static_cast<double>(event->angleDelta().y())/MOUSE_ZOOM_RATE;
     repaint();
@@ -178,6 +191,7 @@ void SolidEditForm::wheelEvent(QWheelEvent *event){
 
 void SolidEditForm::SetModel(CadModelCore* model){
     this->model = model;
+    this->menu.SetModel(model);
     this->controller->SetModel(model);
     this->make_controller->SetModel(model);
     connect(this->model,SIGNAL(UpdateAnyAction()),this,SLOT(repaint()));

@@ -3,10 +3,10 @@
 
 #include <QTreeWidget>
 #include <QMouseEvent>
-#include <QMenu>
 #include <QLabel>
 #include <QImage>
 #include "CadModelCore.h"
+#include "CadModelMenu.h"
 
 class ObjectList : public QTreeWidget, public CadModelCoreInterface
 {
@@ -17,13 +17,7 @@ private:
     QVector<CEdge *> edges ;
     QVector<CFace *> faces ;
     QVector<CBlock*> blocks;
-    QMenu* menu;
-    QAction* delete_action;
-    QAction* reverse_action;
-    QAction* visible_action;
-    QAction* invisible_action;
-    QAction* visible_mesh_action;
-    QAction* invisible_mesh_action;
+    CadModelMenu menu;
 
 protected:
     QIcon getIcon(CObject* obj);
@@ -51,13 +45,6 @@ public slots:
     void UpdateObject();    //オブジェクト更新
     void PullSelected();    //選択情報取得
     void PushSelected();    //選択情報同期
-
-    void Delete(bool);//削除
-    void ReverseArc(bool);//削除
-    void SetVisible(bool);//可視設定
-    void SetInvisible(bool);//不可視設定
-    void SetVisibleMesh(bool);//可視フレーム設定
-    void SetInvisibleMesh(bool);//不可視フレーム設定
 
 public:
     explicit ObjectList(QWidget *parent = 0);

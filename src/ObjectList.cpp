@@ -9,17 +9,15 @@ QIcon ObjectList::getIcon(CObject *obj){
             filepath = ":/ToolImages/Blocks";
         }
     }
-    if(obj->is<CFace>()){
-        filepath = ":/ToolImages/Face";
-    }
+
+    if(obj->is<CFace>())filepath = ":/ToolImages/Face";
+
     if(obj->is<CEdge>()){
         if(obj->is<CLine>  ())filepath = ":/ToolImages/Line";
         if(obj->is<CArc>   ())filepath = ":/ToolImages/Arc";
         if(obj->is<CSpline>())filepath = ":/ToolImages/Spline";
     }
-    if(obj->is<CPoint>()){
-        filepath = ":/ToolImages/Dot";
-    }
+    if(obj->is<CPoint>())filepath = ":/ToolImages/Dot";
 
     //不可視は薄くする
     if(obj->isVisible())filepath += ".png";
@@ -29,49 +27,9 @@ QIcon ObjectList::getIcon(CObject *obj){
 }
 
 void ObjectList::mouseReleaseEvent(QMouseEvent* event){
-
+    //メニュー表示
     if(event->button() == Qt::RightButton){
-        QVector<CObject*> selected = this->CadModelCoreInterface::model->GetSelected();
-        this->menu = new QMenu(this);
-        this->delete_action          = this->menu->addAction("削除");
-        connect(this->delete_action,SIGNAL(triggered(bool)),this,SLOT(Delete(bool)));
-
-        QVector<CEdge*> edges = this->CadModelCoreInterface::model->GetEdges();
-        if(std::any_of(selected.begin(),selected.end(),[&](CObject* obj){return obj->is<CArc>();})){
-            this->reverse_action         = this->menu->addAction("円弧反転");
-            connect(this->reverse_action   ,SIGNAL(triggered(bool)),this,SLOT(ReverseArc(bool)));
-        }
-
-        for(CObject* obj:selected){
-            if(!obj->isVisible()){
-                this->visible_action         = this->menu->addAction("表示");
-                connect(this->visible_action        ,SIGNAL(triggered(bool)),this,SLOT(SetVisible(bool)));
-                break;
-            }
-        }
-        for(CObject* obj:selected){
-            if(obj->isVisible()){
-                this->invisible_action       = this->menu->addAction("非表示");
-                connect(this->invisible_action      ,SIGNAL(triggered(bool)),this,SLOT(SetInvisible(bool)));
-                break;
-            }
-        }
-        for(CObject* obj:selected){
-            if(obj->is<CBlock>() && !dynamic_cast<CBlock*>(obj)->isVisibleMesh()){
-                this->visible_mesh_action   = this->menu->addAction("メッシュ表示");
-                connect(this->visible_mesh_action  ,SIGNAL(triggered(bool)),this,SLOT(SetVisibleMesh(bool)));
-                break;
-            }
-        }
-        for(CObject* obj:selected){
-            if(obj->is<CBlock>() && dynamic_cast<CBlock*>(obj)->isVisibleMesh()){
-                this->invisible_mesh_action = this->menu->addAction("メッシュ非表示");
-                connect(this->invisible_mesh_action,SIGNAL(triggered(bool)),this,SLOT(SetInvisibleMesh(bool)));
-                break;
-            }
-        }
-        this->setSelectionMode(QTreeWidget::ExtendedSelection);
-        this->menu->exec(event->globalPos());
+        menu.Show(event->globalPos());
     }
 }
 
@@ -196,6 +154,7 @@ void ObjectList::pullSelectedPoint(CPoint* point,QTreeWidgetItem* current){
 
 void ObjectList::SetModel(CadModelCore* m){
     this->CadModelCoreInterface::model = m;
+    this->menu.SetModel(m);
     connect(this->CadModelCoreInterface::model,SIGNAL(UpdateAnyObject()),this,SLOT(UpdateObject()));
     connect(this->CadModelCoreInterface::model,SIGNAL(UpdateSelected ()),this,SLOT(PullSelected()));
 }
@@ -257,47 +216,6 @@ void ObjectList::PushSelected(){
     connect(this->CadModelCoreInterface::model,SIGNAL(UpdateSelected()),this,SLOT(PullSelected()));//再コネクト
     connect(this,SIGNAL(itemSelectionChanged()),this,SLOT(PushSelected()));
 }
-
-
-
-void ObjectList::Delete(bool){
-    for(CObject* obj : this->CadModelCoreInterface::model->GetSelected()){
-        this->CadModelCoreInterface::model->Delete(obj);
-    }
-    this->CadModelCoreInterface::model->SelectedClear();
-    UpdateObject();
-}
-void ObjectList::ReverseArc(bool){
-    for(CObject* obj : this->CadModelCoreInterface::model->GetSelected()){
-        if(obj->is<CArc>()){
-            //反転
-            dynamic_cast<CArc*>(obj)->SetReverse(!dynamic_cast<CArc*>(obj)->isReverse());
-        }
-    }
-    this->CadModelCoreInterface::model->SelectedClear();
-    UpdateObject();
-}
-void ObjectList::SetVisible(bool){
-    for(CObject* obj:this->CadModelCoreInterface::model->GetSelected())obj->SetVisible(true);
-}
-void ObjectList::SetInvisible(bool){
-    for(CObject* obj:this->CadModelCoreInterface::model->GetSelected())obj->SetVisible(false);
-}
-void ObjectList::SetVisibleMesh(bool){
-    for(CObject* obj:this->CadModelCoreInterface::model->GetSelected()){
-        if(obj->is<CBlock>()){
-            dynamic_cast<CBlock*>(obj)->SetVisibleMesh(true);
-        }
-    }
-}
-void ObjectList::SetInvisibleMesh(bool){
-    for(CObject* obj:this->CadModelCoreInterface::model->GetSelected()){
-        if(obj->is<CBlock>()){
-            dynamic_cast<CBlock*>(obj)->SetVisibleMesh(false);
-        }
-    }
-}
-
 
 ObjectList::ObjectList(QWidget *parent) :
     QTreeWidget(parent)
