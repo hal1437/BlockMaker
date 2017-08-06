@@ -56,7 +56,7 @@ double Spline::culc(double t)const
 
 
 CREATE_RESULT CSpline::Create(CPoint *pos){
-    connect(pos,SIGNAL(PosChanged(CPoint*,Pos)),this,SLOT(ChangePosCallback(CPoint*,Pos)));
+    connect(pos,SIGNAL(Moved(CObject*)),this,SLOT(ChangeChildHandler(CObject*)));
     if(this->start == nullptr){
         this->start = pos;
     }else if(this->end == nullptr){
@@ -167,19 +167,8 @@ CSpline::~CSpline()
 
 }
 //点移動コールバックオーバーライド
-void CSpline::ChangePosCallback(CPoint *, Pos old_pos){
-    CPoint* p;
-    if(*this->start == old_pos) p = this->start;
-    if(*this->end   == old_pos) p = this->end;
-    for(int i = 0;i < this->GetChildCount();i++){
-        if(*dynamic_cast<CPoint*>(this->GetChild(i)) == old_pos){
-            p = dynamic_cast<CPoint*>(this->GetChild(i));
-        }
-    }
-    //一時的にnew_posを適用
-//    p = new_pos;
+void CSpline::ChangeChildCallback(CObject* ){
     RefreshNodes();
-//    p = old_pos;
 }
 
 

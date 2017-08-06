@@ -55,7 +55,7 @@ public:
 
 public slots:
     //点移動コールバックオーバーライド
-    virtual void ChangePosCallback(CPoint* new_pos,Pos old_pos);
+    virtual void ChangeChildCallback(CObject*);
 
 };
 

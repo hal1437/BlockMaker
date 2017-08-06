@@ -61,7 +61,7 @@ CEdge::CEdge(QObject* parent):
 
 CEdge::~CEdge(){}
 //点移動コールバック
-void CEdge::ChangePosCallback(CPoint* ,Pos ){
+void CEdge::ChangeChildCallback(CObject*){
     //何もしない
 }
 

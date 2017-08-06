@@ -42,7 +42,7 @@ public:
 
 public slots:
     //点移動コールバック
-    virtual void ChangePosCallback(CPoint* pos,Pos old_pos);
+    virtual void ChangeChildCallback(CObject* child);
 
 };
 
