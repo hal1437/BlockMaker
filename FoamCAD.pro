@@ -32,6 +32,7 @@ SOURCES += src/main.cpp\
     src/Dialog/MoveTransformDialog.cpp \
     src/Dialog/SmartDimension.cpp \
     src/Dialog/SmartDimensionDialog.cpp \
+    src/Dialog/PropertyDefinitionDialog.cpp \
     src/CadModelCore.cpp \
     src/SolidEditForm.cpp \
     src/TimeDivider.cpp \
@@ -64,6 +65,7 @@ HEADERS  += src/MainWindow.h \
     src/Dialog/MoveTransformDialog.h \
     src/Dialog/SmartDimension.h \
     src/Dialog/SmartDimensionDialog.h \
+    src/Dialog/PropertyDefinitionDialog.h \
     src/CadModelCore.h \
     src/SolidEditForm.h \
     src/TimeDivider.h \
@@ -80,6 +82,7 @@ FORMS    += src/MainWindow.ui \
     src/Dialog/CBoxDefineDialog.ui \
     src/Dialog/MoveTransformDialog.ui \
     src/Dialog/GridFilterDialog.ui \
+    src/Dialog/PropertyDefinitionDialog.ui \
     src/SolidEditForm.ui
 
 RESOURCES += \

@@ -4,9 +4,10 @@
 
 void MainWindow::SetModel(CadModelCore* model){
     this->model = model;
-    this->ui->SolidEdit ->SetModel(model);
-    this->ui->ObjectTree->SetModel(model);
-    this->move_diag->SetModel(this->model);
+    this->ui->SolidEdit ->SetModel(this->model);
+    this->ui->ObjectTree->SetModel(this->model);
+    this->move_diag->     SetModel(this->model);
+    this->prop_diag->     SetModel(this->model);
     //モデルと結合
     connect(this->model,SIGNAL(UpdateSelected()),this,SLOT(RefreshUI()));
 }
@@ -21,6 +22,7 @@ MainWindow::MainWindow(QWidget *parent) :
     //ボタン関係
     connect(this ,SIGNAL(ToggleChanged(MAKE_OBJECT)),ui->SolidEdit ,SLOT(SetState(MAKE_OBJECT)));
     connect(ui->actionDelete     ,SIGNAL(triggered()) ,this,SLOT(Delete()));
+    connect(ui->actionProperty   ,SIGNAL(triggered()) ,this,SLOT(ShowProperty()));
     connect(ui->actionMove       ,SIGNAL(triggered()) ,this,SLOT(ShowMoveTransform()));
     connect(ui->actionGridFilter ,SIGNAL(triggered()) ,this,SLOT(ShowGridFilter()));
     connect(ui->ToolBlocks       ,SIGNAL(triggered()) ,this,SLOT(MakeBlock()));
@@ -35,17 +37,14 @@ MainWindow::MainWindow(QWidget *parent) :
     this->installEventFilter(ui->SolidEdit);
     connect(this->ui->SolidEdit,SIGNAL(MousePosChanged(Pos)),this,SLOT(RefreshStatusBar(Pos)));
 
-    //SolidEditFoamにイベントフィルター導入
-    this->installEventFilter(ui->SolidEdit);
-    connect(this->ui->SolidEdit,SIGNAL(MousePosChanged(Pos)),this,SLOT(RefreshStatusBar(Pos)));
-
     //移動ダイアログ関係
     move_diag = new MoveTransformDialog(this);
     this->installEventFilter(move_diag);
     connect(move_diag,SIGNAL(RepaintRequest()),this,SLOT(repaint()));
     connect(move_diag,SIGNAL(RepaintRequest()),ui->SolidEdit,SLOT(repaint()));
-    move_diag->setWindowTitle("MoveTransform");
-    move_diag->setWindowFlags(Qt::Dialog | Qt::WindowStaysOnTopHint);
+
+    //プロパティダイアログ関係
+    prop_diag = new PropertyDefinitionDialog(this);
 
     //ドック関係
     connect(this->ui->actionShowObjectList,SIGNAL(triggered()),this,SLOT(ShowObjectList()));
@@ -164,6 +163,10 @@ ToggledToolDefinition(Spline)
 void MainWindow::ToggleConflict(bool conflict){
     if(conflict)this->ui->actionCheckConflict->setIcon(QIcon(":/Others/Conflict.png"));
     else        this->ui->actionCheckConflict->setIcon(QIcon(":/Others/NotConflict.png"));
+}
+void MainWindow::ShowProperty(){
+    prop_diag->UpdateLayout();
+    prop_diag->show();
 }
 
 void MainWindow::ShowMoveTransform(){

@@ -6,10 +6,11 @@ MoveTransformDialog::MoveTransformDialog(QWidget *parent) :
     ui(new Ui::MoveTransformDialog)
 {
     ui->setupUi(this);
-    this->setWindowTitle("MoveTransformDialog");
     connect(this->ui->ApplyButton    ,SIGNAL(clicked()),this,SLOT(Accept()));
     connect(this->ui->DuplicateButton,SIGNAL(clicked()),this,SLOT(Duplicate()));
     connect(this->ui->CloseButton    ,SIGNAL(clicked()),this,SLOT(close()));
+    this->setWindowTitle("MoveTransform");
+    this->setWindowFlags(Qt::Dialog | Qt::WindowStaysOnTopHint);
 }
 
 MoveTransformDialog::~MoveTransformDialog()

@@ -9,12 +9,10 @@ void CadModelMenu::Show(QPoint pos){
         connect(this->delete_action,SIGNAL(triggered(bool)),this,SLOT(Delete(bool)));
     }
 
-    //円弧が含まれているか
     if(std::any_of(selected.begin(),selected.end(),[&](CObject* obj){return obj->is<CArc>();})){
         this->reverse_action         = this->menu->addAction("円弧反転");
         connect(this->reverse_action   ,SIGNAL(triggered(bool)),this,SLOT(ReverseArc(bool)));
     }
-
     for(CObject* obj:selected){
         if(!obj->isVisible()){
             this->visible_action         = this->menu->addAction("表示");

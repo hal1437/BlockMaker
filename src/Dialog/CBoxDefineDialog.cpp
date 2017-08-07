@@ -28,7 +28,7 @@ QString      CBoxDefineDialog::ConvertBoundaryToString(BoundaryType type)const{
     else if(type == BoundaryType::CyclicAMI    )return QString("cyclicAMI (不整合周期境界)");
     else if(type == BoundaryType::Wedge        )return QString("wedge (2次元軸対称)");
     else if(type == BoundaryType::Empty        )return QString("empty (2次元)");
-    else if(type == BoundaryType::None         )return QString("None(連続)");
+    else if(type == BoundaryType::None         )return QString("None (連続)");
     else return QString("Unknown");
 }
 BoundaryType CBoxDefineDialog::ConvertStringToBoundary(QString str)const{
@@ -240,7 +240,7 @@ CBoxDefineDialog::CBoxDefineDialog(QWidget *parent) :
         p->setMaximumSize(100,40);
         p->setDecimals(5);
         this->grading_args.push_back(p);
-        this->ui->GradingArgsLayout->addWidget(this->grading_args[i],i/4,i%4);
+        //this->ui->GradingArgsLayout->addWidget(this->grading_args[i],i/4,i%4);
         if(i >= 3)this->grading_args[i]->hide();
     }
 }

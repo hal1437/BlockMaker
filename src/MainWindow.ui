@@ -89,6 +89,7 @@
    <addaction name="ToolBlocks"/>
    <addaction name="ToolFace"/>
    <addaction name="ToolDimension"/>
+   <addaction name="actionProperty"/>
    <addaction name="actionMove"/>
    <addaction name="separator"/>
    <addaction name="actionDelete"/>
@@ -421,6 +422,11 @@
   <action name="actionExport">
    <property name="text">
     <string>Export</string>
+   </property>
+  </action>
+  <action name="actionProperty">
+   <property name="text">
+    <string>Property</string>
    </property>
   </action>
  </widget>

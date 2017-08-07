@@ -786,20 +786,20 @@
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>
         <widget class="QComboBox" name="GradingCombo">
-         <item>
-          <property name="text">
-           <string>simpleGrading</string>
-          </property>
-         </item>
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
          <item>
           <property name="text">
            <string>edgeGrading</string>
           </property>
          </item>
+         <item>
+          <property name="text">
+           <string>simpleGrading</string>
+          </property>
+         </item>
         </widget>
-       </item>
-       <item>
-        <layout class="QGridLayout" name="GradingArgsLayout"/>
        </item>
       </layout>
      </item>
@@ -807,6 +807,31 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>FrontNameEdit</tabstop>
+  <tabstop>BackTypecombo</tabstop>
+  <tabstop>BackNameEdit</tabstop>
+  <tabstop>LeftNameEdit</tabstop>
+  <tabstop>LeftTypecombo</tabstop>
+  <tabstop>TopNameEdit</tabstop>
+  <tabstop>TopTypecombo</tabstop>
+  <tabstop>RightTypecombo</tabstop>
+  <tabstop>RightNameEdit</tabstop>
+  <tabstop>BottomTypecombo</tabstop>
+  <tabstop>FrontTypecombo</tabstop>
+  <tabstop>BottomNameEdit</tabstop>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>XspinBox</tabstop>
+  <tabstop>YspinBox</tabstop>
+  <tabstop>ZspinBox</tabstop>
+  <tabstop>doubleSpinBox</tabstop>
+  <tabstop>comboBox</tabstop>
+  <tabstop>doubleSpinBox_2</tabstop>
+  <tabstop>comboBox_2</tabstop>
+  <tabstop>doubleSpinBox_3</tabstop>
+  <tabstop>comboBox_3</tabstop>
+  <tabstop>GradingCombo</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>
@@ -816,8 +841,8 @@
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>938</x>
-     <y>380</y>
+     <x>738</x>
+     <y>385</y>
     </hint>
     <hint type="destinationlabel">
      <x>934</x>
@@ -832,12 +857,12 @@
    <slot>AcceptProxy()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>855</x>
+     <x>686</x>
      <y>385</y>
     </hint>
     <hint type="destinationlabel">
-     <x>806</x>
-     <y>370</y>
+     <x>662</x>
+     <y>342</y>
     </hint>
    </hints>
   </connection>

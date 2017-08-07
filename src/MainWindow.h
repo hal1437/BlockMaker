@@ -15,6 +15,7 @@
 #include "Dialog/ExportDialog.h"
 #include "Dialog/GridFilter.h"
 #include "Dialog/GridFilterDialog.h"
+#include "Dialog/PropertyDefinitionDialog.h"
 
 namespace Ui {
 class MainWindow;
@@ -31,6 +32,7 @@ public:
 private:
     Ui::MainWindow *ui;
     MoveTransformDialog* move_diag;
+    PropertyDefinitionDialog* prop_diag;
 
 protected:
     void keyPressEvent  (QKeyEvent* event);
@@ -56,6 +58,7 @@ public slots:
     void ToggledSpline (bool checked);
     void ToggleConflict(bool conflict);
 
+    void ShowProperty();          //プロパティダイアログ表示
     void ShowMoveTransform();     //移動ダイアログ表示
     void ShowGridFilter();        //グリッドフィルター表示
 
