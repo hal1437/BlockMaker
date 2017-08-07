@@ -27,6 +27,7 @@ public:
     virtual void     SetChild(int index,CObject* obj) = 0;
     virtual int      GetChildCount()const = 0;
     virtual Pos      GetMiddleDivide(double t)const = 0;//補間点取得
+    virtual Pos      GetDivisionPoint(int count)const; //エッジ点取得
     virtual void     SetStartPos(CObject* obj);
     virtual void     SetEndPos(CObject* obj);
 
