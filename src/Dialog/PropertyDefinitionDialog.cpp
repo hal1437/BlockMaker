@@ -47,7 +47,14 @@ PropertyDefinitionDialog::PropertyDefinitionDialog(QWidget *parent) :
     this->edge_divide_label  .setText("分割数");
     this->edge_grading_label .setText("エッジ寄せ係数");
     this->edge_divide_spin .setValue(0);
+    this->edge_divide_spin .setMaximum(9999);
+    this->edge_divide_spin .setMinimum(0);
     this->edge_grading_spin.setValue(0);
+    this->edge_grading_spin.setMaximum(10000);
+    this->edge_grading_spin.setMinimum(0);
+    this->edge_grading_spin.setSingleStep(0.01);
+    this->edge_grading_spin.setDecimals(6);
+
 
     //コンボボックス指定
     for(QString str: boundary_combo_text){

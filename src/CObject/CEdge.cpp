@@ -44,6 +44,25 @@ void CEdge::DrawGL(Pos camera,Pos center)const{
         }
         glEnd();
     }
+    //分割ライン表示
+    if(this->divide > 0){
+        for(double i = 1;i<this->divide;i++){
+            double dd = i/this->divide;
+            Pos cc = (this->GetMiddleDivide(dd) - this->GetMiddleDivide(dd + 1.0/this->divide));
+            double theta1 = std::atan2(cc.y(),std::sqrt(cc.x()*cc.x()+cc.z()*cc.z()));
+            double theta2 = std::atan2(-cc.x(),cc.z());
+            double length = (*this->end - *this->start).Length();
+            glBegin(GL_POLYGON);
+            Pos p = this->GetMiddleDivide(dd);
+            double ARROW_ROUND = length/100;
+            for(double j=0;j<2*M_PI;j+= M_PI*2/3){
+                Pos c = Pos(ARROW_ROUND*std::sin(j),ARROW_ROUND*std::cos(j),0).Dot(Quat::getRotateXMatrix(theta1).Dot(Quat::getRotateYMatrix(theta2)));
+                Pos pp = p+c;
+                glVertex3f(pp.x(),pp.y(),pp.z());
+            }
+            glEnd();
+        }
+    }
 }
 void CEdge::SetStartPos(CObject* obj){
     this->SetChild(0,obj);

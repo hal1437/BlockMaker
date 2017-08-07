@@ -33,7 +33,7 @@ void CArc::DrawGL(Pos camera,Pos center)const{
         Pos cc = camera - center;
         double theta1 = std::atan2(cc.y(),std::sqrt(cc.x()*cc.x()+cc.z()*cc.z()));
         double theta2 = std::atan2(-cc.x(),cc.z());
-        //円の描画
+        //点線円の描画
         for(double k=0;k < 2*M_PI;k += M_PI/32){
             const int length = (*this->start-*this->center).Length();
             Pos p = Pos(length*std::sin(k),length*std::cos(k),0).Dot(Quat::getRotateXMatrix(theta1).Dot(Quat::getRotateYMatrix(theta2)));
@@ -41,15 +41,7 @@ void CArc::DrawGL(Pos camera,Pos center)const{
         }
         glEnd();
     }else{
-        glBegin(GL_LINE_STRIP);
-        //線の分割描画
-        for(double i=0;i<=1;i += 1.0/CEdge::LINE_NEAR_DIVIDE){
-            if(i+1.0/CEdge::LINE_NEAR_DIVIDE > 1)i=1;
-            glVertex3f(this->GetMiddleDivide(i).x(),
-                       this->GetMiddleDivide(i).y(),
-                       this->GetMiddleDivide(i).z());
-        }
-        glEnd();
+        CEdge::DrawGL(camera,center);
     }
 }
 bool CArc::isSelectable(Pos pos) const{

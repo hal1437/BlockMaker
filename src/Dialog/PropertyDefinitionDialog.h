@@ -38,10 +38,10 @@ private:
     QComboBox face_boundary_combo;
 
     //Edge
-    QLabel    edge_grading_label;
-    QSpinBox  edge_grading_spin;
     QLabel    edge_divide_label;
     QSpinBox  edge_divide_spin;
+    QLabel    edge_grading_label;
+    QDoubleSpinBox  edge_grading_spin;
 
 private:
     void ConstructFace();//Face用レイアウト定義
