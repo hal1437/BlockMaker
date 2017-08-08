@@ -48,7 +48,6 @@ void CEdge::DrawGL(Pos camera,Pos center)const{
     if(this->divide > 0){
         for(double i = 1;i<this->divide;i++){
             Pos p  = GetDivisionPoint(i);
-            qDebug() << i << p;
             Pos cc = GetDivisionPoint(i) - GetDivisionPoint(i+1);
             double theta1 = std::atan2(cc.y(),std::sqrt(cc.x()*cc.x()+cc.z()*cc.z()));
             double theta2 = std::atan2(-cc.x(),cc.z());

@@ -203,9 +203,10 @@ CEdge*  CFace::GetEdgeSequence(int index)const{
 
     //反転
     CEdge* ans = *it;
+    /*
     if(ans->end == this->GetPointSequence(index)){
         std::swap(ans->start,ans->end);
-    }
+    }*/
     return ans;
 }
 void CFace::DrawGL(Pos,Pos)const{
@@ -242,6 +243,31 @@ void CFace::DrawGL(Pos,Pos)const{
         for(int i=0;i<this->edges.size();i++){
             glVertex3f(this->GetPointSequence(i)->x(),this->GetPointSequence(i)->y(), this->GetPointSequence(i)->z());
         }
+        glEnd();
+    }
+
+    //メッシュ描画
+    QVector<CEdge*> ee = {this->GetEdgeSequence(0),this->GetEdgeSequence(1),this->GetEdgeSequence(2),this->GetEdgeSequence(3)};
+    int count_max = std::min(this->GetEdgeSequence(0)->divide,this->GetEdgeSequence(2)->divide);
+    for(int i=1;i<count_max;i++){
+        glBegin(GL_LINES);
+        Pos p1 ,p2;
+        p1 = ee[0]->GetDivisionPoint(i);
+        if((*ee[0]->end - *ee[0]->start).DotPos(*ee[2]->end - *ee[2]->start) < 0)p2 = ee[2]->GetDivisionPoint(count_max-i);
+        else                                                                     p2 = ee[2]->GetDivisionPoint(i);
+        glVertex3f(p1.x(),p1.y(),p1.z());
+        glVertex3f(p2.x(),p2.y(),p2.z());
+        glEnd();
+    }
+    count_max = std::min(this->GetEdgeSequence(1)->divide,this->GetEdgeSequence(3)->divide);
+    for(int i=1;i<count_max;i++){
+        glBegin(GL_LINES);
+        Pos p1 ,p2;
+        p1 = ee[1]->GetDivisionPoint(i);
+        if((*ee[1]->end - *ee[1]->start).DotPos(*ee[3]->end - *ee[3]->start) < 0)p2 = ee[3]->GetDivisionPoint(count_max-i);
+        else                                                                     p2 = ee[3]->GetDivisionPoint(i);
+        glVertex3f(p1.x(),p1.y(),p1.z());
+        glVertex3f(p2.x(),p2.y(),p2.z());
         glEnd();
     }
 }
