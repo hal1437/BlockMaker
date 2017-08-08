@@ -84,14 +84,32 @@ void MoveTransformDialog::Duplicate(){
     Pos value = Pos(this->ui->XSpinBox->value(),
                     this->ui->YSpinBox->value(),
                     this->ui->ZSpinBox->value());
+    QVector<CPoint*> pp;
     for(CObject* s : this->model->GetSelected()){
         CObject* dup = s->Clone();
         this->model->AutoMerge(dup);
         this->model->AddObject(dup);
         for(CPoint* pos:dup->GetAllChildren()){
-            *pos += value;
+            pp.push_back(pos);
         }
     }
+    //重複削除
+    unique(pp);
+
+    //移動
+    for(CPoint* pos:pp){
+        if(this->ui->RelativeRadio->isChecked()){
+            if(this->ui->MovingCombo->currentText() == "追従")pos->MoveRelative(value);
+            if(this->ui->MovingCombo->currentText() == "強制")*pos += value;
+        }
+        if(this->ui->AbsoluteRadio->isChecked()){
+            if(this->ui->MovingCombo->currentText() == "追従")pos->MoveAbsolute(value);
+            if(this->ui->MovingCombo->currentText() == "強制")*pos = value;
+        }
+    }
+
+
+
     this->model->AutoMerge();
 }
 
