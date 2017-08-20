@@ -52,6 +52,7 @@ public:
 
     //子の操作
     virtual CEdge* GetEdge (int index);
+    virtual CEdge* GetEdge (int index)const;
     virtual CObject* GetChild(int index);
     virtual void     SetChild(int index,CObject* obj);
     virtual int      GetChildCount()const;

@@ -95,19 +95,18 @@ Pos CFace::GetPosFromUV(double u,double v)const{
 }
 Pos CFace::GetPosFromUVSquare(double u,double v)const{
     //二つの対角線で分けた三角形の平均
-    Pos ee[]={*this->GetEdgeSequence(0)->end - *this->GetEdgeSequence(0)->start,
-              *this->GetEdgeSequence(1)->end - *this->GetEdgeSequence(1)->start,
-              *this->GetEdgeSequence(2)->end - *this->GetEdgeSequence(2)->start,
-              *this->GetEdgeSequence(3)->end - *this->GetEdgeSequence(3)->start};
+    Pos ee[]={*this->GetEdge(0)->end - *this->GetEdge(0)->start,
+              *this->GetEdge(1)->end - *this->GetEdge(1)->start,
+              *this->GetEdge(2)->end - *this->GetEdge(2)->start,
+              *this->GetEdge(3)->end - *this->GetEdge(3)->start};
 
     Pos first_triangle;//1,4三角形
-    if(u+v > 1.0)first_triangle = ee[2] * (1.0-u) + ee[1] * -(1.0-v)  + *this->GetPointSequence(2);
-    else         first_triangle = ee[0] * u       + ee[3] * -v       + *this->GetPointSequence(0);
+    if(u+v > 1.0)first_triangle = ee[2] * (1.0-u) + ee[1] * -(1.0-v)  + *this->GetEdge(2)->start;
+    else         first_triangle = ee[0] * u       + ee[3] * -v        + *this->GetEdge(0)->start;
 
     Pos second_triangle;//1,2三角形
-    if(u-v > 1.0)second_triangle = ee[0] * -(1.0-u) + ee[1] * v  + *this->GetPointSequence(1);
-    else         second_triangle = ee[2] * -u + ee[3] * (1.0-v)  + *this->GetPointSequence(3);
-    qDebug() << u << v << second_triangle;
+    if(u-v > 0.0)second_triangle = ee[0] * -(1.0-u) + ee[1] * v  + *this->GetEdge(1)->start;
+    else         second_triangle = ee[2] * -u + ee[3] * (1.0-v)  + *this->GetEdge(3)->start;
 
     return (first_triangle + second_triangle)/2;
 }
@@ -302,6 +301,9 @@ void CFace::ReorderEdges(){
 
 //子の操作
 CEdge*  CFace::GetEdge      (int index){
+    return this->edges[index];
+}
+CEdge*  CFace::GetEdge      (int index)const{
     return this->edges[index];
 }
 CObject* CFace::GetChild     (int index){
