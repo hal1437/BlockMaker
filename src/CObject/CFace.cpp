@@ -91,24 +91,25 @@ void CFace::DefineMap2()const{
 }
 
 Pos CFace::GetPosFromUV(double u,double v)const{
-    CEdge* ee[]={this->GetEdgeSequence(0),
-                 this->GetEdgeSequence(1),
-                 this->GetEdgeSequence(2),
-                 this->GetEdgeSequence(3)};
+    return Pos();
 }
 Pos CFace::GetPosFromUVSquare(double u,double v)const{
-/*
-    CPoint* pp[4];
-    CEdge*  ee[4];
-    for(int i=0;i<4;i++){
-        pp[i] = this->GetPointSequence(i);
-        ee[i] = this->GetEdgeSequence(i);
-    }
-    Pos delta_u,delta_v;
-    delta_u = (pp[3] - pp[0])-(pp[2] - pp[1]);
-    delta_v = (pp[1] - pp[0])-(pp[2] - pp[3]);
-    Pos base_u,base_v;
-*/
+    //二つの対角線で分けた三角形の平均
+    Pos ee[]={*this->GetEdgeSequence(0)->end - *this->GetEdgeSequence(0)->start,
+              *this->GetEdgeSequence(1)->end - *this->GetEdgeSequence(1)->start,
+              *this->GetEdgeSequence(2)->end - *this->GetEdgeSequence(2)->start,
+              *this->GetEdgeSequence(3)->end - *this->GetEdgeSequence(3)->start};
+
+    Pos first_triangle;//1,4三角形
+    if(u+v > 1.0)first_triangle = ee[2] * (1.0-u) + ee[1] * -(1.0-v)  + *this->GetPointSequence(2);
+    else         first_triangle = ee[0] * u       + ee[3] * -v       + *this->GetPointSequence(0);
+
+    Pos second_triangle;//1,2三角形
+    if(u-v > 1.0)second_triangle = ee[0] * -(1.0-u) + ee[1] * v  + *this->GetPointSequence(1);
+    else         second_triangle = ee[2] * -u + ee[3] * (1.0-v)  + *this->GetPointSequence(3);
+    qDebug() << u << v << second_triangle;
+
+    return (first_triangle + second_triangle)/2;
 }
 CPoint* CFace::GetBasePoint()const{
     QVector<CPoint*> pp;
@@ -218,15 +219,21 @@ void CFace::DrawGL(Pos,Pos)const{
         glColor4f(currentColor[0],currentColor[1],currentColor[2], 0.1);
         glDepthMask(GL_FALSE);
 
-        this->DefineMap2();//二次元エバリュエータ定義
+        //this->DefineMap2();//二次元エバリュエータ定義
         const double FACE_DIVIDE = 10.0;//面分割数
         for (int j = 0; j < FACE_DIVIDE; j++){
           for (int i = 0; i < FACE_DIVIDE; i++){
               glBegin(GL_QUADS);
-              glEvalCoord2f((GLfloat)i    /FACE_DIVIDE , (GLfloat)j/FACE_DIVIDE);
-              glEvalCoord2f((GLfloat)i    /FACE_DIVIDE , (GLfloat)(j+1)/FACE_DIVIDE);
-              glEvalCoord2f((GLfloat)(i+1)/FACE_DIVIDE , (GLfloat)(j+1)/FACE_DIVIDE);
-              glEvalCoord2f((GLfloat)(i+1)/FACE_DIVIDE , (GLfloat)j/FACE_DIVIDE);
+
+              Pos pp[4] = {
+                  this->GetPosFromUVSquare(i    /FACE_DIVIDE , j/FACE_DIVIDE),
+                  this->GetPosFromUVSquare(i    /FACE_DIVIDE , (j+1)/FACE_DIVIDE),
+                  this->GetPosFromUVSquare((i+1)/FACE_DIVIDE , (j+1)/FACE_DIVIDE),
+                  this->GetPosFromUVSquare((i+1)/FACE_DIVIDE , j/FACE_DIVIDE)
+              };
+              for(int k=0;k<4;k++){
+                  glVertex3f(pp[k].x(),pp[k].y(),pp[k].z());
+              }
               glEnd();
           }
         }
