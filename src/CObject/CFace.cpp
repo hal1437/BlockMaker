@@ -91,7 +91,22 @@ void CFace::DefineMap2()const{
 }
 
 Pos CFace::GetPosFromUV(double u,double v)const{
-    return Pos();
+    //全ての曲線の差分値の合計
+    Pos delta[4];
+    //計算原点をセット
+    delta[0] = this->GetPosFromUVSquare(u,1.0);
+    delta[1] = this->GetPosFromUVSquare(0,v);
+    delta[2] = this->GetPosFromUVSquare(u,0);
+    delta[3] = this->GetPosFromUVSquare(1.0,v);
+    delta[0] += (this->GetEdge(0)->GetMiddleDivide(    u) - delta[0]) * (1.0-v);
+    delta[1] += (this->GetEdge(1)->GetMiddleDivide(    v) - delta[1]) * u;
+    delta[2] += (this->GetEdge(2)->GetMiddleDivide(1.0-u) - delta[2]) * v;
+    delta[3] += (this->GetEdge(3)->GetMiddleDivide(1.0-v) - delta[3]) * (1.0-u);
+    for(int i=0;i<4;i++){
+        delta[i] -= this->GetPosFromUVSquare(u,v);
+    }
+
+    return this->GetPosFromUVSquare(u,v) + (delta[0]+delta[1]+delta[2]+delta[3]);
 }
 Pos CFace::GetPosFromUVSquare(double u,double v)const{
     //二つの対角線で分けた三角形の平均
@@ -215,20 +230,20 @@ void CFace::DrawGL(Pos,Pos)const{
         //薄い色に変更
         float currentColor[4];
         glGetFloatv(GL_CURRENT_COLOR,currentColor);
-        glColor4f(currentColor[0],currentColor[1],currentColor[2], 0.1);
+        //glColor4f(currentColor[0],currentColor[1],currentColor[2], 0.1);
         glDepthMask(GL_FALSE);
 
         //this->DefineMap2();//二次元エバリュエータ定義
         const double FACE_DIVIDE = 10.0;//面分割数
         for (int j = 0; j < FACE_DIVIDE; j++){
           for (int i = 0; i < FACE_DIVIDE; i++){
-              glBegin(GL_QUADS);
+              glBegin(GL_LINE_LOOP);
 
               Pos pp[4] = {
-                  this->GetPosFromUVSquare(i    /FACE_DIVIDE , j/FACE_DIVIDE),
-                  this->GetPosFromUVSquare(i    /FACE_DIVIDE , (j+1)/FACE_DIVIDE),
-                  this->GetPosFromUVSquare((i+1)/FACE_DIVIDE , (j+1)/FACE_DIVIDE),
-                  this->GetPosFromUVSquare((i+1)/FACE_DIVIDE , j/FACE_DIVIDE)
+                  this->GetPosFromUV(i    /FACE_DIVIDE , j/FACE_DIVIDE),
+                  this->GetPosFromUV(i    /FACE_DIVIDE , (j+1)/FACE_DIVIDE),
+                  this->GetPosFromUV((i+1)/FACE_DIVIDE , (j+1)/FACE_DIVIDE),
+                  this->GetPosFromUV((i+1)/FACE_DIVIDE , j/FACE_DIVIDE)
               };
               for(int k=0;k<4;k++){
                   glVertex3f(pp[k].x(),pp[k].y(),pp[k].z());
