@@ -94,14 +94,16 @@ Pos CFace::GetPosFromUV(double u,double v)const{
     //全ての曲線の差分値の合計
     Pos delta[4];
     //計算原点をセット
-    delta[0] = this->GetPosFromUVSquare(u,1.0);
-    delta[1] = this->GetPosFromUVSquare(0,v);
-    delta[2] = this->GetPosFromUVSquare(u,0);
-    delta[3] = this->GetPosFromUVSquare(1.0,v);
-    delta[0] += (this->GetEdge(0)->GetMiddleDivide(    u) - delta[0]) * (1.0-v);
-    delta[1] += (this->GetEdge(1)->GetMiddleDivide(    v) - delta[1]) * u;
+    delta[0] = this->GetPosFromUVSquare(  u,1.0);
+    delta[1] = this->GetPosFromUVSquare(  0,  v);
+    delta[2] = this->GetPosFromUVSquare(  u,  0);
+    delta[3] = this->GetPosFromUVSquare(1.0,  v);
+    delta[0] += (this->GetEdge(0)->GetMiddleDivide(u) - delta[0]) * (1.0-v);
+    delta[1] += (this->GetEdge(1)->GetMiddleDivide(v) - delta[1]) * u;
     delta[2] += (this->GetEdge(2)->GetMiddleDivide(1.0-u) - delta[2]) * v;
     delta[3] += (this->GetEdge(3)->GetMiddleDivide(1.0-v) - delta[3]) * (1.0-u);
+
+    //GetPosFromUVSquareとの差分を取得
     for(int i=0;i<4;i++){
         delta[i] -= this->GetPosFromUVSquare(u,v);
     }
@@ -109,21 +111,16 @@ Pos CFace::GetPosFromUV(double u,double v)const{
     return this->GetPosFromUVSquare(u,v) + (delta[0]+delta[1]+delta[2]+delta[3]);
 }
 Pos CFace::GetPosFromUVSquare(double u,double v)const{
-    //二つの対角線で分けた三角形の平均
-    Pos ee[]={*this->GetEdge(0)->end - *this->GetEdge(0)->start,
-              *this->GetEdge(1)->end - *this->GetEdge(1)->start,
-              *this->GetEdge(2)->end - *this->GetEdge(2)->start,
-              *this->GetEdge(3)->end - *this->GetEdge(3)->start};
-
-    Pos first_triangle;//1,4三角形
-    if(u+v > 1.0)first_triangle = ee[2] * (1.0-u) + ee[1] * -(1.0-v)  + *this->GetEdge(2)->start;
-    else         first_triangle = ee[0] * u       + ee[3] * -v        + *this->GetEdge(0)->start;
-
-    Pos second_triangle;//1,2三角形
-    if(u-v > 0.0)second_triangle = ee[0] * -(1.0-u) + ee[1] * v  + *this->GetEdge(1)->start;
-    else         second_triangle = ee[2] * -u + ee[3] * (1.0-v)  + *this->GetEdge(3)->start;
-
-    return (first_triangle + second_triangle)/2;
+    //双1次曲面の式
+    //S(u,v)=(1-u)(1-v)P_{0}+u(1-v)P_{1}+(1-u)vP_{2}+uvP_{3};
+    Pos p[4] = {*this->GetEdge(0)->start,
+                *this->GetEdge(1)->start,
+                *this->GetEdge(2)->start,
+                *this->GetEdge(3)->start};
+    return (p[0] * (1-u) * (1-v) +
+            p[1] *     u * (1-v) +
+            p[3] * (1-u) * v +
+            p[2] *     u * v);
 }
 CPoint* CFace::GetBasePoint()const{
     QVector<CPoint*> pp;
