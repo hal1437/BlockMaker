@@ -17,6 +17,9 @@ public:
     double grading = 1.0; //エッジ寄せ
     int    divide  = 0; //分割数(0:自動的に決定)
 
+    //分割レート取得
+    static double GetDivisionRate(int divide, double grading, int count);
+
 public:
     virtual CREATE_RESULT Create(CPoint* pos) = 0;   //作成関数
     virtual void DrawGL(Pos camera,Pos center)const; //三次元描画関数

@@ -1,5 +1,25 @@
 #include "CEdge.h"
 
+double CEdge::GetDivisionRate(int divide,double grading,int count){
+    double A,B,sum=0,p,d;
+
+    //エッジからpとLを抽出
+    d = divide;
+    p = grading;
+
+    //指数関数パラメータ計算
+    B = log(p) / (d-1);
+    for(int i=1;i<=d;i++)sum += exp(B*i);
+    A = 1 / sum;
+
+    //指定番号までの総和
+    double sum_rate=0;
+    for(int i = 1;i <= count;i++){
+        sum_rate += A*exp(B*i);
+    }
+    return sum_rate;
+}
+
 Pos CEdge::GetNearLine(const Pos& pos1,const Pos& pos2)const{
     //GetNearPosによる近似
     Pos ans = *this->start;
@@ -64,24 +84,7 @@ void CEdge::DrawGL(Pos camera,Pos center)const{
     }
 }
 Pos CEdge::GetDivisionPoint(int count)const{
-    double A,B,sum=0,p,d,L;
-
-    //エッジからpとLを抽出
-    d = this->divide;
-    p = this->grading;
-    L = (*this->end - *this->start).Length();
-
-    //指数関数パラメータ計算
-    B = log(p) / (d-1);
-    for(int i=1;i<=d;i++)sum += exp(B*i);
-    A = L / sum;
-
-    //指定番号までの総和
-    double sum_rate=0;
-    for(int i = 1;i <= count;i++){
-        sum_rate += A*exp(B*i);
-    }
-    Pos ans = this->GetMiddleDivide(sum_rate/L);
+    Pos ans = this->GetMiddleDivide(GetDivisionRate(this->divide,this->grading,count));
     return ans;
 }
 void CEdge::SetStartPos(CObject* obj){

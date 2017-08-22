@@ -248,7 +248,6 @@ void CFace::DrawGL(Pos,Pos)const{
               glEnd();
           }
         }
-
         glEnd();
         glDepthMask(GL_TRUE);
 
@@ -265,10 +264,14 @@ void CFace::DrawGL(Pos,Pos)const{
     }
 
     //メッシュ描画
+    const int MESH_DIVIDE = 10;
     QVector<CEdge*> ee = {this->GetEdgeSequence(0),this->GetEdgeSequence(1),this->GetEdgeSequence(2),this->GetEdgeSequence(3)};
-    int count_max = std::min(this->GetEdgeSequence(0)->divide,this->GetEdgeSequence(2)->divide);
-    for(int i=1;i<count_max;i++){
+    int u_max = std::min(this->GetEdgeSequence(0)->divide,this->GetEdgeSequence(2)->divide);
+    int v_max = std::min(this->GetEdgeSequence(1)->divide,this->GetEdgeSequence(3)->divide);
+    /*for(int i=1;i<u_max;i++){
         glBegin(GL_LINES);
+        Pos begin = this->GetPosFromUV();
+        Pos end = this->GetPosFromUV();
         Pos p1 ,p2;
         p1 = ee[0]->GetDivisionPoint(i);
         if((*ee[0]->end - *ee[0]->start).DotPos(*ee[2]->end - *ee[2]->start) < 0)p2 = ee[2]->GetDivisionPoint(count_max-i);
@@ -287,7 +290,7 @@ void CFace::DrawGL(Pos,Pos)const{
         glVertex3f(p1.x(),p1.y(),p1.z());
         glVertex3f(p2.x(),p2.y(),p2.z());
         glEnd();
-    }
+    }*/
 }
 bool CFace::DrawNormArrowGL()const{
     Pos center;
