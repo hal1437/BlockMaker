@@ -73,24 +73,51 @@ CREATE_RESULT CSpline::Create(CPoint *pos){
 
 //中間点操作
 CPoint*  CSpline::GetPoint(int index){
-    if(index == 0)return this->start;
-    if(index > 0 && index < static_cast<int>(this->pos.size()) - 2)return this->pos[index-1];
-    if(index == static_cast<int>(this->pos.size())-1)return this->end;
+    if     (index <= 0                 )return this->start;
+    else if(index <= this->pos.size()  )return this->pos[index-1];
+    else if(index >= this->pos.size()+1)return this->end;
     return nullptr;
 }
 CObject* CSpline::GetChild(int index){
-    return this->GetPoint(index);
+    return GetPoint(index);
 }
 void     CSpline::SetChild(int index,CObject* obj){
-    IgnoreChild(this->GetChild(index));
-    if(index == 0)this->start = dynamic_cast<CPoint*>(obj);
-    if(index > 0 && index < static_cast<int>(this->pos.size())-2)this->pos[index-1] = dynamic_cast<CPoint*>(obj);
-    if(index == static_cast<int>(this->pos.size())-1)this->end = dynamic_cast<CPoint*>(obj);
-    ObserveChild(this->GetChild(index));
+
+    if(obj == nullptr){
+        //切り詰め処理
+        IgnoreChild(this->GetChild(index));
+        if(index <= 0){
+            if(this->GetChildCount()==1){
+                //全て削除された状態
+                this->start = nullptr;
+            }else{
+                this->start = this->pos.front();
+                this->pos.erase(this->pos.begin());//切り詰め
+            }
+        }
+        else if(index <= this->pos.size()){
+            this->pos.erase(std::next(this->pos.begin(),index-1));//切り詰め
+        }
+        else if(index >= this->pos.size()+1){
+            this->end = this->pos.back();
+            this->pos.pop_back();
+        }
+    }else{
+        //入れ替え処理
+        IgnoreChild(this->GetChild(index));
+        if     (index <= 0                 )this->start        = dynamic_cast<CPoint*>(obj);
+        else if(index <= this->pos.size()  )this->pos[index-1] = dynamic_cast<CPoint*>(obj);
+        else if(index >= this->pos.size()+1)this->end          = dynamic_cast<CPoint*>(obj);
+        ObserveChild(this->GetChild(index));
+    }
 }
 
 int CSpline::GetChildCount()const{
-    return this->pos.size()+2;
+    int sum =0;
+    if(this->start != nullptr)sum++;
+    if(this->end   != nullptr)sum++;
+    sum += this->pos.size();
+    return sum;
 }
 Pos CSpline::GetMiddleDivide(double t)const{
     if(pos.size() == 0)return (*end - *start)*t + *start;

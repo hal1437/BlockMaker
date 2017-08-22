@@ -17,9 +17,9 @@ CREATE_RESULT MakeObjectController::MakeJoint(CEdge* obj,Pos pos,CObject* merge)
         new_point = new CPoint(pos,obj);
         if(this->making_step == ENDLESS){
             //終点と同じ点ならば終了
-            if(obj->GetChildCount() > 0 && obj->GetChild(obj->GetChildCount()-1) == merge){
+            if(obj->GetChildCount() > 2 && obj->GetChild(obj->GetChildCount()-2) == merge){
                 //持ち手を破棄してオブジェクトの中間点を終点に変更
-                obj->SetEndPos(obj->GetChild(obj->GetChildCount()-1));
+                obj->SetEndPos(obj->GetChild(obj->GetChildCount()-2));
                 obj->SetChild(obj->GetChildCount()-1,nullptr);
                 this->last_point=nullptr;
                 this->making_count = -1;//手放しまで完了
@@ -68,7 +68,6 @@ void MakeObjectController::StartMaking(MAKE_OBJECT type,Pos pos,CObject* merge){
 
         //startを作成する。
         this->making_step = MakeJoint(this->making_object,pos,merge);
-
 
         //モデルに追加
         this->model->AddPoints(this->last_point);
