@@ -227,14 +227,14 @@ void CFace::DrawGL(Pos,Pos)const{
         //薄い色に変更
         float currentColor[4];
         glGetFloatv(GL_CURRENT_COLOR,currentColor);
-        //glColor4f(currentColor[0],currentColor[1],currentColor[2], 0.1);
+        glColor4f(currentColor[0],currentColor[1],currentColor[2], 0.1);
         glDepthMask(GL_FALSE);
 
-        //this->DefineMap2();//二次元エバリュエータ定義
+        //塗りつぶし描画
         const double FACE_DIVIDE = 10.0;//面分割数
         for (int j = 0; j < FACE_DIVIDE; j++){
           for (int i = 0; i < FACE_DIVIDE; i++){
-              glBegin(GL_LINE_LOOP);
+              glBegin(GL_QUADS);
 
               Pos pp[4] = {
                   this->GetPosFromUV(i    /FACE_DIVIDE , j/FACE_DIVIDE),
@@ -253,9 +253,38 @@ void CFace::DrawGL(Pos,Pos)const{
 
         //色を復元
         glColor4f(currentColor[0],currentColor[1],currentColor[2], currentColor[3]);
+
+        //メッシュ分割描画
+        int u_max = std::min(this->GetEdge(0)->divide,this->GetEdge(2)->divide);//u方向分割
+        int v_max = std::min(this->GetEdge(1)->divide,this->GetEdge(3)->divide);//v方向分割
+        if(u_max < 0)u_max = 1;
+        if(v_max < 0)v_max = 1;
+        for(double i=0;i<u_max;i++){//u方向ループ
+            for(double j=0;j<v_max;j++){//v方向ループ
+                //倍率計算
+                double rate_0 = CEdge::GetDivisionRate(u_max,  this->GetEdge(0)->grading,i);
+                double rate_2 = CEdge::GetDivisionRate(u_max,1/this->GetEdge(2)->grading,i);
+                double rate_1 = CEdge::GetDivisionRate(v_max,1/this->GetEdge(1)->grading,j);
+                double rate_3 = CEdge::GetDivisionRate(v_max,  this->GetEdge(3)->grading,j);
+
+                double rate_p1 = (rate_2-rate_0) * (  j  /u_max) + rate_0;
+                double rate_p3 = (rate_2-rate_0) * ((j+1)/u_max) + rate_0;
+                double rate_p2 = (rate_3-rate_1) * (  i  /v_max) + rate_1;
+                double rate_p4 = (rate_3-rate_1) * ((i+1)/v_max) + rate_1;
+                //座標計算
+                Pos p[] = {this->GetPosFromUV(rate_p1,j/v_max),this->GetPosFromUV(rate_p3,(j+1)/v_max),
+                           this->GetPosFromUV(i/u_max,rate_p2),this->GetPosFromUV((i+1)/u_max,rate_p4)};
+                //描画
+                glBegin(GL_LINES);
+                for(int k=0;k<4;k++){
+                    glVertex3f(p[k].x(),p[k].y(),p[k].z());
+                }
+                glEnd();
+            }
+        }
     }else{
 
-        //外側
+        //外枠
         glBegin(GL_LINE_LOOP);
         for(int i=0;i<this->edges.size();i++){
             glVertex3f(this->GetPointSequence(i)->x(),this->GetPointSequence(i)->y(), this->GetPointSequence(i)->z());
@@ -263,34 +292,6 @@ void CFace::DrawGL(Pos,Pos)const{
         glEnd();
     }
 
-    //メッシュ描画
-    const int MESH_DIVIDE = 10;
-    QVector<CEdge*> ee = {this->GetEdgeSequence(0),this->GetEdgeSequence(1),this->GetEdgeSequence(2),this->GetEdgeSequence(3)};
-    int u_max = std::min(this->GetEdgeSequence(0)->divide,this->GetEdgeSequence(2)->divide);
-    int v_max = std::min(this->GetEdgeSequence(1)->divide,this->GetEdgeSequence(3)->divide);
-    /*for(int i=1;i<u_max;i++){
-        glBegin(GL_LINES);
-        Pos begin = this->GetPosFromUV();
-        Pos end = this->GetPosFromUV();
-        Pos p1 ,p2;
-        p1 = ee[0]->GetDivisionPoint(i);
-        if((*ee[0]->end - *ee[0]->start).DotPos(*ee[2]->end - *ee[2]->start) < 0)p2 = ee[2]->GetDivisionPoint(count_max-i);
-        else                                                                     p2 = ee[2]->GetDivisionPoint(i);
-        glVertex3f(p1.x(),p1.y(),p1.z());
-        glVertex3f(p2.x(),p2.y(),p2.z());
-        glEnd();
-    }
-    count_max = std::min(this->GetEdgeSequence(1)->divide,this->GetEdgeSequence(3)->divide);
-    for(int i=1;i<count_max;i++){
-        glBegin(GL_LINES);
-        Pos p1 ,p2;
-        p1 = ee[1]->GetDivisionPoint(i);
-        if((*ee[1]->end - *ee[1]->start).DotPos(*ee[3]->end - *ee[3]->start) < 0)p2 = ee[3]->GetDivisionPoint(count_max-i);
-        else                                                                     p2 = ee[3]->GetDivisionPoint(i);
-        glVertex3f(p1.x(),p1.y(),p1.z());
-        glVertex3f(p2.x(),p2.y(),p2.z());
-        glEnd();
-    }*/
 }
 bool CFace::DrawNormArrowGL()const{
     Pos center;
