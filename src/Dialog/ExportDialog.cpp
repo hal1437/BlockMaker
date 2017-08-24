@@ -152,33 +152,27 @@ void ExportDialog::Export(QString filename)const{
     // 境界定義
     file.StartListDifinition("boundary");
     //境界追加
-    QMap<QString,std::pair<BoundaryType,QVector<int>>> boundary_list; //(name ,[[index]])
+    QMap<QString,std::pair<Boundary::Type,QVector<int>>> boundary_list; //(name ,[[index]])
     for(CBlock* block:this->model->GetBlocks()){
         for(int i=0;i<6;i++){
             CFace* face = block->GetFaceFormDir(static_cast<BoundaryDir>(i));
             //頂点番号リスト出力
             QVector<CPoint*> vp = this->GetBoundaryPos(block,static_cast<BoundaryDir>(i));
             for(CPoint* v:vp){
-                if(face->boundary == BoundaryType::None)continue;//連続は登録しない
+                if(face->boundary == Boundary::Type::none)continue;//連続は登録しない
                 boundary_list[face->name].first = face->boundary;
                 boundary_list[face->name].second.push_back(GetPosIndex(v));
             }
         }
     }
-    QMap<QString,std::pair<BoundaryType,QVector<int>>>::const_iterator it = boundary_list.constBegin();
+    QMap<QString,std::pair<Boundary::Type,QVector<int>>>::const_iterator it = boundary_list.constBegin();
     while (it != boundary_list.constEnd()) {
 
         //境界名
         file.StartDictionaryDifinition(it.key());
 
         //境界タイプ
-        if(it.value().first == BoundaryType::Patch        ) file.OutValue("type","patch");
-        if(it.value().first == BoundaryType::Wall         ) file.OutValue("type","wall");
-        if(it.value().first == BoundaryType::SymmetryPlane) file.OutValue("type","symmetryPlane");
-        if(it.value().first == BoundaryType::Cyclic       ) file.OutValue("type","cyclic");
-        if(it.value().first == BoundaryType::CyclicAMI    ) file.OutValue("type","cyclicAMI");
-        if(it.value().first == BoundaryType::Wedge        ) file.OutValue("type","wedge");
-        if(it.value().first == BoundaryType::Empty        ) file.OutValue("type","empty");
+        file.OutValue("type",Boundary::BoundaryTypeToString(it.value().first));
 
         //頂点定義
         file.StartListDifinition("faces");

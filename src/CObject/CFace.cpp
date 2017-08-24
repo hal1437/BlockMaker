@@ -1,5 +1,35 @@
 #include "CFace.h"
 
+#define SWITCHING_STRING_TO_BOUNDARY_TYPE(TYPE,COMP)\
+if(COMP == #TYPE)return Boundary::Type::TYPE;
+
+#define SWITCHING_BOUNDARY_TYPE_TO_STRING(TYPE,COMP)\
+if(COMP == Boundary::Type::TYPE) return #TYPE;\
+
+Boundary::Type Boundary::StringToBoundaryType(QString str){
+    SWITCHING_STRING_TO_BOUNDARY_TYPE(patch,str)
+    SWITCHING_STRING_TO_BOUNDARY_TYPE(wall,str)
+    SWITCHING_STRING_TO_BOUNDARY_TYPE(symmetryPlane,str)
+    SWITCHING_STRING_TO_BOUNDARY_TYPE(cyclic,str)
+    SWITCHING_STRING_TO_BOUNDARY_TYPE(cyclicAMI,str)
+    SWITCHING_STRING_TO_BOUNDARY_TYPE(wedge,str)
+    SWITCHING_STRING_TO_BOUNDARY_TYPE(none,str)
+    return Boundary::Type::none;
+}
+QString Boundary::BoundaryTypeToString(Boundary::Type type){
+    SWITCHING_BOUNDARY_TYPE_TO_STRING(patch        ,type)
+    SWITCHING_BOUNDARY_TYPE_TO_STRING(wall         ,type)
+    SWITCHING_BOUNDARY_TYPE_TO_STRING(symmetryPlane,type)
+    SWITCHING_BOUNDARY_TYPE_TO_STRING(cyclic       ,type)
+    SWITCHING_BOUNDARY_TYPE_TO_STRING(cyclicAMI    ,type)
+    SWITCHING_BOUNDARY_TYPE_TO_STRING(wedge        ,type)
+    SWITCHING_BOUNDARY_TYPE_TO_STRING(none         ,type)
+    return "none";
+}
+
+
+
+
 CFace* CFace::base[3];
 
 bool CFace::Creatable(QVector<CObject*> lines){
@@ -93,16 +123,16 @@ void CFace::DefineMap2()const{
 Pos CFace::GetPosFromUV(double u,double v)const{
     //全ての曲線の差分値の合計
     Pos delta[4];
-    //計算原点をセット
+    //曲線の反対側の座標を計算原点をセット
     delta[0] = this->GetPosFromUVSquare(  u,1.0);
     delta[1] = this->GetPosFromUVSquare(  0,  v);
     delta[2] = this->GetPosFromUVSquare(  u,  0);
     delta[3] = this->GetPosFromUVSquare(1.0,  v);
+    //曲面に対して垂直方向の座標値を加算
     delta[0] += (this->GetEdge(0)->GetMiddleDivide(u) - delta[0]) * (1.0-v);
     delta[1] += (this->GetEdge(1)->GetMiddleDivide(v) - delta[1]) * u;
     delta[2] += (this->GetEdge(2)->GetMiddleDivide(1.0-u) - delta[2]) * v;
     delta[3] += (this->GetEdge(3)->GetMiddleDivide(1.0-v) - delta[3]) * (1.0-u);
-
     //GetPosFromUVSquareとの差分を取得
     for(int i=0;i<4;i++){
         delta[i] -= this->GetPosFromUVSquare(u,v);

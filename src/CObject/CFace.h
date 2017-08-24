@@ -3,17 +3,26 @@
 
 #include "CEdge.h"
 
-//面の種類
-enum BoundaryType{
-    Empty         = 0,
-    Patch         = 1,
-    Wall          = 2,
-    SymmetryPlane = 3,
-    Cyclic        = 4,
-    CyclicAMI     = 5,
-    Wedge         = 6,
-    None          = 7,//連続
+//境界面
+class Boundary{
+public:
+    //境界の種類
+    enum Type{
+        empty         = 0,
+        patch         = 1,
+        wall          = 2,
+        symmetryPlane = 3,
+        cyclic        = 4,
+        cyclicAMI     = 5,
+        wedge         = 6,
+        none          = 7,//連続
+    };
+
+    //文字列からBoundary::Typeに変換
+    static Type    StringToBoundaryType(QString str);
+    static QString BoundaryTypeToString(Boundary::Type type);
 };
+
 
 //平面オブジェクト
 class CFace : public CObject
@@ -23,7 +32,7 @@ public:
     static CFace* base[3]; //正面,平面,右側面
 
     QVector<CEdge*> edges;         // 構成線
-    BoundaryType boundary = Empty; // 境界タイプ
+    Boundary::Type boundary = Boundary::Type::empty; // 境界タイプ
     QString name = "Noname";       // 境界名
 
     //ポリゴン判定

@@ -15,7 +15,7 @@
     }
 #define DEFINE_BOX_DIALOG_TYPE_SLOTS(DIR,INDEX)                       \
     void Set##DIR##Type(QString name){                                \
-        this->block->GetFaceFormDir(DIR)->boundary = this->ConvertStringToBoundary(name); \
+        this->block->GetFaceFormDir(DIR)->boundary = Boundary::StringToBoundaryType(name); \
     }
 
 
@@ -34,24 +34,22 @@ public:
 private:
     Ui::CBoxDefineDialog *ui;
     QVector<QDoubleSpinBox*> grading_args;
-    BoundaryType types_log[6];
+    Boundary::Type types_log[6];
 
 protected:
     QComboBox*   ConvertDirToCombo      (BoundaryDir  dir)const;
     QLineEdit*   ConvertDirToNameEdit   (BoundaryDir  dir)const;
-    QString      ConvertBoundaryToString(BoundaryType type)const;
-    BoundaryType ConvertStringToBoundary(QString      str)const;
     QString      ConvertGradingToString (GradingType  dir)const;
     GradingType  ConvertStringToGrading (QString      str)const;
 public:
     //UI操作
-    QString      GetBoundaryName(BoundaryDir dir)const;
-    BoundaryType GetBoundaryType(BoundaryDir dir)const;
-    GradingType  GetGradigngType()const;
+    QString        GetBoundaryName(BoundaryDir dir)const;
+    Boundary::Type GetBoundaryType(BoundaryDir dir)const;
+    GradingType    GetGradigngType()const;
 
     void SetGradigngType(GradingType type);
     void SetBoundaryName(BoundaryDir dir,QString name     );
-    void SetBoundaryType(BoundaryDir dir,BoundaryType type);
+    void SetBoundaryType(BoundaryDir dir,Boundary::Type type);
     QString GetVertices (BoundaryDir dir)const;
 
     //面取得

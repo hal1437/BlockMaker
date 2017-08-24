@@ -105,7 +105,7 @@ void PropertyDefinitionDialog::AcceptProxy(){
             if(this->face_boundary_combo.currentText() != ""){
                 int index = IndexOf(this->boundary_combo_text,this->face_boundary_combo.currentText());
                 if(index != -1){
-                    dynamic_cast<CFace*>(obj)->boundary = static_cast<BoundaryType>(index);
+                    dynamic_cast<CFace*>(obj)->boundary = static_cast<Boundary::Type>(index);
                 }
             }
         }

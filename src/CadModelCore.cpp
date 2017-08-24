@@ -147,7 +147,7 @@ bool CadModelCore::ImportFoamFile(QString filename){
         //境界タイプ
         for(int i=0;i<6;i++,j++){
             CFace* face = make->GetFace(static_cast<BoundaryDir>(i));
-            face->boundary = static_cast<BoundaryType>(sl[j].toInt());
+            face->boundary = static_cast<Boundary::Type>(sl[j].toInt());
         }
         //分割数
         for(int i=0;i<3;i++,j++){
