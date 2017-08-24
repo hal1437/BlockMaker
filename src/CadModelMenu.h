@@ -29,8 +29,8 @@ public slots:
     void ReverseArc(bool);//削除
     void SetVisible(bool);//可視設定
     void SetInvisible(bool);//不可視設定
-    void SetVisibleMesh(bool);//可視フレーム設定
-    void SetInvisibleMesh(bool);//不可視フレーム設定
+    void SetVisibleDetail(bool);//可視フレーム設定
+    void SetInVisibleDetail(bool);//不可視フレーム設定
 };
 
 #endif // CADMODELMENU_H

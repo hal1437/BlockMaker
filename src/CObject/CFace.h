@@ -34,9 +34,8 @@ public:
     QVector<CEdge*> edges;         // 構成線
     Boundary::Type boundary = Boundary::Type::empty; // 境界タイプ
     QString name = "Noname";       // 境界名
-
-    //ポリゴン判定
-    DEFINE_FLAG(Polygon,true)
+    DEFINE_FLAG(VisibleDetail,true)//分割フレーム表示
+    DEFINE_FLAG(Polygon,true)//ポリゴン判定
 
 public:
     //面が作成可能か

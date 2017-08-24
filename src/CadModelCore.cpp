@@ -5,28 +5,44 @@ bool CadModelCore::ExportFoamFile(QString filename)const{
     std::ofstream out(filename.toStdString().c_str());
     if(!out)return false;
 
+    //バージョン出力
+    out << 2 << std::endl;
+
     //頂点リスト出力
     out << this->Points.size() << std::endl;
     for(CPoint* pos: this->Points){
+        //座標
         out << *pos << std::endl;
     }
+
     //エッジリスト出力
     out << this->Edges.size() << std::endl;
     for(CEdge* edge: this->Edges){
+        //エッジタイプ
         std::string name;
         if(edge->is<CLine>  ())name = "CLine";
         if(edge->is<CArc>   ())name = "CArc";
         if(edge->is<CSpline>())name = "CSpline";
-
         out << name;
+
+        //構成点インデックス
         for(int i=0;i<edge->GetChildCount();i++){
             out << "," << IndexOf(this->Points,edge->GetPoint(i));
         }
+        //分割数
+        out << "," << edge->divide;
+        //エッジ寄せ係数
+        out << "," << edge->grading;
+        //エッジ寄せ係数
+        out << "," << edge->grading;
+        //改行
         out << std::endl;
     }
+
     //面リスト出力
     out << this->Faces.size() << std::endl;
     for(CFace* face: this->Faces){
+        //面タイプ
         out << "CFace";
         for(int i=0;i< face->edges.size();i++){
             out << "," << IndexOf(this->Edges,face->edges[i]);

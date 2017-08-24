@@ -33,7 +33,7 @@ public:
     int div[3];               // 分割数
 private:
     QVector<QVector<Pos>> div_pos; //分割位置 (エッジ番号,分割数)
-    DEFINE_FLAG(VisibleMesh,true)//分割フレーム表示
+    DEFINE_FLAG(VisibleDetail,true)//分割フレーム表示
 
 private:
     //各軸長さ取得関数

@@ -27,9 +27,6 @@ QString Boundary::BoundaryTypeToString(Boundary::Type type){
     return "none";
 }
 
-
-
-
 CFace* CFace::base[3];
 
 bool CFace::Creatable(QVector<CObject*> lines){

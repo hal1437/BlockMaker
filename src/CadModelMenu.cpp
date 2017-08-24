@@ -28,16 +28,16 @@ void CadModelMenu::Show(QPoint pos){
         }
     }
     for(CObject* obj:selected){
-        if(obj->is<CBlock>() && !dynamic_cast<CBlock*>(obj)->isVisibleMesh()){
+        if(obj->is<CBlock>() && !dynamic_cast<CBlock*>(obj)->isVisibleDetail()){
             this->visible_mesh_action   = this->menu->addAction("メッシュ表示");
-            connect(this->visible_mesh_action  ,SIGNAL(triggered(bool)),this,SLOT(SetVisibleMesh(bool)));
+            connect(this->visible_mesh_action  ,SIGNAL(triggered(bool)),this,SLOT(SetVisibleDetail(bool)));
             break;
         }
     }
     for(CObject* obj:selected){
-        if(obj->is<CBlock>() && dynamic_cast<CBlock*>(obj)->isVisibleMesh()){
+        if(obj->is<CBlock>() && dynamic_cast<CBlock*>(obj)->isVisibleDetail()){
             this->invisible_mesh_action = this->menu->addAction("メッシュ非表示");
-            connect(this->invisible_mesh_action,SIGNAL(triggered(bool)),this,SLOT(SetInvisibleMesh(bool)));
+            connect(this->invisible_mesh_action,SIGNAL(triggered(bool)),this,SLOT(SetInVisibleDetail(bool)));
             break;
         }
     }
@@ -65,17 +65,17 @@ void CadModelMenu::SetVisible(bool){
 void CadModelMenu::SetInvisible(bool){
     for(CObject* obj:this->CadModelCoreInterface::model->GetSelected())obj->SetVisible(false);
 }
-void CadModelMenu::SetVisibleMesh(bool){
+void CadModelMenu::SetVisibleDetail(bool){
     for(CObject* obj:this->CadModelCoreInterface::model->GetSelected()){
         if(obj->is<CBlock>()){
-            dynamic_cast<CBlock*>(obj)->SetVisibleMesh(true);
+            dynamic_cast<CBlock*>(obj)->SetVisibleDetail(true);
         }
     }
 }
-void CadModelMenu::SetInvisibleMesh(bool){
+void CadModelMenu::SetInVisibleDetail(bool){
     for(CObject* obj:this->CadModelCoreInterface::model->GetSelected()){
         if(obj->is<CBlock>()){
-            dynamic_cast<CBlock*>(obj)->SetVisibleMesh(false);
+            dynamic_cast<CBlock*>(obj)->SetVisibleDetail(false);
         }
     }
 }

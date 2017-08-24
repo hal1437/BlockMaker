@@ -174,7 +174,7 @@ void CBlock::DrawGL(Pos,Pos)const{
         }
     }
 
-    if(this->isVisibleMesh()){
+    if(this->isVisibleDetail()){
         //分割線を描画
         glColor4f(0.1,
                   0.1,

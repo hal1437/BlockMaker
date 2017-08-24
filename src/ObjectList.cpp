@@ -3,7 +3,7 @@
 QIcon ObjectList::getIcon(CObject *obj){
     QString filepath;
     if(obj->is<CBlock>()){
-        if(dynamic_cast<CBlock*>(obj)->isVisibleMesh()){
+        if(dynamic_cast<CBlock*>(obj)->isVisibleDetail()){
             filepath = ":/ToolImages/BlocksMesh";
         }else{
             filepath = ":/ToolImages/Blocks";
