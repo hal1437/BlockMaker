@@ -31,39 +31,43 @@ class CFace : public CObject
 public:
     static CFace* base[3]; //正面,平面,右側面
 
-    QVector<CEdge*> edges;         // 構成線
-    Boundary::Type boundary = Boundary::Type::empty; // 境界タイプ
-    QString name = "Noname";       // 境界名
-    DEFINE_FLAG(VisibleDetail,true)//分割フレーム表示
-    DEFINE_FLAG(Polygon,true)//ポリゴン判定
+    QVector<CEdge*> edges;   // 構成線
+    QString name = "Noname"; // 境界名
+    Boundary::Type boundary = Boundary::Type::none; // 境界タイプ
+    DEFINE_FLAG(VisibleDetail,true) //分割フレーム表示
+    DEFINE_FLAG(Polygon,true)       //ポリゴン判定
 
+    QVector<int> reorder;//エッジ反転係数
 public:
     //面が作成可能か
-    static bool Creatable(QVector<CObject*> lines);
+    static  bool Creatable(QVector<CObject*> lines);
+
     virtual void DrawGL(Pos camera,Pos center)const;//三次元描画関数
-    virtual bool DrawNormArrowGL()const;//三次元法線ベクトル描画関数
+    virtual bool DrawNormArrowGL()const;            //三次元法線ベクトル描画関数
 
-    virtual void ReorderEdges();//エッジ並び替え
     virtual bool isComprehension(Pos pos)const; //平面上かチェックする。
-    virtual Pos  GetNorm()const ;               //法線ベクトル取得
+    virtual Pos  GetNorm()const;               //法線ベクトル取得
+    virtual Pos  GetNorm(double u,double v)const;               //法線ベクトル取得
 
-    //エバリュエータ
-    virtual void DefineMap2()const;//二次元エヴァリュエータ定義
+    virtual void ReorderEdges(); //エッジ方向係数再計算
+
+    //UV座標取得
     virtual Pos  GetPosFromUV      (double u,double v)const; //UV座標取得
     virtual Pos  GetPosFromUVSquare(double u,double v)const; //UV座標取得(全て直線と仮定して)
 
-    //インデックス取得
-    virtual CPoint* GetBasePoint()const;               //基準点取得
-    virtual CEdge*  GetBaseEdge ()const;               //基準線取得
+    //精密取得関数
+    virtual CPoint* GetBasePoint()const;                //基準点取得
+    virtual CEdge*  GetBaseEdge ()const;                //基準線取得
     virtual CPoint* GetPointSequence(int index)const;   //番号順点取得
     virtual CEdge*  GetEdgeSequence (int index)const;   //番号順線取得
 
     //子の操作
-    virtual CEdge* GetEdge (int index);
-    virtual CEdge* GetEdge (int index)const;
+    virtual CEdge*   GetEdge (int index);
+    virtual CEdge*   GetEdge (int index)const;
     virtual CObject* GetChild(int index);
     virtual void     SetChild(int index,CObject* obj);
     virtual int      GetChildCount()const;
+    virtual Pos      GetEdgeMiddle(int index,double t)const;//reorderに依存する中間点取得
 
     //近接点
     virtual Pos GetNearPos (const Pos& hand)const;

@@ -49,16 +49,6 @@ bool CFace::Creatable(QVector<CObject*> lines){
     std::sort(points.begin(),points.end());
     points.erase(std::unique(points.begin(),points.end()),points.end());
 
-    //同一平面テスト
-    /*
-    Pos cross = (*points[1] - *points[0]).Cross
-                (*points[2] - *points[0]);
-    for(int i=3;i<point_maps.size();i++){
-        double d = (*points[i] - *points[0]).DotPos(cross);
-        if(!NearlyEqual(d,0)){
-            return false;
-        }
-    }*/
     return true;
 }
 
@@ -84,37 +74,16 @@ Pos CFace::GetNorm()const{
         return Pos(vec1.Cross(vec2)).GetNormalize();
     }
 }
-void CFace::DefineMap2()const{
-    CEdge* ee[]={this->GetEdgeSequence(0),
-                 this->GetEdgeSequence(1),
-                 this->GetEdgeSequence(2),
-                 this->GetEdgeSequence(3)};
-    if(std::any_of(ee,ee+4,[](CEdge* edge){
-        return edge == nullptr;
-    }))return;
-    //二次元エバリュエータ
-    GLfloat ctrlpoints[4][4][3];
-    for(int i=0;i<3;i++){
-        ctrlpoints[0][0][i] = ee[0]->GetMiddleDivide(0).mat[i];
-        ctrlpoints[1][0][i] = ee[0]->GetMiddleDivide(1.0/3.0).mat[i];
-        ctrlpoints[2][0][i] = ee[0]->GetMiddleDivide(2.0/3.0).mat[i];
-        ctrlpoints[3][0][i] = ee[1]->GetMiddleDivide(0).mat[i];
-        ctrlpoints[0][1][i] = ee[3]->GetMiddleDivide(2.0/3.0).mat[i];
-        ctrlpoints[3][1][i] = ee[1]->GetMiddleDivide(1.0/3.0).mat[i];
-        ctrlpoints[0][2][i] = ee[3]->GetMiddleDivide(1.0/3.0).mat[i];
-        ctrlpoints[3][2][i] = ee[1]->GetMiddleDivide(2.0/3.0).mat[i];
-        ctrlpoints[0][3][i] = ee[3]->GetMiddleDivide(0).mat[i];
-        ctrlpoints[1][3][i] = ee[2]->GetMiddleDivide(2.0/3.0).mat[i];
-        ctrlpoints[2][3][i] = ee[2]->GetMiddleDivide(1.0/3.0).mat[i];
-        ctrlpoints[3][3][i] = ee[2]->GetMiddleDivide(0).mat[i];
+Pos CFace::GetNorm(double u,double v)const{
+    const double DELTA = 0.0001;
+    Pos vec1,vec2;
+    vec1 = this->GetPosFromUV(u + DELTA,v) - this->GetPosFromUV(u,v);
+    vec2 = this->GetPosFromUV(u,v + DELTA) - this->GetPosFromUV(u,v);
 
-        ctrlpoints[1][1][i] = (ctrlpoints[1][0][i] - ctrlpoints[0][0][i]) + (ctrlpoints[0][1][i] - ctrlpoints[0][0][i]) +  ctrlpoints[0][0][i];
-        ctrlpoints[2][1][i] = (ctrlpoints[2][0][i] - ctrlpoints[3][0][i]) + (ctrlpoints[3][1][i] - ctrlpoints[3][0][i]) +  ctrlpoints[3][0][i];
-        ctrlpoints[1][2][i] = (ctrlpoints[0][2][i] - ctrlpoints[0][3][i]) + (ctrlpoints[1][3][i] - ctrlpoints[0][3][i]) +  ctrlpoints[0][3][i];
-        ctrlpoints[2][2][i] = (ctrlpoints[3][2][i] - ctrlpoints[3][3][i]) + (ctrlpoints[2][3][i] - ctrlpoints[3][3][i]) +  ctrlpoints[3][3][i];
+    if(this->edges.size() < 2)return Pos();
+    else{
+        return Pos(vec1.Cross(vec2)).GetNormalize();
     }
-    glMap2f(GL_MAP2_VERTEX_3, 0, 1, 3, 4, 0, 1, 12, 4, &ctrlpoints[0][0][0]);
-    glEnable(GL_MAP2_VERTEX_3);
 }
 
 Pos CFace::GetPosFromUV(double u,double v)const{
@@ -304,6 +273,8 @@ void CFace::DrawGL(Pos,Pos)const{
                 //描画
                 glBegin(GL_LINES);
                 for(int k=0;k<4;k++){
+                    if(j == 0 && k >= 2)continue;//線上
+                    if(i == 0 && k  < 2)continue;//線上
                     glVertex3f(p[k].x(),p[k].y(),p[k].z());
                 }
                 glEnd();
@@ -361,6 +332,14 @@ void CFace::SetChild(int index,CObject* obj){
 
 int      CFace::GetChildCount()const{
     return this->edges.size();
+}
+Pos      CFace::GetEdgeMiddle(int index,double t)const{
+    bool reverse = false;
+    if(this->reorder.size() > index){
+        reverse = this->reorder[index];
+    }
+    if(reverse)return this->GetEdge(index)->GetMiddleDivide(1.0 - t);
+    else       return this->GetEdge(index)->GetMiddleDivide(t);
 }
 
 Pos CFace::GetNearPos (const Pos&)const{

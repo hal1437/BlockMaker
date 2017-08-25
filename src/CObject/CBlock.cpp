@@ -159,21 +159,6 @@ void CBlock::DrawGL(Pos,Pos)const{
     glGetFloatv(GL_CURRENT_COLOR,oldColor);
     glColor4f(0.5,0.5,0.5,1);
 
-    for(CFace* face:this->faces){
-        face->DefineMap2();//二次元エバリュエータ定義
-        const double FACE_DIVIDE = 10.0;//面分割数
-        for (int j = 0; j < FACE_DIVIDE; j++){
-          for (int i = 0; i < FACE_DIVIDE; i++){
-              glBegin(GL_QUADS);
-              glEvalCoord2f((GLfloat)i    /FACE_DIVIDE , (GLfloat)j/FACE_DIVIDE);
-              glEvalCoord2f((GLfloat)i    /FACE_DIVIDE , (GLfloat)(j+1)/FACE_DIVIDE);
-              glEvalCoord2f((GLfloat)(i+1)/FACE_DIVIDE , (GLfloat)(j+1)/FACE_DIVIDE);
-              glEvalCoord2f((GLfloat)(i+1)/FACE_DIVIDE , (GLfloat)j/FACE_DIVIDE);
-              glEnd();
-          }
-        }
-    }
-
     if(this->isVisibleDetail()){
         //分割線を描画
         glColor4f(0.1,
