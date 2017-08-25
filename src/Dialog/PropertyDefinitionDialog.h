@@ -56,7 +56,7 @@ public:
 
 public slots:
     void UpdateLayout();
-    void AcceptProxy();
+    void Accept();
 
 private:
     Ui::PropertyDefinitionDialog *ui;

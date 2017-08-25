@@ -1,6 +1,12 @@
 #include "PropertyDefinitionDialog.h"
 #include "ui_PropertyDefinitionDialog.h"
 
+//CObjectの配列ARRAY内の特定のメンバが全て等しいかどうか判定
+#define SELECTED_SAME_VALUE(ARRAY,TYPE,MEMBER) \
+std::count_if(ARRAY.begin(),ARRAY.end(),[&](CObject* obj){\
+    return (dynamic_cast<TYPE>(obj)->MEMBER == dynamic_cast<TYPE>(ARRAY.first())->MEMBER);\
+}) == ARRAY.size()
+
 
 void PropertyDefinitionDialog::ConstructFace(){
     //Face用レイアウト構築
@@ -11,15 +17,11 @@ void PropertyDefinitionDialog::ConstructFace(){
     this->face_boundary_combo.show();
     //全て名前が同じであれば
     QVector<CObject*> selected = this->model->GetSelected();
-    if(std::count_if(selected.begin(),selected.end(),[&](CObject* obj){
-        return (dynamic_cast<CFace*>(obj)->name == dynamic_cast<CFace*>(selected.first())->name);
-    }) == selected.size()){
+    if(SELECTED_SAME_VALUE(selected,CFace*,name)){
         this->face_name_edit.setText(dynamic_cast<CFace*>(selected.first())->name);
     }
     //全ての境界条件が同じであれば
-    if(std::count_if(selected.begin(),selected.end(),[&](CObject* obj){
-        return (dynamic_cast<CFace*>(obj)->boundary == dynamic_cast<CFace*>(selected.first())->boundary);
-    }) == selected.size()){
+    if(SELECTED_SAME_VALUE(selected,CFace*,boundary)){
         this->face_boundary_combo.setCurrentIndex(static_cast<int>(dynamic_cast<CFace*>(selected.first())->boundary));
     }
 }
@@ -31,6 +33,16 @@ void PropertyDefinitionDialog::ConstructEdge(){
     this->edge_divide_spin.show();
     this->edge_grading_label.show();
     this->edge_grading_spin.show();
+
+    //全て分割数が同じであれば
+    QVector<CObject*> selected = this->model->GetSelected();
+    if(SELECTED_SAME_VALUE(selected,CEdge*,divide)){
+        this->edge_divide_spin.setValue(dynamic_cast<CEdge*>(selected.first())->divide);
+    }
+    //全てのメッシュ寄せ係数が同じであれば
+    if(SELECTED_SAME_VALUE(selected,CEdge*,grading)){
+        this->edge_grading_spin.setValue(dynamic_cast<CEdge*>(selected.first())->grading);
+    }
 }
 bool PropertyDefinitionDialog::CheckAvailable()const{
     QVector<CObject*> selected = this->model->GetSelected();
@@ -50,7 +62,8 @@ PropertyDefinitionDialog::PropertyDefinitionDialog(QWidget *parent) :
     ui(new Ui::PropertyDefinitionDialog)
 {
     ui->setupUi(this);
-    connect(this->ui->buttonBox,SIGNAL(accepted()),this,SLOT(AcceptProxy()));
+    connect(this->ui->ApplyButton,SIGNAL(pressed()),this,SLOT(Accept()));
+    connect(this->ui->CloseButton,SIGNAL(pressed()),this,SLOT(close()));
     this->setWindowTitle("Property");
     this->setWindowFlags(Qt::Dialog | Qt::WindowStaysOnTopHint);
 
@@ -107,8 +120,8 @@ void PropertyDefinitionDialog::UpdateLayout(){
     this->repaint();
 }
 
-void PropertyDefinitionDialog::AcceptProxy(){
-    //終了処理
+void PropertyDefinitionDialog::Accept(){
+    //適用処理
     QVector<CObject*> selected = this->model->GetSelected();
 
     //値を代入
@@ -128,6 +141,5 @@ void PropertyDefinitionDialog::AcceptProxy(){
         }
     }
 
-    this->accept();
 }
 
