@@ -60,6 +60,9 @@ public slots:
 
 private:
     Ui::PropertyDefinitionDialog *ui;
+
+signals:
+    void RepaintRequest();
 };
 
 #endif // PROPERTYDEFINITIONDIALOG_H

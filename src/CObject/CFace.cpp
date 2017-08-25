@@ -260,21 +260,23 @@ void CFace::DrawGL(Pos,Pos)const{
                 //倍率計算
                 double rate_0 = CEdge::GetDivisionRate(u_max,  this->GetEdge(0)->grading,i);
                 double rate_2 = CEdge::GetDivisionRate(u_max,1/this->GetEdge(2)->grading,i);
-                double rate_1 = CEdge::GetDivisionRate(v_max,1/this->GetEdge(1)->grading,j);
-                double rate_3 = CEdge::GetDivisionRate(v_max,  this->GetEdge(3)->grading,j);
+                double rate_1 = CEdge::GetDivisionRate(v_max,  this->GetEdge(1)->grading,j);
+                double rate_3 = CEdge::GetDivisionRate(v_max,1/this->GetEdge(3)->grading,j);
 
                 double rate_p1 = (rate_2-rate_0) * (  j  /u_max) + rate_0;
                 double rate_p3 = (rate_2-rate_0) * ((j+1)/u_max) + rate_0;
-                double rate_p2 = (rate_3-rate_1) * (  i  /v_max) + rate_1;
-                double rate_p4 = (rate_3-rate_1) * ((i+1)/v_max) + rate_1;
+                double rate_p2 = (rate_1-rate_3) * (  i  /v_max) + rate_3;
+                double rate_p4 = (rate_1-rate_3) * ((i+1)/v_max) + rate_3;
                 //座標計算
-                Pos p[] = {this->GetPosFromUV(rate_p1,j/v_max),this->GetPosFromUV(rate_p3,(j+1)/v_max),
-                           this->GetPosFromUV(i/u_max,rate_p2),this->GetPosFromUV((i+1)/u_max,rate_p4)};
+                Pos p[] = {this->GetPosFromUV(rate_p1    ,j/v_max),
+                           this->GetPosFromUV(rate_p3    ,(j+1)/v_max),
+                           this->GetPosFromUV(i/u_max    ,rate_p2),
+                           this->GetPosFromUV((i+1)/u_max,rate_p4)};
                 //描画
                 glBegin(GL_LINES);
                 for(int k=0;k<4;k++){
-                    if(j == 0 && k >= 2)continue;//線上
-                    if(i == 0 && k  < 2)continue;//線上
+                    if(j == 0 && k >= 2)continue;//線上は描画しない
+                    if(i == 0 && k  < 2)continue;//線上は描画しない
                     glVertex3f(p[k].x(),p[k].y(),p[k].z());
                 }
                 glEnd();

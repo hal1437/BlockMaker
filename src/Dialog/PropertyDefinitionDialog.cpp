@@ -140,6 +140,6 @@ void PropertyDefinitionDialog::Accept(){
             if(this->edge_grading_spin.value() != 0)dynamic_cast<CEdge*>(obj)->grading = this->edge_grading_spin.value();
         }
     }
-
+    emit RepaintRequest();
 }
 

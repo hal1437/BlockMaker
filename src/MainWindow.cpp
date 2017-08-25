@@ -45,6 +45,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     //プロパティダイアログ関係
     prop_diag = new PropertyDefinitionDialog(this);
+    connect(prop_diag,SIGNAL(RepaintRequest()),this,SLOT(repaint()));
+    connect(prop_diag,SIGNAL(RepaintRequest()),ui->SolidEdit,SLOT(repaint()));
 
     //ドック関係
     connect(this->ui->actionShowObjectList,SIGNAL(triggered()),this,SLOT(ShowObjectList()));
