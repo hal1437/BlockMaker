@@ -9,6 +9,19 @@ void PropertyDefinitionDialog::ConstructFace(){
     this->face_name_edit.show();
     this->face_boundary_label.show();
     this->face_boundary_combo.show();
+    //全て名前が同じであれば
+    QVector<CObject*> selected = this->model->GetSelected();
+    if(std::count_if(selected.begin(),selected.end(),[&](CObject* obj){
+        return (dynamic_cast<CFace*>(obj)->name == dynamic_cast<CFace*>(selected.first())->name);
+    }) == selected.size()){
+        this->face_name_edit.setText(dynamic_cast<CFace*>(selected.first())->name);
+    }
+    //全ての境界条件が同じであれば
+    if(std::count_if(selected.begin(),selected.end(),[&](CObject* obj){
+        return (dynamic_cast<CFace*>(obj)->boundary == dynamic_cast<CFace*>(selected.first())->boundary);
+    }) == selected.size()){
+        this->face_boundary_combo.setCurrentIndex(static_cast<int>(dynamic_cast<CFace*>(selected.first())->boundary));
+    }
 }
 
 void PropertyDefinitionDialog::ConstructEdge(){

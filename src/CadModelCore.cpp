@@ -33,8 +33,8 @@ bool CadModelCore::ExportFoamFile(QString filename)const{
         out << "," << edge->divide;
         //エッジ寄せ係数
         out << "," << edge->grading;
-        //エッジ寄せ係数
-        out << "," << edge->grading;
+        //詳細表示
+        out << "," << edge->isVisibleDetail();
         //改行
         out << std::endl;
     }
@@ -44,27 +44,31 @@ bool CadModelCore::ExportFoamFile(QString filename)const{
     for(CFace* face: this->Faces){
         //面タイプ
         out << "CFace";
+        //構成線インデックス
         for(int i=0;i< face->edges.size();i++){
             out << "," << IndexOf(this->Edges,face->edges[i]);
         }
+        //境界名
+        out << "," << face->name.toStdString();
+        //境界タイプ
+        out << "," << Boundary::BoundaryTypeToString(face->boundary).toStdString();
+        //詳細表示
+        out << "," << face->isVisibleDetail();
+        //改行
         out << std::endl;
     }
     //立体リスト出力
     out << this->Blocks.size() << std::endl;
     for(CBlock* block: this->Blocks){
+        //立体タイプ
         out << "CBlock";
-        //平面番号
+        //平面インデックス
         for(int i=0;i< 6;i++)out << "," << IndexOf(this->Faces,block->faces[i]);
-        //境界タイプ
-        for(int i=0;i< 6;i++)out << "," << block->GetFaceFormDir(static_cast<BoundaryDir>(i))->boundary;
         //分割数
         for(int i=0;i< 3;i++)out << "," << block->div[i];
-        //分割間隔タイプ
-        //out << "," << block->grading;
-        //分割間隔タイプ
-//        for(double d:block->grading_args){
-//            out << "," << d;
-//        }
+        //詳細表示
+        out << "," << block->isVisibleDetail();
+
         out << std::endl;
     }
     return true;
@@ -82,26 +86,30 @@ bool CadModelCore::ImportFoamFile(QString filename){
     this->Blocks.clear();
     this->Selected.clear();
 
-    //頂点取得
+    //バージョン取得
+    int version;
+    in >> version;
+
+    //頂点リスト取得
     int vertex_num;
     in >> vertex_num;
     for(int i=0;i<vertex_num;i++){
         Pos p;
+        //座標
         in >> p;
+        //モデルに追加
         this->Points.push_back(new CPoint(p));
     }
 
-    //エッジ取得
+    //エッジリスト取得
     int edge_num;
     in >> edge_num;
     for(int i=0;i<edge_num;i++){
         std::string str;
-        in >> str;
-
-        //オブジェクト判定
+        //エッジタイプ
         CEdge* make = nullptr;
+        in >> str;
         QStringList sl = QString(str.c_str()).split(',');
-
         if(sl[0] == "CLine"  )make = new CLine();
         if(sl[0] == "CArc"   )make = new CArc();
         if(sl[0] == "CSpline")make = new CSpline();
@@ -109,7 +117,7 @@ bool CadModelCore::ImportFoamFile(QString filename){
         //オブジェクト生成
         if(make != nullptr){
 
-            if(sl[0] == "CArc"){
+            if(make->is<CArc>()){
                 //例外
                 make->Create(this->Points[sl[2].toInt()]);
                 make->Create(this->Points[sl[1].toInt()]);
@@ -118,16 +126,25 @@ bool CadModelCore::ImportFoamFile(QString filename){
 
                 CREATE_RESULT res = make->Create(this->Points[sl[1].toInt()]);
                 if(res == CREATE_RESULT::ENDLESS){
-                    for(int j=3;j<sl.size();j++){
+                    //spline
+                    for(int j=3;j<sl.size()-3;j++){
                         make->Create(this->Points[sl[j].toInt()]);
                     }
                     make->Create(this->Points[sl[2].toInt()]);
                 }else{
-                    for(int j=2;j<sl.size();j++){
+                    //line
+                    for(int j=2;j<sl.size()-3;j++){
                         make->Create(this->Points[sl[j].toInt()]);
                     }
                 }
             }
+            //分割数取得
+            make->divide  = sl[sl.size()-3].toInt();
+            //分割数取得
+            make->grading = sl[sl.size()-2].toDouble();
+            //詳細表示取得
+            make->SetVisibleDetail(sl[sl.size()-1]=="1");
+            //モデルに追加
             Edges.push_back(make);
         }
     }
@@ -135,15 +152,23 @@ bool CadModelCore::ImportFoamFile(QString filename){
     int face_num;
     in >> face_num;
     for(int i=0;i<face_num;i++){
+        //面タイプ
         std::string str;
         in >> str;
 
+        //エッジ取得
         CFace* make = new CFace();
         QStringList sl = QString(str.c_str()).split(',');
-        //エッジ判定
-        for(int j = 1;j<sl.size();j++){
+        for(int j = 1;j<sl.size()-3;j++){
             make->edges.push_back(this->Edges[sl[j].toInt()]);
         }
+        //境界名
+        make->name = sl[sl.size()-3];
+        //境界名
+        make->boundary = Boundary::StringToBoundaryType(sl[sl.size()-2]);
+        //詳細表示取得
+        make->SetVisibleDetail(sl[sl.size()-1]=="1");
+        //モデルに追加
         this->Faces.push_back(make);
     }
     //立体取得
@@ -153,33 +178,26 @@ bool CadModelCore::ImportFoamFile(QString filename){
         std::string str;
         in >> str;
 
+        //平面判定
         CBlock* make = new CBlock();
         QStringList sl = QString(str.c_str()).split(',');
         int j=1;
-        //平面判定
         for(int i=0;i<6;i++,j++){
             make->faces.push_back(this->Faces[sl[j].toInt()]);
-        }
-        //境界タイプ
-        for(int i=0;i<6;i++,j++){
-            CFace* face = make->GetFace(static_cast<BoundaryDir>(i));
-            face->boundary = static_cast<Boundary::Type>(sl[j].toInt());
         }
         //分割数
         for(int i=0;i<3;i++,j++){
             make->div[i] = sl[j].toInt();
         }
-        //分割間隔タイプ
-        //make->grading = static_cast<GradingType>(sl[j].toInt());
-        j++;
-        //分割間隔タイプ
-        for(;j<sl.length();j++){
-            //make->grading_args.push_back(sl[j].toDouble());
-        }
+        //詳細表示取得
+        make->SetVisibleDetail(sl[sl.size()-1]=="1");
+        //再編成
         make->RefreshDividePoint();
         make->ReorderEdges();
+        //モデルに追加
         this->Blocks.push_back(make);
     }
+    //更新
     emit UpdatePoints();
     emit UpdateEdges();
     emit UpdateFaces();
