@@ -266,7 +266,7 @@ void CFace::DrawGL(Pos,Pos)const{
                 double rate_p1 = (rate_2-rate_0) * (  j  /u_max) + rate_0;
                 double rate_p3 = (rate_2-rate_0) * ((j+1)/u_max) + rate_0;
                 double rate_p2 = (rate_1-rate_3) * (  i  /v_max) + rate_3;
-                double rate_p4 = (rate_1-rate_3) * ((i+1)/v_max) + rate_3;
+                double rate_p4 = (rate_1-rate_3) * ((i+1)/v_max) + rate_3 ;
                 //座標計算
                 Pos p[] = {this->GetPosFromUV(rate_p1    ,j/v_max),
                            this->GetPosFromUV(rate_p3    ,(j+1)/v_max),

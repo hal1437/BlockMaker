@@ -185,5 +185,8 @@ void SolidEditController::Refresh3Face(){
     CFace::base[0] = this->getFrontFace();
     CFace::base[1] = this->getTopFace();
     CFace::base[2] = this->getSideFace();
+    CFace::base[0]->name = "正面";
+    CFace::base[1]->name = "平面";
+    CFace::base[2]->name = "右側面";
 }
 
