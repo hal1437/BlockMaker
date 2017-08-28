@@ -84,8 +84,11 @@ CObject* CSpline::GetChild(int index){
 void     CSpline::SetChild(int index,CObject* obj){
 
     if(obj == nullptr){
+        //シグナル全解除
+        for(int i = 0;i< this->GetChildCount();i++){
+            IgnoreChild(this->GetChild(i));
+        }
         //切り詰め処理
-        IgnoreChild(this->GetChild(index));
         if(index <= 0){
             if(this->GetChildCount()==1){
                 //全て削除された状態
@@ -101,6 +104,10 @@ void     CSpline::SetChild(int index,CObject* obj){
         else if(index >= this->pos.size()+1){
             this->end = this->pos.back();
             this->pos.pop_back();
+        }
+        //シグナル再接続
+        for(int i = 0;i< this->GetChildCount();i++){
+            ObserveChild(this->GetChild(i));
         }
     }else{
         //入れ替え処理
