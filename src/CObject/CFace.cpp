@@ -95,10 +95,10 @@ Pos CFace::GetPosFromUV(double u,double v)const{
     delta[2] = this->GetPosFromUVSquare(  u,  0);
     delta[3] = this->GetPosFromUVSquare(1.0,  v);
     //曲面に対して垂直方向の座標値を加算
-    delta[0] += (this->GetEdge(0)->GetMiddleDivide(u) - delta[0]) * (1.0-v);
-    delta[1] += (this->GetEdge(1)->GetMiddleDivide(v) - delta[1]) * u;
-    delta[2] += (this->GetEdge(2)->GetMiddleDivide(1.0-u) - delta[2]) * v;
-    delta[3] += (this->GetEdge(3)->GetMiddleDivide(1.0-v) - delta[3]) * (1.0-u);
+    delta[0] += (this->GetEdgeMiddle(0,u) - delta[0]) * (1.0-v);
+    delta[1] += (this->GetEdgeMiddle(1,v) - delta[1]) * u;
+    delta[2] += (this->GetEdgeMiddle(2,1.0-u) - delta[2]) * v;
+    delta[3] += (this->GetEdgeMiddle(3,1.0-v) - delta[3]) * (1.0-u);
     //GetPosFromUVSquareとの差分を取得
     for(int i=0;i<4;i++){
         delta[i] -= this->GetPosFromUVSquare(u,v);
@@ -109,10 +109,10 @@ Pos CFace::GetPosFromUV(double u,double v)const{
 Pos CFace::GetPosFromUVSquare(double u,double v)const{
     //双1次曲面の式
     //S(u,v)=(1-u)(1-v)P_{0}+u(1-v)P_{1}+(1-u)vP_{2}+uvP_{3};
-    Pos p[4] = {*this->GetEdge(0)->start,
-                *this->GetEdge(1)->start,
-                *this->GetEdge(2)->start,
-                *this->GetEdge(3)->start};
+    Pos p[4] = {this->GetEdgeMiddle(0,0),
+                this->GetEdgeMiddle(1,0),
+                this->GetEdgeMiddle(2,0),
+                this->GetEdgeMiddle(3,0)};
     return (p[0] * (1-u) * (1-v) +
             p[1] *     u * (1-v) +
             p[3] * (1-u) * v +
@@ -176,7 +176,7 @@ CPoint* CFace::GetPointSequence(int index)const{
         old = ans;
         if(candidate.size() == 2){
             //二択
-            if(Pos::Angle(*candidate[0]-*corner,*candidate[1]-*corner) > Pos::Angle(*candidate[1]-*corner,*candidate[0]-*corner)){
+            if(candidate[0]->DotPos(Pos(1,0,0)) > candidate[1]->DotPos(Pos(1,0,0))){
                 ans = candidate[0];
             }else{
                 ans = candidate[1];
@@ -208,14 +208,7 @@ CEdge*  CFace::GetEdgeSequence(int index)const{
         qDebug() << "?";
         return nullptr;
     }
-
-    //反転
-    CEdge* ans = *it;
-    /*
-    if(ans->end == this->GetPointSequence(index)){
-        std::swap(ans->start,ans->end);
-    }*/
-    return ans;
+    return *it;
 }
 void CFace::DrawGL(Pos,Pos)const{
     if(!this->isVisible())return;
@@ -249,39 +242,9 @@ void CFace::DrawGL(Pos,Pos)const{
 
         //色を復元
         glColor4f(currentColor[0],currentColor[1],currentColor[2], currentColor[3]);
+        //メッシュ描画
+        this->DrawMeshGL();
 
-        //メッシュ分割描画
-        int u_max = std::min(this->GetEdge(0)->divide,this->GetEdge(2)->divide);//u方向分割
-        int v_max = std::min(this->GetEdge(1)->divide,this->GetEdge(3)->divide);//v方向分割
-        if(u_max < 0)u_max = 1;
-        if(v_max < 0)v_max = 1;
-        for(double i=0;i<u_max;i++){//u方向ループ
-            for(double j=0;j<v_max;j++){//v方向ループ
-                //倍率計算
-                double rate_0 = CEdge::GetDivisionRate(u_max,  this->GetEdge(0)->grading,i);
-                double rate_2 = CEdge::GetDivisionRate(u_max,1/this->GetEdge(2)->grading,i);
-                double rate_1 = CEdge::GetDivisionRate(v_max,  this->GetEdge(1)->grading,j);
-                double rate_3 = CEdge::GetDivisionRate(v_max,1/this->GetEdge(3)->grading,j);
-
-                double rate_p1 = (rate_2-rate_0) * (  j  /u_max) + rate_0;
-                double rate_p3 = (rate_2-rate_0) * ((j+1)/u_max) + rate_0;
-                double rate_p2 = (rate_1-rate_3) * (  i  /v_max) + rate_3;
-                double rate_p4 = (rate_1-rate_3) * ((i+1)/v_max) + rate_3 ;
-                //座標計算
-                Pos p[] = {this->GetPosFromUV(rate_p1    ,j/v_max),
-                           this->GetPosFromUV(rate_p3    ,(j+1)/v_max),
-                           this->GetPosFromUV(i/u_max    ,rate_p2),
-                           this->GetPosFromUV((i+1)/u_max,rate_p4)};
-                //描画
-                glBegin(GL_LINES);
-                for(int k=0;k<4;k++){
-                    if(j == 0 && k >= 2)continue;//線上は描画しない
-                    if(i == 0 && k  < 2)continue;//線上は描画しない
-                    glVertex3f(p[k].x(),p[k].y(),p[k].z());
-                }
-                glEnd();
-            }
-        }
     }else{
 
         //外枠
@@ -306,13 +269,62 @@ bool CFace::DrawNormArrowGL()const{
     glEnd();
     return true;
 }
+void CFace::DrawMeshGL()const{
+    //メッシュ分割描画
+    int u_max = std::min(this->GetEdge(0)->divide,this->GetEdge(2)->divide);//u方向分割
+    int v_max = std::min(this->GetEdge(1)->divide,this->GetEdge(3)->divide);//v方向分割
+    if(u_max < 0)u_max = 1;
+    if(v_max < 0)v_max = 1;
+    for(double i=0;i<u_max;i++){//u方向ループ
+        for(double j=0;j<v_max;j++){//v方向ループ
+            //倍率計算
+            double rate_0 = CEdge::GetDivisionRate(u_max,  this->GetEdge(0)->grading,i);
+            double rate_2 = CEdge::GetDivisionRate(u_max,1/this->GetEdge(2)->grading,i);
+            double rate_1 = CEdge::GetDivisionRate(v_max,  this->GetEdge(1)->grading,j);
+            double rate_3 = CEdge::GetDivisionRate(v_max,1/this->GetEdge(3)->grading,j);
+
+            double rate_p1 = (rate_2-rate_0) * (  j  /u_max) + rate_0;
+            double rate_p3 = (rate_2-rate_0) * ((j+1)/u_max) + rate_0;
+            double rate_p2 = (rate_1-rate_3) * (  i  /v_max) + rate_3;
+            double rate_p4 = (rate_1-rate_3) * ((i+1)/v_max) + rate_3;
+            //座標計算
+            Pos p[] = {this->GetPosFromUV(rate_p1    ,j/v_max),
+                       this->GetPosFromUV(rate_p3    ,(j+1)/v_max),
+                       this->GetPosFromUV(i/u_max    ,rate_p2),
+                       this->GetPosFromUV((i+1)/u_max,rate_p4)};
+            //描画
+            glBegin(GL_LINES);
+            for(int k=0;k<4;k++){
+                if(j == 0 && k >= 2)continue;//線上は描画しない
+                if(i == 0 && k  < 2)continue;//線上は描画しない
+                glVertex3f(p[k].x(),p[k].y(),p[k].z());
+            }
+            glEnd();
+        }
+    }
+}
 
 void CFace::ReorderEdges(){
     QVector<CEdge*> ans;
+    //整合確認
     for(int i=0;i<this->edges.size();i++){
         ans.push_back(this->GetEdgeSequence(i));
+        qDebug() << this->GetPointSequence(i);
     }
     this->edges = ans;
+
+    //反転確認
+    this->reorder.resize(this->edges.size());
+    for(int i=0;i<this->edges.size();i++){
+        //反転確認
+        qDebug() << this->GetPointSequence(i);
+        CPoint* pp = this->GetPointSequence(i);
+        if     (pp == this->edges[i]->start)this->reorder[i] =  1;
+        else if(pp == this->edges[i]->end  )this->reorder[i] = -1;
+        else{
+            this->reorder[i] =  0;
+        }
+    }
 }
 
 //子の操作
@@ -336,12 +348,8 @@ int      CFace::GetChildCount()const{
     return this->edges.size();
 }
 Pos      CFace::GetEdgeMiddle(int index,double t)const{
-    bool reverse = false;
-    if(this->reorder.size() > index){
-        reverse = this->reorder[index];
-    }
-    if(reverse)return this->GetEdge(index)->GetMiddleDivide(1.0 - t);
-    else       return this->GetEdge(index)->GetMiddleDivide(t);
+    if(this->reorder[index] == -1)return this->GetEdge(index)->GetMiddleDivide(1.0 - t);
+    else                          return this->GetEdge(index)->GetMiddleDivide(t);
 }
 
 Pos CFace::GetNearPos (const Pos&)const{

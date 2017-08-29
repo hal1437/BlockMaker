@@ -168,6 +168,9 @@ bool CadModelCore::ImportFoamFile(QString filename){
         make->boundary = Boundary::StringToBoundaryType(sl[sl.size()-2]);
         //詳細表示取得
         make->SetVisibleDetail(sl[sl.size()-1]=="1");
+
+        //エッジ情報更新
+        make->ReorderEdges();
         //モデルに追加
         this->Faces.push_back(make);
     }

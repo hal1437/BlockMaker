@@ -42,8 +42,9 @@ public:
     //面が作成可能か
     static  bool Creatable(QVector<CObject*> lines);
 
-    virtual void DrawGL(Pos camera,Pos center)const;//三次元描画関数
-    virtual bool DrawNormArrowGL()const;            //三次元法線ベクトル描画関数
+    virtual void DrawGL(Pos camera,Pos center)const; //三次元描画関数
+    virtual bool DrawNormArrowGL()const;             //三次元法線ベクトル描画関数
+    virtual void DrawMeshGL()const;                  //三次元メッシュ関数
 
     virtual bool isComprehension(Pos pos)const; //平面上かチェックする。
     virtual Pos  GetNorm()const;               //法線ベクトル取得
