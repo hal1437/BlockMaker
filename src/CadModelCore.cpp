@@ -171,6 +171,7 @@ bool CadModelCore::ImportFoamFile(QString filename){
 
         //エッジ情報更新
         make->ReorderEdges();
+        make->RecalcMesh();
         //モデルに追加
         this->Faces.push_back(make);
     }

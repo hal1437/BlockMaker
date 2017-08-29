@@ -239,6 +239,7 @@ void MainWindow::MakeFace(){
         face->edges.push_back(dynamic_cast<CEdge*>(obj));
     }
     face->ReorderEdges();
+    face->RecalcMesh();
     this->model->AddFaces(face);
     this->model->GetSelected().clear();//選択解除
 }

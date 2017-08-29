@@ -220,22 +220,20 @@ void CFace::DrawGL(Pos,Pos)const{
         glDepthMask(GL_FALSE);
 
         //塗りつぶし描画
-        const double FACE_DIVIDE = 10.0;//面分割数
-        for (int j = 0; j < FACE_DIVIDE; j++){
-          for (int i = 0; i < FACE_DIVIDE; i++){
-              glBegin(GL_QUADS);
-
-              Pos pp[4] = {
-                  this->GetPosFromUV(i    /FACE_DIVIDE , j/FACE_DIVIDE),
-                  this->GetPosFromUV(i    /FACE_DIVIDE , (j+1)/FACE_DIVIDE),
-                  this->GetPosFromUV((i+1)/FACE_DIVIDE , (j+1)/FACE_DIVIDE),
-                  this->GetPosFromUV((i+1)/FACE_DIVIDE , j/FACE_DIVIDE)
-              };
-              for(int k=0;k<4;k++){
-                  glVertex3f(pp[k].x(),pp[k].y(),pp[k].z());
-              }
-              glEnd();
-          }
+        for(double i=0;i<this->mesh_memory.size()-1;i++){//u方向ループ
+            for(double j=0;j<this->mesh_memory.first().size()-1;j++){//v方向ループ
+                glBegin(GL_QUADS);
+                Pos pp[4] = {
+                    this->mesh_memory[i][j],
+                    this->mesh_memory[i+1][j],
+                    this->mesh_memory[i+1][j+1],
+                    this->mesh_memory[i][j+1],
+                };
+                for(int k=0;k<4;k++){
+                    glVertex3f(pp[k].x(),pp[k].y(),pp[k].z());
+                }
+                glEnd();
+            }
         }
         glEnd();
         glDepthMask(GL_TRUE);
@@ -270,38 +268,30 @@ bool CFace::DrawNormArrowGL()const{
     return true;
 }
 void CFace::DrawMeshGL()const{
-    //メッシュ分割描画
-    int u_max = std::min(this->GetEdge(0)->divide,this->GetEdge(2)->divide);//u方向分割
-    int v_max = std::min(this->GetEdge(1)->divide,this->GetEdge(3)->divide);//v方向分割
-    if(u_max < 0)u_max = 1;
-    if(v_max < 0)v_max = 1;
-    for(double i=0;i<u_max;i++){//u方向ループ
-        for(double j=0;j<v_max;j++){//v方向ループ
-            //倍率計算
-            double rate_0 = CEdge::GetDivisionRate(u_max,  this->GetEdge(0)->grading,i);
-            double rate_2 = CEdge::GetDivisionRate(u_max,1/this->GetEdge(2)->grading,i);
-            double rate_1 = CEdge::GetDivisionRate(v_max,  this->GetEdge(1)->grading,j);
-            double rate_3 = CEdge::GetDivisionRate(v_max,1/this->GetEdge(3)->grading,j);
-
-            double rate_p1 = (rate_2-rate_0) * (  j  /u_max) + rate_0;
-            double rate_p3 = (rate_2-rate_0) * ((j+1)/u_max) + rate_0;
-            double rate_p2 = (rate_1-rate_3) * (  i  /v_max) + rate_3;
-            double rate_p4 = (rate_1-rate_3) * ((i+1)/v_max) + rate_3;
-            //座標計算
-            Pos p[] = {this->GetPosFromUV(rate_p1    ,j/v_max),
-                       this->GetPosFromUV(rate_p3    ,(j+1)/v_max),
-                       this->GetPosFromUV(i/u_max    ,rate_p2),
-                       this->GetPosFromUV((i+1)/u_max,rate_p4)};
+    //u方向
+    for(double i=0;i<this->mesh_memory.size()-1;i++){//u方向ループ
+        for(double j=1;j<this->mesh_memory.first().size()-1;j++){//v方向ループ
             //描画
-            glBegin(GL_LINES);
-            for(int k=0;k<4;k++){
-                if(j == 0 && k >= 2)continue;//線上は描画しない
-                if(i == 0 && k  < 2)continue;//線上は描画しない
-                glVertex3f(p[k].x(),p[k].y(),p[k].z());
-            }
+            glBegin(GL_LINE_STRIP);
+            glVertex3f(this->mesh_memory[i][j].x(),this->mesh_memory[i][j].y(),this->mesh_memory[i][j].z());
+            glVertex3f(this->mesh_memory[i+1][j].x(),this->mesh_memory[i+1][j].y(),this->mesh_memory[i+1][j].z());
             glEnd();
+
         }
     }
+    //v方向
+    for(double i=1;i<this->mesh_memory.size()-1;i++){//u方向ループ
+        for(double j=0;j<this->mesh_memory.first().size()-1;j++){//v方向ループ
+            //描画
+            glBegin(GL_LINE_STRIP);
+            glVertex3f(this->mesh_memory[i][j].x(),this->mesh_memory[i][j].y(),this->mesh_memory[i][j].z());
+            glVertex3f(this->mesh_memory[i][j+1].x(),this->mesh_memory[i][j+1].y(),this->mesh_memory[i][j+1].z());
+            glEnd();
+
+        }
+    }
+
+
 }
 
 void CFace::ReorderEdges(){
@@ -326,8 +316,33 @@ void CFace::ReorderEdges(){
         }
     }
 }
+void CFace::RecalcMesh(){
+    //メッシュ分割描画
+    int u_max = std::min(this->GetEdge(0)->divide,this->GetEdge(2)->divide)+1;//u方向分割
+    int v_max = std::min(this->GetEdge(1)->divide,this->GetEdge(3)->divide)+1;//v方向分割
+    if(u_max < 2)u_max = 2;
+    if(v_max < 2)v_max = 2;
 
-//子の操作
+    this->mesh_memory.resize(u_max);
+    for(double i=0;i<u_max;i++){//u方向ループ
+        QVector<Pos> v_pp;//v方向点群
+        v_pp.resize(v_max);
+        for(double j=0;j<v_max;j++){//v方向ループ
+            //倍率計算
+            double rate_0 = CEdge::GetDivisionRate(u_max-1,  this->GetGrading(0),i);
+            double rate_2 = CEdge::GetDivisionRate(u_max-1,1/this->GetGrading(2),i);
+            double rate_1 = CEdge::GetDivisionRate(v_max-1,  this->GetGrading(1),j);
+            double rate_3 = CEdge::GetDivisionRate(v_max-1,1/this->GetGrading(3),j);
+
+            double rate_p1 = (rate_2-rate_0) * (  j  /(u_max-1)) + rate_0;
+            double rate_p2 = (rate_1-rate_3) * (  i  /(v_max-1)) + rate_3;
+            //座標計算
+            v_pp[j] = this->GetPosFromUV(rate_p1,rate_p2);
+        }
+        this->mesh_memory[i] = v_pp;
+    }
+}
+
 CEdge*  CFace::GetEdge      (int index){
     return this->edges[index];
 }
@@ -350,6 +365,10 @@ int      CFace::GetChildCount()const{
 Pos      CFace::GetEdgeMiddle(int index,double t)const{
     if(this->reorder[index] == -1)return this->GetEdge(index)->GetMiddleDivide(1.0 - t);
     else                          return this->GetEdge(index)->GetMiddleDivide(t);
+}
+double   CFace::GetGrading(int index)const{
+    if(this->reorder[index] == -1)return (1/this->GetEdge(index)->grading);
+    else                          return (  this->GetEdge(index)->grading);
 }
 
 Pos CFace::GetNearPos (const Pos&)const{

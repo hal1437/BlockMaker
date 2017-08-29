@@ -38,6 +38,7 @@ public:
     DEFINE_FLAG(Polygon,true)       //ポリゴン判定
 
     QVector<int> reorder;//エッジ反転係数
+    QVector<QVector<Pos>> mesh_memory;//メッシュ分割位置記録二次元配列
 public:
     //面が作成可能か
     static  bool Creatable(QVector<CObject*> lines);
@@ -51,6 +52,7 @@ public:
     virtual Pos  GetNorm(double u,double v)const;               //法線ベクトル取得
 
     virtual void ReorderEdges(); //エッジ方向係数再計算
+    virtual void RecalcMesh();   //メッシュ位置再計算
 
     //UV座標取得
     virtual Pos  GetPosFromUV      (double u,double v)const; //UV座標取得
@@ -68,7 +70,8 @@ public:
     virtual CObject* GetChild(int index);
     virtual void     SetChild(int index,CObject* obj);
     virtual int      GetChildCount()const;
-    virtual Pos      GetEdgeMiddle(int index,double t)const;//reorderに依存する中間点取得
+    virtual Pos      GetEdgeMiddle(int index,double t)const; //reorderに依存する中間点取得
+    virtual double   GetGrading   (int index)const;          //reorderに依存するエッジ寄せ係数取得
 
     //近接点
     virtual Pos GetNearPos (const Pos& hand)const;
