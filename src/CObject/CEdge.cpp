@@ -1,6 +1,10 @@
 #include "CEdge.h"
 
 double CEdge::GetDivisionRate(int divide,double grading,int count){
+    if(divide == 1){
+        if(count == 0)return 0;
+        if(count == 1)return 1;
+    }
     double A,B,sum=0,p,d;
 
     //エッジからpとLを抽出
@@ -65,8 +69,8 @@ void CEdge::DrawGL(Pos camera,Pos center)const{
         glEnd();
     }
     //分割ライン表示
-    if(this->divide > 0){
-        for(double i = 1;i<this->divide;i++){
+    if(this->getDivide() > 0){
+        for(double i = 1;i<this->getDivide();i++){
             Pos p  = GetDivisionPoint(i);
             Pos cc = GetDivisionPoint(i) - GetDivisionPoint(i+1);
             double theta1 = std::atan2(cc.y(),std::sqrt(cc.x()*cc.x()+cc.z()*cc.z()));
@@ -84,7 +88,7 @@ void CEdge::DrawGL(Pos camera,Pos center)const{
     }
 }
 Pos CEdge::GetDivisionPoint(int count)const{
-    Pos ans = this->GetMiddleDivide(GetDivisionRate(this->divide,this->grading,count));
+    Pos ans = this->GetMiddleDivide(GetDivisionRate(this->getDivide(),this->getGrading(),count));
     return ans;
 }
 void CEdge::SetStartPos(CObject* obj){
@@ -98,12 +102,14 @@ void CEdge::SetEndPos(CObject* obj){
 CEdge::CEdge(QObject* parent):
     CObject(parent)
 {
+    this->Divide  = 1;
+    this->Grading = 1.0;
     this->start = this->end = nullptr;
 }
 
 CEdge::~CEdge(){}
 //点移動コールバック
 void CEdge::ChangeChildCallback(CObject*){
-    //何もしない
+    emit Changed(this);
 }
 

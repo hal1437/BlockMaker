@@ -2,6 +2,7 @@
 #define CEDGE_H
 #include "CPoint.h"
 
+
 //エッジクラス
 class CEdge :public CObject
 {
@@ -12,13 +13,12 @@ public:
     const static int LINE_NEAR_DIVIDE = 100; //近似直線判定関数の分割数
     DEFINE_FLAG(VisibleDetail,true)//分割フレーム表示
 
-
 public:
     CPoint* start; //エッジの始点
     CPoint* end;   //エッジの終点
-    double grading = 1.0; //エッジ寄せ
-    int    divide  = 0; //分割数(0:自動的に決定)
-
+    OBSERVE_MEMBER(double,Grading)//エッジ寄せ
+    OBSERVE_MEMBER(int   ,Divide )//分割数
+public:
     //分割レート取得
     static double GetDivisionRate(int divide, double grading, int count);
 

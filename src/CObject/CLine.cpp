@@ -2,10 +2,10 @@
 
 CREATE_RESULT CLine::Create(CPoint *pos){
     if(this->start == nullptr){
-        this->start = pos;
+        this->SetStartPos(pos);
         return CREATE_RESULT::ONESHOT;//あと1回
     }else{
-        this->end   = pos;
+        this->SetEndPos(pos);
         return CREATE_RESULT::COMPLETE;//完結
     }
 }
@@ -53,10 +53,10 @@ Pos CLine::GetNearPos(const Pos& hand)const{
 
 CEdge* CLine::Clone()const{
     CLine* ptr = new CLine(this->parent());
-    ptr->start = new CPoint(*this->start,ptr);
-    ptr->end   = new CPoint(*this->end  ,ptr);
-    ptr->grading = this->grading;
-    ptr->divide  = this->divide;
+    ptr->SetStartPos(new CPoint(*this->start,ptr));
+    ptr->SetEndPos  (new CPoint(*this->end  ,ptr));
+    ptr->Grading = this->Grading;
+    ptr->Divide  = this->Divide;
     return ptr;
 }
 
@@ -70,10 +70,4 @@ CLine::CLine(CPoint* start,CPoint* end,QObject* parent):
     this->SetChild(0,start);
     this->SetChild(1,end);
 }
-
-
-
-CLine::~CLine()
-{
-}
-
+CLine::~CLine(){}

@@ -4,7 +4,7 @@
 //CObjectの配列ARRAY内の特定のメンバが全て等しいかどうか判定
 #define SELECTED_SAME_VALUE(ARRAY,TYPE,MEMBER) \
 std::count_if(ARRAY.begin(),ARRAY.end(),[&](CObject* obj){\
-    return (dynamic_cast<TYPE>(obj)->MEMBER == dynamic_cast<TYPE>(ARRAY.first())->MEMBER);\
+    return (dynamic_cast<TYPE>(obj)->get##MEMBER() == dynamic_cast<TYPE>(ARRAY.first())->get##MEMBER());\
 }) == ARRAY.size()
 
 
@@ -17,12 +17,12 @@ void PropertyDefinitionDialog::ConstructFace(){
     this->face_boundary_combo.show();
     //全て名前が同じであれば
     QVector<CObject*> selected = this->model->GetSelected();
-    if(SELECTED_SAME_VALUE(selected,CFace*,name)){
-        this->face_name_edit.setText(dynamic_cast<CFace*>(selected.first())->name);
+    if(SELECTED_SAME_VALUE(selected,CFace*,Name)){
+        this->face_name_edit.setText(dynamic_cast<CFace*>(selected.first())->getName());
     }
     //全ての境界条件が同じであれば
-    if(SELECTED_SAME_VALUE(selected,CFace*,boundary)){
-        this->face_boundary_combo.setCurrentIndex(static_cast<int>(dynamic_cast<CFace*>(selected.first())->boundary));
+    if(SELECTED_SAME_VALUE(selected,CFace*,Boundary)){
+        this->face_boundary_combo.setCurrentIndex(static_cast<int>(dynamic_cast<CFace*>(selected.first())->getBoundary()));
     }
 }
 
@@ -36,12 +36,12 @@ void PropertyDefinitionDialog::ConstructEdge(){
 
     //全て分割数が同じであれば
     QVector<CObject*> selected = this->model->GetSelected();
-    if(SELECTED_SAME_VALUE(selected,CEdge*,divide)){
-        this->edge_divide_spin.setValue(dynamic_cast<CEdge*>(selected.first())->divide);
+    if(SELECTED_SAME_VALUE(selected,CEdge*,Divide)){
+        this->edge_divide_spin.setValue(dynamic_cast<CEdge*>(selected.first())->getDivide());
     }
     //全てのメッシュ寄せ係数が同じであれば
-    if(SELECTED_SAME_VALUE(selected,CEdge*,grading)){
-        this->edge_grading_spin.setValue(dynamic_cast<CEdge*>(selected.first())->grading);
+    if(SELECTED_SAME_VALUE(selected,CEdge*,Grading)){
+        this->edge_grading_spin.setValue(dynamic_cast<CEdge*>(selected.first())->getGrading());
     }
 }
 bool PropertyDefinitionDialog::CheckAvailable()const{
@@ -127,17 +127,17 @@ void PropertyDefinitionDialog::Accept(){
     //値を代入
     for(CObject* obj: selected){
         if(this->constructed == CONSTRUCTED::FACE){
-            if(this->face_name_edit.text() != "")dynamic_cast<CFace*>(obj)->name = this->face_name_edit.text();
+            if(this->face_name_edit.text() != "")dynamic_cast<CFace*>(obj)->getName() = this->face_name_edit.text();
             if(this->face_boundary_combo.currentText() != ""){
                 int index = IndexOf(this->boundary_combo_text,this->face_boundary_combo.currentText());
                 if(index != -1){
-                    dynamic_cast<CFace*>(obj)->boundary = static_cast<Boundary::Type>(index);
+                    dynamic_cast<CFace*>(obj)->setBoundary(static_cast<Boundary::Type>(index));
                 }
             }
         }
         if(this->constructed == CONSTRUCTED::EDGE){
-            if(this->edge_divide_spin .value() != 0)dynamic_cast<CEdge*>(obj)->divide  = this->edge_divide_spin.value();
-            if(this->edge_grading_spin.value() != 0)dynamic_cast<CEdge*>(obj)->grading = this->edge_grading_spin.value();
+            if(this->edge_divide_spin .value() != 0)dynamic_cast<CEdge*>(obj)->setDivide (this->edge_divide_spin.value());
+            if(this->edge_grading_spin.value() != 0)dynamic_cast<CEdge*>(obj)->setGrading(this->edge_grading_spin.value());
         }
     }
     emit RepaintRequest();

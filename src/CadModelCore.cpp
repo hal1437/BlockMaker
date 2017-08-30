@@ -30,9 +30,9 @@ bool CadModelCore::ExportFoamFile(QString filename)const{
             out << "," << IndexOf(this->Points,edge->GetPoint(i));
         }
         //分割数
-        out << "," << edge->divide;
+        out << "," << edge->getDivide();
         //エッジ寄せ係数
-        out << "," << edge->grading;
+        out << "," << edge->getGrading();
         //詳細表示
         out << "," << edge->isVisibleDetail();
         //改行
@@ -49,9 +49,9 @@ bool CadModelCore::ExportFoamFile(QString filename)const{
             out << "," << IndexOf(this->Edges,face->edges[i]);
         }
         //境界名
-        out << "," << face->name.toStdString();
+        out << "," << face->getName().toStdString();
         //境界タイプ
-        out << "," << Boundary::BoundaryTypeToString(face->boundary).toStdString();
+        out << "," << Boundary::BoundaryTypeToString(face->getBoundary()).toStdString();
         //詳細表示
         out << "," << face->isVisibleDetail();
         //改行
@@ -139,9 +139,9 @@ bool CadModelCore::ImportFoamFile(QString filename){
                 }
             }
             //分割数取得
-            make->divide  = sl[sl.size()-3].toInt();
+            make->setDivide(sl[sl.size()-3].toInt());
             //分割数取得
-            make->grading = sl[sl.size()-2].toDouble();
+            make->setGrading(sl[sl.size()-2].toDouble());
             //詳細表示取得
             make->SetVisibleDetail(sl[sl.size()-1]=="1");
             //モデルに追加
@@ -159,19 +159,19 @@ bool CadModelCore::ImportFoamFile(QString filename){
         //エッジ取得
         CFace* make = new CFace();
         QStringList sl = QString(str.c_str()).split(',');
+        QVector<CEdge*> ee;
         for(int j = 1;j<sl.size()-3;j++){
-            make->edges.push_back(this->Edges[sl[j].toInt()]);
+            ee.push_back(this->Edges[sl[j].toInt()]);
         }
+        make->Create(ee);//作成
+
         //境界名
-        make->name = sl[sl.size()-3];
+        make->setName(sl[sl.size()-3]);
         //境界名
-        make->boundary = Boundary::StringToBoundaryType(sl[sl.size()-2]);
+        make->setBoundary(Boundary::StringToBoundaryType(sl[sl.size()-2]));
         //詳細表示取得
         make->SetVisibleDetail(sl[sl.size()-1]=="1");
 
-        //エッジ情報更新
-        make->ReorderEdges();
-        make->RecalcMesh();
         //モデルに追加
         this->Faces.push_back(make);
     }

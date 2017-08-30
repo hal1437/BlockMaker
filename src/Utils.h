@@ -63,6 +63,19 @@ T Mod(T lhs,const U& rhs){
     return lhs - rhs * static_cast<int>(lhs/rhs);
 }
 
+//Changeシグナル対象変数マクロ
+#define OBSERVE_MEMBER(TYPE,NAME)             \
+protected:                                    \
+    TYPE NAME;                                \
+public:                                       \
+    TYPE get##NAME()const{return this->NAME;} \
+    void set##NAME(const TYPE& v){            \
+        if(this->NAME != v){                  \
+            this->NAME = v;                   \
+            emit Changed(this);               \
+        }                                     \
+    }                                         \
+
 //フラグ定義
 #define DEFINE_FLAG(NAME,DEFAULT)                    \
 private:                                             \
@@ -70,6 +83,8 @@ private:                                             \
 public:                                              \
     virtual void Set##NAME(bool flag){NAME = flag;}  \
     virtual bool is##NAME ()const{return NAME;}      \
+
+
 
 //ゲッターセッター定義
 #define CREATEGETTER(TYPE,NAME,VALUE) \

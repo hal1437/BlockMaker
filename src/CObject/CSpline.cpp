@@ -191,8 +191,8 @@ CEdge* CSpline::Clone()const{
     for(int i=0;i<this->GetChildCount();i++){
         ptr->pos.push_back(new CPoint(*dynamic_cast<CPoint*>(dynamic_cast<const CObject*>(this)->GetChild(i)),ptr));
     }
-    ptr->grading = this->grading;
-    ptr->divide  = this->divide;
+    ptr->Grading = this->Grading;
+    ptr->Divide  = this->Divide;
     return ptr;
 }
 

@@ -235,11 +235,12 @@ void MainWindow::MakeBlock(){
 }
 void MainWindow::MakeFace(){
     CFace* face = new CFace(this);
+    QVector<CEdge*> ee;
+
     for(QObject* obj: this->model->GetSelected()){
-        face->edges.push_back(dynamic_cast<CEdge*>(obj));
+        ee.push_back(dynamic_cast<CEdge*>(obj));
     }
-    face->ReorderEdges();
-    face->RecalcMesh();
+    face->Create(ee);
     this->model->AddFaces(face);
     this->model->GetSelected().clear();//選択解除
 }

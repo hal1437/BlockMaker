@@ -11,11 +11,11 @@
 
 #define DEFINE_BOX_DIALOG_NAME_SLOTS(DIR,INDEX)   \
     void Set##DIR##Name(QString name){            \
-        this->block->GetFaceFormDir(DIR)->name = name;\
+        this->block->GetFaceFormDir(DIR)->setName(name);\
     }
 #define DEFINE_BOX_DIALOG_TYPE_SLOTS(DIR,INDEX)                       \
     void Set##DIR##Type(QString name){                                \
-        this->block->GetFaceFormDir(DIR)->boundary = Boundary::StringToBoundaryType(name); \
+        this->block->GetFaceFormDir(DIR)->setBoundary(Boundary::StringToBoundaryType(name)); \
     }
 
 

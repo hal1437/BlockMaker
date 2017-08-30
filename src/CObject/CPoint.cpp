@@ -28,7 +28,7 @@ void CPoint::MoveRelative(const Pos& diff){
     if(isLock() == false && !isControlPoint() && !this->isMoving()){
         this->SetMoving(true);  //再帰呼び出し制限
         *this += diff;//移動
-        emit Moved(this);
+        emit Changed(this);
         this->SetMoving(false); //再帰呼び出し制限解除
     }
 }

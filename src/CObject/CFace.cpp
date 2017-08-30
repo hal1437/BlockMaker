@@ -51,6 +51,15 @@ bool CFace::Creatable(QVector<CObject*> lines){
 
     return true;
 }
+void CFace::Create(QVector<CEdge*> edges){
+    this->edges = edges;
+    this->ReorderEdges();
+    this->RecalcMesh();
+    for(CEdge* e :this->edges){
+        this->ObserveChild(e);
+    }
+}
+
 
 bool CFace::isComprehension(Pos pos)const{
     if(this->edges.size()<3)return true;
@@ -299,7 +308,6 @@ void CFace::ReorderEdges(){
     //整合確認
     for(int i=0;i<this->edges.size();i++){
         ans.push_back(this->GetEdgeSequence(i));
-        qDebug() << this->GetPointSequence(i);
     }
     this->edges = ans;
 
@@ -307,7 +315,6 @@ void CFace::ReorderEdges(){
     this->reorder.resize(this->edges.size());
     for(int i=0;i<this->edges.size();i++){
         //反転確認
-        qDebug() << this->GetPointSequence(i);
         CPoint* pp = this->GetPointSequence(i);
         if     (pp == this->edges[i]->start)this->reorder[i] =  1;
         else if(pp == this->edges[i]->end  )this->reorder[i] = -1;
@@ -318,8 +325,8 @@ void CFace::ReorderEdges(){
 }
 void CFace::RecalcMesh(){
     //メッシュ分割描画
-    int u_max = std::min(this->GetEdge(0)->divide,this->GetEdge(2)->divide)+1;//u方向分割
-    int v_max = std::min(this->GetEdge(1)->divide,this->GetEdge(3)->divide)+1;//v方向分割
+    int u_max = std::min(this->GetEdge(0)->getDivide(),this->GetEdge(2)->getDivide())+1;//u方向分割
+    int v_max = std::min(this->GetEdge(1)->getDivide(),this->GetEdge(3)->getDivide())+1;//v方向分割
     if(u_max < 2)u_max = 2;
     if(v_max < 2)v_max = 2;
 
@@ -367,8 +374,8 @@ Pos      CFace::GetEdgeMiddle(int index,double t)const{
     else                          return this->GetEdge(index)->GetMiddleDivide(t);
 }
 double   CFace::GetGrading(int index)const{
-    if(this->reorder[index] == -1)return (1/this->GetEdge(index)->grading);
-    else                          return (  this->GetEdge(index)->grading);
+    if(this->reorder[index] == -1)return (1/this->GetEdge(index)->getGrading());
+    else                          return (  this->GetEdge(index)->getGrading());
 }
 
 Pos CFace::GetNearPos (const Pos&)const{
@@ -392,17 +399,29 @@ CObject* CFace::Clone()const{
             if(*new_obj->GetEdge(i)->end   == *new_obj->GetEdge(j)->end  )new_obj->GetEdge(j)->end   = new_obj->GetEdge(i)->end;
         }
     }
-    new_obj->name     = this->name;
-    new_obj->boundary = this->boundary;
+    new_obj->Name = this->Name;
+    new_obj->Boundary = this->Boundary;
     return new_obj;
 }
 
 CFace::CFace(QObject* parent):
     CObject(parent)
 {
+    this->Name = "Noname";
+    this->Boundary = Boundary::Type::none;
 }
 
-CFace::~CFace()
-{
+CFace::~CFace(){}
+
+void CFace::ChangeChildCallback(CObject* edge){
+    //対角エッジの分割数同期
+    for(int i=0;i<edges.size();i++){
+        if(this->edges[i] == edge){
+            this->edges[(i+2)%edges.size()]->setDivide(dynamic_cast<CEdge*>(edge)->getDivide());
+        }
+    }
+    //
+    //メッシュ再計算
+    this->RecalcMesh();
 }
 

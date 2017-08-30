@@ -2,43 +2,20 @@
 
 double   CObject::drawing_scale;
 
-
-
 void CObject::ObserveChild(CObject* obj){
     //コールバック接続
     if(obj != nullptr){
-        connect(obj,SIGNAL(Moved(CObject*)),this,SLOT(ChangeChildHandler(CObject*)));
+        connect(obj,SIGNAL(Changed(CObject*)),this,SLOT(ChangeChildCallback(CObject*)));
     }
 }
 
 void CObject::IgnoreChild(CObject* obj){
     //コールバック接続解除
     if(obj != nullptr){
-        disconnect(obj,SIGNAL(Moved(CObject*)),this,SLOT(ChangeChildHandler(CObject*)));
+        disconnect(obj,SIGNAL(Changed(CObject*)),this,SLOT(ChangeChildCallback(CObject*)));
     }
 }
 
-
-/*
-void CObject::MoveAbsolute(const Pos& diff){
-    QVector<CPoint*> children = this->GetAllChildren();
-    Pos sum;//平均値
-    for(CPoint* p : children){
-        sum = sum + *reinterpret_cast<Pos*>(p);
-    }
-    sum /= children.size();
-
-    //平均値との差分だけ移動
-    for(CPoint*& p : children){
-        p->MoveRelative(sum - diff);
-    }
-}
-void CObject::MoveRelative(const Pos& diff){
-    QVector<CPoint*> children = this->GetAllChildren();
-    for(CPoint*& p : children){
-        p->MoveRelative(diff);
-    }
-}*/
 bool CObject::isSelectable(Pos pos)const{
     return Pos(this->GetNearPos(pos) - pos).Length() < CObject::COLLISION_SIZE / drawing_scale;
 }
@@ -64,19 +41,16 @@ QVector<CPoint *> CObject::GetAllChildren(){
 
 CObject::CObject(QObject* parent):QObject(parent)
 {
-
+    connect(this,SIGNAL(Changed(CObject*)),this,SLOT(ChangeChildHandler(CObject*)));
 }
 
-CObject::~CObject()
-{
-
-}
+CObject::~CObject(){}
 
 void CObject::ChangeChildCallback(CObject*){
+    qDebug() << "call";
 }
 
-void CObject::ChangeChildHandler(CObject* obj){
-    ChangeChildCallback(obj);
-    emit Moved();
+void CObject::ChangeChildHandler(CObject* ){
+    emit Changed();
 }
 

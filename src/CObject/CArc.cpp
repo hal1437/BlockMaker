@@ -67,7 +67,6 @@ void     CArc::SetChild(int index,CObject* obj){
     if(index == 1)this->center = dynamic_cast<CPoint*>(obj);
     if(index == 2)this->end    = dynamic_cast<CPoint*>(obj);
     ObserveChild(this->GetChild(index));
-
 }
 
 int CArc::GetChildCount()const{
@@ -101,8 +100,8 @@ CEdge* CArc::Clone()const{
     ptr->start  = new CPoint(*this->start ,ptr);
     ptr->end    = new CPoint(*this->end   ,ptr);
     ptr->center = new CPoint(*this->center,ptr);
-    ptr->grading = this->grading;
-    ptr->divide  = this->divide;
+    ptr->Grading = this->Grading;
+    ptr->Divide  = this->Divide;
     return ptr;
 }
 
@@ -142,6 +141,7 @@ void CArc::ChangeChildCallback(CObject* child){
         round = (*this->end - *this->center).Length();
         this->start->MoveAbsolute((*this->start - *this->center).GetNormalize() * round + *this->center);
     }
+    emit Changed(this);
 }
 
 

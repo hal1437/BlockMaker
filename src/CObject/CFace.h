@@ -31,17 +31,18 @@ class CFace : public CObject
 public:
     static CFace* base[3]; //正面,平面,右側面
 
-    QVector<CEdge*> edges;   // 構成線
-    QString name = "Noname"; // 境界名
-    Boundary::Type boundary = Boundary::Type::none; // 境界タイプ
-    DEFINE_FLAG(VisibleDetail,true) //分割フレーム表示
-    DEFINE_FLAG(Polygon,true)       //ポリゴン判定
+    QVector<CEdge*> edges;                  // 構成線
+    OBSERVE_MEMBER(QString,Name)            // 境界名
+    OBSERVE_MEMBER(Boundary::Type,Boundary) // 境界タイプ
+    DEFINE_FLAG(VisibleDetail,true)         // 分割フレーム表示
+    DEFINE_FLAG(Polygon,true)               // ポリゴン判定
 
     QVector<int> reorder;//エッジ反転係数
     QVector<QVector<Pos>> mesh_memory;//メッシュ分割位置記録二次元配列
 public:
     //面が作成可能か
     static  bool Creatable(QVector<CObject*> lines);
+    virtual void Create(QVector<CEdge*> edges);     //作成
 
     virtual void DrawGL(Pos camera,Pos center)const; //三次元描画関数
     virtual bool DrawNormArrowGL()const;             //三次元法線ベクトル描画関数
@@ -82,6 +83,10 @@ public:
 
     CFace(QObject* parent=nullptr);
     ~CFace();
+
+public slots:
+    //線移動コールバック
+    virtual void ChangeChildCallback(CObject* egde);
 };
 
 #endif // CFACE_H

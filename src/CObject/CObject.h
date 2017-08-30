@@ -46,7 +46,6 @@ protected:
     void IgnoreChild (CObject* obj);
 
 public:
-
     //型判別
     template<class T>
     bool is()const {
@@ -79,14 +78,14 @@ public:
 
 signals:
     //移動シグナル
-    void Moved();
-    void Moved(CObject* child);
+    void Changed();
+    void Changed(CObject* child);
 
 public slots:
     //子変更コールバック
     virtual void ChangeChildCallback(CObject* child);
 
-private slots:
+protected slots:
     //引数有りから無しを呼び出す
     void ChangeChildHandler(CObject* obj);
 };

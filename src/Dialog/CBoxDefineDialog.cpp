@@ -114,8 +114,8 @@ QString CBoxDefineDialog::FormatError()const{
 void CBoxDefineDialog::ExportCBlock(){
     for(int i=0;i<6;i++){
         BoundaryDir dir = static_cast<BoundaryDir>(i);
-        this->block->GetFaceFormDir(static_cast<BoundaryDir>(i))->boundary = this->GetBoundaryType(dir);
-        this->block->GetFaceFormDir(static_cast<BoundaryDir>(i))->name     = this->GetBoundaryName(dir);
+        this->block->GetFaceFormDir(static_cast<BoundaryDir>(i))->setBoundary(this->GetBoundaryType(dir));
+        this->block->GetFaceFormDir(static_cast<BoundaryDir>(i))->setName    (this->GetBoundaryName(dir));
     }
     this->block->div[0] = this->ui->XspinBox->value();
     this->block->div[1] = this->ui->YspinBox->value();
@@ -131,9 +131,9 @@ void CBoxDefineDialog::ImportCBlock(){
     //面の設定
     for(int i = 0;i<6;i++){
         CFace* face = this->block->GetFaceFormDir(static_cast<BoundaryDir>(i));
-        this->ConvertDirToNameEdit(static_cast<BoundaryDir>(i))->setText(face->name);
-        this->ConvertDirToCombo   (static_cast<BoundaryDir>(i))->setCurrentText(Boundary::BoundaryTypeToString(face->boundary));
-        types_log[i] = face->boundary;
+        this->ConvertDirToNameEdit(static_cast<BoundaryDir>(i))->setText(face->getName());
+        this->ConvertDirToCombo   (static_cast<BoundaryDir>(i))->setCurrentText(Boundary::BoundaryTypeToString(face->getBoundary()));
+        types_log[i] = face->getBoundary();
     }
     this->ui->XspinBox->setValue(this->block->div[0] == 0 ? 10 :this->block->div[0]);
     this->ui->YspinBox->setValue(this->block->div[1] == 0 ? 10 :this->block->div[1]);
@@ -239,8 +239,8 @@ void CBoxDefineDialog::AcceptProxy(){
         //値の代入
         for(int i=0;i<6;i++){
             BoundaryDir dir = static_cast<BoundaryDir>(i);
-            this->block->GetFaceFormDir(static_cast<BoundaryDir>(i))->boundary = this->GetBoundaryType(dir);
-            this->block->GetFaceFormDir(static_cast<BoundaryDir>(i))->name     = this->GetBoundaryName(dir);
+            this->block->GetFaceFormDir(static_cast<BoundaryDir>(i))->setBoundary(this->GetBoundaryType(dir));
+            this->block->GetFaceFormDir(static_cast<BoundaryDir>(i))->setName    (this->GetBoundaryName(dir));
         }
         this->block->div[0] = this->ui->XspinBox->value();
         this->block->div[1] = this->ui->YspinBox->value();
@@ -255,13 +255,13 @@ void CBoxDefineDialog::AcceptProxy(){
         //境界条件Noneを他のBlockに伝達
         for(int i =0;i<6;i++){
             CFace* face = this->block->GetFace(static_cast<BoundaryDir>(i));
-            if(face->boundary == Boundary::Type::none){
+            if(face->getBoundary() == Boundary::Type::none){
                 CFace* face = this->block->GetFaceFormDir(static_cast<BoundaryDir>(i));
                 for(CBlock* block:this->model->GetParent(face)){
                     for(int j=0;j<6;j++){
                         if(block->GetFaceFormDir(static_cast<BoundaryDir>(j)) == face){
-                            face->boundary = Boundary::Type::none;
-                            face->name    = "連続面";
+                            face->setBoundary(Boundary::Type::none);
+                            face->setName    ("連続面") ;
                         }
                     }
                 }

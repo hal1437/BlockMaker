@@ -112,7 +112,7 @@ Pos CBlock::GetDivisionPoint(int edge_index,int count_index)const{
 
     //エッジからpとLを抽出
     CEdge *edge =  this->GetEdgeSequence(edge_index);
-    p = edge->grading;
+    p = edge->getGrading();
     L = (*edge->end - *edge->start).Length();
 
     //指数関数パラメータ計算
