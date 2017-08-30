@@ -230,7 +230,7 @@ void CFace::DrawGL(Pos,Pos)const{
         if(this->isFaceBlend()){
             glDepthMask(GL_FALSE);
         }else{
-            glColor4f(0.7,0.7,0.9, 1);
+            glColor4f(0.5,0.5,0.6, 1);
             glDepthMask(GL_TRUE);
         }
 
@@ -395,18 +395,20 @@ Pos CFace::GetNearLine(const Pos& ,const Pos& )const{
 
 CObject* CFace::Clone()const{
     CFace* new_obj = new CFace();
+    QVector<CEdge*> edges;
     for(CEdge* edge:this->edges){
-        new_obj->edges.push_back(dynamic_cast<CEdge*>(edge->Clone()));
+        edges.push_back(dynamic_cast<CEdge*>(edge->Clone()));
     }
     //構成点マージ
-    for(int i=0;i<new_obj->GetChildCount();i++){
-        for(int j=0;j<new_obj->GetChildCount();j++){
-            if(*new_obj->GetEdge(i)->start == *new_obj->GetEdge(j)->start)new_obj->GetEdge(j)->start = new_obj->GetEdge(i)->start;
-            if(*new_obj->GetEdge(i)->start == *new_obj->GetEdge(j)->end  )new_obj->GetEdge(j)->end   = new_obj->GetEdge(i)->start;
-            if(*new_obj->GetEdge(i)->end   == *new_obj->GetEdge(j)->start)new_obj->GetEdge(j)->start = new_obj->GetEdge(i)->end;
-            if(*new_obj->GetEdge(i)->end   == *new_obj->GetEdge(j)->end  )new_obj->GetEdge(j)->end   = new_obj->GetEdge(i)->end;
+    for(CEdge* e1: edges){
+        for(CEdge* e2: edges){
+            if(*e1->start == *e2->start)e2->start = e1->start;
+            if(*e1->start == *e2->end  )e2->end   = e1->start;
+            if(*e1->end   == *e2->start)e2->start = e1->end;
+            if(*e1->end   == *e2->end  )e2->end   = e1->end;
         }
     }
+    new_obj->Create(edges);
     new_obj->Name = this->Name;
     new_obj->Boundary = this->Boundary;
     return new_obj;

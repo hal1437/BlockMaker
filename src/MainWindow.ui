@@ -425,6 +425,10 @@
    </property>
   </action>
   <action name="actionProperty">
+   <property name="icon">
+    <iconset resource="../Resource/images.qrc">
+     <normaloff>:/ToolImages/Property.png</normaloff>:/ToolImages/Property.png</iconset>
+   </property>
    <property name="text">
     <string>Property</string>
    </property>
