@@ -3,8 +3,11 @@
 bool CBlock::Creatable(QVector<CObject*> values){
     if(values.size()==1 && values[0]->is<CBlock>())return true;
 
+    //全てがCFaceである
     if(std::any_of(values.begin(),values.end(),[](CObject* p){return !p->is<CFace>();}))return false;
-    if(values.size() < 6)return false;
+
+    //6面存在する
+    if(values.size() != 6)return false;
 
     //閉じた立体テスト
     std::map<CPoint*,int> point_maps;
@@ -14,10 +17,16 @@ bool CBlock::Creatable(QVector<CObject*> values){
             point_maps[e->end]++;
         }
     }
-    //全て6
     if(!std::all_of(point_maps.begin(),point_maps.end(),[](std::pair<CObject*,int> c){return c.second==6;}))return false;
 
     return true;
+}
+void CBlock::Create(QVector<CFace*> faces){
+    this->faces = faces;
+    for(CFace* f :this->faces){
+        f->SetFaceBlend(false); //面を非透過に
+        this->ObserveChild(f);  //監視
+    }
 }
 
 CPoint* CBlock::GetBasePoint()const{
@@ -154,6 +163,7 @@ double CBlock::GetLengthZ(){
 }
 void CBlock::DrawGL(Pos,Pos)const{
     if(!this->isVisible())return;
+    /*
     //薄い色に変更
     float oldColor[4];
     glGetFloatv(GL_CURRENT_COLOR,oldColor);
@@ -180,6 +190,7 @@ void CBlock::DrawGL(Pos,Pos)const{
     }
     //色を復元
     glColor4f(oldColor[0],oldColor[1],oldColor[2], oldColor[3]);
+    */
     return;
 }
 
@@ -315,26 +326,8 @@ int CBlock::GetChildCount()const{
     return this->faces.size();
 }
 
-
-void CBlock::RefreshDividePoint(){
-
-    //更新
-    this->div_pos.clear();
-    this->div_pos.resize(12);
-    for(int i=0;i<12;i++){
-        QVector<Pos> pos;
-        int div_index[] = {0,1,0,1,0,1,0,1,2,2,2,2};
-        for(int j=0;j<this->div[div_index[i]];j++){
-            //線の分割描画
-             pos.push_back(this->GetDivisionPoint(i,j));
-        }
-        this->div_pos[i] = pos;
-    }
-}
-
-
-
 void CBlock::ReorderEdges(){
+    /*
     //エッジ並び替え
     for(int i=0;i<12;i++){
         CEdge* edge = this->GetEdgeSequence(i);
@@ -345,7 +338,7 @@ void CBlock::ReorderEdges(){
         if((*edge->end - *edge->start).DotPos(base) < 0){
             std::swap(edge->start , edge->end);
         }
-    }
+    }*/
 }
 
 CObject* CBlock::Clone()const{

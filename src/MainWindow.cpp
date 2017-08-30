@@ -199,11 +199,12 @@ void MainWindow::MakeRestraint(){
 }
 
 void MainWindow::MakeBlock(){
-    CBoxDefineDialog* diag = new CBoxDefineDialog();
+    //CBoxDefineDialog* diag = new CBoxDefineDialog();
 
-    diag->SetModel(this->model);
+    //diag->SetModel(this->model);
 
     //すでに作成済みのブロックであれば
+    /*
     if(this->model->GetSelected().size() == 1 && this->model->GetSelected()[0]->is<CBlock>()){
         //定義編集
         diag->block = dynamic_cast<CBlock*>(this->model->GetSelected()[0]);
@@ -214,9 +215,10 @@ void MainWindow::MakeBlock(){
         for(QObject* obj: this->model->GetSelected()){
             block->faces.push_back(dynamic_cast<CFace*>(obj));
         }
+
         //コネクト
         for(int i=0;i<12;i++){
-            connect(block->GetPointSequence(i),SIGNAL(Moved()),block,SLOT(RefreshDividePoint()));
+            connect(block->GetPointSequence(i),SIGNAL(Changed()),block,SLOT(RefreshDividePoint()));
         }
         diag->block = block;
         diag->ImportCBlock();
@@ -230,7 +232,18 @@ void MainWindow::MakeBlock(){
             this->model->AddBlocks(diag->block);
         }
         this->model->SelectedClear();//選択解除
+    }*/
+
+    CBlock* block = new CBlock(this);
+
+    QVector<CFace*> faces;
+    for(CObject* obj:this->model->GetSelected()){
+        faces.push_back(dynamic_cast<CFace*>(obj));
     }
+
+    block->Create(faces);
+    this->model->AddBlocks(block);
+
     RefreshUI();
 }
 void MainWindow::MakeFace(){

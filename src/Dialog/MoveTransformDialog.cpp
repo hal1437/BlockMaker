@@ -76,7 +76,7 @@ void MoveTransformDialog::Accept(){
         AbsoluteMove(value);
     }
     for(CBlock* block:this->model->GetBlocks()){
-        block->RefreshDividePoint();
+        //block->RefreshDividePoint();
     }
     emit RepaintRequest();
 }

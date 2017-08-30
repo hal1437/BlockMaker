@@ -32,7 +32,6 @@ public:
 public:
     int div[3];               // 分割数
 private:
-    QVector<QVector<Pos>> div_pos; //分割位置 (エッジ番号,分割数)
     DEFINE_FLAG(VisibleDetail,true)//分割フレーム表示
 
 private:
@@ -42,6 +41,8 @@ private:
 public:
     //立体が作成可能か
     static bool Creatable(QVector<CObject* > values);
+    virtual void Create(QVector<CFace*> faces);     //作成
+
     void DrawGL(Pos camera,Pos center)const; //三次元描画関数
 
     //インデックス取得
@@ -79,8 +80,6 @@ public:
     CBlock(QObject* parent=nullptr);
     virtual ~CBlock();
 
-public slots:
-    void RefreshDividePoint();//div_pos再計算
 };
 
 #endif // CBLOCK_H

@@ -225,36 +225,25 @@ void CFace::DrawGL(Pos,Pos)const{
         //薄い色に変更
         float currentColor[4];
         glGetFloatv(GL_CURRENT_COLOR,currentColor);
-        glColor4f(currentColor[0],currentColor[1],currentColor[2], 0.1);
-        glDepthMask(GL_FALSE);
 
-        //塗りつぶし描画
-        for(double i=0;i<this->mesh_memory.size()-1;i++){//u方向ループ
-            for(double j=0;j<this->mesh_memory.first().size()-1;j++){//v方向ループ
-                glBegin(GL_QUADS);
-                Pos pp[4] = {
-                    this->mesh_memory[i][j],
-                    this->mesh_memory[i+1][j],
-                    this->mesh_memory[i+1][j+1],
-                    this->mesh_memory[i][j+1],
-                };
-                for(int k=0;k<4;k++){
-                    glVertex3f(pp[k].x(),pp[k].y(),pp[k].z());
-                }
-                glEnd();
-            }
+        glColor4f(currentColor[0],currentColor[1],currentColor[2], 0.1);
+        if(this->isFaceBlend()){
+            glDepthMask(GL_FALSE);
+        }else{
+            glColor4f(0.7,0.7,0.9, 1);
+            glDepthMask(GL_TRUE);
         }
-        glEnd();
-        glDepthMask(GL_TRUE);
+
+        //面描画
+        DrawFillGL();
 
         //色を復元
         glColor4f(currentColor[0],currentColor[1],currentColor[2], currentColor[3]);
-        //メッシュ描画
-        this->DrawMeshGL();
-
+        //分割メッシュ描画
+        if(this->isVisibleDetail())this->DrawMeshGL();
     }else{
 
-        //外枠
+        //外枠のみ
         glBegin(GL_LINE_LOOP);
         for(int i=0;i<this->edges.size();i++){
             glVertex3f(this->GetPointSequence(i)->x(),this->GetPointSequence(i)->y(), this->GetPointSequence(i)->z());
@@ -264,6 +253,7 @@ void CFace::DrawGL(Pos,Pos)const{
 
 }
 bool CFace::DrawNormArrowGL()const{
+    /* 適切な値を示さない可能性アリ */
     Pos center;
     for(int i=0;i<this->edges.size();i++){
         center += *this->GetPointSequence(i);
@@ -275,6 +265,26 @@ bool CFace::DrawNormArrowGL()const{
     glVertex3f((center+this->GetNorm()*100).x(),(center+this->GetNorm()*100).y(), (center+this->GetNorm()*100).z());
     glEnd();
     return true;
+}
+void CFace::DrawFillGL()const{
+    //塗りつぶし描画
+    for(double i=0;i<this->mesh_memory.size()-1;i++){//u方向ループ
+        for(double j=0;j<this->mesh_memory.first().size()-1;j++){//v方向ループ
+            glBegin(GL_QUADS);
+            Pos pp[4] = {
+                this->mesh_memory[i][j],
+                this->mesh_memory[i+1][j],
+                this->mesh_memory[i+1][j+1],
+                this->mesh_memory[i][j+1],
+            };
+            for(int k=0;k<4;k++){
+                glVertex3f(pp[k].x(),pp[k].y(),pp[k].z());
+            }
+            glEnd();
+        }
+    }
+    glEnd();
+
 }
 void CFace::DrawMeshGL()const{
     //u方向
@@ -299,8 +309,6 @@ void CFace::DrawMeshGL()const{
 
         }
     }
-
-
 }
 
 void CFace::ReorderEdges(){

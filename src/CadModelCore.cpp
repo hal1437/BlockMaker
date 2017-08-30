@@ -196,7 +196,7 @@ bool CadModelCore::ImportFoamFile(QString filename){
         //詳細表示取得
         make->SetVisibleDetail(sl[sl.size()-1]=="1");
         //再編成
-        make->RefreshDividePoint();
+        //make->RefreshDividePoint();
         make->ReorderEdges();
         //モデルに追加
         this->Blocks.push_back(make);

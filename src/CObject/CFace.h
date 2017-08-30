@@ -36,6 +36,7 @@ public:
     OBSERVE_MEMBER(Boundary::Type,Boundary) // 境界タイプ
     DEFINE_FLAG(VisibleDetail,true)         // 分割フレーム表示
     DEFINE_FLAG(Polygon,true)               // ポリゴン判定
+    DEFINE_FLAG(FaceBlend,true)             // 面透過判定
 
     QVector<int> reorder;//エッジ反転係数
     QVector<QVector<Pos>> mesh_memory;//メッシュ分割位置記録二次元配列
@@ -46,6 +47,7 @@ public:
 
     virtual void DrawGL(Pos camera,Pos center)const; //三次元描画関数
     virtual bool DrawNormArrowGL()const;             //三次元法線ベクトル描画関数
+    virtual void DrawFillGL()const;                  //三次元面描画関数
     virtual void DrawMeshGL()const;                  //三次元メッシュ関数
 
     virtual bool isComprehension(Pos pos)const; //平面上かチェックする。

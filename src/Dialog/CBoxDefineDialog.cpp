@@ -125,7 +125,7 @@ void CBoxDefineDialog::ExportCBlock(){
         //this->block->grading_args.push_back(this->grading_args[i]->value());
     }
     this->block->ReorderEdges();
-    this->block->RefreshDividePoint();
+    //this->block->RefreshDividePoint();
 }
 void CBoxDefineDialog::ImportCBlock(){
     //面の設定
@@ -250,7 +250,7 @@ void CBoxDefineDialog::AcceptProxy(){
         /*for(int i=0;i<this->block->grading_args.size();i++){
             this->block->grading_args[i] = this->grading_args[i]->value();
         }*/
-        this->block->RefreshDividePoint();
+        //this->block->RefreshDividePoint();
 
         //境界条件Noneを他のBlockに伝達
         for(int i =0;i<6;i++){
