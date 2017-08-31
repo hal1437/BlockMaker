@@ -186,8 +186,9 @@ bool CadModelCore::ImportFoamFile(QString filename){
         CBlock* make = new CBlock();
         QStringList sl = QString(str.c_str()).split(',');
         int j=1;
+        QVector<CFace*> faces;
         for(int i=0;i<6;i++,j++){
-            make->faces.push_back(this->Faces[sl[j].toInt()]);
+            faces.push_back(this->Faces[sl[j].toInt()]);
         }
         //分割数
         for(int i=0;i<3;i++,j++){
@@ -195,8 +196,8 @@ bool CadModelCore::ImportFoamFile(QString filename){
         }
         //詳細表示取得
         make->SetVisibleDetail(sl[sl.size()-1]=="1");
+        make->Create(faces);
         //再編成
-        //make->RefreshDividePoint();
         make->ReorderEdges();
         //モデルに追加
         this->Blocks.push_back(make);

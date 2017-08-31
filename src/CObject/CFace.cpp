@@ -230,8 +230,11 @@ void CFace::DrawGL(Pos,Pos)const{
         if(this->isFaceBlend()){
             glDepthMask(GL_FALSE);
         }else{
-            glColor4f(0.5,0.5,0.6, 1);
             glDepthMask(GL_TRUE);
+            glColor4f(currentColor[0] * 0.2 + 0.5,
+                      currentColor[1] * 0.2 + 0.5,
+                      currentColor[2] * 0.2 + 0.6,
+                      1.0);
         }
 
         //面描画
@@ -250,6 +253,7 @@ void CFace::DrawGL(Pos,Pos)const{
         }
         glEnd();
     }
+    glDepthMask(GL_TRUE);
 
 }
 bool CFace::DrawNormArrowGL()const{

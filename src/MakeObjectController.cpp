@@ -49,6 +49,10 @@ CREATE_RESULT MakeObjectController::MakeJoint(CEdge* obj,Pos pos,CObject* merge)
     }else{
         //mergeの近接点を作成
         new_point = new CPoint(merge->GetNearPos(pos));
+        //モデルに追加
+        this->model->AddPoints(new_point);
+        //生成点を持つ
+        this->last_point = new_point;
     }
 
     //実行
@@ -69,15 +73,16 @@ void MakeObjectController::StartMaking(MAKE_OBJECT type,Pos pos,CObject* merge){
 
         //すでに点が存在していれば
         if(merge == nullptr){
-            //新しく点を作成
-            CPoint* new_pos = new CPoint(pos,this->making_object);
-
-            //startを作成する。
-            this->making_object->Create(new_pos);
-            this->model->AddPoints(new_pos);
+            MakeJoint(this->making_object,pos,merge);
         }else{
             //mergeをstartとして作成する。
-            this->making_object->Create(dynamic_cast<CPoint*>(merge));
+            if(merge->is<CPoint>()){
+                this->making_object->Create(dynamic_cast<CPoint*>(merge));
+            }else{
+                CPoint* new_pos = new CPoint(this->making_object->GetNearPos(pos), this->making_object);
+                this->making_object->Create(dynamic_cast<CPoint*>(new_pos));
+                this->model->AddPoints(new_pos);
+            }
         }
 
         //新しく持ち点を追加

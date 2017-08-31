@@ -1,7 +1,5 @@
 #include "CSpline.h"
 
-
-
 //スプラインデータ初期化
 void Spline::init(std::vector<double> sp)
 {
@@ -56,7 +54,7 @@ double Spline::culc(double t)const
 
 
 CREATE_RESULT CSpline::Create(CPoint *pos){
-    connect(pos,SIGNAL(Moved(CObject*)),this,SLOT(ChangeChildHandler(CObject*)));
+    this->ObserveChild(pos);
     if(this->start == nullptr){
         this->start = pos;
     }else if(this->end == nullptr){

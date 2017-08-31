@@ -299,7 +299,6 @@ void SolidEditForm::paintGL(){
         glEnd();
     }
 
-
     glFlush();
 }
 

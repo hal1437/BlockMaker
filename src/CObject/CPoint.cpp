@@ -1,5 +1,7 @@
 #include "CPoint.h"
 
+CPoint* CPoint::origin;
+
 CREATE_RESULT CPoint::Create(CPoint *pos){
     this->x() = pos->x();
     this->y() = pos->y();
@@ -9,7 +11,7 @@ CREATE_RESULT CPoint::Create(CPoint *pos){
 void CPoint::DrawGL(Pos camera,Pos center)const{
     if(!this->isVisible())return;
     glBegin(GL_LINE_LOOP);
-    Pos cc = camera- center;
+    Pos cc = camera - center;
     double theta1 = std::atan2(cc.y(),std::sqrt(cc.x()*cc.x()+cc.z()*cc.z()));
     double theta2 = std::atan2(-cc.x(),cc.z());
     //円の描画
