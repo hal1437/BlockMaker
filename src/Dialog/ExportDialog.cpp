@@ -91,28 +91,19 @@ void ExportDialog::Export(QString filename)const{
 
         //分割数
         QVector<int> div_indices;
-        for(int i=0;i<3;i++){
-            div_indices.push_back(block->div[i]);
-        }
+        div_indices.push_back(block->GetEdgeSequence(0)->getDivide());
+        div_indices.push_back(block->GetEdgeSequence(3)->getDivide());
+        div_indices.push_back(block->GetEdgeSequence(8)->getDivide());
         file.OutVectorInline(div_indices);
 
         //分割パラメータ
         QVector<double> grading_args;
-        /*
-        if(block->grading == GradingType::SimpleGrading){
-            file.OutStringInline("simpleGrading");
-            for(int i=0;i<3;i++){
-                grading_args.push_back(block->grading_args[i]);
-            }
-            file.OutVectorInline(grading_args);
-        }else if(block->grading == GradingType::EdgeGrading){
-        */
-            file.OutStringInline("edgeGrading");
-            for(int i=0;i<12;i++){
-                //grading_args.push_back(block->grading_args[i]);
-            }
-            file.OutVectorInline(grading_args);
-//        }
+
+        file.OutStringInline("edgeGrading");
+        for(int i=0;i<12;i++){
+            grading_args.push_back(block->GetEdgeSequence(i)->getGrading());
+        }
+        file.OutVectorInline(grading_args);
         file.OutNewline();
     }    
     file.EndScope();
@@ -155,7 +146,7 @@ void ExportDialog::Export(QString filename)const{
     QMap<QString,std::pair<Boundary::Type,QVector<int>>> boundary_list; //(name ,[[index]])
     for(CBlock* block:this->model->GetBlocks()){
         for(int i=0;i<6;i++){
-            CFace* face = block->GetFaceFormDir(static_cast<BoundaryDir>(i));
+            CFace* face = block->GetFace(static_cast<BoundaryDir>(i));
             //頂点番号リスト出力
             QVector<CPoint*> vp = this->GetBoundaryPos(block,static_cast<BoundaryDir>(i));
             for(CPoint* v:vp){

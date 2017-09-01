@@ -25,7 +25,6 @@ SOURCES += src/main.cpp\
     src/CObject/CArc.cpp \
     src/CObject/CSpline.cpp \
     src/CObject/CBlock.cpp \
-    src/Dialog/CBoxDefineDialog.cpp \
     src/Dialog/ExportDialog.cpp \
     src/Dialog/GridFilter.cpp \
     src/Dialog/GridFilterDialog.cpp \
@@ -58,7 +57,6 @@ HEADERS  += src/MainWindow.h \
     src/CObject/CBoxDefineDialog.h \
     src/GridFilter/GridFilter.h \
     src/GridFilter/GridFilterDialog.h \
-    src/Dialog/CBoxDefineDialog.h \
     src/Dialog/ExportDialog.h \
     src/Dialog/GridFilter.h \
     src/Dialog/GridFilterDialog.h \
@@ -79,7 +77,6 @@ HEADERS  += src/MainWindow.h \
 FORMS    += src/MainWindow.ui \
     src/Dialog/SmartDimensionDialog.ui \
     src/Dialog/ExportDialog.ui \
-    src/Dialog/CBoxDefineDialog.ui \
     src/Dialog/MoveTransformDialog.ui \
     src/Dialog/GridFilterDialog.ui \
     src/Dialog/PropertyDefinitionDialog.ui \

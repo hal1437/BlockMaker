@@ -10,7 +10,6 @@
 #include "SolidEditForm.h"
 
 #include "Dialog/SmartDimensionDialog.h"
-#include "Dialog/CBoxDefineDialog.h"
 #include "Dialog/MoveTransformDialog.h"
 #include "Dialog/ExportDialog.h"
 #include "Dialog/GridFilter.h"

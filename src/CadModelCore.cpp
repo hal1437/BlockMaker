@@ -65,7 +65,7 @@ bool CadModelCore::ExportFoamFile(QString filename)const{
         //平面インデックス
         for(int i=0;i< 6;i++)out << "," << IndexOf(this->Faces,block->faces[i]);
         //分割数
-        for(int i=0;i< 3;i++)out << "," << block->div[i];
+        //for(int i=0;i< 3;i++)out << "," << block->div[i];
         //詳細表示
         out << "," << block->isVisibleDetail();
 
@@ -190,15 +190,9 @@ bool CadModelCore::ImportFoamFile(QString filename){
         for(int i=0;i<6;i++,j++){
             faces.push_back(this->Faces[sl[j].toInt()]);
         }
-        //分割数
-        for(int i=0;i<3;i++,j++){
-            make->div[i] = sl[j].toInt();
-        }
         //詳細表示取得
         make->SetVisibleDetail(sl[sl.size()-1]=="1");
         make->Create(faces);
-        //再編成
-        make->ReorderEdges();
         //モデルに追加
         this->Blocks.push_back(make);
     }

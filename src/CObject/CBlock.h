@@ -7,30 +7,11 @@
 #include "CSpline.h"
 #include "CFace.h"
 
-//面の方向
-enum BoundaryDir{
-    Top,
-    Right,
-    Left,
-    Bottom,
-    Front,
-    Back,
-};
-
-//格子点間隔の種類
-enum GradingType{
-    EmptyGrading = 0,
-    SimpleGrading = 1,
-    EdgeGrading = 2,
-};
-
-
 class CBlock : public CObject{
     Q_OBJECT
 public:
     QVector<CFace*> faces;
-public:
-    int div[3];               // 分割数
+
 private:
     DEFINE_FLAG(VisibleDetail,true)//分割フレーム表示
 
@@ -53,7 +34,6 @@ public:
     virtual QVector<CFace* > GetAllFaces()const;  //構成面取得
     virtual CPoint* GetPointSequence(int index) const;//番号順点取得
     virtual CEdge*  GetEdgeSequence (int index) const;//番号順線取得
-    virtual CFace*  GetFaceFormDir(BoundaryDir dir);  //BoundaryDirに基づく面の取得
 
     //子の操作
     virtual CFace*   GetFace (int index);
@@ -72,9 +52,7 @@ public:
     Pos GetNearPos (const Pos& hand)const;
     Pos GetNearLine(const Pos& pos1,const Pos& pos2)const;
 
-    void ReorderEdges();//エッジ並び替え
 public:
-
     virtual CObject* Clone()const;
 
     CBlock(QObject* parent=nullptr);

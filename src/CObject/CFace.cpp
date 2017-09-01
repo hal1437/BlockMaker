@@ -7,6 +7,7 @@ if(COMP == #TYPE)return Boundary::Type::TYPE;
 if(COMP == Boundary::Type::TYPE) return #TYPE;\
 
 Boundary::Type Boundary::StringToBoundaryType(QString str){
+    SWITCHING_STRING_TO_BOUNDARY_TYPE(empty,str)
     SWITCHING_STRING_TO_BOUNDARY_TYPE(patch,str)
     SWITCHING_STRING_TO_BOUNDARY_TYPE(wall,str)
     SWITCHING_STRING_TO_BOUNDARY_TYPE(symmetryPlane,str)
@@ -17,6 +18,7 @@ Boundary::Type Boundary::StringToBoundaryType(QString str){
     return Boundary::Type::none;
 }
 QString Boundary::BoundaryTypeToString(Boundary::Type type){
+    SWITCHING_BOUNDARY_TYPE_TO_STRING(empty        ,type)
     SWITCHING_BOUNDARY_TYPE_TO_STRING(patch        ,type)
     SWITCHING_BOUNDARY_TYPE_TO_STRING(wall         ,type)
     SWITCHING_BOUNDARY_TYPE_TO_STRING(symmetryPlane,type)
@@ -422,7 +424,7 @@ CFace::CFace(QObject* parent):
     CObject(parent)
 {
     this->Name = "Noname";
-    this->Boundary = Boundary::Type::none;
+    this->Boundary = Boundary::Type::empty;
 }
 
 CFace::~CFace(){}

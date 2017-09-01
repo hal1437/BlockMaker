@@ -26,9 +26,10 @@ private:
         EMPTY
     };
 
-    QVector<QString> boundary_combo_text = {"patch (パッチ)","wall (壁)","symmetryPlane (対称面)",
-                                            "cyclic (周期境界)","cyclicAMI (不整合周期境界)",
-                                            "wedge (2次元軸対称)","empty (2次元)","None (連続)",""};
+    QVector<QString> boundary_combo_text = {"empty (2次元)","patch (パッチ)","wall (壁)",
+                                            "symmetryPlane (対称面)","cyclic (周期境界)",
+                                            "cyclicAMI (不整合周期境界)","wedge (2次元軸対称)",
+                                            "None (連続)"};
     CONSTRUCTED constructed = CONSTRUCTED::EMPTY;
 
     //Face

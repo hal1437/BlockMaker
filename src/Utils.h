@@ -21,8 +21,10 @@ public slots:                                    \
     QVector<TYPE>& Get##NAME(){return NAME;}     \
     QVector<TYPE>  Get##NAME()const{return NAME;}\
     inline void Add##NAME(TYPE value){           \
-        NAME.push_back(value);                   \
-        emit Update##NAME();                     \
+        if(!exist(NAME,value)){                  \
+            NAME.push_back(value);               \
+            emit Update##NAME();                 \
+        }                                        \
     }                                            \
     inline void Remove##NAME(TYPE value){        \
         NAME.removeAll(value);                   \
@@ -110,14 +112,6 @@ CREATESETTER(TYPE,NAME,VALUE)
 #define CREATE_IO_ARRAY(TYPE,NAME,VALUE)    \
 CREATEGETTER_ARRAY(TYPE,NAME,VALUE)         \
 CREATESETTER_ARRAY(TYPE,NAME,VALUE)
-
-
-
-
-
-
-
-
 
 #endif // UTILS
 

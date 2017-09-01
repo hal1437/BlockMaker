@@ -88,56 +88,6 @@ QVector<CFace*> CBlock::GetAllFaces()const{
     return this->faces;
 }
 
-CFace* CBlock::GetFaceFormDir(BoundaryDir dir){
-    int edge_index[6][4]={{2,6,10,11},
-                          {1,5,9,10},
-                          {3,7,8,11},
-                          {0,4,8,9},
-                          {4,5,6,7},
-                          {0,1,2,3}};
-
-    for(CFace* face:this->faces){
-        bool check = false;
-        for(int i=0;i<4;i++){
-            if(!exist(face->edges,this->GetEdgeSequence(edge_index[static_cast<int>(dir)][i]))){
-                check = true;
-                break;
-            }
-        }
-        if(check == false){
-            return face;
-        }
-    }
-    return nullptr;
-}
-
-Pos CBlock::GetDivisionPoint(int edge_index,int count_index)const{
-    double A,B,sum=0,p,d,L;
-
-    //各パラメータ取得
-    if(edge_index == 0 || edge_index == 2 || edge_index == 4  || edge_index == 6 )d = this->div[0];
-    if(edge_index == 1 || edge_index == 3 || edge_index == 5  || edge_index == 7 )d = this->div[1];
-    if(edge_index == 8 || edge_index == 9 || edge_index == 10 || edge_index == 11)d = this->div[2];
-
-    //エッジからpとLを抽出
-    CEdge *edge =  this->GetEdgeSequence(edge_index);
-    p = edge->getGrading();
-    L = (*edge->end - *edge->start).Length();
-
-    //指数関数パラメータ計算
-    B = log(p) / (d-1);
-    for(int i=1;i<=d;i++)sum += exp(B*i);
-    A = L / sum;
-
-    //指定番号までの総和
-    double sum_rate=0;
-    for(int i = 1;i <= count_index;i++){
-        sum_rate += A*exp(B*i);
-    }
-    Pos ans = edge->GetMiddleDivide(sum_rate/L);
-    return ans;
-}
-
 double CBlock::GetLength_impl(Quat convert){
     QVector<CPoint*> pp;
     pp = this->GetAllPoints();
@@ -163,34 +113,6 @@ double CBlock::GetLengthZ(){
 }
 void CBlock::DrawGL(Pos,Pos)const{
     if(!this->isVisible())return;
-    /*
-    //薄い色に変更
-    float oldColor[4];
-    glGetFloatv(GL_CURRENT_COLOR,oldColor);
-    glColor4f(0.5,0.5,0.5,1);
-
-    if(this->isVisibleDetail()){
-        //分割線を描画
-        glColor4f(0.1,
-                  0.1,
-                  0.1,
-                  1);
-        int edge_index[3][4] = {{0,2,6,4},{1,3,7,5},{8,9,10,11}};
-        for(int i=0;i<3;i++){
-            for(int j=0;j<this->div[i];j++){
-                glBegin(GL_LINE_LOOP);
-                for(int k=0;k<4;k++){
-                    //線の分割描画
-                    Pos p = this->div_pos[edge_index[i][k]][j];
-                    glVertex3f(p.x(),p.y(),p.z());
-                }
-                glEnd();
-            }
-        }
-    }
-    //色を復元
-    glColor4f(oldColor[0],oldColor[1],oldColor[2], oldColor[3]);
-    */
     return;
 }
 
@@ -283,30 +205,19 @@ CPoint* CBlock::GetPointSequence(int index)const{
 }
 CEdge* CBlock::GetEdgeSequence(int index) const{
     //始点と終点を取得
-    QVector<QVector<int>> edge_comb = {{0,1}, //0
-                                       {1,2}, //1
-                                       {3,2}, //2
-                                       {0,3}, //3
-                                       {4,5}, //4
-                                       {5,6}, //5
-                                       {7,6}, //6
-                                       {4,7}, //7
-                                       {0,4}, //8
-                                       {1,5}, //9
-                                       {2,6}, //10
-                                       {3,7}};//11
+    QVector<QVector<int>> edge_comb = {{0,1},{1,2},{3,2},{0,3},{4,5},{5,6},
+                                       {7,6},{4,7},{0,4},{1,5},{2,6},{3,7}};
+
+    //始点と終点を持つ点を探す
     QVector<CEdge*> edges = this->GetAllEdges();
     CPoint* p1 = this->GetPointSequence(edge_comb[index][0]);
     CPoint* p2 = this->GetPointSequence(edge_comb[index][1]);
     CEdge* edge = *std::find_if(edges.begin(),edges.end(),[&](CEdge* e){
         return (e->start == p1 && e->end == p2) || (e->start == p2 && e->end == p1);
     });
-    //反転
-    if(edge->end == p2){
-         std::swap(edge->start,edge->end);
-    }
     return edge;
 }
+
 
 //子の操作
 CFace*   CBlock::GetFace (int index){
@@ -324,21 +235,6 @@ void CBlock::SetChild(int index,CObject* obj){
 
 int CBlock::GetChildCount()const{
     return this->faces.size();
-}
-
-void CBlock::ReorderEdges(){
-    /*
-    //エッジ並び替え
-    for(int i=0;i<12;i++){
-        CEdge* edge = this->GetEdgeSequence(i);
-        Pos base;
-        if(i==0 || i==2 || i==4 || i==6)base = Pos(1,0,0);
-        if(i==1 || i==3 || i==5 || i==7)base = Pos(0,1,0);
-        if(i>=8)                        base = Pos(0,0,1);
-        if((*edge->end - *edge->start).DotPos(base) < 0){
-            std::swap(edge->start , edge->end);
-        }
-    }*/
 }
 
 CObject* CBlock::Clone()const{

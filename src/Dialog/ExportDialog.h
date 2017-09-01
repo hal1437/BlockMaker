@@ -20,6 +20,16 @@ namespace Ui {
 class ExportDialog;
 }
 
+//面の方向
+enum BoundaryDir{
+    Top,
+    Right,
+    Left,
+    Bottom,
+    Front,
+    Back,
+};
+
 class ExportDialog : public QDialog ,public CadModelCoreInterface
 {
     Q_OBJECT
@@ -29,8 +39,8 @@ private:
     //座標から番号へ変換
     int GetPosIndex(CPoint *p)const;
 
-    //境界面の座標を取得
-    QVector<CPoint *> GetBoundaryPos(CBlock *block, BoundaryDir dir)const;
+    //方向から面を取得し適切な順番に点を並び替えて返す
+    QVector<CPoint*> GetBoundaryPos(CBlock* block,BoundaryDir dir)const;
 
 public:
     explicit ExportDialog(QWidget *parent = 0);
