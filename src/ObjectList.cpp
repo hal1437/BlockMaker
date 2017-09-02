@@ -50,7 +50,7 @@ void ObjectList::AddBlockToTree(CBlock* block,QTreeWidgetItem* parent,int index)
 }
 void ObjectList::AddFaceToTree(CFace*  face ,QTreeWidgetItem* parent,int index){
     QTreeWidgetItem* item = new QTreeWidgetItem();
-    item->setText(0,QString("Face:") + QString::number(index));
+    item->setText(0,face->getName());
     item->setIcon(0,getIcon(face));
 
     for(int i = 0;i<face->edges.size();i++){
