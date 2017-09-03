@@ -196,7 +196,8 @@ void SolidEditForm::SetModel(CadModelCore* model){
     this->make_controller->SetModel(model);
     connect(this->model,SIGNAL(UpdateAnyAction()),this,SLOT(repaint()));
     //三平面作成
-    this->controller->Refresh3Face();
+    this->controller->Create3Face();
+    this->controller->CreateOrigin();
 }
 
 void SolidEditForm::initializeGL(){

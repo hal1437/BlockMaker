@@ -178,7 +178,7 @@ SolidEditController::~SolidEditController()
 {
 }
 
-void SolidEditController::Refresh3Face(){
+void SolidEditController::Create3Face(){
     for(int i=0;i<3;i++){
         if(CFace::base[i] != nullptr) delete CFace::base[i];
     }
@@ -191,5 +191,10 @@ void SolidEditController::Refresh3Face(){
     for(int i=0;i<3;i++){
         this->model->AddFaces(CFace::base[i]);
     }
+}
+void SolidEditController::CreateOrigin(){
+    if(CPoint::origin != nullptr) delete CPoint::origin;
+    CPoint::origin = new CPoint(nullptr);
+    this->model->AddPoints(CPoint::origin);
 }
 

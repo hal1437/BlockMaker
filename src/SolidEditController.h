@@ -51,7 +51,8 @@ public:
     ~SolidEditController();
 
 public slots:
-    void Refresh3Face();//三面を更新する。
+    void Create3Face();  //三面を更新する。
+    void CreateOrigin(); //原点を更新する。
 
 };
 
