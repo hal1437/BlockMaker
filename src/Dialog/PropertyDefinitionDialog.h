@@ -32,9 +32,11 @@ private:
                                             "None (連続)"};
     CONSTRUCTED constructed = CONSTRUCTED::EMPTY;
 
+    //All
+    QLabel    name_label;
+    QLineEdit name_edit;
+
     //Face
-    QLabel    face_name_label;
-    QLineEdit face_name_edit;
     QLabel    face_boundary_label;
     QComboBox face_boundary_combo;
 

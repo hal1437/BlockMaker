@@ -11,15 +11,10 @@ std::count_if(ARRAY.begin(),ARRAY.end(),[&](CObject* obj){\
 void PropertyDefinitionDialog::ConstructFace(){
     //Face用レイアウト構築
     this->constructed = CONSTRUCTED::FACE;
-    this->face_name_label.show();
-    this->face_name_edit.show();
     this->face_boundary_label.show();
     this->face_boundary_combo.show();
-    //全て名前が同じであれば
     QVector<CObject*> selected = this->model->GetSelected();
-    if(SELECTED_SAME_VALUE(selected,CFace*,Name)){
-        this->face_name_edit.setText(dynamic_cast<CFace*>(selected.first())->getName());
-    }
+
     //全ての境界条件が同じであれば
     if(SELECTED_SAME_VALUE(selected,CFace*,Boundary)){
         this->face_boundary_combo.setCurrentIndex(static_cast<int>(dynamic_cast<CFace*>(selected.first())->getBoundary()));
@@ -68,7 +63,7 @@ PropertyDefinitionDialog::PropertyDefinitionDialog(QWidget *parent) :
     this->setWindowFlags(Qt::Dialog | Qt::WindowStaysOnTopHint);
 
     //初期値設定
-    this->face_name_label    .setText("境界面名");
+    this->name_label         .setText("オブジェクト名");
     this->face_boundary_label.setText("境界タイプ");
     this->edge_divide_label  .setText("分割数");
     this->edge_grading_label .setText("エッジ寄せ係数");
@@ -88,8 +83,8 @@ PropertyDefinitionDialog::PropertyDefinitionDialog(QWidget *parent) :
     }
     this->face_boundary_combo.setCurrentText(boundary_combo_text[boundary_combo_text.size()-1]);
 
-    this->ui->Grid->addWidget(&this->face_name_label    ,0,0);
-    this->ui->Grid->addWidget(&this->face_name_edit     ,0,1);
+    this->ui->Grid->addWidget(&this->name_label         ,0,0);
+    this->ui->Grid->addWidget(&this->name_edit          ,0,1);
     this->ui->Grid->addWidget(&this->face_boundary_label,1,0);
     this->ui->Grid->addWidget(&this->face_boundary_combo,1,1);
     this->ui->Grid->addWidget(&this->edge_divide_label  ,2,0);
@@ -104,8 +99,8 @@ PropertyDefinitionDialog::~PropertyDefinitionDialog()
 
 void PropertyDefinitionDialog::UpdateLayout(){
     //レイアウト解除
-    this->face_name_label.hide();
-    this->face_name_edit.hide();
+    this->name_label.hide();
+    this->name_edit.hide();
     this->face_boundary_label.hide();
     this->face_boundary_combo.hide();
     this->edge_divide_label.hide();
@@ -113,6 +108,16 @@ void PropertyDefinitionDialog::UpdateLayout(){
     this->edge_grading_label.hide();
     this->edge_grading_spin.hide();
     QVector<CObject*> selected = this->model->GetSelected();
+    if(selected.size() > 0){
+        //全て名前が同じであれば
+        if(SELECTED_SAME_VALUE(selected,CObject*,Name)){
+            this->name_edit.setText(selected.first()->getName());
+        }else{
+            this->name_edit.clear();
+        }
+        this->name_label.show();
+        this->name_edit .show();
+    }
     if     (selected.size() > 0 && std::all_of(selected.begin(),selected.end(),[](CObject* obj){return obj->is<CEdge>();}))this->ConstructEdge();
     else if(selected.size() > 0 && std::all_of(selected.begin(),selected.end(),[](CObject* obj){return obj->is<CFace>();}))this->ConstructFace();
     else this->constructed = CONSTRUCTED::EMPTY;
@@ -124,11 +129,15 @@ void PropertyDefinitionDialog::Accept(){
     //適用処理
     QVector<CObject*> selected = this->model->GetSelected();
 
+
     //値を代入
     for(CObject* obj: selected){
+        //名前
+        if(this->name_edit.text() != "")obj->setName(this->name_edit.text());
+
         //面
         if(this->constructed == CONSTRUCTED::FACE){
-            if(this->face_name_edit.text() != "")obj->setName(this->face_name_edit.text());
+            //境界タイプ
             if(this->face_boundary_combo.currentText() != ""){
                 int index = IndexOf(this->boundary_combo_text,this->face_boundary_combo.currentText());
                 if(index != -1){
@@ -138,7 +147,9 @@ void PropertyDefinitionDialog::Accept(){
         }
         //線
         if(this->constructed == CONSTRUCTED::EDGE){
+            //分割数
             if(this->edge_divide_spin .value() != 0)dynamic_cast<CEdge*>(obj)->setDivide (this->edge_divide_spin.value());
+            //メッシュ寄せ係数
             if(this->edge_grading_spin.value() != 0)dynamic_cast<CEdge*>(obj)->setGrading(this->edge_grading_spin.value());
         }
     }
