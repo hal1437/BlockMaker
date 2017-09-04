@@ -228,8 +228,8 @@ void CFace::DrawGL(Pos,Pos)const{
         float currentColor[4];
         glGetFloatv(GL_CURRENT_COLOR,currentColor);
 
-        glColor4f(currentColor[0],currentColor[1],currentColor[2], 0.1);
         if(this->isFaceBlend()){
+            glColor4f(currentColor[0],currentColor[1],currentColor[2], 0.1);
             glDepthMask(GL_FALSE);
         }else{
             glDepthMask(GL_TRUE);
@@ -249,10 +249,26 @@ void CFace::DrawGL(Pos,Pos)const{
     }else{
 
         //外枠のみ
+        float currentColor[4];
+        glGetFloatv(GL_CURRENT_COLOR,currentColor);
+
+        Pos norm = this->GetNorm();
+        //完全透過色であれば
+        if(currentColor[3] == 0){
+            glColor4f(std::abs(norm.x()),
+                      std::abs(norm.y()),
+                      std::abs(norm.z()),
+                      1.0);
+        }
         glBegin(GL_LINE_LOOP);
         for(int i=0;i<this->edges.size();i++){
-            glVertex3f(this->GetPointSequence(i)->x(),this->GetPointSequence(i)->y(), this->GetPointSequence(i)->z());
+            glVertex3f(this->GetPointSequence(i)->x(),
+                       this->GetPointSequence(i)->y(),
+                       this->GetPointSequence(i)->z());
         }
+        //色を復元
+        glColor4f(currentColor[0],currentColor[1],currentColor[2], currentColor[3]);
+
         glEnd();
     }
     glDepthMask(GL_TRUE);

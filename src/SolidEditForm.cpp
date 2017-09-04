@@ -259,15 +259,15 @@ void SolidEditForm::paintGL(){
 
     //描画面と色のリスト作成
     QVector<std::pair<CFace*,QVector<int>>> faces;
-    faces.push_back(std::make_pair(controller->getSideFace()    ,QVector<int>({1,0,0})));//右側面
-    faces.push_back(std::make_pair(controller->getTopFace()     ,QVector<int>({0,1,0})));//平面
-    faces.push_back(std::make_pair(controller->getFrontFace()   ,QVector<int>({0,0,1})));//正面
-    faces.push_back(std::make_pair(this->controller->sketch_face,QVector<int>({1,1,0})));//スケッチ面
+    for(int i=0;i< 3;i++){
+        faces.push_back(std::make_pair(CFace::base[i]    ,QVector<int>({0,0,0,0})));//右側面
+    }
+    faces.push_back(std::make_pair(this->controller->sketch_face,QVector<int>({1,1,0,1})));//スケッチ面
     //面の描画
     glLineWidth(2);
     for(std::pair<CFace*,QVector<int>>f: faces){
         if(f.first != nullptr){
-            glColor3f(f.second[0], f.second[1], f.second[2]);
+            glColor4f(f.second[0], f.second[1], f.second[2],f.second[3]);
             f.first->DrawGL(this->camera,this->center);
         }
     }

@@ -3,13 +3,13 @@
 
 
 void MainWindow::SetModel(CadModelCore* model){
+    //モデルと結合
     this->model = model;
-    this->ui->SolidEdit ->SetModel(this->model);
+    connect(this->model,SIGNAL(UpdateSelected()),this,SLOT(RefreshUI()));
     this->ui->ObjectTree->SetModel(this->model);
+    this->ui->SolidEdit ->SetModel(this->model);
     this->move_diag->     SetModel(this->model);
     this->prop_diag->     SetModel(this->model);
-    //モデルと結合
-    connect(this->model,SIGNAL(UpdateSelected()),this,SLOT(RefreshUI()));
 }
 
 MainWindow::MainWindow(QWidget *parent) :

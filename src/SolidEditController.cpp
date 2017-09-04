@@ -77,6 +77,9 @@ CFace* SolidEditController::getFrontFace_impl(Quat convert,Quat invert)const{
     face->edges.push_back(new CLine(poses[2],poses[3]));
     face->edges.push_back(new CLine(poses[3],poses[0]));
     face->SetPolygon(false);
+    for(CPoint* pos:poses){
+        pos->SetControlPoint(true);
+    }
     return face;
 }
 
