@@ -35,9 +35,11 @@ void ObjectList::mouseReleaseEvent(QMouseEvent* event){
 
 void ObjectList::AddBlockToTree(CBlock* block,QTreeWidgetItem* parent,int index){
     QTreeWidgetItem* item = new QTreeWidgetItem();
-    item->setText(0,QString("Block:") + QString::number(index));
-    QIcon icon;
-
+    if(block->getName() == ""){
+        item->setText(0,QString("Block:") + QString::number(IndexOf(this->CadModelCoreInterface::model->GetBlocks(),block)));
+    }else{
+        item->setText(0,block->getName());
+    }
     item->setIcon(0,getIcon(block));
 
     for(int i = 0;i<block->faces.size();i++){
@@ -50,11 +52,19 @@ void ObjectList::AddBlockToTree(CBlock* block,QTreeWidgetItem* parent,int index)
 }
 void ObjectList::AddFaceToTree(CFace*  face ,QTreeWidgetItem* parent,int index){
     QTreeWidgetItem* item = new QTreeWidgetItem();
-    item->setText(0,face->getName());
+
+    if(face->getName() == ""){
+        item->setText(0,QString("Face:") + IndexOf(this->CadModelCoreInterface::model->GetFaces(),face));
+    }else{
+        item->setText(0,face->getName());
+    }
     item->setIcon(0,getIcon(face));
 
-    for(int i = 0;i<face->edges.size();i++){
-        AddEdgeToTree(face->edges[i],item,i+1);
+    //三平面の子は除外
+    if(!exist(CFace::base,face)){
+        for(int i = 0;i<face->edges.size();i++){
+            AddEdgeToTree(face->edges[i],item,i+1);
+        }
     }
     item->setSelected(exist(this->CadModelCoreInterface::model->GetSelected(),face));
     if(parent == nullptr)this->addTopLevelItem(item);
@@ -62,11 +72,16 @@ void ObjectList::AddFaceToTree(CFace*  face ,QTreeWidgetItem* parent,int index){
 }
 void ObjectList::AddEdgeToTree(CEdge* edge,QTreeWidgetItem* parent,int index){
     QTreeWidgetItem* item = new QTreeWidgetItem();
-    std::string s;
+    QString s;
     if(edge->is<CLine>  ())s = "Line";
     if(edge->is<CArc>   ())s = "Arc";
     if(edge->is<CSpline>())s = "Spline";
-    item->setText(0,QString(s.c_str()) + ":" + QString::number(index));
+
+    if(edge->getName() == ""){
+        item->setText(0,s + ":" + QString::number(IndexOf(this->CadModelCoreInterface::model->GetEdges(),edge)));
+    }else{
+        item->setText(0,edge->getName());
+    }
     item->setIcon(0,getIcon(edge));
 
     for(int i=0;i<edge->GetChildCount();i++){
@@ -85,7 +100,11 @@ void ObjectList::AddPointToTree(CPoint* point,QTreeWidgetItem* parent,int index)
     if(point == nullptr){
         item->setText(0,QString("NullPointer:") + QString::number(index));
     }else{
-        item->setText(0,QString("Point:") + QString::number(index));
+        if(point->getName() == ""){
+            item->setText(0,QString("Point:") + QString::number(IndexOf(this->CadModelCoreInterface::model->GetPoints(),point)));
+        }else{
+            item->setText(0,point->getName());
+        }
         item->setIcon(0,getIcon(point));
         item->setSelected(exist(this->CadModelCoreInterface::model->GetSelected(),point));
     }

@@ -14,11 +14,22 @@ void CPoint::DrawGL(Pos camera,Pos center)const{
     Pos cc = camera - center;
     double theta1 = std::atan2(cc.y(),std::sqrt(cc.x()*cc.x()+cc.z()*cc.z()));
     double theta2 = std::atan2(-cc.x(),cc.z());
-    //円の描画
-    for(double k=0;k < 2*M_PI;k += M_PI/32){
-        const int length = cc.Length()*10;
-        Pos p = Pos(length*std::sin(k),length*std::cos(k),0).Dot(Quat::getRotateXMatrix(theta1).Dot(Quat::getRotateYMatrix(theta2)));
-        glVertex3f((p + *this).x(),(p + *this).y(),(p + *this).z());
+    const double length = cc.Length()*10;
+    if(!this->isControlPoint()){
+        //円の描画
+        for(double k=0;k < 2*M_PI;k += M_PI/32){
+            Pos p = Pos(length*std::sin(k),length*std::cos(k),0).Dot(Quat::getRotateXMatrix(theta1).Dot(Quat::getRotateYMatrix(theta2)));
+            glVertex3f((p + *this).x(),(p + *this).y(),(p + *this).z());
+        }
+    }else{
+        //四角の描画
+        for(double k=0;k < 2*M_PI;k += M_PI/2){
+            Pos p = Pos(length * std::sqrt(2) * std::sin(k+M_PI/4),
+                        length * std::sqrt(2) * std::cos(k+M_PI/4),0)
+                        .Dot(Quat::getRotateXMatrix(theta1)
+                        .Dot(Quat::getRotateYMatrix(theta2)));
+            glVertex3f((p + *this).x(),(p + *this).y(),(p + *this).z());
+        }
     }
     glEnd();
 }

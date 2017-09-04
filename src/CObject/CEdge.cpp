@@ -58,7 +58,7 @@ void CEdge::DrawGL(Pos camera,Pos center)const{
         glVertex3f(this->GetMiddleDivide(0.9).x(),
                    this->GetMiddleDivide(0.9).y(),
                    this->GetMiddleDivide(0.9).z());
-        int ARROW_ROUND = length*10;
+        double ARROW_ROUND = length*10;
         for(double i=0;i<2*M_PI;i+= M_PI/32){
             Pos c = Pos(ARROW_ROUND*std::sin(i),ARROW_ROUND*std::cos(i),0).Dot(Quat::getRotateXMatrix(theta1).Dot(Quat::getRotateYMatrix(theta2)));
             Pos pp = p+c;

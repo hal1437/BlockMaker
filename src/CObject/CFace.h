@@ -32,7 +32,6 @@ public:
     static CFace* base[3]; //正面,平面,右側面
 
     QVector<CEdge*> edges;                  // 構成線
-    OBSERVE_MEMBER(QString,Name)            // 境界名
     OBSERVE_MEMBER(Boundary::Type,Boundary) // 境界タイプ
     DEFINE_FLAG(VisibleDetail,true)         // 分割フレーム表示
     DEFINE_FLAG(Polygon,true)               // ポリゴン判定

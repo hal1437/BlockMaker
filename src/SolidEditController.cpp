@@ -195,6 +195,8 @@ void SolidEditController::Create3Face(){
 void SolidEditController::CreateOrigin(){
     if(CPoint::origin != nullptr) delete CPoint::origin;
     CPoint::origin = new CPoint(nullptr);
+    CPoint::origin->setName("原点");
+    CPoint::origin->SetControlPoint(true);
     this->model->AddPoints(CPoint::origin);
 }
 
