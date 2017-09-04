@@ -69,7 +69,7 @@ void CEdge::DrawGL(Pos camera,Pos center)const{
         glEnd();
     }
     //分割ライン表示
-    if(this->getDivide() > 0){
+    if(this->isVisibleDetail() && this->getDivide() > 0){
         for(double i = 1;i<this->getDivide();i++){
             Pos p  = GetDivisionPoint(i);
             Pos cc = GetDivisionPoint(i) - GetDivisionPoint(i+1);
@@ -105,6 +105,7 @@ CEdge::CEdge(QObject* parent):
     this->Divide  = 1;
     this->Grading = 1.0;
     this->start = this->end = nullptr;
+    this->SetVisibleDetail(false);
 }
 
 CEdge::~CEdge(){}

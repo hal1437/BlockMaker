@@ -243,8 +243,6 @@ bool CadModelCore::ImportFoamFile(QString filename){
     for(int i=0;i<3;i++){
         this->AddFaces(CFace::base[i]);//原点
     }
-
-
     return true;
 }
 

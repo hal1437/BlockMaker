@@ -192,6 +192,7 @@ void SolidEditController::Create3Face(){
     CFace::base[1]->setName("平面");
     CFace::base[2]->setName("右側面");
     for(int i=0;i<3;i++){
+        CFace::base[i]->SetVisibleDetail(false);
         this->model->AddFaces(CFace::base[i]);
     }
 }

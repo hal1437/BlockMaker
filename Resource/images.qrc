@@ -16,6 +16,27 @@
         <file>Dot_disabled.png</file>
         <file>Line_disabled.png</file>
         <file>Property.png</file>
+        <file>ArcMesh_disabled.png</file>
+        <file>ArcMesh.png</file>
+        <file>ConcurrentRestraint.png</file>
+        <file>Conflict.png</file>
+        <file>EqualRestraint.png</file>
+        <file>FaceMesh_disabled.png</file>
+        <file>FaceMesh.png</file>
+        <file>HorizontalRestraint.png</file>
+        <file>images.qrc</file>
+        <file>LineMesh_disabled.png</file>
+        <file>LineMesh.png</file>
+        <file>LockRestraint.png</file>
+        <file>Marge.png</file>
+        <file>MatchRestraint.png</file>
+        <file>Move.png</file>
+        <file>NotConflict.png</file>
+        <file>SplineMesh_disabled.png</file>
+        <file>SplineMesh.png</file>
+        <file>TangentRestraint.png</file>
+        <file>UnlockRestraint.png</file>
+        <file>VerticalRestraint.png</file>
     </qresource>
     <qresource prefix="/Restraint">
         <file>ConcurrentRestraint.png</file>

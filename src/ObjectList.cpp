@@ -2,15 +2,8 @@
 
 QIcon ObjectList::getIcon(CObject *obj){
     QString filepath;
-    if(obj->is<CBlock>()){
-        if(dynamic_cast<CBlock*>(obj)->isVisibleDetail()){
-            filepath = ":/ToolImages/BlocksMesh";
-        }else{
-            filepath = ":/ToolImages/Blocks";
-        }
-    }
-
-    if(obj->is<CFace>())filepath = ":/ToolImages/Face";
+    if(obj->is<CBlock>())filepath = ":/ToolImages/Blocks";
+    if(obj->is<CFace> ())filepath = ":/ToolImages/Face";
 
     if(obj->is<CEdge>()){
         if(obj->is<CLine>  ())filepath = ":/ToolImages/Line";
@@ -18,6 +11,9 @@ QIcon ObjectList::getIcon(CObject *obj){
         if(obj->is<CSpline>())filepath = ":/ToolImages/Spline";
     }
     if(obj->is<CPoint>())filepath = ":/ToolImages/Dot";
+
+    //詳細表示
+    if(!obj->is<CPoint>() && obj->isVisibleDetail())filepath += "Mesh";
 
     //不可視は薄くする
     if(obj->isVisible())filepath += ".png";
@@ -36,7 +32,7 @@ void ObjectList::mouseReleaseEvent(QMouseEvent* event){
 void ObjectList::AddBlockToTree(CBlock* block,QTreeWidgetItem* parent,int index){
     QTreeWidgetItem* item = new QTreeWidgetItem();
     if(block->getName() == ""){
-        item->setText(0,QString("Block:") + QString::number(IndexOf(this->CadModelCoreInterface::model->GetBlocks(),block)));
+        item->setText(0,QString("Block:") + QString::number(IndexOf(this->CadModelCoreInterface::model->GetBlocks(),block)+1));
     }else{
         item->setText(0,block->getName());
     }
@@ -54,7 +50,7 @@ void ObjectList::AddFaceToTree(CFace*  face ,QTreeWidgetItem* parent,int index){
     QTreeWidgetItem* item = new QTreeWidgetItem();
 
     if(face->getName() == ""){
-        item->setText(0,QString("Face:") + IndexOf(this->CadModelCoreInterface::model->GetFaces(),face));
+        item->setText(0,QString("Face:") + IndexOf(this->CadModelCoreInterface::model->GetFaces(),face)+1);
     }else{
         item->setText(0,face->getName());
     }
@@ -78,7 +74,7 @@ void ObjectList::AddEdgeToTree(CEdge* edge,QTreeWidgetItem* parent,int index){
     if(edge->is<CSpline>())s = "Spline";
 
     if(edge->getName() == ""){
-        item->setText(0,s + ":" + QString::number(IndexOf(this->CadModelCoreInterface::model->GetEdges(),edge)));
+        item->setText(0,s + ":" + QString::number(IndexOf(this->CadModelCoreInterface::model->GetEdges(),edge)+1));
     }else{
         item->setText(0,edge->getName());
     }
@@ -101,7 +97,7 @@ void ObjectList::AddPointToTree(CPoint* point,QTreeWidgetItem* parent,int index)
         item->setText(0,QString("NullPointer:") + QString::number(index));
     }else{
         if(point->getName() == ""){
-            item->setText(0,QString("Point:") + QString::number(IndexOf(this->CadModelCoreInterface::model->GetPoints(),point)));
+            item->setText(0,QString("Point:") + QString::number(IndexOf(this->CadModelCoreInterface::model->GetPoints(),point)+1));
         }else{
             item->setText(0,point->getName());
         }

@@ -41,7 +41,8 @@ public:
 
     //フラグ定義
     DEFINE_FLAG(Lock   ,false)
-    DEFINE_FLAG(Visible,true)    
+    DEFINE_FLAG(Visible,true)
+    DEFINE_FLAG(VisibleDetail,true)//分割フレーム表示
 
 protected:
     //子を監視対象にする
