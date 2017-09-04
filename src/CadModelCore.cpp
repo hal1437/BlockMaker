@@ -6,24 +6,32 @@ bool CadModelCore::ExportFoamFile(QString filename)const{
     if(!out)return false;
 
     //バージョン出力
-    out << 2 << std::endl;
+    out << 3 << std::endl;
 
     //頂点リスト出力
     out << this->Points.size() << std::endl;
     for(CPoint* pos: this->Points){
         //座標
-        out << *pos << std::endl;
+        out << pos->getName().toStdString() << ",";
+        out << pos->x() << "," ;
+        out << pos->y() << "," ;
+        out << pos->z() << std::endl;
     }
 
     //エッジリスト出力
     out << this->Edges.size() << std::endl;
     for(CEdge* edge: this->Edges){
+
         //エッジタイプ
         std::string name;
         if(edge->is<CLine>  ())name = "CLine";
         if(edge->is<CArc>   ())name = "CArc";
         if(edge->is<CSpline>())name = "CSpline";
         out << name;
+
+        //オブジェクト名
+        out << "," << edge->getName().toStdString().c_str();
+
 
         //構成点インデックス
         for(int i=0;i<edge->GetChildCount();i++){
@@ -40,10 +48,16 @@ bool CadModelCore::ExportFoamFile(QString filename)const{
     }
 
     //面リスト出力
-    out << this->Faces.size() << std::endl;
+    out << this->Faces.size()-3 << std::endl;
     for(CFace* face: this->Faces){
+        //三平面は出力しない
+        if(exist(CFace::base,face))continue;
+
         //面タイプ
         out << "CFace";
+        //オブジェクト名
+        out << "," << face->getName().toStdString().c_str();
+
         //構成線インデックス
         for(int i=0;i< face->edges.size();i++){
             out << "," << IndexOf(this->Edges,face->edges[i]);
@@ -62,6 +76,9 @@ bool CadModelCore::ExportFoamFile(QString filename)const{
     for(CBlock* block: this->Blocks){
         //立体タイプ
         out << "CBlock";
+        //オブジェクト名
+        out << "," << block->getName().toStdString().c_str();
+
         //平面インデックス
         for(int i=0;i< 6;i++)out << "," << IndexOf(this->Faces,block->faces[i]);
         //分割数
@@ -85,6 +102,7 @@ bool CadModelCore::ImportFoamFile(QString filename){
     this->Faces.clear();
     this->Blocks.clear();
     this->Selected.clear();
+    this->AddPoints(CPoint::origin);//原点
 
     //バージョン取得
     int version;
@@ -94,11 +112,19 @@ bool CadModelCore::ImportFoamFile(QString filename){
     int vertex_num;
     in >> vertex_num;
     for(int i=0;i<vertex_num;i++){
-        Pos p;
+        std::string str;
+        in >> str;
+        QStringList sl = QString(str.c_str()).split(',');
+        if(sl[0] == "原点")continue;
+        CPoint* p = new CPoint();
+        //名前
+        p->setName(sl[0]);
         //座標
-        in >> p;
+        p->x() = sl[1].toDouble();
+        p->y() = sl[2].toDouble();
+        p->z() = sl[3].toDouble();
         //モデルに追加
-        this->Points.push_back(new CPoint(p));
+        this->Points.push_back(p);
     }
 
     //エッジリスト取得
@@ -114,26 +140,29 @@ bool CadModelCore::ImportFoamFile(QString filename){
         if(sl[0] == "CArc"   )make = new CArc();
         if(sl[0] == "CSpline")make = new CSpline();
 
+        //名前
+        make->setName(sl[1]);
+
         //オブジェクト生成
         if(make != nullptr){
 
             if(make->is<CArc>()){
                 //例外
-                make->Create(this->Points[sl[2].toInt()]);
-                make->Create(this->Points[sl[1].toInt()]);
                 make->Create(this->Points[sl[3].toInt()]);
+                make->Create(this->Points[sl[2].toInt()]);
+                make->Create(this->Points[sl[4].toInt()]);
             }else{
 
-                CREATE_RESULT res = make->Create(this->Points[sl[1].toInt()]);
+                CREATE_RESULT res = make->Create(this->Points[sl[2].toInt()]);
                 if(res == CREATE_RESULT::ENDLESS){
                     //spline
                     for(int j=3;j<sl.size()-3;j++){
                         make->Create(this->Points[sl[j].toInt()]);
                     }
-                    make->Create(this->Points[sl[2].toInt()]);
+                    make->Create(this->Points[sl[3].toInt()]);
                 }else{
                     //line
-                    for(int j=2;j<sl.size()-3;j++){
+                    for(int j=3;j<sl.size()-3;j++){
                         make->Create(this->Points[sl[j].toInt()]);
                     }
                 }
@@ -159,8 +188,12 @@ bool CadModelCore::ImportFoamFile(QString filename){
         //エッジ取得
         CFace* make = new CFace();
         QStringList sl = QString(str.c_str()).split(',');
+
+        //名前
+        make->setName(sl[1]);
+
         QVector<CEdge*> ee;
-        for(int j = 1;j<sl.size()-3;j++){
+        for(int j = 2;j<sl.size()-3;j++){
             ee.push_back(this->Edges[sl[j].toInt()]);
         }
         make->Create(ee);//作成
@@ -185,7 +218,10 @@ bool CadModelCore::ImportFoamFile(QString filename){
         //平面判定
         CBlock* make = new CBlock();
         QStringList sl = QString(str.c_str()).split(',');
-        int j=1;
+        //名前
+        make->setName(sl[1]);
+
+        int j=2;
         QVector<CFace*> faces;
         for(int i=0;i<6;i++,j++){
             faces.push_back(this->Faces[sl[j].toInt()]);
@@ -202,6 +238,13 @@ bool CadModelCore::ImportFoamFile(QString filename){
     emit UpdateFaces();
     emit UpdateBlocks();
     emit UpdateSelected();
+
+    //三平面復元
+    for(int i=0;i<3;i++){
+        this->AddFaces(CFace::base[i]);//原点
+    }
+
+
     return true;
 }
 

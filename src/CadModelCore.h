@@ -2,6 +2,7 @@
 #define CADMODELCORE_H
 
 #include <QObject>
+#include <QStringList>
 #include <iostream>
 #include <fstream>
 #include "CObject/CObject.h"
