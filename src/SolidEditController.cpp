@@ -148,9 +148,9 @@ CFace* SolidEditController::getHangedFace(Pos center,Pos camera_pos)const{
 
     //最も近い面を選択する
     QVector<std::pair<double,CFace*>> rank;
-    rank.push_back(std::make_pair(Collision::GetLengthFaceToLine(this->getFrontFace(),camera_pos,camera_pos-center),this->getFrontFace()));
-    rank.push_back(std::make_pair(Collision::GetLengthFaceToLine(this->getTopFace()  ,camera_pos,camera_pos-center),this->getTopFace()));
-    rank.push_back(std::make_pair(Collision::GetLengthFaceToLine(this->getSideFace() ,camera_pos,camera_pos-center),this->getSideFace()));
+    rank.push_back(std::make_pair(Collision::GetLengthFaceToLine(CFace::base[0] ,camera_pos,camera_pos-center),CFace::base[0]));
+    rank.push_back(std::make_pair(Collision::GetLengthFaceToLine(CFace::base[1] ,camera_pos,camera_pos-center),CFace::base[1]));
+    rank.push_back(std::make_pair(Collision::GetLengthFaceToLine(CFace::base[2] ,camera_pos,camera_pos-center),CFace::base[2]));
     for(CFace* f:this->model->GetFaces()){
         if(f->isVisible()){
             rank.push_back(std::make_pair(Collision::GetLengthFaceToLine(f,camera_pos,camera_pos-center),f));

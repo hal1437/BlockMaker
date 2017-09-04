@@ -117,6 +117,18 @@ void PropertyDefinitionDialog::UpdateLayout(){
         }
         this->name_label.show();
         this->name_edit .show();
+
+        //変更不可なものが含まれていれば
+        if(exist(selected,CPoint::origin) ||
+           exist(selected,CFace::base[0]) ||
+           exist(selected,CFace::base[1]) ||
+           exist(selected,CFace::base[2])){
+            this->name_label.setEnabled(false);
+            this->name_edit .setEnabled(false);
+        }else{
+            this->name_label.setEnabled(true);
+            this->name_edit .setEnabled(true);
+        }
     }
     if     (selected.size() > 0 && std::all_of(selected.begin(),selected.end(),[](CObject* obj){return obj->is<CEdge>();}))this->ConstructEdge();
     else if(selected.size() > 0 && std::all_of(selected.begin(),selected.end(),[](CObject* obj){return obj->is<CFace>();}))this->ConstructFace();
