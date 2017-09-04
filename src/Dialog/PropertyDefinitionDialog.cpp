@@ -126,8 +126,9 @@ void PropertyDefinitionDialog::Accept(){
 
     //値を代入
     for(CObject* obj: selected){
+        //面
         if(this->constructed == CONSTRUCTED::FACE){
-            if(this->face_name_edit.text() != "")dynamic_cast<CFace*>(obj)->getName() = this->face_name_edit.text();
+            if(this->face_name_edit.text() != "")obj->setName(this->face_name_edit.text());
             if(this->face_boundary_combo.currentText() != ""){
                 int index = IndexOf(this->boundary_combo_text,this->face_boundary_combo.currentText());
                 if(index != -1){
@@ -135,6 +136,7 @@ void PropertyDefinitionDialog::Accept(){
                 }
             }
         }
+        //線
         if(this->constructed == CONSTRUCTED::EDGE){
             if(this->edge_divide_spin .value() != 0)dynamic_cast<CEdge*>(obj)->setDivide (this->edge_divide_spin.value());
             if(this->edge_grading_spin.value() != 0)dynamic_cast<CEdge*>(obj)->setGrading(this->edge_grading_spin.value());

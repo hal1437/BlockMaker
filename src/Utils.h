@@ -21,15 +21,23 @@ public slots:                                    \
     QVector<TYPE>& Get##NAME(){return NAME;}     \
     QVector<TYPE>  Get##NAME()const{return NAME;}\
     inline void Add##NAME(TYPE value){           \
+        connect(value,SIGNAL(Changed()),this,SLOT(Update##NAME##Emittor())); \
         if(!exist(NAME,value)){                  \
             NAME.push_back(value);               \
             emit Update##NAME();                 \
         }                                        \
     }                                            \
     inline void Remove##NAME(TYPE value){        \
+        disconnect(value,SIGNAL(Changed()),this,SLOT(Update##NAME##Emittor())); \
         NAME.removeAll(value);                   \
         emit Update##NAME();                     \
     }                                            \
+
+#define DEFINE_EMITTOR(NAME) \
+void NAME##Emittor(){        \
+    emit NAME();             \
+}
+
 
 
 //配列内に要素が存在しているかの確認

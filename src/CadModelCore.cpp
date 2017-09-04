@@ -314,37 +314,26 @@ void CadModelCore::Delete(CObject* obj){
     if(obj->is<CBlock>())this->Delete(dynamic_cast<CBlock*>(obj));
 }
 
-
-
 void CadModelCore::SelectedClear(){
     this->Selected.clear();
     emit UpdateSelected();
 }
-
-void CadModelCore::UpdateObject(){
-    emit UpdateAnyObject();
-}
-
-void CadModelCore::UpdateAction(){
-    emit UpdateAnyAction();
-}
-
 
 CadModelCore::CadModelCore(QWidget *parent):
     QObject(parent)
 {
     this->origin = new CPoint(Pos(0,0,0));
     this->origin->SetControlPoint(true);
-    connect(this,SIGNAL(UpdatePoints()),this,SLOT(UpdateObject()));
-    connect(this,SIGNAL(UpdateEdges ()),this,SLOT(UpdateObject()));
-    connect(this,SIGNAL(UpdateFaces ()),this,SLOT(UpdateObject()));
-    connect(this,SIGNAL(UpdateBlocks()),this,SLOT(UpdateObject()));
-    connect(this,SIGNAL(UpdateSelected     ()),this,SLOT(UpdateAction()));
-    connect(this,SIGNAL(SelectObjectChanged()),this,SLOT(UpdateAction()));
-    connect(this,SIGNAL(UpdateAnyObject    ()),this,SLOT(UpdateAction()));
-    connect(this,SIGNAL(UpdateRestraints   ()),this,SLOT(UpdateAction()));
-    connect(this,SIGNAL(UpdateRestraints   ()),this,SLOT(UpdateAction()));
-    connect(this,SIGNAL(UpdateDimensions   ()),this,SLOT(UpdateAction()));
+    connect(this,SIGNAL(UpdatePoints()),this,SLOT(UpdateAnyObjectEmittor()));
+    connect(this,SIGNAL(UpdateEdges ()),this,SLOT(UpdateAnyObjectEmittor()));
+    connect(this,SIGNAL(UpdateFaces ()),this,SLOT(UpdateAnyObjectEmittor()));
+    connect(this,SIGNAL(UpdateBlocks()),this,SLOT(UpdateAnyObjectEmittor()));
+    connect(this,SIGNAL(UpdateSelected     ()),this,SLOT(UpdateAnyActionEmittor()));
+    connect(this,SIGNAL(SelectObjectChanged()),this,SLOT(UpdateAnyActionEmittor()));
+    connect(this,SIGNAL(UpdateAnyObject    ()),this,SLOT(UpdateAnyActionEmittor()));
+    connect(this,SIGNAL(UpdateRestraints   ()),this,SLOT(UpdateAnyActionEmittor()));
+    connect(this,SIGNAL(UpdateRestraints   ()),this,SLOT(UpdateAnyActionEmittor()));
+    connect(this,SIGNAL(UpdateDimensions   ()),this,SLOT(UpdateAnyActionEmittor()));
 }
 
 CadModelCore::~CadModelCore()

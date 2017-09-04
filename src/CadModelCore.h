@@ -25,8 +25,8 @@ public:
     DEFINE_OBSERVER(CEdge*          ,Edges     )
     DEFINE_OBSERVER(CFace*          ,Faces     )
     DEFINE_OBSERVER(CBlock*         ,Blocks    )
-    DEFINE_OBSERVER(Restraint*      ,Restraints)
-    DEFINE_OBSERVER(SmartDimension* ,Dimensions)
+    //DEFINE_OBSERVER(Restraint*      ,Restraints)
+    //DEFINE_OBSERVER(SmartDimension* ,Dimensions)
 
 public:
     CPoint* origin; //原点
@@ -63,11 +63,17 @@ public:
     void SelectedClear();
 
 public slots:
-    //UpdateAnyObjectを呼び出す
-    void UpdateObject();
 
-    //UpdateAnyActionを呼び出す
-    void UpdateAction();
+    //Emittor
+    DEFINE_EMITTOR(UpdateSelected)
+    DEFINE_EMITTOR(UpdatePoints)
+    DEFINE_EMITTOR(UpdateEdges)
+    DEFINE_EMITTOR(UpdateFaces)
+    DEFINE_EMITTOR(UpdateBlocks)
+    DEFINE_EMITTOR(UpdateRestraints)
+    DEFINE_EMITTOR(UpdateDimensions)
+    DEFINE_EMITTOR(UpdateAnyObject)
+    DEFINE_EMITTOR(UpdateAnyAction)
 
 public:
     explicit CadModelCore(QWidget *parent = 0);
