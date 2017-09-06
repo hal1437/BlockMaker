@@ -179,23 +179,38 @@ CPoint* CFace::GetPointSequence(int index)const{
         for(CEdge* line:this->edges){
             if(ans == line->start && old != line->end){
                 candidate.push_back(line->end);
-            }else if(ans == line->end && old != line->start){
+            }
+            if(ans == line->end && old != line->start){
                 candidate.push_back(line->start);
             }
         }
         //選定
         old = ans;
         if(candidate.size() == 2){
-            //二択
-            if(candidate[0]->DotPos(Pos(1,0,0)) > candidate[1]->DotPos(Pos(1,0,0))){
-                ans = candidate[0];
+            //X基底に近いエッジを選択
+            double d1 = (*candidate[0]-*ans).GetNormalize().DotPos(Pos(1,0,0));
+            double d2 = (*candidate[1]-*ans).GetNormalize().DotPos(Pos(1,0,0));
+            //X方向評価可能
+            if(std::abs(d1-d2) > SAME_POINT_EPS){
+                //X方向評価
+                if(d1 > d2){
+                    ans = candidate[0];
+                }else{
+                    ans = candidate[1];
+                }
             }else{
-                ans = candidate[1];
+                //Y方向評価
+                if((*candidate[0]-*ans).GetNormalize().DotPos(Pos(0,1,0)) > (*candidate[1]-*ans).GetNormalize().DotPos(Pos(0,1,0))){
+                    ans = candidate[0];
+                }else{
+                    ans = candidate[1];
+                }
             }
         }else if(candidate.size() == 1){
             ans = candidate[0];
         }else{
             ans = corner;
+            qDebug() << "?";
         }
         candidate.clear();
     }
@@ -337,6 +352,7 @@ void CFace::ReorderEdges(){
     QVector<CEdge*> ans;
     //整合確認
     for(int i=0;i<this->edges.size();i++){
+        qDebug() << this->GetPointSequence(i);
         ans.push_back(this->GetEdgeSequence(i));
     }
     this->edges = ans;
@@ -344,11 +360,12 @@ void CFace::ReorderEdges(){
     //反転確認
     this->reorder.resize(this->edges.size());
     for(int i=0;i<this->edges.size();i++){
-        //反転確認
         CPoint* pp = this->GetPointSequence(i);
+        qDebug() << pp;
         if     (pp == this->edges[i]->start)this->reorder[i] =  1;
         else if(pp == this->edges[i]->end  )this->reorder[i] = -1;
         else{
+            qDebug() << "?";
             this->reorder[i] =  0;
         }
     }
