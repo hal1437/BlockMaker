@@ -80,7 +80,7 @@ bool CadModelCore::ExportFoamFile(QString filename)const{
         out << "," << block->getName().toStdString().c_str();
 
         //平面インデックス
-        for(int i=0;i< 6;i++)out << "," << IndexOf(this->Faces,block->faces[i]);
+        for(int i=0;i< 6;i++)out << "," << IndexOf(this->Faces,block->faces[i])-3;
         //分割数
         //for(int i=0;i< 3;i++)out << "," << block->div[i];
         //詳細表示

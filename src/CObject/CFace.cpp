@@ -352,7 +352,6 @@ void CFace::ReorderEdges(){
     QVector<CEdge*> ans;
     //整合確認
     for(int i=0;i<this->edges.size();i++){
-        qDebug() << this->GetPointSequence(i);
         ans.push_back(this->GetEdgeSequence(i));
     }
     this->edges = ans;
@@ -361,7 +360,6 @@ void CFace::ReorderEdges(){
     this->reorder.resize(this->edges.size());
     for(int i=0;i<this->edges.size();i++){
         CPoint* pp = this->GetPointSequence(i);
-        qDebug() << pp;
         if     (pp == this->edges[i]->start)this->reorder[i] =  1;
         else if(pp == this->edges[i]->end  )this->reorder[i] = -1;
         else{

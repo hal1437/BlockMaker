@@ -228,7 +228,7 @@ void SolidEditForm::paintGL(){
     //カメラ調整
     if(this->controller->theta1 >  M_PI/2) this->controller->theta1 =  M_PI/2;
     if(this->controller->theta1 < -M_PI/2) this->controller->theta1 = -M_PI/2;
-    if(this->round              <  0     ) this->round = 0;
+    if(this->round              <  0     ) this->round = 0.00001;
     this->camera = Pos(0,0,round).Dot(this->controller->getCameraMatrix());
     glMatrixMode(GL_PROJECTION);  //行列モード切替
     glLoadIdentity();

@@ -118,15 +118,15 @@ void MainWindow::RefreshUI(){
     QVector<RestraintType> able = Restraint::Restraintable(this->model->GetSelected());
     for(RestraintType r:able){
         std::pair<std::string,std::string> p;
-        if(r == MATCH     )p = std::make_pair("一致"   ,":/Restraint/MatchRestraint.png");
+        //if(r == MATCH     )p = std::make_pair("一致"   ,":/Restraint/MatchRestraint.png");
         if(r == EQUAL     )p = std::make_pair("等値"   ,":/Restraint/EqualRestraint.png");
-        if(r == CONCURRENT)p = std::make_pair("並行"   ,":/Restraint/ConcurrentRestraint.png");
-        if(r == VERTICAL  )p = std::make_pair("垂直"   ,":/Restraint/VerticalRestraint.png");
-        if(r == HORIZONTAL)p = std::make_pair("水平"   ,":/Restraint/HorizontalRestraint.png");
-        if(r == TANGENT   )p = std::make_pair("正接"   ,":/Restraint/TangentRestraint.png");
-        if(r == LOCK      )p = std::make_pair("固定"   ,":/Restraint/LockRestraint.png");
-        if(r == UNLOCK    )p = std::make_pair("固定解除",":/Restraint/UnlockRestraint.png");
-        if(r == MARGE     )p = std::make_pair("マージ"  ,":/Restraint/Marge.png");
+        //if(r == CONCURRENT)p = std::make_pair("並行"   ,":/Restraint/ConcurrentRestraint.png");
+        //if(r == VERTICAL  )p = std::make_pair("垂直"   ,":/Restraint/VerticalRestraint.png");
+        //if(r == HORIZONTAL)p = std::make_pair("水平"   ,":/Restraint/HorizontalRestraint.png");
+        //if(r == TANGENT   )p = std::make_pair("正接"   ,":/Restraint/TangentRestraint.png");
+        //if(r == LOCK      )p = std::make_pair("固定"   ,":/Restraint/LockRestraint.png");
+        //if(r == UNLOCK    )p = std::make_pair("固定解除",":/Restraint/UnlockRestraint.png");
+        //if(r == MARGE     )p = std::make_pair("マージ"  ,":/Restraint/Marge.png");
         ui->RestraintList->addItem(new QListWidgetItem(p.first.c_str()));
         ui->RestraintList->item(ui->RestraintList->count()-1)->setIcon(QIcon(p.second.c_str()));
     }

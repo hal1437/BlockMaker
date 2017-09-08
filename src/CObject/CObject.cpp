@@ -47,7 +47,7 @@ CObject::CObject(QObject* parent):QObject(parent)
 CObject::~CObject(){}
 
 void CObject::ChangeChildCallback(CObject*){
-    qDebug() << "call";
+//    qDebug() << "call";
 }
 
 void CObject::ChangeChildHandler(CObject* ){

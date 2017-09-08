@@ -7,83 +7,60 @@
 #include "CObject/CLine.h"
 #include "CObject/CArc.h"
 #include "CObject/CSpline.h"
-
+#include "CObject/CSpline.h"
 
 enum RestraintType{
     EQUAL      ,//等しい値
-    VERTICAL   ,//垂直拘束 c:[-.]
-    HORIZONTAL ,//水平拘束 c:[-.]
-    MATCH      ,//一致拘束 c:[p.-]
-    MATCH_H    ,//水平一致拘束 c:[p.-]
-    MATCH_V    ,//水平一致拘束 c:[p.-]
-    CONCURRENT ,//並行拘束 c:[l,l]
-    CROSS      ,
-    ANGLE      ,//角度拘束 c:[l,l]
-    TANGENT    ,//正接拘束 c:[l]
-    LOCK       ,//固定拘束 c:[]
-    UNLOCK     ,//固定解除 c:[]
-    Paradox    ,//矛盾拘束 c:[]
-    MARGE      ,
+    EMPTY,
 };
 
-//拘束
-struct Restraint{
-    QVector<CObject*> nodes;//拘束対象
-    double value;      //値
-    RestraintType type; //タイプ
+//幾何拘束
+struct Restraint :public QObject{
+    Q_OBJECT
+protected:
+    QVector<CObject*> nodes; //拘束対象
+    RestraintType type;      //タイプ
+    double value;            //拘束値
 
-    static QVector<RestraintType> Restraintable(const QVector<CObject *> values);
+protected:
+    //オブジェクトを監視対象にする
+    void ObserveChild(CObject* obj);
+    void IgnoreChild (CObject* obj);
 
-    //最寄りの点に補完
-    virtual bool Complete() = 0;
-    //解決しているか
-    virtual bool isComplete() = 0;
+public:
+    CREATE_IO(double,Value,value)
 
-    //いつもの
+    //型判別
     template<class T>
     bool is()const{
         return (dynamic_cast<const T*>(this) != nullptr);
     }
 
+    //作成可能タイプを検索
+    static QVector<RestraintType> Restraintable(const QVector<CObject*> nodes);
 
-    Restraint(){}
-    Restraint(QVector<CObject*> Nodes,
-              double Value):
-        nodes(Nodes),
-        value(Value){}
+    //作成
+    void Create(const QVector<CObject*> nodes,double value);
 
-    virtual ~Restraint(){}
+    //拘束再計算
+    virtual void Calc() = 0;
+
+    explicit Restraint(QObject* parent=nullptr):QObject(parent){}
+    virtual  ~Restraint(){}
+
+public slots:
+    virtual void ChangeObjectCallback(CObject*){}
 };
 
-#define RESTRAINT_MAKE_DEF(CLASS_NAME ,TYPE_VAL)            \
-struct CLASS_NAME : public Restraint{                       \
-    /* 最寄りの点に補完 */                                     \
-    bool Complete();                                        \
-    /* 解決しているか */                                      \
-    bool isComplete();                                      \
-                                                            \
-    CLASS_NAME(){type = VERTICAL;};                         \
-    CLASS_NAME(QVector<CObject*> Nodes,                     \
-              double Value=0):                              \
-        Restraint(Nodes,Value){CLASS_NAME();};              \
-    virtual ~CLASS_NAME(){};                                \
-};                                                          \
-
-RESTRAINT_MAKE_DEF(EqualRestraint     ,EQUAL) //等値
-RESTRAINT_MAKE_DEF(VerticalRestraint  ,VERTICAL) //垂直拘束 c:[l] s:[]
-RESTRAINT_MAKE_DEF(HorizontalRestraint,HORIZONTAL) //水平拘束 c:[l] s:[]
-RESTRAINT_MAKE_DEF(MatchRestraint     ,MACH) //一致拘束 c:[p] s:[-]
-RESTRAINT_MAKE_DEF(MatchHRestraint    ,MATCH_H) //一致拘束 c:[p] s:[-]
-RESTRAINT_MAKE_DEF(MatchVRestraint    ,MATCH_V) //一致拘束 c:[p] s:[-]
-RESTRAINT_MAKE_DEF(ConcurrentRestraint,CONCURRENT) //並行拘束 c:[l,l] s:[]
-RESTRAINT_MAKE_DEF(CrossRestraint     ,CONCURRENT) //拘束 c:[]  s:[]
-//RESTRAINT_MAKE_DEF(TangentRestraint  ) //正接拘束 c:[l] s:[a]
-RESTRAINT_MAKE_DEF(FixRestraint       ,FIX) //固定拘束 c:[]  s:[]
-RESTRAINT_MAKE_DEF(ParadoxRestraint   ,PARADOX) //矛盾拘束 c:[]  s:[]
-
-
-
-//演算子定義
-Restraint*        operator&(const Restraint& lhs  ,const Restraint& rhs); //and演算
+//等しい値
+class EqualLengthRestraint: public Restraint{
+    Q_OBJECT
+public:
+    //CEdge限定
+    static bool Restraintable(const QVector<CObject*> nodes);
+    virtual void Calc();
+public slots:
+    virtual void ChangeObjectCallback(CObject*);
+};
 
 #endif // RESTRAINT_H
