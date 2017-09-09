@@ -26,7 +26,7 @@ public:
     DEFINE_OBSERVER(CEdge*          ,Edges     )
     DEFINE_OBSERVER(CFace*          ,Faces     )
     DEFINE_OBSERVER(CBlock*         ,Blocks    )
-    //DEFINE_OBSERVER(Restraint*      ,Restraints)
+    DEFINE_OBSERVER(Restraint*      ,Restraints)
     //DEFINE_OBSERVER(SmartDimension* ,Dimensions)
 
 public:

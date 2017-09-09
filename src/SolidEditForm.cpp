@@ -249,6 +249,9 @@ void SolidEditForm::paintGL(){
     glDepthFunc(GL_LEQUAL);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+    //オブジェクト更新
+    for(Restraint* rest : this->model->GetRestraints())rest->Calc();
+
     //オブジェクト描画
     glLineWidth(2);
     glColor3f(0,0,1);//青

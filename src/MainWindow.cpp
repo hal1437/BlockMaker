@@ -184,18 +184,23 @@ void MainWindow::ShowGridFilter(){
 
 void MainWindow::MakeRestraint(){
     //qDebug() << text;
-    //RestraintType type = Paradox;
-    /*
-    if(ui->RestraintList->currentItem()->text() == "一致")type = MATCH;
-    if(ui->RestraintList->currentItem()->text() == "並行")type = CONCURRENT;
-    if(ui->RestraintList->currentItem()->text() == "垂直")type = VERTICAL;
-    if(ui->RestraintList->currentItem()->text() == "水平")type = HORIZONTAL;
-    if(ui->RestraintList->currentItem()->text() == "正接")type = TANGENT;
-    if(ui->RestraintList->currentItem()->text() == "固定")type = LOCK;
-    if(ui->RestraintList->currentItem()->text() == "固定解除")type = UNLOCK;
+    Restraint* rest = nullptr;
+    if(ui->RestraintList->currentItem()->text() == "等値"){
+        rest = new EqualLengthRestraint();
+        CEdge* ee = dynamic_cast<CEdge*>(this->model->GetSelected().first());
+        rest->Create(this->model->GetSelected(),(*ee->end-*ee->start).Length());
+    }
+    //if(ui->RestraintList->currentItem()->text() == "一致")type = MATCH;
+    //if(ui->RestraintList->currentItem()->text() == "並行")type = CONCURRENT;
+    //if(ui->RestraintList->currentItem()->text() == "垂直")type = VERTICAL;
+    //if(ui->RestraintList->currentItem()->text() == "水平")type = HORIZONTAL;
+    //if(ui->RestraintList->currentItem()->text() == "正接")type = TANGENT;
+    //if(ui->RestraintList->currentItem()->text() == "固定")type = LOCK;
+    //if(ui->RestraintList->currentItem()->text() == "固定解除")type = UNLOCK;
+    this->model->AddRestraints(rest);
     ui->RestraintList->clear();
-    this->RefreshUI();
-    */
+    //this->RefreshUI();
+
 }
 
 void MainWindow::MakeBlock(){

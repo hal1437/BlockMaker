@@ -30,11 +30,16 @@ bool EqualLengthRestraint::Restraintable(const QVector<CObject *> nodes){
 }
 void EqualLengthRestraint::Calc(){
     //先頭のCEdgeの長さに統一する。
+    bool changed = false;
     double dd = (*dynamic_cast<CEdge*>(this->nodes[0])->end - *dynamic_cast<CEdge*>(this->nodes[0])->start).Length();
     for(int i=1;i<this->nodes.size();i++){
         CEdge* edge = dynamic_cast<CEdge*>(this->nodes[i]);
         //endを移動させる
         *edge->end = (*edge->end - *edge->start).GetNormalize() * dd + *edge->start;
+        changed = true;
+    }
+    if(changed){
+        //emit Changed();
     }
 }
 void EqualLengthRestraint::ChangeObjectCallback(CObject* obj){

@@ -45,11 +45,12 @@ public:
     //拘束再計算
     virtual void Calc() = 0;
 
-    explicit Restraint(QObject* parent=nullptr):QObject(parent){}
-    virtual  ~Restraint(){}
 
 public slots:
     virtual void ChangeObjectCallback(CObject*){}
+
+signals:
+    void Changed();
 };
 
 //等しい値
@@ -59,6 +60,7 @@ public:
     //CEdge限定
     static bool Restraintable(const QVector<CObject*> nodes);
     virtual void Calc();
+
 public slots:
     virtual void ChangeObjectCallback(CObject*);
 };
