@@ -20,6 +20,7 @@ QVector<RestraintType> Restraint::Restraintable(const QVector<CObject*> nodes){
 }
 void Restraint::Create(const QVector<CObject*> nodes, double value){
     this->nodes = nodes;
+    for(CObject* edge:nodes)ObserveChild(edge);
     this->setValue(value);
 }
 
@@ -35,7 +36,10 @@ void EqualLengthRestraint::Calc(){
     for(int i=1;i<this->nodes.size();i++){
         CEdge* edge = dynamic_cast<CEdge*>(this->nodes[i]);
         //endを移動させる
-        *edge->end = (*edge->end - *edge->start).GetNormalize() * dd + *edge->start;
+        double d = (*edge->end - *edge->start).Length();
+        Pos center = (*edge->end + *edge->start)/2;
+        *edge->start = (*edge->start - center).GetNormalize() * dd/2 + center;
+        *edge->end   = (*edge->end   - center).GetNormalize() * dd/2 + center;
         changed = true;
     }
     if(changed){
