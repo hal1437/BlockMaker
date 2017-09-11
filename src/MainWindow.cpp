@@ -120,7 +120,7 @@ void MainWindow::RefreshUI(){
         std::pair<std::string,std::string> p;
         //if(r == MATCH     )p = std::make_pair("一致"   ,":/Restraint/MatchRestraint.png");
         if(r == EQUAL     )p = std::make_pair("等値"   ,":/Restraint/EqualRestraint.png");
-        //if(r == CONCURRENT)p = std::make_pair("並行"   ,":/Restraint/ConcurrentRestraint.png");
+        if(r == CONCURRENT)p = std::make_pair("平行"   ,":/Restraint/ConcurrentRestraint.png");
         //if(r == VERTICAL  )p = std::make_pair("垂直"   ,":/Restraint/VerticalRestraint.png");
         //if(r == HORIZONTAL)p = std::make_pair("水平"   ,":/Restraint/HorizontalRestraint.png");
         //if(r == TANGENT   )p = std::make_pair("正接"   ,":/Restraint/TangentRestraint.png");
@@ -190,14 +190,21 @@ void MainWindow::MakeRestraint(){
         CEdge* ee = dynamic_cast<CEdge*>(this->model->GetSelected().first());
         rest->Create(this->model->GetSelected(),(*ee->end-*ee->start).Length());
     }
-    //if(ui->RestraintList->currentItem()->text() == "一致")type = MATCH;
+    if(ui->RestraintList->currentItem()->text() == "平行"){
+        rest = new ConcurrentRestraint();
+        rest->Create(this->model->GetSelected());
+    }
     //if(ui->RestraintList->currentItem()->text() == "並行")type = CONCURRENT;
+    //if(ui->RestraintList->currentItem()->text() == "一致")type = MATCH;
     //if(ui->RestraintList->currentItem()->text() == "垂直")type = VERTICAL;
     //if(ui->RestraintList->currentItem()->text() == "水平")type = HORIZONTAL;
     //if(ui->RestraintList->currentItem()->text() == "正接")type = TANGENT;
     //if(ui->RestraintList->currentItem()->text() == "固定")type = LOCK;
     //if(ui->RestraintList->currentItem()->text() == "固定解除")type = UNLOCK;
-    this->model->AddRestraints(rest);
+    if(rest != nullptr){
+        rest->Calc();
+        this->model->AddRestraints(rest);
+    }
     ui->RestraintList->clear();
     //this->RefreshUI();
 

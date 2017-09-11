@@ -2,15 +2,36 @@
 #define RESTRAINT_H
 #include <algorithm>
 #include <vector>
-#include "Point.h"
 #include "CObject/CObject.h"
 #include "CObject/CLine.h"
 #include "CObject/CArc.h"
 #include "CObject/CSpline.h"
-#include "CObject/CSpline.h"
+
+//拘束生成条件マクロ:全て同じ型
+#define ALL_SAME_TYPE_RESTRAINTABLE(TYPE)                                                                           \
+static bool Restraintable(const QVector<CObject *> nodes){                                                          \
+    return (nodes.size()>=2 && std::all_of(nodes.begin(),nodes.end(),[](CObject* obj){return obj->is<TYPE>();}));   \
+}
+//監視コールバック:先頭に出す
+#define SWAP_FRONT_CALLBACK                                 \
+virtual void ChangeObjectCallback(CObject* obj){            \
+    for(int i=1;i< this->nodes.size();i++){                 \
+        if(this->nodes[i] == obj){                          \
+            std::swap(this->nodes[0],this->nodes[i]);break; \
+        }                                                   \
+    }                                                       \
+    this->Calc();                                           \
+}
+//監視コールバック:自信を削除
+#define DESTROY_CALLBACK                        \
+virtual void ChangeObjectCallback(CObject*){    \
+    emit Destroy();                             \
+}
+
 
 enum RestraintType{
-    EQUAL      ,//等しい値
+    EQUAL     ,//等しい値
+    CONCURRENT,//平行
     EMPTY,
 };
 
@@ -40,17 +61,20 @@ public:
     static QVector<RestraintType> Restraintable(const QVector<CObject*> nodes);
 
     //作成
-    void Create(const QVector<CObject*> nodes,double value);
+    void Create(const QVector<CObject*> nodes,double value = 0);
 
     //拘束再計算
     virtual void Calc() = 0;
+    //解決済みか判定
+    virtual bool isComplete() = 0;
 
 
 public slots:
     virtual void ChangeObjectCallback(CObject*){}
 
 signals:
-    void Changed();
+    void Changed(); //変更シグナル
+    void Destroy(); //自身削除シグナル
 };
 
 //等しい値
@@ -58,11 +82,26 @@ class EqualLengthRestraint: public Restraint{
     Q_OBJECT
 public:
     //CEdge限定
-    static bool Restraintable(const QVector<CObject*> nodes);
+    ALL_SAME_TYPE_RESTRAINTABLE(CEdge)
     virtual void Calc();
+    virtual bool isComplete();
 
 public slots:
-    virtual void ChangeObjectCallback(CObject*);
+    DESTROY_CALLBACK
 };
+
+//平行
+class ConcurrentRestraint: public Restraint{
+    Q_OBJECT
+public:
+    //CEdge限定
+    ALL_SAME_TYPE_RESTRAINTABLE(CEdge)
+    virtual void Calc();
+    virtual bool isComplete();
+
+public slots:
+    DESTROY_CALLBACK
+};
+
 
 #endif // RESTRAINT_H
