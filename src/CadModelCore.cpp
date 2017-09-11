@@ -246,7 +246,6 @@ bool CadModelCore::ImportFoamFile(QString filename){
     return true;
 }
 
-
 void CadModelCore::AddObject(CObject* obj){
     if(obj->is<CPoint>())this->AddPoints(dynamic_cast<CPoint*>(obj));
     if(obj->is<CEdge >())this->AddEdges (dynamic_cast<CEdge* >(obj));
@@ -354,6 +353,11 @@ void CadModelCore::Delete(CObject* obj){
     if(obj->is<CFace> ())this->Delete(dynamic_cast<CFace* >(obj));
     if(obj->is<CBlock>())this->Delete(dynamic_cast<CBlock*>(obj));
 }
+void CadModelCore::Delete(Restraint* obj){
+    this->Restraints.removeAll(obj);
+    emit UpdateRestraints();
+}
+
 
 void CadModelCore::SelectedClear(){
     this->Selected.clear();

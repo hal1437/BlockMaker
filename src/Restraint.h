@@ -25,7 +25,7 @@ virtual void ChangeObjectCallback(CObject* obj){            \
 //監視コールバック:自信を削除
 #define DESTROY_CALLBACK                        \
 virtual void ChangeObjectCallback(CObject*){    \
-    emit Destroy();                             \
+    emit Destroy(this);                         \
 }
 
 //監視コールバック:自信を削除
@@ -82,7 +82,7 @@ public slots:
 
 signals:
     void Changed(); //変更シグナル
-    void Destroy(); //自身削除シグナル
+    void Destroy(Restraint*); //自壊シグナル
 };
 
 //等しい値

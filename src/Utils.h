@@ -12,33 +12,11 @@
 #define MOUSE_ZOOM_RATE 10000.0
 #define NearlyEqual(RHS,LHS) (std::abs(RHS-LHS) < 0.000001)
 
-
-//監視オブジェクトの定義、関数宣言を行う
-#define DEFINE_OBSERVER(TYPE,NAME)               \
-private:                                         \
-    QVector<TYPE> NAME;                          \
-public slots:                                    \
-    QVector<TYPE>& Get##NAME(){return NAME;}     \
-    QVector<TYPE>  Get##NAME()const{return NAME;}\
-    inline void Add##NAME(TYPE value){           \
-        connect(value,SIGNAL(Changed()),this,SLOT(Update##NAME##Emittor())); \
-        if(!exist(NAME,value)){                  \
-            NAME.push_back(value);               \
-            emit Update##NAME();                 \
-        }                                        \
-    }                                            \
-    inline void Remove##NAME(TYPE value){        \
-        disconnect(value,SIGNAL(Changed()),this,SLOT(Update##NAME##Emittor())); \
-        NAME.removeAll(value);                   \
-        emit Update##NAME();                     \
-    }                                            \
-
+//シグナル発生スロット
 #define DEFINE_EMITTOR(NAME) \
 void NAME##Emittor(){        \
     emit NAME();             \
 }
-
-
 
 //配列内に要素が存在しているかの確認
 template<class C,class V>

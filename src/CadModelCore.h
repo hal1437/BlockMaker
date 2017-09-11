@@ -14,19 +14,68 @@
 #include "Restraint.h"
 
 
+//監視変数追加
+#define OBSERVER_BASE(TYPE,NAME)                    \
+private:                                            \
+    QVector<TYPE> NAME;                             \
+public slots:                                       \
+    QVector<TYPE>& Get##NAME()     {return NAME;}   \
+    QVector<TYPE>  Get##NAME()const{return NAME;}
 
+//通常追加マクロ
+#define OBSERVER_IO_COBJECT(TYPE,NAME)                                      \
+inline void Add##NAME(TYPE value){                                          \
+    connect(value,SIGNAL(Changed()),this,SLOT(Update##NAME##Emittor()));    \
+    if(!exist(NAME,value)){                                                 \
+        NAME.push_back(value);                                              \
+        emit Update##NAME();                                                \
+    }                                                                       \
+}                                                                           \
+inline void Remove##NAME(TYPE value){                                       \
+    disconnect(value,SIGNAL(Changed()),this,SLOT(Update##NAME##Emittor())); \
+    NAME.removeAll(value);                                                  \
+    emit Update##NAME();                                                    \
+}
+//自壊追加マクロ
+#define OBSERVER_IO_RESTRAINT(TYPE,NAME)                                    \
+inline void Add##NAME(TYPE value){                                          \
+    connect(value,SIGNAL(Changed())    ,this,SLOT(Update##NAME##Emittor()));\
+    connect(value,SIGNAL(Destroy(TYPE)),this,SLOT(Delete(TYPE)));           \
+    if(!exist(NAME,value)){                                                 \
+        NAME.push_back(value);                                              \
+        emit Update##NAME();                                                \
+    }                                                                       \
+}                                                                           \
+inline void Remove##NAME(TYPE value){                                       \
+    disconnect(value,SIGNAL(Changed()),this,SLOT(Update##NAME##Emittor())); \
+    disconnect(value,SIGNAL(Destroy(TYPE)),this,SLOT(Delete(TYPE)));        \
+    NAME.removeAll(value);                                                  \
+    emit Update##NAME();                                                    \
+}
+
+//監視オブジェクトの定義、関数宣言を行う
+#define DEFINE_OBSERVER_COBJECT(TYPE,NAME)          \
+    OBSERVER_BASE(TYPE,NAME)                        \
+    OBSERVER_IO_COBJECT(TYPE,NAME)
+#define DEFINE_OBSERVER_RESTRAINT(TYPE,NAME)        \
+    OBSERVER_BASE(TYPE,NAME)                        \
+    OBSERVER_IO_RESTRAINT(TYPE,NAME)
+
+
+//クラス定義
 class CadModelCore:public QObject
 {
     Q_OBJECT
 
 public:
     //オブジェクト定義
-    DEFINE_OBSERVER(CObject*        ,Selected  )
-    DEFINE_OBSERVER(CPoint*         ,Points    )
-    DEFINE_OBSERVER(CEdge*          ,Edges     )
-    DEFINE_OBSERVER(CFace*          ,Faces     )
-    DEFINE_OBSERVER(CBlock*         ,Blocks    )
-    DEFINE_OBSERVER(Restraint*      ,Restraints)
+    DEFINE_OBSERVER_COBJECT(CObject*  ,Selected  )
+    DEFINE_OBSERVER_COBJECT(CPoint*   ,Points    )
+    DEFINE_OBSERVER_COBJECT(CEdge*    ,Edges     )
+    DEFINE_OBSERVER_COBJECT(CFace*    ,Faces     )
+    DEFINE_OBSERVER_COBJECT(CBlock*   ,Blocks    )
+
+    DEFINE_OBSERVER_RESTRAINT(Restraint*      ,Restraints)
     //DEFINE_OBSERVER(SmartDimension* ,Dimensions)
 
 public:
@@ -53,13 +102,6 @@ public:
     QVector<CFace*>  GetParent(CEdge*  child)const;
     QVector<CEdge*>  GetParent(CPoint* child)const;
 
-    //削除
-    void Delete(CBlock* obj);
-    void Delete(CFace*  obj);
-    void Delete(CEdge*  obj);
-    void Delete(CPoint* obj);
-    void Delete(CObject* obj);
-
     //選択解除
     void SelectedClear();
 
@@ -75,6 +117,14 @@ public slots:
     DEFINE_EMITTOR(UpdateDimensions)
     DEFINE_EMITTOR(UpdateAnyObject)
     DEFINE_EMITTOR(UpdateAnyAction)
+
+    //削除
+    void Delete(CBlock* obj);
+    void Delete(CFace*  obj);
+    void Delete(CEdge*  obj);
+    void Delete(CPoint* obj);
+    void Delete(CObject* obj);
+    void Delete(Restraint* obj);
 
 public:
     explicit CadModelCore(QWidget *parent = 0);
