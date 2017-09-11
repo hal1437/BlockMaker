@@ -29,6 +29,7 @@ public slots:
     void RelativeMove(Pos diff);
     void Accept();
     void Duplicate();
+//    void UpdateObjects(); //オブジェクト更新
 
 signals:
     void RepaintRequest();

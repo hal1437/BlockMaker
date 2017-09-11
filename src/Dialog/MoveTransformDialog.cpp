@@ -18,6 +18,17 @@ MoveTransformDialog::~MoveTransformDialog()
     delete ui;
 }
 
+QVector<CPoint*> MoveTransformDialog::GetSelectedPoint(){
+    QVector<CPoint*> ans;
+    for(CObject* obj:this->model->GetSelected()){
+        for(CPoint* child:obj->GetAllChildren()){
+            ans.push_back(child);
+        }
+    }
+    unique(ans);//排他
+    return ans;
+}
+
 void MoveTransformDialog::keyPressEvent(QKeyEvent *event){
     if(event->key() == Qt::Key_Shift){
         this->ui->XSpinBox->setValue(-this->ui->XSpinBox->value());
@@ -34,30 +45,22 @@ void MoveTransformDialog::keyReleaseEvent(QKeyEvent *event){
     }
 }
 
-
-QVector<CPoint*> MoveTransformDialog::GetSelectedPoint(){
-    QVector<CPoint*> ans;
-    for(CObject* s : this->model->GetSelected()){
-        for(CPoint* p : s->GetAllChildren()){
-            ans.push_back(p);
-        }
-    }
-
-    //排他
-    unique(ans);
-    std::sort(ans.begin(),ans.end());
-    ans.erase(std::unique(ans.begin(),ans.end()),ans.end());
-    return ans;
-}
-
 void MoveTransformDialog::AbsoluteMove(Pos pos){
-    for(CPoint* p :this->GetSelectedPoint()){
-        if(this->ui->MovingCombo->currentText() == "追従")p->MoveAbsolute(pos);
-        if(this->ui->MovingCombo->currentText() == "強制")*p = pos;
+    //選択された点の平均値を絶対移動
+    Pos delta;
+    QVector<CPoint*> array =  this->GetSelectedPoint();
+    for(CPoint* p :array)delta += *p;
+    delta /= array.size();
+
+    //移動
+    for(CPoint* p :array){
+        if(this->ui->MovingCombo->currentText() == "追従")p->MoveAbsolute(*p-delta+pos);
+        if(this->ui->MovingCombo->currentText() == "強制")*p = *p-delta+pos;
     }
 }
 
 void MoveTransformDialog::RelativeMove(Pos diff){
+    //選択された点を相対移動
     for(CPoint* p :this->GetSelectedPoint()){
         if(this->ui->MovingCombo->currentText() == "追従")p->MoveRelative(diff);
         if(this->ui->MovingCombo->currentText() == "強制")*p += diff;
