@@ -230,6 +230,7 @@ void SolidEditForm::paintGL(){
     if(this->controller->theta1 < -M_PI/2) this->controller->theta1 = -M_PI/2;
     if(this->round              <  0     ) this->round = 0.00001;
     this->camera = Pos(0,0,round).Dot(this->controller->getCameraMatrix());
+
     glMatrixMode(GL_PROJECTION);  //行列モード切替
     glLoadIdentity();
     glOrtho(-this->width() *(round),
@@ -249,8 +250,16 @@ void SolidEditForm::paintGL(){
     glDepthFunc(GL_LEQUAL);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    //オブジェクト更新
-    //for(Restraint* rest : this->model->GetRestraints())rest->Calc();
+    //幾何拘束更新
+    for(Restraint* rest : this->model->GetRestraints()){
+        //rest->Calc();
+        QImage img(rest->GetIconPath());
+        QImage glimg = QGLWidget::convertToGLFormat(img);
+        for(Pos pp:rest->GetIconPoint()){
+            glRasterPos3f(pp.x(),pp.y(),pp.z());
+            glDrawPixels( img.width(), img.height(), GL_RGBA, GL_UNSIGNED_BYTE, glimg.bits());
+        }
+    }
 
     //オブジェクト描画
     glLineWidth(2);

@@ -28,6 +28,13 @@ virtual void ChangeObjectCallback(CObject*){    \
     emit Destroy();                             \
 }
 
+//監視コールバック:自信を削除
+#define DEFINE_ICON_PATH(PATH)      \
+virtual QString GetIconPath()const{ \
+    return QString(PATH);           \
+}
+
+
 
 enum RestraintType{
     EQUAL     ,//等しい値
@@ -63,10 +70,11 @@ public:
     //作成
     void Create(const QVector<CObject*> nodes,double value = 0);
 
-    //拘束再計算
-    virtual void Calc() = 0;
-    //解決済みか判定
-    virtual bool isComplete() = 0;
+    virtual void Calc() = 0;//拘束再計算
+    virtual bool isComplete() = 0;//解決済みか判定
+
+    virtual QString GetIconPath()const = 0;//アイコン
+    virtual QVector<Pos> GetIconPoint()const;//アイコン表示点を取得
 
 
 public slots:
@@ -83,6 +91,7 @@ class EqualLengthRestraint: public Restraint{
 public:
     //CEdge限定
     ALL_SAME_TYPE_RESTRAINTABLE(CEdge)
+    DEFINE_ICON_PATH(":/Restraint/EqualRestraint.png")
     virtual void Calc();
     virtual bool isComplete();
 
@@ -96,6 +105,7 @@ class ConcurrentRestraint: public Restraint{
 public:
     //CEdge限定
     ALL_SAME_TYPE_RESTRAINTABLE(CEdge)
+    DEFINE_ICON_PATH(":/Restraint/ConcurrentRestraint.png")
     virtual void Calc();
     virtual bool isComplete();
 

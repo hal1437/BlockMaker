@@ -25,6 +25,25 @@ void Restraint::Create(const QVector<CObject*> nodes, double value){
     this->setValue(value);
 }
 
+QVector<Pos> Restraint::GetIconPoint()const{
+    QVector<Pos> ans;
+    for(CObject* obj:this->nodes){
+        Pos p;
+        if(obj->is<CPoint>())p = *dynamic_cast<CPoint*>(obj);//点自身
+        else if(obj->is<CEdge>() )p = dynamic_cast<CEdge*>(obj)->GetMiddleDivide(0.5);//中点
+        else {
+            QVector<CPoint*> children = obj->GetAllChildren();
+            for(CPoint* pos:children){
+                p += *pos;
+            }
+            p /= children.size();
+        }
+        ans.push_back(p);
+    }
+    return ans;
+}
+
+
 bool EqualLengthRestraint::isComplete(){
     double dd = (*dynamic_cast<CEdge*>(this->nodes[0])->end - *dynamic_cast<CEdge*>(this->nodes[0])->start).Length();
     return std::all_of(this->nodes.begin()+1,this->nodes.end(),[dd](CObject* obj){

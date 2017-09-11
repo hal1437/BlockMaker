@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QMouseEvent>
 #include <QOpenGLWidget>
+#include <QGLWidget>
 #include "MakeObjectController.h"
 #include "SolidEditController.h"
 #include "TimeDivider.h"
