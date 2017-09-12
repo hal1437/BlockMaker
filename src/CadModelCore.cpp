@@ -271,7 +271,6 @@ void CadModelCore::Merge(QVector<CPoint*> points){
         }
     }
 }
-
 void CadModelCore::AutoMerge_impl(QVector<CPoint*> points){
     for(int i=0;i<points.size();i++){
         QVector<CPoint*> same;
@@ -290,14 +289,12 @@ void CadModelCore::AutoMerge_impl(QVector<CPoint*> points){
         }
     }
 }
-
 void CadModelCore::AutoMerge(){
     this->AutoMerge_impl(this->GetPoints());
 }
 void CadModelCore::AutoMerge(CObject* obj){
     this->AutoMerge_impl(obj->GetAllChildren());
 }
-
 
 QVector<CBlock*> CadModelCore::GetParent(CFace*  child)const{
     QVector<CBlock*>ans;
@@ -358,6 +355,11 @@ void CadModelCore::Delete(Restraint* obj){
     emit UpdateRestraints();
 }
 
+void CadModelCore::UpdatePause(){
+}
+
+void CadModelCore::UpdateRestart(){
+}
 
 void CadModelCore::SelectedClear(){
     this->Selected.clear();

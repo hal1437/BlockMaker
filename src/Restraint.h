@@ -8,9 +8,9 @@
 #include "CObject/CSpline.h"
 
 //拘束生成条件マクロ:全て同じ型
-#define ALL_SAME_TYPE_RESTRAINTABLE(TYPE)                                                                           \
+#define ALL_SAME_TYPE_RESTRAINTABLE(TYPE,MIN_COUNT)                                                                           \
 static bool Restraintable(const QVector<CObject *> nodes){                                                          \
-    return (nodes.size()>=2 && std::all_of(nodes.begin(),nodes.end(),[](CObject* obj){return obj->is<TYPE>();}));   \
+    return (nodes.size()>=MIN_COUNT && std::all_of(nodes.begin(),nodes.end(),[](CObject* obj){return obj->is<TYPE>();}));   \
 }
 //監視コールバック:先頭に出す
 #define SWAP_FRONT_CALLBACK                                 \
@@ -25,7 +25,7 @@ virtual void ChangeObjectCallback(CObject* obj){            \
 //監視コールバック:自信を削除
 #define DESTROY_CALLBACK                        \
 virtual void ChangeObjectCallback(CObject*){    \
-    emit Destroy(this);                         \
+    if(!this->isComplete())emit Destroy(this);  \
 }
 
 //監視コールバック:自信を削除
@@ -37,9 +37,10 @@ virtual QString GetIconPath()const{ \
 
 
 enum RestraintType{
-    EQUAL     ,//等しい値
-    CONCURRENT,//平行
-    EMPTY,
+    EQUAL      , //等しい値
+    CONCURRENT , //平行
+    LOCK       , //固定
+    EMPTY      ,
 };
 
 //幾何拘束
@@ -79,6 +80,7 @@ public:
 
 public slots:
     virtual void ChangeObjectCallback(CObject*){}
+    DESTROY_CALLBACK
 
 signals:
     void Changed(); //変更シグナル
@@ -90,28 +92,38 @@ class EqualLengthRestraint: public Restraint{
     Q_OBJECT
 public:
     //CEdge限定
-    ALL_SAME_TYPE_RESTRAINTABLE(CEdge)
+    ALL_SAME_TYPE_RESTRAINTABLE(CEdge,2)
     DEFINE_ICON_PATH(":/Restraint/EqualRestraint.png")
     virtual void Calc();
     virtual bool isComplete();
 
-public slots:
-    DESTROY_CALLBACK
 };
 
 //平行
 class ConcurrentRestraint: public Restraint{
     Q_OBJECT
 public:
-    //CEdge限定
-    ALL_SAME_TYPE_RESTRAINTABLE(CEdge)
+    //CLine限定
+    ALL_SAME_TYPE_RESTRAINTABLE(CLine,2)
     DEFINE_ICON_PATH(":/Restraint/ConcurrentRestraint.png")
     virtual void Calc();
     virtual bool isComplete();
-
-public slots:
-    DESTROY_CALLBACK
 };
+
+//固定
+class LockRestraint: public Restraint{
+    Q_OBJECT
+public:
+    //1つ以上であれば全て可
+    ALL_SAME_TYPE_RESTRAINTABLE(CObject,1)
+    DEFINE_ICON_PATH(":/Restraint/LockRestraint.png")
+    virtual void Calc();
+    virtual bool isComplete();
+public slots:
+    //自壊コールバックのオーバーライド
+    virtual void ChangeObjectCallback(CObject*);
+};
+
 
 
 #endif // RESTRAINT_H

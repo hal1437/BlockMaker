@@ -36,6 +36,7 @@ inline void Remove##NAME(TYPE value){                                       \
     NAME.removeAll(value);                                                  \
     emit Update##NAME();                                                    \
 }
+
 //自壊追加マクロ
 #define OBSERVER_IO_RESTRAINT(TYPE,NAME)                                    \
 inline void Add##NAME(TYPE value){                                          \
@@ -80,6 +81,7 @@ public:
 
 public:
     CPoint* origin; //原点
+    DEFINE_FLAG(pause,false)             //更新停止フラグ
 
     //自動点結合
     void AutoMerge_impl(QVector<CPoint*> points);
@@ -126,6 +128,10 @@ public slots:
     void Delete(CObject* obj);
     void Delete(Restraint* obj);
 
+    //更新操作関数
+    void UpdatePause();   //停止
+    void UpdateRestart(); //再始動
+
 public:
     explicit CadModelCore(QWidget *parent = 0);
     ~CadModelCore();
@@ -141,6 +147,10 @@ signals:
     void UpdateDimensions();
     void UpdateAnyObject ();
     void UpdateAnyAction ();
+    void ChangedPoints   (QVector<CPoint*>);
+    void ChangedEdges    (QVector<CEdge* >);
+    void ChangedFaces    (QVector<CFace* >);
+    void ChangedBlocks   (QVector<CBlock*>);
 };
 
 class CadModelCoreInterface{

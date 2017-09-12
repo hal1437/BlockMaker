@@ -45,6 +45,7 @@ QVector<Pos> Restraint::GetIconPoint()const{
 
 
 bool EqualLengthRestraint::isComplete(){
+    //全てのEdgeの長さが同じ
     double dd = (*dynamic_cast<CEdge*>(this->nodes[0])->end - *dynamic_cast<CEdge*>(this->nodes[0])->start).Length();
     return std::all_of(this->nodes.begin()+1,this->nodes.end(),[dd](CObject* obj){
         CEdge* edge = dynamic_cast<CEdge*>(obj);
@@ -52,11 +53,24 @@ bool EqualLengthRestraint::isComplete(){
     });
 }
 bool ConcurrentRestraint::isComplete(){
+    //全てのEdgeの向きが同じ
     Pos pos = (*dynamic_cast<CEdge*>(this->nodes[0])->end - *dynamic_cast<CEdge*>(this->nodes[0])->start).GetNormalize();
     return std::all_of(this->nodes.begin()+1,this->nodes.end(),[pos](CObject* obj){
         CEdge* edge = dynamic_cast<CEdge*>(obj);
         return (*edge->end - *edge->start).GetNormalize() == pos;
     });
+}
+
+bool LockRestraint::isComplete(){
+    bool unlocked = false;
+    for(CObject* child :this->nodes){
+        for(CPoint* pp:child->GetAllChildren()){
+            //一つでもロックが解除されていれば
+            if(!pp->isLock())unlocked = false;
+        }
+    }
+    //ロック解除
+    return unlocked;
 }
 
 void EqualLengthRestraint::Calc(){
@@ -84,10 +98,43 @@ void ConcurrentRestraint::Calc(){
         CEdge* edge = dynamic_cast<CEdge*>(this->nodes[i]);
         //endを移動させる
         double l = (*edge->end  - *edge->start).Length();
-        *edge->end = base * l + *edge->start;
+        if((*edge->end - *edge->start).DotPos(base) < 0) l = -l;//反転
+        edge->end->MoveAbsolute(base * l + *edge->start);
         changed = true;
     }
     if(changed){
         //emit Changed();
     }
 }
+
+void ConcurrentRestraint::Calc(){
+    //先頭のCEdgeと同じ向きに変更する。
+    bool changed = false;
+    Pos base = (*dynamic_cast<CEdge*>(this->nodes[0])->end - *dynamic_cast<CEdge*>(this->nodes[0])->start).GetNormalize();
+    for(int i=1;i<this->nodes.size();i++){
+        CEdge* edge = dynamic_cast<CEdge*>(this->nodes[i]);
+        //endを移動させる
+        double l = (*edge->end  - *edge->start).Length();
+        if((*edge->end - *edge->start).DotPos(base) < 0) l = -l;//反転
+        edge->end->MoveAbsolute(base * l + *edge->start);
+        changed = true;
+    }
+    if(changed){
+        //emit Changed();
+    }
+}
+
+virtual void ChangeObjectCallback(CObject*){
+    if(!this->isComplete()){
+        //全てのロックの解除
+        for(CObject* child :this->nodes){
+            for(CPoint* pp:child->GetAllChildren()){
+                //全てのロックを解除
+                pp->SetLock(false);
+            }
+        }
+        //自壊
+        emit Destroy(this);
+    }
+}
+
