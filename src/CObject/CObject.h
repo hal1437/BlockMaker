@@ -43,6 +43,7 @@ public:
     DEFINE_FLAG(Lock   ,false)
     DEFINE_FLAG(Visible,true)
     DEFINE_FLAG(VisibleDetail,true)//分割フレーム表示
+    DEFINE_EMITTOR_ARG(Changed,this) // 変更エミッター
 
 protected:
     //子を監視対象にする

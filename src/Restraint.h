@@ -40,6 +40,7 @@ enum RestraintType{
     EQUAL      , //等しい値
     CONCURRENT , //平行
     LOCK       , //固定
+    UNLOCK     , //固定解除
     EMPTY      ,
 };
 
@@ -72,15 +73,13 @@ public:
     void Create(const QVector<CObject*> nodes,double value = 0);
 
     virtual void Calc() = 0;//拘束再計算
-    virtual bool isComplete() = 0;//解決済みか判定
+    virtual bool isComplete(){return true;}//解決済みか判定
 
     virtual QString GetIconPath()const = 0;//アイコン
     virtual QVector<Pos> GetIconPoint()const;//アイコン表示点を取得
 
-
 public slots:
-    virtual void ChangeObjectCallback(CObject*){}
-    DESTROY_CALLBACK
+    DESTROY_CALLBACK //変更時に自壊する。
 
 signals:
     void Changed(); //変更シグナル
@@ -114,14 +113,23 @@ public:
 class LockRestraint: public Restraint{
     Q_OBJECT
 public:
-    //1つ以上であれば全て可
-    ALL_SAME_TYPE_RESTRAINTABLE(CObject,1)
+    //ロックされていないオブジェクト以上であれば全て可
+    static bool Restraintable(const QVector<CObject *> nodes);
     DEFINE_ICON_PATH(":/Restraint/LockRestraint.png")
     virtual void Calc();
     virtual bool isComplete();
 public slots:
     //自壊コールバックのオーバーライド
     virtual void ChangeObjectCallback(CObject*);
+};
+//固定解除
+class UnlockRestraint: public Restraint{
+    Q_OBJECT
+public:
+    //ロックされているオブジェクト以上であれば全て可
+    static bool Restraintable(const QVector<CObject *> nodes);
+    DEFINE_ICON_PATH(":/Restraint/UnlockRestraint.png")
+    virtual void Calc();
 };
 
 

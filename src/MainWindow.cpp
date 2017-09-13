@@ -124,8 +124,8 @@ void MainWindow::RefreshUI(){
         //if(r == VERTICAL  )p = std::make_pair("垂直"   ,":/Restraint/VerticalRestraint.png");
         //if(r == HORIZONTAL)p = std::make_pair("水平"   ,":/Restraint/HorizontalRestraint.png");
         //if(r == TANGENT   )p = std::make_pair("正接"   ,":/Restraint/TangentRestraint.png");
-        //if(r == LOCK      )p = std::make_pair("固定"   ,":/Restraint/LockRestraint.png");
-        //if(r == UNLOCK    )p = std::make_pair("固定解除",":/Restraint/UnlockRestraint.png");
+        if(r == LOCK      )p = std::make_pair("固定"   ,":/Restraint/LockRestraint.png");
+        if(r == UNLOCK    )p = std::make_pair("固定解除",":/Restraint/UnlockRestraint.png");
         //if(r == MARGE     )p = std::make_pair("マージ"  ,":/Restraint/Marge.png");
         ui->RestraintList->addItem(new QListWidgetItem(p.first.c_str()));
         ui->RestraintList->item(ui->RestraintList->count()-1)->setIcon(QIcon(p.second.c_str()));
@@ -199,11 +199,18 @@ void MainWindow::MakeRestraint(){
     //if(ui->RestraintList->currentItem()->text() == "垂直")type = VERTICAL;
     //if(ui->RestraintList->currentItem()->text() == "水平")type = HORIZONTAL;
     //if(ui->RestraintList->currentItem()->text() == "正接")type = TANGENT;
-    //if(ui->RestraintList->currentItem()->text() == "固定")type = LOCK;
-    //if(ui->RestraintList->currentItem()->text() == "固定解除")type = UNLOCK;
+    if(ui->RestraintList->currentItem()->text() == "固定"){
+        rest = new LockRestraint();
+        rest->Create(this->model->GetSelected());
+    }
+    if(ui->RestraintList->currentItem()->text() == "固定解除"){
+        rest = new UnlockRestraint();
+        rest->Create(this->model->GetSelected());
+    }
     if(rest != nullptr){
-        rest->Calc();
         this->model->AddRestraints(rest);
+        rest->Calc();
+        this->model->SelectedClear();
     }
     ui->RestraintList->clear();
     //this->RefreshUI();
@@ -211,57 +218,18 @@ void MainWindow::MakeRestraint(){
 }
 
 void MainWindow::MakeBlock(){
-    //CBoxDefineDialog* diag = new CBoxDefineDialog();
-
-    //diag->SetModel(this->model);
-
-    //すでに作成済みのブロックであれば
-    /*
-    if(this->model->GetSelected().size() == 1 && this->model->GetSelected()[0]->is<CBlock>()){
-        //定義編集
-        diag->block = dynamic_cast<CBlock*>(this->model->GetSelected()[0]);
-        diag->ImportCBlock();
-    }else{
-        //新規定義
-        CBlock* block = new CBlock(this);
-        for(QObject* obj: this->model->GetSelected()){
-            block->faces.push_back(dynamic_cast<CFace*>(obj));
-        }
-
-        //コネクト
-        for(int i=0;i<12;i++){
-            connect(block->GetPointSequence(i),SIGNAL(Changed()),block,SLOT(RefreshDividePoint()));
-        }
-        diag->block = block;
-        diag->ImportCBlock();
-        block->RefreshDividePoint();
-    }
-
-    //ダイアログ起動
-    if(diag->exec()){
-        diag->ExportCBlock();
-        if(!exist(this->model->GetBlocks(),diag->block)){
-            this->model->AddBlocks(diag->block);
-        }
-        this->model->SelectedClear();//選択解除
-    }*/
-
     CBlock* block = new CBlock(this);
-
     QVector<CFace*> faces;
     for(CObject* obj:this->model->GetSelected()){
         faces.push_back(dynamic_cast<CFace*>(obj));
     }
-
     block->Create(faces);
     this->model->AddBlocks(block);
-
-    RefreshUI();
+    this->model->GetSelected().clear();//選択解除
 }
 void MainWindow::MakeFace(){
     CFace* face = new CFace(this);
     QVector<CEdge*> ee;
-
     for(QObject* obj: this->model->GetSelected()){
         ee.push_back(dynamic_cast<CEdge*>(obj));
     }

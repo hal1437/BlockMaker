@@ -17,6 +17,10 @@
 void NAME##Emittor(){        \
     emit NAME();             \
 }
+#define DEFINE_EMITTOR_ARG(NAME,ARG) \
+void NAME##Emittor(){                \
+    emit NAME(ARG);                  \
+}
 
 //配列内に要素が存在しているかの確認
 template<class C,class V>
