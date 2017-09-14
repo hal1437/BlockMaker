@@ -251,6 +251,7 @@ void SolidEditForm::paintGL(){
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     //幾何拘束描画
+    Quat quat = Quat::getRotateXMatrix(this->controller->theta1).Dot(Quat::getRotateYMatrix(this->controller->theta2));
     QVector<std::pair<Pos,QVector<QString>>> rest_maps;
     for(Restraint* rest : this->model->GetRestraints()){
         for(Pos pp:rest->GetIconPoint()){
@@ -271,7 +272,8 @@ void SolidEditForm::paintGL(){
         for(int i=0;i<ss.second.size();i++){
             QImage img(ss.second[i]);
             QImage glimg = QGLWidget::convertToGLFormat(img);
-            glRasterPos3f(ss.first.x()+i*30,ss.first.y(),ss.first.z());
+            Pos cp = ss.first + Pos(30*i,0,0).Dot(quat);
+            glRasterPos3f(cp.x(),cp.y(),cp.z());
             glDrawPixels(img.width(), img.height(), GL_RGBA, GL_UNSIGNED_BYTE, glimg.bits());
         }
     }
