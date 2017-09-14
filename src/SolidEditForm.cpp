@@ -250,14 +250,29 @@ void SolidEditForm::paintGL(){
     glDepthFunc(GL_LEQUAL);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    //幾何拘束更新
+    //幾何拘束描画
+    QVector<std::pair<Pos,QVector<QString>>> rest_maps;
     for(Restraint* rest : this->model->GetRestraints()){
-        //rest->Calc();
-        QImage img(rest->GetIconPath());
-        QImage glimg = QGLWidget::convertToGLFormat(img);
         for(Pos pp:rest->GetIconPoint()){
-            glRasterPos3f(pp.x(),pp.y(),pp.z());
-            glDrawPixels( img.width(), img.height(), GL_RGBA, GL_UNSIGNED_BYTE, glimg.bits());
+            bool exist = false;
+            for(std::pair<Pos,QVector<QString>>& p: rest_maps){
+                if(p.first == pp){
+                    p.second.push_back(rest->GetIconPath());
+                    exist = true;
+                    break;
+                }
+            }
+            if(exist != true){
+                rest_maps.push_back(std::make_pair(pp,QVector<QString>{rest->GetIconPath()}));
+            }
+        }
+    }
+    for(std::pair<Pos,QVector<QString>> ss : rest_maps){
+        for(int i=0;i<ss.second.size();i++){
+            QImage img(ss.second[i]);
+            QImage glimg = QGLWidget::convertToGLFormat(img);
+            glRasterPos3f(ss.first.x()+i*30,ss.first.y(),ss.first.z());
+            glDrawPixels(img.width(), img.height(), GL_RGBA, GL_UNSIGNED_BYTE, glimg.bits());
         }
     }
 

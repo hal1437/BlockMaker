@@ -87,7 +87,7 @@ void ConcurrentRestraint::Calc(){
         //endを移動させる
         double l = (*edge->end  - *edge->start).Length();
         if((*edge->end - *edge->start).DotPos(base) < 0) l = -l;//反転
-        edge->end->MoveAbsolute(base * l + *edge->start);
+        *edge->end = base * l + *edge->start;
         changed = true;
     }
     if(changed){

@@ -14,11 +14,12 @@ void CPoint::DrawGL(Pos camera,Pos center)const{
     Pos cc = camera - center;
     double theta1 = std::atan2(cc.y(),std::sqrt(cc.x()*cc.x()+cc.z()*cc.z()));
     double theta2 = std::atan2(-cc.x(),cc.z());
+    Quat quat = Quat::getRotateXMatrix(theta1).Dot(Quat::getRotateYMatrix(theta2));
     const double length = cc.Length()*10;
     if(!this->isControlPoint()){
         //円の描画
         for(double k=0;k < 2*M_PI;k += M_PI/32){
-            Pos p = Pos(length*std::sin(k),length*std::cos(k),0).Dot(Quat::getRotateXMatrix(theta1).Dot(Quat::getRotateYMatrix(theta2)));
+            Pos p = Pos(length*std::sin(k),length*std::cos(k),0).Dot(quat);
             glVertex3f((p + *this).x(),(p + *this).y(),(p + *this).z());
         }
     }else{
@@ -26,12 +27,24 @@ void CPoint::DrawGL(Pos camera,Pos center)const{
         for(double k=0;k < 2*M_PI;k += M_PI/2){
             Pos p = Pos(length * std::sqrt(2) * std::sin(k+M_PI/4),
                         length * std::sqrt(2) * std::cos(k+M_PI/4),0)
-                        .Dot(Quat::getRotateXMatrix(theta1)
-                        .Dot(Quat::getRotateYMatrix(theta2)));
+                        .Dot(quat);
             glVertex3f((p + *this).x(),(p + *this).y(),(p + *this).z());
         }
     }
     glEnd();
+
+    //固定時
+    if(this->isLock()){
+        //円の描画
+        glBegin(GL_LINES);
+        double angle[4] = {M_PI/4.0, M_PI*5.0/4.0, M_PI*3.0/4.0, M_PI*7.0/4.0};
+        for(int i=0;i<4;i++){
+            Pos p = Pos(length * std::sin(angle[i]),
+                        length * std::cos(angle[i]),0).Dot(quat);
+            glVertex3f((p + *this).x(),(p + *this).y(),(p + *this).z());
+        }
+        glEnd();
+    }
 }
 
 void CPoint::MoveAbsolute(const Pos& diff){
@@ -55,9 +68,9 @@ void CPoint::SetChild(int,CObject*){
 int CPoint::GetChildCount()const{
     return 0;
 }
-QVector<CPoint*> CPoint::GetAllChildren(){
+QVector<CPoint*> CPoint::GetAllChildren() const{
     QVector<CPoint*>ans;
-    ans.push_back(this);
+    ans.push_back(const_cast<CPoint*>(this));
     return ans;
 }
 

@@ -68,7 +68,7 @@ public:
     virtual void     SetChild     (int index,CObject* obj)=0;
     virtual void     InsertChild  (int index,CObject* obj);
     virtual int      GetChildCount()const = 0;
-    virtual QVector<CPoint*> GetAllChildren();
+    virtual QVector<CPoint*> GetAllChildren()const;
 
     //近接点
     virtual Pos GetNearPos (const Pos& hand)const=0;

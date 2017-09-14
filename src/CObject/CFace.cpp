@@ -55,8 +55,10 @@ bool CFace::Creatable(QVector<CObject*> lines){
 }
 void CFace::Create(QVector<CEdge*> edges){
     this->edges = edges;
-    this->ReorderEdges();
-    this->RecalcMesh();
+    if(edges.size()==4){
+        this->ReorderEdges();
+        this->RecalcMesh();
+    }
     for(CEdge* e :this->edges){
         this->ObserveChild(e);
     }
@@ -254,8 +256,18 @@ void CFace::DrawGL(Pos,Pos)const{
                       1.0);
         }
 
-        //面描画
-        DrawFillGL();
+        //四角形以外ならば
+        if(this->edges.size() != 4){
+            //塗りつぶし描画
+            glBegin(GL_POLYGON);
+            for(CPoint* pp :this->GetAllChildren()){
+                glVertex3f(pp->x(),pp->y(),pp->z());
+            }
+            glEnd();
+        }else{
+            //面描画
+            DrawFillGL();
+        }
 
         //色を復元
         glColor4f(currentColor[0],currentColor[1],currentColor[2], currentColor[3]);
@@ -305,9 +317,9 @@ bool CFace::DrawNormArrowGL()const{
 }
 void CFace::DrawFillGL()const{
     //塗りつぶし描画
+    glBegin(GL_QUADS);
     for(double i=0;i<this->mesh_memory.size()-1;i++){//u方向ループ
         for(double j=0;j<this->mesh_memory.first().size()-1;j++){//v方向ループ
-            glBegin(GL_QUADS);
             Pos pp[4] = {
                 this->mesh_memory[i][j],
                 this->mesh_memory[i+1][j],
@@ -317,7 +329,6 @@ void CFace::DrawFillGL()const{
             for(int k=0;k<4;k++){
                 glVertex3f(pp[k].x(),pp[k].y(),pp[k].z());
             }
-            glEnd();
         }
     }
     glEnd();
@@ -469,6 +480,8 @@ void CFace::ChangeChildCallback(CObject* edge){
     }
     //
     //メッシュ再計算
-    this->RecalcMesh();
+    if(this->edges.size() == 4){
+        this->RecalcMesh();
+    }
 }
 

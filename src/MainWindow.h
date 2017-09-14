@@ -61,7 +61,7 @@ public slots:
     void ShowMoveTransform();     //移動ダイアログ表示
     void ShowGridFilter();        //グリッドフィルター表示
 
-    void MakeRestraint();   //拘束作成
+    void MakeRestraint(QListWidgetItem *);   //拘束作成
     void MakeBlock();       //ブロック作成
     void MakeFace();        //面作成
 

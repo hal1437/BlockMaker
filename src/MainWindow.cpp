@@ -31,7 +31,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionOpen       ,SIGNAL(triggered()) ,this,SLOT(Load()));
 
     //リスト変更系
-    connect(ui->RestraintList ,SIGNAL(itemSelectionChanged()) ,this ,SLOT(MakeRestraint()));
+    connect(ui->RestraintList ,SIGNAL(itemClicked(QListWidgetItem*)) ,this ,SLOT(MakeRestraint(QListWidgetItem*)));
 
     //SolidEditFoamにイベントフィルター導入
     this->installEventFilter(ui->SolidEdit);
@@ -182,7 +182,7 @@ void MainWindow::ShowGridFilter(){
     diag->show();
 }
 
-void MainWindow::MakeRestraint(){
+void MainWindow::MakeRestraint(QListWidgetItem*){
     //qDebug() << text;
     Restraint* rest = nullptr;
     if(ui->RestraintList->currentItem()->text() == "等値"){
@@ -213,7 +213,7 @@ void MainWindow::MakeRestraint(){
         this->model->SelectedClear();
     }
     ui->RestraintList->clear();
-    //this->RefreshUI();
+    this->RefreshUI();
 
 }
 
