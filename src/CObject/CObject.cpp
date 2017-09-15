@@ -48,11 +48,11 @@ CObject::CObject(QObject* parent):QObject(parent)
 
 CObject::~CObject(){}
 
-void CObject::ChangeChildCallback(CObject*){
+void CObject::ChangeChildCallback(QVector<CObject*>){
 //    qDebug() << "call";
 }
 
 void CObject::ChangeChildHandler(CObject* ){
-    emit Changed();
+//    emit Changed();
 }
 

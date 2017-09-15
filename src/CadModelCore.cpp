@@ -90,7 +90,6 @@ bool CadModelCore::ExportFoamFile(QString filename)const{
     }
     return true;
 }
-
 bool CadModelCore::ImportFoamFile(QString filename){
 
     std::ifstream in(filename.toStdString().c_str());
@@ -334,12 +333,12 @@ void CadModelCore::Delete(CFace*  obj){
     this->GetFaces().removeAll(obj);
     emit UpdateFaces();
 }
-void  CadModelCore::Delete(CEdge*  obj){
+void CadModelCore::Delete(CEdge*  obj){
     for(CFace* parent:this->GetParent(obj))this->Delete(parent);
     this->GetEdges().removeAll(obj);
     emit UpdateEdges();
 }
-void  CadModelCore::Delete(CPoint* obj){
+void CadModelCore::Delete(CPoint* obj){
     for(CEdge* parent:this->GetParent(obj))this->Delete(parent);
     this->GetPoints().removeAll(obj);
     emit UpdatePoints();
