@@ -15,8 +15,8 @@ public:
 public:
     CPoint* start; //エッジの始点
     CPoint* end;   //エッジの終点
-    OBSERVE_MEMBER(double,Grading)//エッジ寄せ
-    OBSERVE_MEMBER(int   ,Divide )//分割数
+    OBSERVE_MEMBER(double,Grading,grading)//エッジ寄せ
+    OBSERVE_MEMBER(int   ,Divide ,divide)//分割数
 public:
     //分割レート取得
     static double GetDivisionRate(int divide, double grading, int count);

@@ -100,8 +100,8 @@ CEdge* CArc::Clone()const{
     ptr->start  = new CPoint(*this->start ,ptr);
     ptr->end    = new CPoint(*this->end   ,ptr);
     ptr->center = new CPoint(*this->center,ptr);
-    ptr->Grading = this->Grading;
-    ptr->Divide  = this->Divide;
+    ptr->grading = this->grading;
+    ptr->divide  = this->divide;
     return ptr;
 }
 

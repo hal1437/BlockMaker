@@ -37,7 +37,7 @@ public:
     static double drawing_scale;                    //描画スケール
 
     //名前
-    OBSERVE_MEMBER(QString,Name)
+    OBSERVE_MEMBER(QString,Name,name)
 
     //フラグ定義
     DEFINE_FLAG(Lock   ,false)

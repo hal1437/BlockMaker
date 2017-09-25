@@ -56,12 +56,12 @@ T Mod(T lhs,const U& rhs){
 }
 
 //Changeシグナル対象変数マクロ
-#define OBSERVE_MEMBER(TYPE,NAME)             \
+#define OBSERVE_MEMBER(TYPE,CALL,NAME)             \
 protected:                                    \
     TYPE NAME;                                \
 public:                                       \
-    TYPE get##NAME()const{return this->NAME;} \
-    void set##NAME(const TYPE& v){            \
+    TYPE get##CALL()const{return this->NAME;} \
+    void set##CALL(const TYPE& v){            \
         if(this->NAME != v){                  \
             this->NAME = v;                   \
             emit Changed(this);               \

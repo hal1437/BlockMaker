@@ -7,7 +7,7 @@
 class Boundary{
 public:
     //境界の種類
-    enum Type{
+    enum class Type{
         empty         = 0,
         patch         = 1,
         wall          = 2,
@@ -32,7 +32,7 @@ public:
     static CFace* base[3]; //正面,平面,右側面
 
     QVector<CEdge*> edges;                  // 構成線
-    OBSERVE_MEMBER(Boundary::Type,Boundary) // 境界タイプ
+    OBSERVE_MEMBER(Boundary::Type,Boundary,boundary) // 境界タイプ
     DEFINE_FLAG(VisibleDetail,true)         // 分割フレーム表示
     DEFINE_FLAG(Polygon,true)               // ポリゴン判定
     DEFINE_FLAG(FaceBlend,true)             // 面透過判定

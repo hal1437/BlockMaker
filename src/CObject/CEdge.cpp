@@ -102,8 +102,8 @@ void CEdge::SetEndPos(CObject* obj){
 CEdge::CEdge(QObject* parent):
     CObject(parent)
 {
-    this->Divide  = 1;
-    this->Grading = 1.0;
+    this->divide  = 1;
+    this->grading = 1.0;
     this->start = this->end = nullptr;
     this->SetVisibleDetail(false);
 }
