@@ -45,6 +45,17 @@ void MoveTransformDialog::keyReleaseEvent(QKeyEvent *event){
     }
 }
 
+
+void MoveTransformDialog::PauseChanged(){
+    for(CObject* obj:this->model->GetSelected()){
+        obj->ObservePause();
+    }
+}
+void MoveTransformDialog::RestartChanged(){
+    for(CObject* obj:this->model->GetSelected()){
+        obj->ObserveRestart();
+    }
+}
 void MoveTransformDialog::AbsoluteMove(Pos pos){
     //選択された点の平均値を絶対移動
     Pos delta;
@@ -53,18 +64,22 @@ void MoveTransformDialog::AbsoluteMove(Pos pos){
     delta /= array.size();
 
     //移動
+    PauseChanged();
     for(CPoint* p :array){
         if(this->ui->MovingCombo->currentText() == "追従")p->MoveAbsolute(*p-delta+pos);
         if(this->ui->MovingCombo->currentText() == "強制")*p = *p-delta+pos;
     }
+    RestartChanged();
 }
 
 void MoveTransformDialog::RelativeMove(Pos diff){
     //選択された点を相対移動
+    PauseChanged();
     for(CPoint* p :this->GetSelectedPoint()){
         if(this->ui->MovingCombo->currentText() == "追従")p->MoveRelative(diff);
         if(this->ui->MovingCombo->currentText() == "強制")*p += diff;
     }
+    RestartChanged();
 }
 
 void MoveTransformDialog::Accept(){

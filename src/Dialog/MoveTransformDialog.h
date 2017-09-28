@@ -25,6 +25,9 @@ public:
     ~MoveTransformDialog();
 
 public slots:
+    void PauseChanged();
+    void RestartChanged();
+
     void AbsoluteMove(Pos pos);
     void RelativeMove(Pos diff);
     void Accept();

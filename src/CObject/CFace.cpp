@@ -479,7 +479,7 @@ void CFace::ChangeChildCallback(QVector<CObject*> edges){
             //対角エッジの分割数同期
             for(int i=0;i<this->edges.size();i++){
                 if(this->edges[i] == edge){
-                    this->edges[(i+2)%edges.size()]->setDivide(dynamic_cast<CEdge*>(edge)->getDivide());
+                    this->edges[(i+2)%this->edges.size()]->setDivide(dynamic_cast<CEdge*>(edge)->getDivide());
                 }
             }
         }
@@ -487,5 +487,6 @@ void CFace::ChangeChildCallback(QVector<CObject*> edges){
     //
     //メッシュ再計算
     this->RecalcMesh();
+    qDebug() << "re";
 }
 
