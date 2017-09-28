@@ -54,9 +54,6 @@ HEADERS  += src/MainWindow.h \
     src/CObject/CArc.h \
     src/CObject/CSpline.h \
     src/CObject/CBlock.h \
-    src/CObject/CBoxDefineDialog.h \
-    src/GridFilter/GridFilter.h \
-    src/GridFilter/GridFilterDialog.h \
     src/Dialog/ExportDialog.h \
     src/Dialog/GridFilter.h \
     src/Dialog/GridFilterDialog.h \

@@ -42,7 +42,7 @@ public:
 
 public slots:
     //点移動コールバックオーバーライド
-    virtual void ChangeChildCallback(CObject* child);
+    virtual void ChangeChildCallback(QVector<CObject*> child);
 
 };
 

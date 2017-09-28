@@ -121,23 +121,23 @@ CArc::~CArc()
 {
 }
 
-void CArc::ChangeChildCallback(CObject* child){
+void CArc::ChangeChildCallback(QVector<CObject*> child){
     if(this->start==nullptr || this->end==nullptr)return;
 
     //中心の移動
-    if(child == this->center){
+    if(exist(child,this->center)){
         //平均値
         round = ((*this->start - *this->center).Length() + (*this->end - *this->center).Length())/2;
         this->start->MoveAbsolute((*this->start - *this->center).GetNormalize() * round + *this->center);
         this->end  ->MoveAbsolute((*this->end   - *this->center).GetNormalize() * round + *this->center);
     }
     //始点
-    if(child == this->start){
+    if(exist(child,this->start)){
         round = (*this->start - *this->center).Length();
         this->end->MoveAbsolute((*this->end   - *this->center).GetNormalize() * round + *this->center);
     }
     //終点
-    if(child == this->end){
+    if(exist(child,this->end)){
         round = (*this->end - *this->center).Length();
         this->start->MoveAbsolute((*this->start - *this->center).GetNormalize() * round + *this->center);
     }

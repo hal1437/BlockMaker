@@ -47,7 +47,7 @@ public:
 
 public slots:
     //点移動コールバック
-    virtual void ChangeChildCallback(CObject* child);
+    virtual void ChangeChildCallback(QVector<CObject*> child);
 
 };
 

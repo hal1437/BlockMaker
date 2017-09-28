@@ -87,7 +87,7 @@ public:
 
 public slots:
     //線移動コールバック
-    virtual void ChangeChildCallback(CObject* egde);
+    virtual void ChangeChildCallback(QVector<CObject*> egde);
 };
 
 #endif // CFACE_H

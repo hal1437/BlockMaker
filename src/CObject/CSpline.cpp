@@ -199,7 +199,7 @@ CSpline::~CSpline()
 
 }
 //点移動コールバックオーバーライド
-void CSpline::ChangeChildCallback(CObject* ){
+void CSpline::ChangeChildCallback(QVector<CObject *> ){
     RefreshNodes();
 }
 

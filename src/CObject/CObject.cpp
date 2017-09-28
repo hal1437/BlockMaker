@@ -5,14 +5,14 @@ double   CObject::drawing_scale;
 void CObject::ObserveChild(CObject* obj){
     //コールバック接続
     if(obj != nullptr){
-        connect(obj,SIGNAL(Changed(CObject*)),this,SLOT(ChangeChildCallback(CObject*)));
+        connect(obj,SIGNAL(Changed(CObject*)),this,SLOT(StackChangeCallback(CObject*)));
     }
 }
 
 void CObject::IgnoreChild(CObject* obj){
     //コールバック接続解除
     if(obj != nullptr){
-        disconnect(obj,SIGNAL(Changed(CObject*)),this,SLOT(ChangeChildCallback(CObject*)));
+        disconnect(obj,SIGNAL(Changed(CObject*)),this,SLOT(StackChangeCallback(CObject*)));
     }
 }
 
@@ -41,18 +41,33 @@ QVector<CPoint *> CObject::GetAllChildren()const{
     return ans;
 }
 
+
+void CObject::ObservePause  (){
+    this->observe_pause = true;
+}
+void CObject::ObserveRestart(){
+    this->observe_pause = false;
+    if(this->observe_queue.size() > 0){
+        //更新
+        this->ChangeChildCallback(this->observe_queue);
+        this->observe_queue.clear();
+    }
+}
+
+
 CObject::CObject(QObject* parent):QObject(parent)
 {
-    connect(this,SIGNAL(Changed(CObject*)),this,SLOT(ChangeChildHandler(CObject*)));
 }
 
 CObject::~CObject(){}
 
+
+void CObject::StackChangeCallback(CObject* child){
+    if(this->observe_pause == true){
+         this->observe_queue.push_back(child);
+    }else{
+        this->ChangeChildCallback({child});
+    }
+}
 void CObject::ChangeChildCallback(QVector<CObject*>){
-//    qDebug() << "call";
 }
-
-void CObject::ChangeChildHandler(CObject* ){
-//    emit Changed();
-}
-

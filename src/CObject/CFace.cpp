@@ -426,10 +426,12 @@ int      CFace::GetChildCount()const{
     return this->edges.size();
 }
 Pos      CFace::GetEdgeMiddle(int index,double t)const{
+    if(this->reorder.isEmpty())return (this->GetEdge(index)->GetMiddleDivide(t));
     if(this->reorder[index] == -1)return this->GetEdge(index)->GetMiddleDivide(1.0 - t);
     else                          return this->GetEdge(index)->GetMiddleDivide(t);
 }
 double   CFace::GetGrading(int index)const{
+    if(this->reorder.isEmpty())return (this->GetEdge(index)->getGrading());
     if(this->reorder[index] == -1)return (1/this->GetEdge(index)->getGrading());
     else                          return (  this->GetEdge(index)->getGrading());
 }
@@ -471,17 +473,19 @@ CFace::CFace(QObject* parent):
 
 CFace::~CFace(){}
 
-void CFace::ChangeChildCallback(CObject* edge){
-    //対角エッジの分割数同期
-    for(int i=0;i<edges.size();i++){
-        if(this->edges[i] == edge){
-            this->edges[(i+2)%edges.size()]->setDivide(dynamic_cast<CEdge*>(edge)->getDivide());
+void CFace::ChangeChildCallback(QVector<CObject*> edges){
+    for(CEdge* edge:this->edges){
+        if(exist(edges,edge)){
+            //対角エッジの分割数同期
+            for(int i=0;i<this->edges.size();i++){
+                if(this->edges[i] == edge){
+                    this->edges[(i+2)%edges.size()]->setDivide(dynamic_cast<CEdge*>(edge)->getDivide());
+                }
+            }
         }
     }
     //
     //メッシュ再計算
-    if(this->edges.size() == 4){
-        this->RecalcMesh();
-    }
+    this->RecalcMesh();
 }
 

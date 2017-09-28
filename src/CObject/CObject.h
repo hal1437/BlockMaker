@@ -31,18 +31,23 @@ class CObject:public QObject
 {
     Q_OBJECT
 public:
-    static constexpr double COLLISION_SIZE = 6;     //当たり判定半径
-    static constexpr double DRAWING_LINE_SIZE = 3;  //描画線幅
-    static constexpr double SAME_POINT_EPS = 0.001; //同一点誤差
-    static double drawing_scale;                    //描画スケール
+    static constexpr double  COLLISION_SIZE = 6;     //当たり判定半径
+    static constexpr double  DRAWING_LINE_SIZE = 3;  //描画線幅
+    static constexpr double  SAME_POINT_EPS = 0.001; //同一点誤差
+    static double            drawing_scale;          //描画スケール
+
+public:
 
     //名前
     OBSERVE_MEMBER(QString,Name,name)
 
     //フラグ定義
-    DEFINE_FLAG(Lock   ,false)
-    DEFINE_FLAG(Visible,true)
-    DEFINE_FLAG(VisibleDetail,true)//分割フレーム表示
+    bool              observe_pause; //子の変更による更新を停止
+    QVector<CObject*> observe_queue; //子変更キュー
+
+    DEFINE_FLAG(Lock   ,false)       //固定
+    DEFINE_FLAG(Visible,true)        //表示
+    DEFINE_FLAG(VisibleDetail,true)  //分割フレーム表示
     DEFINE_EMITTOR_ARG(Changed,this) // 変更エミッター
 
 protected:
@@ -77,21 +82,26 @@ public:
     //複製
     virtual  CObject* Clone()const = 0;
 
+    //子監視関連
+    void ObservePause  ();//監視を一時停止
+    void ObserveRestart();//監視を再開
+
+
     //コンストラクタ
     explicit CObject(QObject* parent=nullptr);
     virtual ~CObject();
 
 signals:
     //移動シグナル
+    void Changed();
     void Changed(CObject* child);
 
 public slots:
+    //変更コールバック保存
+    virtual void StackChangeCallback(CObject* children);
     //子変更コールバック
     virtual void ChangeChildCallback(QVector<CObject*> children);
 
-protected slots:
-    //引数有りから無しを呼び出す
-    void ChangeChildHandler(CObject* obj);
 };
 
 

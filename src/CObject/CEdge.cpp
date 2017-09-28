@@ -110,7 +110,7 @@ CEdge::CEdge(QObject* parent):
 
 CEdge::~CEdge(){}
 //点移動コールバック
-void CEdge::ChangeChildCallback(CObject*){
+void CEdge::ChangeChildCallback(QVector<CObject*>){
     emit Changed(this);
 }
 
