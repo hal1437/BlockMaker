@@ -141,6 +141,32 @@ void PropertyDefinitionDialog::Accept(){
     //適用処理
     QVector<CObject*> selected = this->model->GetSelected();
 
+    //更新停止対象選定
+    QVector<CObject*> paused;
+    if(this->constructed == CONSTRUCTED::FACE){
+        for(CBlock* block: this->model->GetBlocks()){
+            for(CObject* obj: selected){
+                for(int i=0;i<block->GetChildCount();i++){
+                    if(block->GetChild(i) == obj){
+                        paused.push_back(block);
+                    }
+                }
+            }
+        }
+    }
+    if(this->constructed == CONSTRUCTED::EDGE){
+        for(CFace* face: this->model->GetFaces()){
+            for(CObject* obj: selected){
+                for(int i=0;i<face->GetChildCount();i++){
+                    if(face->GetChild(i) == obj){
+                        paused.push_back(face);
+                    }
+                }
+            }
+        }
+    }
+    //更新停止
+    for(CObject* obj:paused) obj->ObservePause();
 
     //値を代入
     for(CObject* obj: selected){
@@ -165,6 +191,10 @@ void PropertyDefinitionDialog::Accept(){
             if(this->edge_grading_spin.value() != 0)dynamic_cast<CEdge*>(obj)->setGrading(this->edge_grading_spin.value());
         }
     }
+
+    //更新再開
+    for(CObject* obj:paused) obj->ObserveRestart();
+
     emit RepaintRequest();
 }
 

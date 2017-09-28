@@ -51,6 +51,7 @@ private:
     void ConstructEdge();//Edge用レイアウト定義
 
 public:
+
     bool CheckAvailable()const;
     void SetModel(CadModelCore *m);
 
