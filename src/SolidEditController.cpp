@@ -148,28 +148,20 @@ CFace* SolidEditController::getHangedFace(Pos center,Pos camera_pos)const{
 
     //最も近い面を選択する
     QVector<std::pair<double,CFace*>> rank;
-    rank.push_back(std::make_pair(Collision::GetLengthFaceToLine(CFace::base[0] ,camera_pos,camera_pos-center),CFace::base[0]));
-    rank.push_back(std::make_pair(Collision::GetLengthFaceToLine(CFace::base[1] ,camera_pos,camera_pos-center),CFace::base[1]));
-    rank.push_back(std::make_pair(Collision::GetLengthFaceToLine(CFace::base[2] ,camera_pos,camera_pos-center),CFace::base[2]));
     for(CFace* f:this->model->GetFaces()){
         if(f->isVisible()){
             rank.push_back(std::make_pair(Collision::GetLengthFaceToLine(f,camera_pos,camera_pos-center),f));
         }
     }
 
-    if(std::all_of(rank.begin(),rank.end(),[](std::pair<double,CFace*> v){return v.first==-1;})){
-        return nullptr;
-    }else{
-        rank.erase(std::remove_if(rank.begin(),rank.end(),[](std::pair<double,CFace*> v){
-            return v.first==-1;
-        }),rank.end());
-        std::pair<double,CFace*> a = *std::min_element(rank.begin(),rank.end(),[](std::pair<double,CFace*> lhs,std::pair<double,CFace*> rhs){
-            return lhs.first < rhs.first;
-        });
-        //qDebug() << a.first;
-        return a.second;
-    }
-
+    rank.erase(std::remove_if(rank.begin(),rank.end(),[](std::pair<double,CFace*> v){
+        return v.first==-1;
+    }),rank.end());
+    if(rank.size()==0) return nullptr;
+    std::pair<double,CFace*> a = *std::min_element(rank.begin(),rank.end(),[](std::pair<double,CFace*> lhs,std::pair<double,CFace*> rhs){
+        return lhs.first < rhs.first;
+    });
+    return a.second;
 }
 
 SolidEditController::SolidEditController(QObject *parent):

@@ -20,7 +20,8 @@ class SolidEditForm : public QOpenGLWidget ,public CadModelCoreInterface
 {
     Q_OBJECT
 
-    const int SENSITIVITY = 100;
+    const int    SENSITIVITY        = 100;      //マウス感度
+    const double CAMERA_ANGLE_LIMIT = M_PI/360; //角度限界値
 private:
     SolidEditController* controller;
     MakeObjectController* make_controller;

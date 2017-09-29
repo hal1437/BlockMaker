@@ -16,10 +16,11 @@ void SolidEditForm::MakeObject(){
 CFace* SolidEditForm::GetHangedFace(){
     if(this->controller->isSketcheing())return nullptr;
     Pos  hang_center = (Pos(0,0,1) + this->screen_pos).Dot(this->controller->getCameraMatrix());
-    return  this->controller->getHangedFace(hang_center,this->camera*this->round*1000 + hang_center);
+    return  this->controller->getHangedFace(this->center + hang_center,
+                                            this->camera*this->round + hang_center);
 }
 CObject* SolidEditForm::GetHangedObject(){
-    Pos  hang_center = (Pos(0,0,1) + this->screen_pos).Dot(this->controller->getCameraMatrix());
+    Pos  hang_center = this->center + (Pos(0,0,1) + this->screen_pos).Dot(this->controller->getCameraMatrix());
     return this->controller->getHangedObject(hang_center,(this->camera - this->center).GetNormalize());
 }
 void SolidEditForm::ColorSelect(CObject* obj){
@@ -39,9 +40,18 @@ void SolidEditForm::keyPressEvent    (QKeyEvent *event){
         if(event->key() == Qt::Key_Left  )this->setCameraRotate(0,0);
         if(event->key() == Qt::Key_Right )this->setCameraRotate(0,-M_PI/2);
         if(event->key() == Qt::Key_Down  )this->setCameraRotate(M_PI/4,-M_PI/4);
+        if(event->key() == Qt::Key_Down  ){
+            TimeDivider* t[3],*r;
+            for(int i = 0;i< 3;i++){
+                t[i] = TimeDivider::TimeDivide(this->center.mat[i],0,500);
+                connect(t[i],SIGNAL(PerTime()),this,SLOT(repaint()));
+            }
+            r = TimeDivider::TimeDivide(this->round,1.0,500);
+            connect(r,SIGNAL(PerTime()),this,SLOT(repaint()));
+        }
     }
     shift_pressed = event->modifiers() & Qt::ShiftModifier;
-    ctrl_pressed  = event->modifiers() & Qt::ControlModifier;
+    ctrl_pressed  = event->modifiers() & Qt::MetaModifier;
 
     //スケッチ終了
     if(event->key() == Qt::Key_Escape){
@@ -79,7 +89,7 @@ void SolidEditForm::setCameraRotate(double theta1,double theta2){
 }
 void SolidEditForm::keyReleaseEvent  (QKeyEvent *event){
     shift_pressed = event->modifiers() & Qt::ShiftModifier;
-    ctrl_pressed  = event->modifiers() & Qt::ControlModifier;
+    ctrl_pressed  = event->modifiers() & Qt::MetaModifier;
 }
 void SolidEditForm::mousePressEvent  (QMouseEvent *event){
     this->drag_base   = Pos(event->pos().x(),event->pos().y());
@@ -134,14 +144,14 @@ void SolidEditForm::mouseMoveEvent   (QMouseEvent *event){
     this->screen_pos =  Pos(event->pos().x() - this->width()/2,-(event->pos().y() - this->height()/2)) * 2 * round;
     if(this->controller->isSketcheing()){
         //スケッチ中であれば平面上に点を配置
-        Pos Line_base1 = this->screen_pos.Dot(this->controller->getCameraMatrix());
-        Pos Line_base2 = Pos(0,0,1)      .Dot(this->controller->getCameraMatrix());
+        Pos Line_base1 = this->screen_pos.Dot(this->controller->getCameraMatrix())+ this->center;
+        Pos Line_base2 = Pos(0,0,1)      .Dot(this->controller->getCameraMatrix())+ this->center;
         this->mouse_pos  =  Collision::GetHitPosFaceToLine(this->controller->sketch_face->GetNorm(),
                                                            *this->controller->sketch_face->GetPointSequence(0),
                                                            Line_base1,Line_base2);
     }else{
         //カメラ角度から算出
-        this->mouse_pos = this->screen_pos.Dot(this->controller->getCameraMatrix());
+        this->mouse_pos = this->screen_pos.Dot(this->controller->getCameraMatrix()) + this->center;
     }
 
     //シグナル発生
@@ -155,11 +165,16 @@ void SolidEditForm::mouseMoveEvent   (QMouseEvent *event){
     }
 
     if(this->drag_base != Pos(0,0) && !this->controller->isSketcheing()){
-        //カメラ角度変更
-        this->controller->theta1 += static_cast<double>(event->pos().y() - this->drag_base.y())/SENSITIVITY;
-        this->controller->theta2 += static_cast<double>(event->pos().x() - this->drag_base.x())/SENSITIVITY;
-        this->controller->theta1 = Mod(this->controller->theta1,2*M_PI);
-        this->controller->theta2 = Mod(this->controller->theta2,2*M_PI);
+        if(ctrl_pressed){
+            Pos delta(-(event->pos().x()-this->drag_base.x()) ,event->pos().y()-this->drag_base.y());
+            this->center = (delta*round).Dot(this->controller->getCameraMatrix()) + this->center;
+        }else{
+            //カメラ角度変更
+            this->controller->theta1 += static_cast<double>(event->pos().y() - this->drag_base.y())/SENSITIVITY;
+            this->controller->theta2 += static_cast<double>(event->pos().x() - this->drag_base.x())/SENSITIVITY;
+            this->controller->theta1 = Mod(this->controller->theta1,2*M_PI);
+            this->controller->theta2 = Mod(this->controller->theta2,2*M_PI);
+        }
         this->drag_base = Pos(event->pos().x(),event->pos().y());
     }
 
@@ -226,10 +241,10 @@ void SolidEditForm::resizeGL(int w, int h){
 void SolidEditForm::paintGL(){
 
     //カメラ調整
-    if(this->controller->theta1 >  M_PI/2) this->controller->theta1 =  M_PI/2;
-    if(this->controller->theta1 < -M_PI/2) this->controller->theta1 = -M_PI/2;
+    if(this->controller->theta1 >  M_PI/2 - CAMERA_ANGLE_LIMIT) this->controller->theta1 =  M_PI/2 - CAMERA_ANGLE_LIMIT;
+    if(this->controller->theta1 < -M_PI/2 + CAMERA_ANGLE_LIMIT) this->controller->theta1 = -M_PI/2 + CAMERA_ANGLE_LIMIT;
     if(this->round              <  0     ) this->round = 0.00001;
-    this->camera = Pos(0,0,round).Dot(this->controller->getCameraMatrix());
+    this->camera = this->center + Pos(0,0,round).Dot(this->controller->getCameraMatrix());
 
     glMatrixMode(GL_PROJECTION);  //行列モード切替
     glLoadIdentity();
@@ -252,6 +267,7 @@ void SolidEditForm::paintGL(){
 
     //幾何拘束描画
     Quat quat = Quat::getRotateXMatrix(this->controller->theta1).Dot(Quat::getRotateYMatrix(this->controller->theta2));
+
     QVector<std::pair<Pos,QVector<QString>>> rest_maps;
     for(Restraint* rest : this->model->GetRestraints()){
         for(Pos pp:rest->GetIconPoint()){
@@ -321,7 +337,7 @@ void SolidEditForm::paintGL(){
         glBegin(GL_LINES);
         glColor3f((i==0), (i==1), (i==2));
 
-        Pos cc = (Pos(100-this->width(),100-this->height(),1)*round).Dot(this->controller->getCameraMatrix());
+        Pos cc = (Pos(100-this->width(),100-this->height(),1)*round).Dot(this->controller->getCameraMatrix()) + this->center;
         Pos ex = cc + Pos(50*(i==0)*round, 50*(i==1)*round, 50*(i==2)*round);
 
         glVertex3f(cc.x(),cc.y(),cc.z());
