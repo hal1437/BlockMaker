@@ -32,6 +32,7 @@ void TimeDivider::stop(){
     this->timer->stop();
     disconnect(this->timer,SIGNAL(timeout()),this,SLOT(step()));
     this->timer = nullptr;
+    this->obj   = this->end;
     all_object.removeAll(this);
     emit EndTime();
 }

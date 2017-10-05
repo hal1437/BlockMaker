@@ -20,7 +20,6 @@ namespace Ui {
 class MainWindow;
 }
 
-
 class MainWindow : public QMainWindow ,CadModelCoreInterface
 {
     Q_OBJECT
@@ -50,11 +49,11 @@ public slots:
     void ClearButton();       //全ボタンリセット
     void RefreshUI();         //UI更新
 
-    void ToggledPoint  (bool checked);
-    void ToggledLine   (bool checked);
-    void ToggledArc    (bool checked);
-    //void ToggledRect   (bool checked);
-    void ToggledSpline (bool checked);
+    void ToggledPoint   (bool checked);
+    void ToggledLine    (bool checked);
+    void ToggledArc     (bool checked);
+    void ToggledSpline  (bool checked);
+    void ToggledFileEdge(bool checked);
     void ToggleConflict(bool conflict);
 
     void ShowProperty();          //プロパティダイアログ表示

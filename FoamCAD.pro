@@ -40,7 +40,8 @@ SOURCES += src/main.cpp\
     src/MakeObjectController.cpp \
     src/CObject/CFace.cpp \
     src/ObjectList.cpp \
-    src/CadModelMenu.cpp
+    src/CadModelMenu.cpp \
+    src/CObject/CFileEdge.cpp
 
 HEADERS  += src/MainWindow.h \
     src/Point.h \
@@ -69,7 +70,8 @@ HEADERS  += src/MainWindow.h \
     src/MakeObjectController.h \
     src/CObject/CFace.h \
     src/ObjectList.h \
-    src/CadModelMenu.h
+    src/CadModelMenu.h \
+    src/CObject/CFileEdge.h
 
 FORMS    += src/MainWindow.ui \
     src/Dialog/SmartDimensionDialog.ui \

@@ -57,6 +57,7 @@ void CObject::ObserveRestart(){
 
 CObject::CObject(QObject* parent):QObject(parent)
 {
+    observe_pause = false;
 }
 
 CObject::~CObject(){}

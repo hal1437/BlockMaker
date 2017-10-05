@@ -85,6 +85,7 @@
    <addaction name="ToolLine"/>
    <addaction name="ToolArc"/>
    <addaction name="ToolSpline"/>
+   <addaction name="ToolFileEdge"/>
    <addaction name="separator"/>
    <addaction name="ToolBlocks"/>
    <addaction name="ToolFace"/>
@@ -433,6 +434,14 @@
     <string>Property</string>
    </property>
   </action>
+  <action name="ToolFileEdge">
+   <property name="text">
+    <string>FileEdge</string>
+   </property>
+   <property name="toolTip">
+    <string>FileEdge</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
@@ -448,6 +457,8 @@
   </customwidget>
  </customwidgets>
  <resources>
+  <include location="../Resource/images.qrc"/>
+  <include location="../Resource/images.qrc"/>
   <include location="../Resource/images.qrc"/>
  </resources>
  <connections/>

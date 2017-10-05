@@ -6,6 +6,7 @@
 #include "CObject/CLine.h"
 #include "CObject/CArc.h"
 #include "CObject/CSpline.h"
+#include "CObject/CFileEdge.h"
 
 //拘束生成条件マクロ:全て同じ型
 #define ALL_SAME_TYPE_RESTRAINTABLE(TYPE,MIN_COUNT)                                                                           \

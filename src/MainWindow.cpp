@@ -90,19 +90,19 @@ void MainWindow::Delete(){
 }
 
 void MainWindow::ConnectSignals(){
-    connect(ui->ToolPoint ,SIGNAL(toggled(bool)),this,SLOT(ToggledPoint(bool)));
-    connect(ui->ToolArc   ,SIGNAL(toggled(bool)),this,SLOT(ToggledArc(bool)));
-    connect(ui->ToolLine  ,SIGNAL(toggled(bool)),this,SLOT(ToggledLine(bool)));
-    //connect(ui->ToolRect  ,SIGNAL(toggled(bool)),this,SLOT(ToggledRect(bool)));
-    connect(ui->ToolSpline,SIGNAL(toggled(bool)),this,SLOT(ToggledSpline(bool)));
+    connect(ui->ToolPoint   ,SIGNAL(toggled(bool)),this,SLOT(ToggledPoint(bool)));
+    connect(ui->ToolArc     ,SIGNAL(toggled(bool)),this,SLOT(ToggledArc(bool)));
+    connect(ui->ToolLine    ,SIGNAL(toggled(bool)),this,SLOT(ToggledLine(bool)));
+    connect(ui->ToolSpline  ,SIGNAL(toggled(bool)),this,SLOT(ToggledSpline(bool)));
+    connect(ui->ToolFileEdge,SIGNAL(triggered(bool)),this,SLOT(ToggledFileEdge(bool)));
 }
 
 void MainWindow::DisconnectSignals(){
-    disconnect(ui->ToolPoint ,SIGNAL(toggled(bool)),this,SLOT(ToggledPoint(bool)));
-    disconnect(ui->ToolArc   ,SIGNAL(toggled(bool)),this,SLOT(ToggledArc(bool)));
-    disconnect(ui->ToolLine  ,SIGNAL(toggled(bool)),this,SLOT(ToggledLine(bool)));
-    //disconnect(ui->ToolRect  ,SIGNAL(toggled(bool)),this,SLOT(ToggledRect(bool)));
-    disconnect(ui->ToolSpline,SIGNAL(toggled(bool)),this,SLOT(ToggledSpline(bool)));
+    disconnect(ui->ToolPoint   ,SIGNAL(toggled(bool)),this,SLOT(ToggledPoint(bool)));
+    disconnect(ui->ToolArc     ,SIGNAL(toggled(bool)),this,SLOT(ToggledArc(bool)));
+    disconnect(ui->ToolLine    ,SIGNAL(toggled(bool)),this,SLOT(ToggledLine(bool)));
+    disconnect(ui->ToolSpline  ,SIGNAL(toggled(bool)),this,SLOT(ToggledSpline(bool)));
+    disconnect(ui->ToolFileEdge,SIGNAL(triggered(bool)),this,SLOT(ToggledFileEdge(bool)));
 }
 
 void MainWindow::ClearButton(){
@@ -161,6 +161,25 @@ ToggledToolDefinition(Line)
 ToggledToolDefinition(Arc)
 //ToggledToolDefinition(Rect)
 ToggledToolDefinition(Spline)
+
+void MainWindow::ToggledFileEdge(bool){
+    //ファイルパス変更ダイアログ
+    QString filepath = QFileDialog::getOpenFileName(this,
+                                                    "外部ファイルを選択",
+                                                    "",
+                                                    "CSV File(*.csv);;All Files (*)");
+    if(filepath != ""){
+        CFileEdge* edge = CFileEdge::CreateFromFile(filepath);
+        if(edge != nullptr){
+            this->model->AddEdges(edge);
+            this->model->AddPoints(edge->start);
+            for(int i =0;i<edge->GetChildCount();i++){
+                this->model->AddObject(edge->GetChild(i));
+            }
+            this->model->AddPoints(edge->end);
+        }
+    }
+}
 
 void MainWindow::ToggleConflict(bool conflict){
     if(conflict)this->ui->actionCheckConflict->setIcon(QIcon(":/Others/Conflict.png"));

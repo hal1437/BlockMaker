@@ -8,6 +8,7 @@
 #include "CObject/CFace.h"
 #include "TimeDivider.h"
 
+
 class SolidEditController:public QObject ,public CadModelCoreInterface
 {
     Q_OBJECT

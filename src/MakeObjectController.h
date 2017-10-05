@@ -8,7 +8,8 @@ enum class MAKE_OBJECT{
     Line  ,
     Arc   ,
     Spline,
-    Rect
+    FileEdge,
+    Rect  ,
 };
 
 //オブジェクト生成に関するコントローラ
