@@ -16,6 +16,8 @@ public:
     static CFileEdge* CreateFromFile(QString filepath);
 public:
 
+    virtual void DrawGL(Pos camera,Pos center)const;
+
     virtual CREATE_RESULT Create(CPoint *pos);
 
     CFileEdge();

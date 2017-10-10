@@ -17,7 +17,7 @@ CFace* SolidEditForm::GetHangedFace(){
     if(this->controller->isSketcheing())return nullptr;
     Pos  hang_center = (Pos(0,0,1) + this->screen_pos).Dot(this->controller->getCameraMatrix());
     return  this->controller->getHangedFace(this->center + hang_center,
-                                            this->camera*this->round + hang_center);
+                                            this->camera + hang_center);
 }
 CObject* SolidEditForm::GetHangedObject(){
     Pos  hang_center = this->center + (Pos(0,0,1) + this->screen_pos).Dot(this->controller->getCameraMatrix());

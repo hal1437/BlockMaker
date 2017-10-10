@@ -33,6 +33,15 @@ CFileEdge* CFileEdge::CreateFromFile(QString filepath){
     return edge;
 }
 
+
+void CFileEdge::DrawGL(Pos camera,Pos center)const{
+    //詳細表示に構成点の表示を含める
+    for(int i =0;i<this->pos.size();i++){
+        this->pos[i]->SetVisible(this->isVisibleDetail());
+    }
+    this->CEdge::DrawGL(camera,center);
+}
+
 CREATE_RESULT CFileEdge::Create(CPoint *pos){
     this->ObserveChild(pos);
     if(this->start == nullptr){
