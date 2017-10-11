@@ -2,6 +2,7 @@
 #define CFACE_H
 
 #include "CEdge.h"
+#include "Collision.h"
 
 //境界面
 class Boundary{
@@ -88,6 +89,12 @@ public:
 public slots:
     //線移動コールバック
     virtual void ChangeChildCallback(QVector<CObject*> egde);
+public:
+
+    //線分との距離取得
+    double GetLengthFaceToLine(Pos camera,Pos dir);
+    //線分との衝突判定
+    bool   CheckHitFaceToLine (Pos camera,Pos dir);
 };
 
 #endif // CFACE_H

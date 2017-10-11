@@ -436,8 +436,8 @@ double   CFace::GetGrading(int index)const{
     else                          return (  this->GetEdge(index)->getGrading());
 }
 
-Pos CFace::GetNearPos (const Pos&)const{
-    return Pos();
+Pos CFace::GetNearPos (const Pos& pos)const{
+    return Collision::GetHitPosFaceToPoint(this->GetNorm(),*this->GetAllChildren().first(),pos);
 }
 Pos CFace::GetNearLine(const Pos& ,const Pos& )const{
     return Pos();
@@ -489,4 +489,31 @@ void CFace::ChangeChildCallback(QVector<CObject*> edges){
     this->RecalcMesh();
     qDebug() << "re";
 }
+
+double CFace::GetLengthFaceToLine(Pos center ,Pos dir){
+    //法線ベクトルの算出
+    Pos norm = this->GetNorm();
+
+    //面と平行
+    if((dir).DotPos(norm) == 0)return false;
+
+    //交点を取得
+    Pos p = Collision::GetHitPosFaceToLine(norm,*this->GetPointSequence(0),center,dir);
+
+    //四角形内であるか
+    double sum=0;
+    for(int i=0;i<this->edges.size();i++){
+        sum += Pos::Angle(*this->GetPointSequence(i)-p,*this->GetPointSequence((i+1)%this->edges.size())-p);
+    }
+    if(std::abs(sum-360) > 0.000001){
+        return -1;
+    }else{
+        return (center - p).Length();
+    }
+}
+
+bool CFace::CheckHitFaceToLine(Pos center ,Pos dir){
+    return (this->GetLengthFaceToLine(center,dir) != -1);
+}
+
 

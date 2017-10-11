@@ -150,7 +150,7 @@ CFace* SolidEditController::getHangedFace(Pos center,Pos camera_pos)const{
     QVector<std::pair<double,CFace*>> rank;
     for(CFace* f:this->model->GetFaces()){
         if(f->isVisible()){
-            rank.push_back(std::make_pair(Collision::GetLengthFaceToLine(f,camera_pos,camera_pos-center),f));
+            rank.push_back(std::make_pair(f->GetLengthFaceToLine(camera_pos,camera_pos-center),f));
         }
     }
 

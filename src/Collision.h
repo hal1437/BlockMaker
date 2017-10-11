@@ -10,12 +10,13 @@
 class Collision
 {
 public:
-    //平面の法線、平面上の任意の点、直線の始点、直線の向き
+    //線分と平面の交点を取得（平面の法線、平面上の任意の点、直線の始点、直線の向き）
     static Pos GetHitPosFaceToLine(Pos face_norm,Pos face_center,Pos line_0,Pos line_s);
 
+    //点と平面の最近点を取得（平面の法線、平面上の任意の点、点の座標）
+    static Pos GetHitPosFaceToPoint(Pos face_norm,Pos face_center,Pos pos);
+
 public:
-    static double GetLengthFaceToLine(CFace* face, Pos camera,Pos dir);
-    static bool   CheckHitFaceToLine (CFace* face, Pos camera,Pos dir);
 
     Collision();
     ~Collision();

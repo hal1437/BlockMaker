@@ -195,9 +195,7 @@ bool MatchRestraint::isComplete(){
             for(int j=0;j<this->nodes.size();j++){
                 if(i==j)continue;
                 CPoint* pos = dynamic_cast<CPoint*>(this->nodes[j]);
-                qDebug() << (*pos - this->nodes[i]->GetNearPos(*pos)).Length();
                 if((*pos - this->nodes[i]->GetNearPos(*pos)).Length() > 1.0e-10){
-                    qDebug() << "del";
                     return false;
                 }
             }
