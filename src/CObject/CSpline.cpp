@@ -52,7 +52,6 @@ double Spline::culc(double t)const
     return a[j] + ( b[j] + (c[j] + d[j] * dt) * dt ) * dt;
 }
 
-
 CREATE_RESULT CSpline::Create(CPoint *pos){
     this->ObserveChild(pos);
     if(this->start == nullptr){

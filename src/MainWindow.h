@@ -31,6 +31,7 @@ private:
     Ui::MainWindow *ui;
     MoveTransformDialog* move_diag;
     PropertyDefinitionDialog* prop_diag;
+    QVector<Restraint*> creatable; //作成可能な拘束
 
 protected:
     void keyPressEvent  (QKeyEvent* event);

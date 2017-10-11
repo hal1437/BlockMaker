@@ -158,7 +158,7 @@ bool CadModelCore::ImportFoamFile(QString filename){
                     for(int j=3;j<sl.size()-3;j++){
                         make->Create(this->Points[sl[j].toInt()]);
                     }
-                    make->Create(this->Points[sl[3].toInt()]);
+                    //make->Create(this->Points[sl[3].toInt()]);
                 }else{
                     //line
                     for(int j=3;j<sl.size()-3;j++){

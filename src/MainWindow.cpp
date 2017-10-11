@@ -115,20 +115,10 @@ void MainWindow::RefreshUI(){
 
     ui->RestraintList->clear();
 
-    QVector<RestraintType> able = Restraint::Restraintable(this->model->GetSelected());
-    for(RestraintType r:able){
-        std::pair<std::string,std::string> p;
-        //if(r == MATCH     )p = std::make_pair("一致"   ,":/Restraint/MatchRestraint.png");
-        if(r == EQUAL     )p = std::make_pair("等値"   ,":/Restraint/EqualRestraint.png");
-        if(r == CONCURRENT)p = std::make_pair("平行"   ,":/Restraint/ConcurrentRestraint.png");
-        //if(r == VERTICAL  )p = std::make_pair("垂直"   ,":/Restraint/VerticalRestraint.png");
-        //if(r == HORIZONTAL)p = std::make_pair("水平"   ,":/Restraint/HorizontalRestraint.png");
-        //if(r == TANGENT   )p = std::make_pair("正接"   ,":/Restraint/TangentRestraint.png");
-        if(r == LOCK      )p = std::make_pair("固定"   ,":/Restraint/LockRestraint.png");
-        if(r == UNLOCK    )p = std::make_pair("固定解除",":/Restraint/UnlockRestraint.png");
-        //if(r == MARGE     )p = std::make_pair("マージ"  ,":/Restraint/Marge.png");
-        ui->RestraintList->addItem(new QListWidgetItem(p.first.c_str()));
-        ui->RestraintList->item(ui->RestraintList->count()-1)->setIcon(QIcon(p.second.c_str()));
+    this->creatable = Restraint::Restraintable(this->model->GetSelected());
+    for(Restraint* r:this->creatable){
+        ui->RestraintList->addItem(new QListWidgetItem(r->GetRestraintName()));
+        ui->RestraintList->item(ui->RestraintList->count()-1)->setIcon(QIcon(r->GetIconPath()));
     }
 
     //ブロック生成可否判定
@@ -204,28 +194,17 @@ void MainWindow::ShowGridFilter(){
 void MainWindow::MakeRestraint(QListWidgetItem*){
     //qDebug() << text;
     Restraint* rest = nullptr;
+    int index = ui->RestraintList->currentRow();
+    rest = this->creatable[index];
+    rest->Create(this->model->GetSelected());
+
+    /*
     if(ui->RestraintList->currentItem()->text() == "等値"){
         rest = new EqualLengthRestraint();
         CEdge* ee = dynamic_cast<CEdge*>(this->model->GetSelected().first());
-        rest->Create(this->model->GetSelected(),(*ee->end-*ee->start).Length());
-    }
-    if(ui->RestraintList->currentItem()->text() == "平行"){
-        rest = new ConcurrentRestraint();
         rest->Create(this->model->GetSelected());
-    }
-    //if(ui->RestraintList->currentItem()->text() == "並行")type = CONCURRENT;
-    //if(ui->RestraintList->currentItem()->text() == "一致")type = MATCH;
-    //if(ui->RestraintList->currentItem()->text() == "垂直")type = VERTICAL;
-    //if(ui->RestraintList->currentItem()->text() == "水平")type = HORIZONTAL;
-    //if(ui->RestraintList->currentItem()->text() == "正接")type = TANGENT;
-    if(ui->RestraintList->currentItem()->text() == "固定"){
-        rest = new LockRestraint();
-        rest->Create(this->model->GetSelected());
-    }
-    if(ui->RestraintList->currentItem()->text() == "固定解除"){
-        rest = new UnlockRestraint();
-        rest->Create(this->model->GetSelected());
-    }
+    }*/
+
     if(rest != nullptr){
         this->model->AddRestraints(rest);
         rest->Calc();

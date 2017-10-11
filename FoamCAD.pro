@@ -41,7 +41,8 @@ SOURCES += src/main.cpp\
     src/CObject/CFace.cpp \
     src/ObjectList.cpp \
     src/CadModelMenu.cpp \
-    src/CObject/CFileEdge.cpp
+    src/CObject/CFileEdge.cpp \
+    src/CadModelSearch.cpp
 
 HEADERS  += src/MainWindow.h \
     src/Point.h \
@@ -71,7 +72,8 @@ HEADERS  += src/MainWindow.h \
     src/CObject/CFace.h \
     src/ObjectList.h \
     src/CadModelMenu.h \
-    src/CObject/CFileEdge.h
+    src/CObject/CFileEdge.h \
+    src/CadModelSearch.h
 
 FORMS    += src/MainWindow.ui \
     src/Dialog/SmartDimensionDialog.ui \

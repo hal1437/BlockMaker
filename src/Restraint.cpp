@@ -13,18 +13,23 @@ void Restraint::IgnoreChild(CObject* obj){
     }
 }
 
-QVector<RestraintType> Restraint::Restraintable(const QVector<CObject*> nodes){
-    QVector<RestraintType> ans;
-    if(EqualLengthRestraint::Restraintable(nodes))ans.push_back(RestraintType::EQUAL);
-    if( ConcurrentRestraint::Restraintable(nodes))ans.push_back(RestraintType::CONCURRENT);
-    if(       LockRestraint::Restraintable(nodes))ans.push_back(RestraintType::LOCK);
-    if(     UnlockRestraint::Restraintable(nodes))ans.push_back(RestraintType::UNLOCK);
+QVector<Restraint*> Restraint::Restraintable(const QVector<CObject*> nodes){
+    //実際にオブジェクトを生成して投げつける
+    QVector<Restraint*> ans;
+    if(EqualLengthRestraint::Restraintable(nodes))ans.push_back(new EqualLengthRestraint(nodes));
+    if( ConcurrentRestraint::Restraintable(nodes))ans.push_back(new ConcurrentRestraint (nodes));
+    if(       LockRestraint::Restraintable(nodes))ans.push_back(new LockRestraint       (nodes));
+    if(     UnlockRestraint::Restraintable(nodes))ans.push_back(new UnlockRestraint     (nodes));
+    if(      MatchRestraint::Restraintable(nodes))ans.push_back(new MatchRestraint     (nodes));
     return ans;
 }
-void Restraint::Create(const QVector<CObject*> nodes, double value){
+void Restraint::Create(const QVector<CObject*> nodes){
     this->nodes = nodes;
     for(CObject* edge:nodes)ObserveChild(edge);
-    this->setValue(value);
+}
+
+Restraint::Restraint(QVector<CObject*> nodes):
+    nodes(nodes){
 }
 
 QVector<Pos> Restraint::GetIconPoint()const{
@@ -45,6 +50,11 @@ QVector<Pos> Restraint::GetIconPoint()const{
     return ans;
 }
 
+void EqualLengthRestraint::Create(const QVector<CObject*> nodes){
+    CEdge* ee = dynamic_cast<CEdge*>(nodes.first());
+    this->length = (*ee->end - *ee->start).Length();
+    Restraint::Create(nodes);
+}
 bool EqualLengthRestraint::isComplete(){
     //全てのEdgeの長さが同じ
     double dd = (*dynamic_cast<CEdge*>(this->nodes[0])->end - *dynamic_cast<CEdge*>(this->nodes[0])->start).Length();
@@ -154,4 +164,44 @@ bool UnlockRestraint::Restraintable(const QVector<CObject *> nodes){
         }
     }
     return false;
+}
+
+
+QVector<Pos> MatchRestraint::GetIconPoint()const{
+    QVector<Pos> ans;
+    for(int i=0;i<this->nodes.size();i++){
+        if(this->nodes[i]->is<CPoint>()){
+            ans.push_back(*dynamic_cast<CPoint*>(this->nodes[i]));
+        }
+    }
+    return ans;
+}
+void MatchRestraint::Calc(){
+    //CPointでないCObjectにその他のCPoint一致させる。
+    for(int i=0;i<this->nodes.size();i++){
+        if(!this->nodes[i]->is<CPoint>()){
+            for(int j=0;j<this->nodes.size();j++){
+                if(i==j)continue;
+                CPoint* pos = dynamic_cast<CPoint*>(this->nodes[j]);
+                pos->MoveAbsolute(this->nodes[i]->GetNearPos(*pos));
+
+            }
+        }
+    }
+}
+bool MatchRestraint::isComplete(){
+    for(int i=0;i<this->nodes.size();i++){
+        if(!this->nodes[i]->is<CPoint>()){
+            for(int j=0;j<this->nodes.size();j++){
+                if(i==j)continue;
+                CPoint* pos = dynamic_cast<CPoint*>(this->nodes[j]);
+                qDebug() << (*pos - this->nodes[i]->GetNearPos(*pos)).Length();
+                if((*pos - this->nodes[i]->GetNearPos(*pos)).Length() > 1.0e-10){
+                    qDebug() << "del";
+                    return false;
+                }
+            }
+        }
+    }
+    return true;
 }

@@ -6,7 +6,6 @@
 #include <QMessageBox>
 #include <CObject/CSpline.h>
 
-
 class CFileEdge : public CSpline
 {
     Q_OBJECT

@@ -79,7 +79,7 @@ void MakeObjectController::StartMaking(MAKE_OBJECT type,Pos pos,CObject* merge){
             if(merge->is<CPoint>()){
                 this->making_object->Create(dynamic_cast<CPoint*>(merge));
             }else{
-                CPoint* new_pos = new CPoint(this->making_object->GetNearPos(pos), this->making_object);
+                CPoint* new_pos = new CPoint(merge->GetNearPos(pos), this->making_object);
                 this->making_object->Create(dynamic_cast<CPoint*>(new_pos));
                 this->model->AddPoints(new_pos);
             }
