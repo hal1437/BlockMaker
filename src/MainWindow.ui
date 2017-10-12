@@ -435,6 +435,10 @@
    </property>
   </action>
   <action name="ToolFileEdge">
+   <property name="icon">
+    <iconset resource="../Resource/images.qrc">
+     <normaloff>:/ToolImages/FileEdge.png</normaloff>:/ToolImages/FileEdge.png</iconset>
+   </property>
    <property name="text">
     <string>FileEdge</string>
    </property>
@@ -457,7 +461,6 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../Resource/images.qrc"/>
   <include location="../Resource/images.qrc"/>
   <include location="../Resource/images.qrc"/>
  </resources>

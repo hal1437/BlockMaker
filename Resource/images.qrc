@@ -37,6 +37,7 @@
         <file>TangentRestraint.png</file>
         <file>UnlockRestraint.png</file>
         <file>VerticalRestraint.png</file>
+        <file>FileEdge.png</file>
     </qresource>
     <qresource prefix="/Restraint">
         <file>ConcurrentRestraint.png</file>

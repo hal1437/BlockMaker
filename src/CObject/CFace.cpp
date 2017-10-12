@@ -487,7 +487,6 @@ void CFace::ChangeChildCallback(QVector<CObject*> edges){
     //
     //メッシュ再計算
     this->RecalcMesh();
-    qDebug() << "re";
 }
 
 double CFace::GetLengthFaceToLine(Pos center ,Pos dir){
