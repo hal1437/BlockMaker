@@ -35,6 +35,9 @@ void MoveTransformDialog::keyPressEvent(QKeyEvent *event){
         this->ui->YSpinBox->setValue(-this->ui->YSpinBox->value());
         this->ui->ZSpinBox->setValue(-this->ui->ZSpinBox->value());
     }
+    if(event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return){
+        this->Accept();
+    }
 }
 
 void MoveTransformDialog::keyReleaseEvent(QKeyEvent *event){
