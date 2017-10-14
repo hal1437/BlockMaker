@@ -31,6 +31,7 @@ CREATE_RESULT MakeObjectController::MakeJoint(CEdge* obj,Pos pos,CObject* merge)
                 obj->SetChild(obj->GetChildCount()-1,nullptr);
                 this->last_point=nullptr;
                 this->making_count = -1;//手放しまで完了
+                this->making_object = nullptr;   //作成完了
                 return COMPLETE;
             }else{
                 //最終点をmergeに置き換え
