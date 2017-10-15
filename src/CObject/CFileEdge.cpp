@@ -26,6 +26,8 @@ CFileEdge* CFileEdge::CreateFromFile(QString filepath){
             rows++;
         }
         edge->start_base = *edge->start;
+        QStringList pp = filepath.split("/");
+        edge->setName(pp[pp.size()-1]);
     }catch(QException e){
        std::cerr << e.what() << std::endl;
        return nullptr;
