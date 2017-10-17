@@ -65,12 +65,14 @@ MainWindow::~MainWindow()
 
 void MainWindow::keyPressEvent  (QKeyEvent* event){
     this->ui->SolidEdit->keyPressEvent(event);
+    if(event->key() == Qt::Key_Shift)this->shift_press = true;
 
     //ESC押下時
     if(event->key() == Qt::Key_Escape)ClearButton();
 }
 
 void MainWindow::keyReleaseEvent(QKeyEvent* event){
+    if(event->key() == Qt::Key_Shift)this->shift_press = false;
     this->ui->SolidEdit->keyReleaseEvent(event);
 }
 
@@ -78,8 +80,20 @@ void MainWindow::keyReleaseEvent(QKeyEvent* event){
 void MainWindow::CtrlZ(){
 }
 void MainWindow::Delete(){
-    for(CObject* obj : this->model->GetSelected()){
-        this->model->Delete(obj);
+    if(this->shift_press){
+        QVector<CPoint*> pp;
+        for(CObject* obj : this->model->GetSelected()){
+            for(CPoint* p:obj->GetAllChildren()){
+                pp.push_back(p);
+            }
+        }
+        for(CPoint* obj : pp){
+            this->model->Delete(obj);
+        }
+    }else{
+        for(CObject* obj : this->model->GetSelected()){
+            this->model->Delete(obj);
+        }
     }
 
     this->ui->ObjectTree->UpdateObject();
