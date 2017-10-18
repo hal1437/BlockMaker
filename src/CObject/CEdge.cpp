@@ -107,9 +107,15 @@ CEdge::CEdge(QObject* parent):
     this->start = this->end = nullptr;
     this->SetVisibleDetail(false);
 }
+CEdge::CEdge(CPoint* start,CPoint* end,QObject* parent):
+    CEdge(parent)
+{
+    this->start = start;
+    this->end = end;
+}
 
 CEdge::~CEdge(){}
-//点移動コールバック
+
 void CEdge::ChangeChildCallback(QVector<CObject*>){
     emit Changed(this);
 }

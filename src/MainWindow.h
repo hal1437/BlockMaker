@@ -56,6 +56,7 @@ public slots:
     void ToggledArc     (bool checked);
     void ToggledSpline  (bool checked);
     void ToggledFileEdge(bool checked);
+    void ToggledSTL     (bool checked);
     void ToggleConflict(bool conflict);
 
     void ShowProperty();          //プロパティダイアログ表示

@@ -13,13 +13,15 @@
 #define NearlyEqual(RHS,LHS) (std::abs(RHS-LHS) < 0.000001)
 
 //シグナル発生スロット
-#define DEFINE_EMITTOR(NAME) \
-void NAME##Emittor(){        \
-    emit NAME();             \
+#define DEFINE_EMITTOR(NAME)        \
+void NAME##Emittor(){               \
+    if(this->isPause() == false){   \
+        emit NAME();                \
+    }                               \
 }
 #define DEFINE_EMITTOR_ARG(NAME,ARG) \
 void NAME##Emittor(){                \
-    emit NAME(ARG);                  \
+    emit NAME(ARG);              \
 }
 
 //配列内に要素が存在しているかの確認

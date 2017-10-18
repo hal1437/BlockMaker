@@ -109,6 +109,7 @@ void MainWindow::ConnectSignals(){
     connect(ui->ToolLine    ,SIGNAL(toggled(bool)),this,SLOT(ToggledLine(bool)));
     connect(ui->ToolSpline  ,SIGNAL(toggled(bool)),this,SLOT(ToggledSpline(bool)));
     connect(ui->ToolFileEdge,SIGNAL(triggered(bool)),this,SLOT(ToggledFileEdge(bool)));
+    connect(ui->ToolSTL     ,SIGNAL(triggered(bool)),this,SLOT(ToggledSTL(bool)));
 }
 
 void MainWindow::DisconnectSignals(){
@@ -117,6 +118,7 @@ void MainWindow::DisconnectSignals(){
     disconnect(ui->ToolLine    ,SIGNAL(toggled(bool)),this,SLOT(ToggledLine(bool)));
     disconnect(ui->ToolSpline  ,SIGNAL(toggled(bool)),this,SLOT(ToggledSpline(bool)));
     disconnect(ui->ToolFileEdge,SIGNAL(triggered(bool)),this,SLOT(ToggledFileEdge(bool)));
+    disconnect(ui->ToolSTL     ,SIGNAL(triggered(bool)),this,SLOT(ToggledSTL(bool)));
 }
 
 void MainWindow::ClearButton(){
@@ -182,6 +184,26 @@ void MainWindow::ToggledFileEdge(bool){
             }
             this->model->AddPoints(edge->end);
         }
+    }
+}
+void MainWindow::ToggledSTL(bool){
+    //ファイルパス変更ダイアログ
+    QString filepath = QFileDialog::getOpenFileName(this,
+                                                    "STLファイルを選択",
+                                                    "",
+                                                    "STL File(*.stl);;All Files (*)");
+    if(filepath != ""){
+        CStl* stl = CStl::CreateFromFile(filepath);
+        if(stl != nullptr){
+            this->model->AddStls(stl);
+            this->model->SetPause(true);
+            for(int i =0;i<stl->points.size();i++){
+                this->model->AddPoints(stl->points[i]);
+                this->model->AddEdges (stl->edges[i]);
+            }
+            this->model->SetPause(false);
+        }
+
     }
 }
 

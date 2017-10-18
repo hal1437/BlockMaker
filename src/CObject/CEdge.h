@@ -43,6 +43,7 @@ public:
     virtual CObject* Clone()const = 0;
 
     CEdge(QObject* parent=nullptr);
+    CEdge(CPoint* start,CPoint* end,QObject* parent=nullptr);
     ~CEdge();
 
 public slots:

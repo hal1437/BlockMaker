@@ -63,8 +63,6 @@ public:
     }
 
     virtual void DrawGL(Pos camera,Pos center)const = 0; //三次元描画関数
-    //virtual void MoveAbsolute(const Pos& diff);  //絶対移動関数
-    //virtual void MoveRelative(const Pos& diff);  //相対移動関数
     virtual bool isSelectable(Pos pos)const;     //posの位置で選択可能か
 
     //子の操作

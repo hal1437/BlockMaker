@@ -10,6 +10,7 @@
 #include "CObject/CEdge.h"
 #include "CObject/CFace.h"
 #include "CObject/CBlock.h"
+#include "CObject/CStl.h"
 #include "Dialog/SmartDimension.h"
 #include "Restraint.h"
 
@@ -75,13 +76,14 @@ public:
     DEFINE_OBSERVER_COBJECT(CEdge*    ,Edges     )
     DEFINE_OBSERVER_COBJECT(CFace*    ,Faces     )
     DEFINE_OBSERVER_COBJECT(CBlock*   ,Blocks    )
+    DEFINE_OBSERVER_COBJECT(CStl*     ,Stls      )
 
     DEFINE_OBSERVER_RESTRAINT(Restraint*      ,Restraints)
     //DEFINE_OBSERVER(SmartDimension* ,Dimensions)
 
 public:
     CPoint* origin; //原点
-    DEFINE_FLAG(pause,false)             //更新停止フラグ
+    DEFINE_FLAG(Pause,false)             //更新停止フラグ
 
     //自動点結合
     void AutoMerge_impl(QVector<CPoint*> points);
@@ -115,17 +117,19 @@ public slots:
     DEFINE_EMITTOR(UpdateEdges)
     DEFINE_EMITTOR(UpdateFaces)
     DEFINE_EMITTOR(UpdateBlocks)
+    DEFINE_EMITTOR(UpdateStls)
     DEFINE_EMITTOR(UpdateRestraints)
     DEFINE_EMITTOR(UpdateDimensions)
     DEFINE_EMITTOR(UpdateAnyObject)
     DEFINE_EMITTOR(UpdateAnyAction)
 
     //削除
-    void Delete(CBlock* obj);
-    void Delete(CFace*  obj);
-    void Delete(CEdge*  obj);
-    void Delete(CPoint* obj);
-    void Delete(CObject* obj);
+    void Delete(CObject*   obj);
+    void Delete(CPoint*    obj);
+    void Delete(CEdge*     obj);
+    void Delete(CFace*     obj);
+    void Delete(CBlock*    obj);
+    void Delete(CStl*      obj);
     void Delete(Restraint* obj);
 
     //更新操作関数
@@ -143,6 +147,7 @@ signals:
     void UpdateEdges     ();
     void UpdateFaces     ();
     void UpdateBlocks    ();
+    void UpdateStls      ();
     void UpdateRestraints();
     void UpdateDimensions();
     void UpdateAnyObject ();

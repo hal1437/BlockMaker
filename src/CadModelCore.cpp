@@ -324,34 +324,39 @@ QVector<CEdge*>  CadModelCore::GetParent(CPoint* child)const{
     }
     return ans;
 }
-void CadModelCore::Delete(CBlock*  obj){
-    this->GetBlocks().removeAll(obj);
-    emit UpdateBlocks();
-}
-void CadModelCore::Delete(CFace*  obj){
-    for(CBlock* parent:this->GetParent(obj))this->Delete(parent);
-    this->GetFaces().removeAll(obj);
-    emit UpdateFaces();
-}
-void CadModelCore::Delete(CEdge*  obj){
-    for(CFace* parent:this->GetParent(obj))this->Delete(parent);
-    this->GetEdges().removeAll(obj);
-    emit UpdateEdges();
-}
-void CadModelCore::Delete(CPoint* obj){
-    for(CEdge* parent:this->GetParent(obj))this->Delete(parent);
-    this->GetPoints().removeAll(obj);
-    emit UpdatePoints();
-}
 void CadModelCore::Delete(CObject* obj){
     if(obj->is<CPoint>())this->Delete(dynamic_cast<CPoint*>(obj));
     if(obj->is<CEdge> ())this->Delete(dynamic_cast<CEdge* >(obj));
     if(obj->is<CFace> ())this->Delete(dynamic_cast<CFace* >(obj));
     if(obj->is<CBlock>())this->Delete(dynamic_cast<CBlock*>(obj));
+    if(obj->is<CStl  >())this->Delete(dynamic_cast<CStl*  >(obj));
+}
+void CadModelCore::Delete(CPoint* obj){
+    for(CEdge* parent:this->GetParent(obj))this->Delete(parent);
+    this->GetPoints().removeAll(obj);
+    UpdatePointsEmittor();
+}
+void CadModelCore::Delete(CEdge*  obj){
+    for(CFace* parent:this->GetParent(obj))this->Delete(parent);
+    this->GetEdges().removeAll(obj);
+    UpdateEdgesEmittor();
+}
+void CadModelCore::Delete(CFace*  obj){
+    for(CBlock* parent:this->GetParent(obj))this->Delete(parent);
+    this->GetFaces().removeAll(obj);
+    UpdateFacesEmittor();
+}
+void CadModelCore::Delete(CBlock*  obj){
+    this->GetBlocks().removeAll(obj);
+    UpdateBlocksEmittor();
+}
+void CadModelCore::Delete(CStl* obj){
+    this->GetStls().removeAll(obj);
+    UpdateStlsEmittor();
 }
 void CadModelCore::Delete(Restraint* obj){
     this->Restraints.removeAll(obj);
-    emit UpdateRestraints();
+    UpdateRestraintsEmittor();
 }
 
 void CadModelCore::UpdatePause(){
@@ -362,7 +367,7 @@ void CadModelCore::UpdateRestart(){
 
 void CadModelCore::SelectedClear(){
     this->Selected.clear();
-    emit UpdateSelected();
+    UpdateSelectedEmittor();
 }
 
 CadModelCore::CadModelCore(QWidget *parent):
@@ -374,6 +379,7 @@ CadModelCore::CadModelCore(QWidget *parent):
     connect(this,SIGNAL(UpdateEdges ()),this,SLOT(UpdateAnyObjectEmittor()));
     connect(this,SIGNAL(UpdateFaces ()),this,SLOT(UpdateAnyObjectEmittor()));
     connect(this,SIGNAL(UpdateBlocks()),this,SLOT(UpdateAnyObjectEmittor()));
+    connect(this,SIGNAL(UpdateStls  ()),this,SLOT(UpdateAnyObjectEmittor()));
     connect(this,SIGNAL(UpdateSelected     ()),this,SLOT(UpdateAnyActionEmittor()));
     connect(this,SIGNAL(SelectObjectChanged()),this,SLOT(UpdateAnyActionEmittor()));
     connect(this,SIGNAL(UpdateAnyObject    ()),this,SLOT(UpdateAnyActionEmittor()));
