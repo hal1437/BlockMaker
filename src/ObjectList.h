@@ -17,6 +17,7 @@ private:
     QVector<CEdge *> edges ;
     QVector<CFace *> faces ;
     QVector<CBlock*> blocks;
+    QVector<CStl  *> stls;
     CadModelMenu menu;
 
 protected:
@@ -24,18 +25,19 @@ protected:
     void mouseReleaseEvent(QMouseEvent* event);
 
 private:
-    void AddBlockToTree(CBlock* block,QTreeWidgetItem* parent,int index);
-    void AddFaceToTree (CFace*  face ,QTreeWidgetItem* parent,int index);
-    void AddEdgeToTree (CEdge*  edge ,QTreeWidgetItem* parent,int index);
     void AddPointToTree(CPoint* point,QTreeWidgetItem* parent,int index);
-    void pullSelectedBlock(CBlock* block,QTreeWidgetItem* current);
-    void pullSelectedFace (CFace*  face ,QTreeWidgetItem* current);
-    void pullSelectedEdge (CEdge*  edge ,QTreeWidgetItem* current);
+    void AddEdgeToTree (CEdge*  edge ,QTreeWidgetItem* parent,int index);
+    void AddFaceToTree (CFace*  face ,QTreeWidgetItem* parent,int index);
+    void AddBlockToTree(CBlock* block,QTreeWidgetItem* parent,int index);
+    void AddStlToTree  (CStl*   stl  ,QTreeWidgetItem* parent,int index);
     void pullSelectedPoint(CPoint* point,QTreeWidgetItem* current);
-    void pushSelectedBlock(CBlock* block,QTreeWidgetItem* current);
-    void pushSelectedFace (CFace*  face ,QTreeWidgetItem* current);
-    void pushSelectedEdge (CEdge*  edge ,QTreeWidgetItem* current);
+    void pullSelectedEdge (CEdge*  edge ,QTreeWidgetItem* current);
+    void pullSelectedFace (CFace*  face ,QTreeWidgetItem* current);
+    void pullSelectedBlock(CBlock* block,QTreeWidgetItem* current);
     void pushSelectedPoint(CPoint* point,QTreeWidgetItem* current);
+    void pushSelectedEdge (CEdge*  edge ,QTreeWidgetItem* current);
+    void pushSelectedFace (CFace*  face ,QTreeWidgetItem* current);
+    void pushSelectedBlock(CBlock* block,QTreeWidgetItem* current);
 
 public:
     void SetModel(CadModelCore* m);

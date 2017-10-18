@@ -448,6 +448,10 @@
    </property>
   </action>
   <action name="ToolSTL">
+   <property name="icon">
+    <iconset resource="../Resource/images.qrc">
+     <normaloff>:/ToolImages/Stl.png</normaloff>:/ToolImages/Stl.png</iconset>
+   </property>
    <property name="text">
     <string>STL </string>
    </property>
@@ -470,7 +474,6 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../Resource/images.qrc"/>
   <include location="../Resource/images.qrc"/>
   <include location="../Resource/images.qrc"/>
  </resources>

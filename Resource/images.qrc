@@ -38,6 +38,8 @@
         <file>UnlockRestraint.png</file>
         <file>VerticalRestraint.png</file>
         <file>FileEdge.png</file>
+        <file>Stl_disabled.png</file>
+        <file>Stl.png</file>
     </qresource>
     <qresource prefix="/Restraint">
         <file>ConcurrentRestraint.png</file>

@@ -11,6 +11,7 @@ QIcon ObjectList::getIcon(CObject *obj){
         if(obj->is<CSpline>())filepath = ":/ToolImages/Spline";
     }
     if(obj->is<CPoint>())filepath = ":/ToolImages/Dot";
+    if(obj->is<CStl  >())filepath = ":/ToolImages/Stl";
 
     //詳細表示
     if(!obj->is<CPoint>() && obj->isVisibleDetail())filepath += "Mesh";
@@ -29,6 +30,23 @@ void ObjectList::mouseReleaseEvent(QMouseEvent* event){
     }
 }
 
+void ObjectList::AddStlToTree(CStl* stl,QTreeWidgetItem* parent,int){
+    QTreeWidgetItem* item = new QTreeWidgetItem();
+    if(stl->name == ""){
+        item->setText(0,QString("STL:") + QString::number(IndexOf(this->CadModelCoreInterface::model->GetStls(),stl)+1));
+    }else{
+        item->setText(0,stl->name);
+    }
+    item->setIcon(0,getIcon(stl));
+
+    for(int i = 0;i<stl->edges.size();i++){
+        AddEdgeToTree(stl->edges[i],item,i+1);
+    }
+    item->setSelected(exist(this->CadModelCoreInterface::model->GetSelected(),stl));
+
+    if(parent == nullptr)this->addTopLevelItem(item);
+    else                 parent->addChild(item);
+}
 void ObjectList::AddBlockToTree(CBlock* block,QTreeWidgetItem* parent,int index){
     QTreeWidgetItem* item = new QTreeWidgetItem();
     if(block->getName() == ""){
@@ -179,6 +197,7 @@ void ObjectList::UpdateObject  (){
     this->edges  = this->CadModelCoreInterface::model->GetEdges();
     this->faces  = this->CadModelCoreInterface::model->GetFaces();
     this->blocks = this->CadModelCoreInterface::model->GetBlocks();
+    this->stls   = this->CadModelCoreInterface::model->GetStls();
 
     //排他処理
     for(CEdge* edge: this->edges){
@@ -199,6 +218,7 @@ void ObjectList::UpdateObject  (){
     for(int i=0;i<this->faces .size();i++)AddFaceToTree (this->faces [i],nullptr,i+1);
     for(int i=0;i<this->edges .size();i++)AddEdgeToTree (this->edges [i],nullptr,i+1);
     for(int i=0;i<this->points.size();i++)AddPointToTree(this->points[i],nullptr,i+1);
+    for(int i=0;i<this->stls  .size();i++)AddStlToTree  (this->stls  [i],nullptr,i+1);
     connect(this->CadModelCoreInterface::model,SIGNAL(UpdateSelected()),this,SLOT(PullSelected()));//再コネクト
     connect(this,SIGNAL(itemSelectionChanged()),this,SLOT(PushSelected()));
 }

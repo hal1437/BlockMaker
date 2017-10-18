@@ -47,7 +47,7 @@ public:
 
     DEFINE_FLAG(Lock   ,false)       //固定
     DEFINE_FLAG(Visible,true)        //表示
-    DEFINE_FLAG(VisibleDetail,true)  //分割フレーム表示
+    DEFINE_FLAG(VisibleDetail,false)  //分割フレーム表示
     DEFINE_EMITTOR_ARG(Changed,this) // 変更エミッター
 
 protected:

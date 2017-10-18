@@ -35,7 +35,7 @@ Pos CEdge::GetNearLine(const Pos& pos1,const Pos& pos2)const{
     }
     return ans;
 }
-void CEdge::DrawGL(Pos camera,Pos center)const{
+void CEdge::DrawGL(Pos,Pos)const{
     if(!this->isVisible())return;
     glBegin(GL_LINE_STRIP);
     //線の分割描画

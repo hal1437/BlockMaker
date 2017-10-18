@@ -45,7 +45,6 @@ CStl* CStl::CreateFromFile(QString filepath){
                 index[j] = ans->points.size();
                 ans->points.push_back(new CPoint(pp));
             }
-            qDebug() << index[j];
         }
         ans->edges.push_back(new CLine(ans->points[index[0]],ans->points[index[1]]));
         ans->edges.push_back(new CLine(ans->points[index[1]],ans->points[index[2]]));
