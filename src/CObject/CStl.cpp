@@ -46,13 +46,26 @@ CStl* CStl::CreateFromFile(QString filepath){
                 ans->points.push_back(new CPoint(pp));
             }
         }
-        ans->edges.push_back(new CLine(ans->points[index[0]],ans->points[index[1]]));
-        ans->edges.push_back(new CLine(ans->points[index[1]],ans->points[index[2]]));
-        ans->edges.push_back(new CLine(ans->points[index[2]],ans->points[index[0]]));
+        //存在しなければ追加
+        CEdge* ee[3] = {new CLine(ans->points[index[0]],ans->points[index[1]]),
+                        new CLine(ans->points[index[1]],ans->points[index[2]]),
+                        new CLine(ans->points[index[2]],ans->points[index[0]])};
+        for(int j=0;j<3;j++){
+            if(std::find_if(ans->edges.begin(),ans->edges.end(),[&](CEdge* e){
+                return ((e->start == ee[j]->start && e->end == ee[j]->end  ) ||
+                        (e->start == ee[j]->end   && e->end == ee[j]->start) );
+            }) == ans->edges.end()){
+                ans->edges.push_back(ee[j]);
+            }
+        }
 
         //未使用データ
         in.readRawData (reinterpret_cast<char*>(&no_used),2);
     }
+
+    qDebug() << ans->name;
+    qDebug() << "頂点数:" << ans->points.size();
+    qDebug() << "エッジ数:" << ans->edges.size();
 
     return ans;
 }
