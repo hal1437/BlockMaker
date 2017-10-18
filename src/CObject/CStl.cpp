@@ -38,13 +38,14 @@ CStl* CStl::CreateFromFile(QString filepath){
             Pos pp(point[j][0],point[j][1],point[j][2]);
             for(int k=0;k<ans->points.size();k++){
                 if(*ans->points[k] == pp){
-                    index[j] == k;
+                    index[j] = k;
                 }
             }
             if(index[j] == -1){
                 index[j] = ans->points.size();
                 ans->points.push_back(new CPoint(pp));
             }
+            qDebug() << index[j];
         }
         ans->edges.push_back(new CLine(ans->points[index[0]],ans->points[index[1]]));
         ans->edges.push_back(new CLine(ans->points[index[1]],ans->points[index[2]]));

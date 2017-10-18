@@ -199,6 +199,8 @@ void MainWindow::ToggledSTL(bool){
             this->model->SetPause(true);
             for(int i =0;i<stl->points.size();i++){
                 this->model->AddPoints(stl->points[i]);
+            }
+            for(int i =0;i<stl->edges.size();i++){
                 this->model->AddEdges (stl->edges[i]);
             }
             this->model->SetPause(false);
