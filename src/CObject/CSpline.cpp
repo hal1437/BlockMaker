@@ -67,6 +67,19 @@ CREATE_RESULT CSpline::Create(CPoint *pos){
     }
     return CREATE_RESULT::ENDLESS;
 }
+void CSpline::DrawGL(Pos camera,Pos center)const{
+    glBegin(GL_LINE_STRIP);
+    //線の分割描画
+    for(double i=0;i<=1;i += 1.0/CSpline::LINE_NEAR_DIVIDE){
+        if(i+1.0/CSpline::LINE_NEAR_DIVIDE > 1)i=1;
+        glVertex3f(this->GetMiddleDivide(i).x(),
+                   this->GetMiddleDivide(i).y(),
+                   this->GetMiddleDivide(i).z());
+    }
+    glEnd();
+    CEdge::DrawGL(camera,center);
+}
+
 
 //中間点操作
 CPoint*  CSpline::GetPoint(int index){

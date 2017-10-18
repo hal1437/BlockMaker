@@ -16,7 +16,7 @@ void CPoint::DrawGL(Pos camera,Pos center)const{
     double theta2 = std::atan2(-cc.x(),cc.z());
     Quat quat = Quat::getRotateXMatrix(theta1).Dot(Quat::getRotateYMatrix(theta2));
     const double length = cc.Length()*10;
-    const int POLY_COUNT = 3;
+    const int POLY_COUNT = 8;
     if(!this->isControlPoint()){
         //円の描画
         for(double k=0;k < 2*M_PI;k += 2*M_PI/POLY_COUNT){

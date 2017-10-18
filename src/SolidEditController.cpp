@@ -118,7 +118,7 @@ CObject* SolidEditController::getHangedObject(Pos center, Pos dir)const{
                 }
             }
         }
-    }
+    }/*
     if(ans == nullptr){
         //エッジの選択
         for(CEdge* e : this->model->GetEdges()){
@@ -139,7 +139,7 @@ CObject* SolidEditController::getHangedObject(Pos center, Pos dir)const{
                 }
             }
         }
-    }
+    }*/
     return ans;
 }
 

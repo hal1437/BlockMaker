@@ -9,6 +9,15 @@ CREATE_RESULT CLine::Create(CPoint *pos){
         return CREATE_RESULT::COMPLETE;//完結
     }
 }
+void CLine::DrawGL(Pos camera,Pos center)const{
+    //線の分割描画
+    glBegin(GL_LINES);
+    glVertex3f(this->GetMiddleDivide(0).x(),this->GetMiddleDivide(0).y(),this->GetMiddleDivide(0).z());
+    glVertex3f(this->GetMiddleDivide(1).x(),this->GetMiddleDivide(1).y(),this->GetMiddleDivide(1).z());
+    glEnd();
+    CEdge::DrawGL(camera,center);
+}
+
 bool CLine::isSelectable(Pos pos)const{
     //追加条件
     if(CObject::isSelectable(pos) &&

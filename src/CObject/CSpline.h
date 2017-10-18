@@ -21,6 +21,7 @@ class CSpline : public CEdge
     Q_OBJECT
 private:
     const static int DIVISION = 10;//分解数
+    const static int LINE_NEAR_DIVIDE = 30; //近似直線判定関数の分割数
 protected:
     std::vector<CPoint*> pos;
     Spline xs;
@@ -31,6 +32,7 @@ public:
 
     //作成関数(完了時:true , 継続時:false)
     virtual CREATE_RESULT Create(CPoint* pos);
+    virtual void DrawGL(Pos camera,Pos center)const;
 
     //中間点操作
     virtual CPoint*  GetPoint(int index);

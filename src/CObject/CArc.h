@@ -7,6 +7,7 @@ class CArc : public CEdge
     Q_OBJECT
 protected:
     double round = 0;//半径
+    const static int LINE_NEAR_DIVIDE = 30; //近似直線判定関数の分割数
 
 public:
     CPoint* center; //中心

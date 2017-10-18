@@ -9,6 +9,7 @@ class CLine : public CEdge
 public:
     //作成関数(完了時:true , 継続時:false)
     virtual CREATE_RESULT Create(CPoint* pos);
+    virtual void DrawGL(Pos camera,Pos center)const; //三次元描画関数
     virtual bool isSelectable(Pos pos)const;
 
     //中間点操作

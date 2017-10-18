@@ -38,10 +38,10 @@ void ObjectList::AddStlToTree(CStl* stl,QTreeWidgetItem* parent,int){
         item->setText(0,stl->name);
     }
     item->setIcon(0,getIcon(stl));
-
+    /*
     for(int i = 0;i<stl->edges.size();i++){
         AddEdgeToTree(stl->edges[i],item,i+1);
-    }
+    }*/
     item->setSelected(exist(this->CadModelCoreInterface::model->GetSelected(),stl));
 
     if(parent == nullptr)this->addTopLevelItem(item);
@@ -193,11 +193,17 @@ void ObjectList::SetModel(CadModelCore* m){
 }
 
 void ObjectList::UpdateObject  (){
-    this->points = this->CadModelCoreInterface::model->GetPoints();
-    this->edges  = this->CadModelCoreInterface::model->GetEdges();
-    this->faces  = this->CadModelCoreInterface::model->GetFaces();
-    this->blocks = this->CadModelCoreInterface::model->GetBlocks();
-    this->stls   = this->CadModelCoreInterface::model->GetStls();
+    this->points.clear();
+    this->edges.clear();
+    this->faces.clear();
+    this->faces.clear();
+    this->blocks.clear();
+    this->stls.clear();
+    for(CPoint* p :this->CadModelCoreInterface::model->GetPoints())this->points.push_back(p);
+    for(CEdge*  p :this->CadModelCoreInterface::model->GetEdges ())this->edges.push_back(p);
+    for(CFace*  p :this->CadModelCoreInterface::model->GetFaces ())this->faces.push_back(p);
+    for(CBlock* p :this->CadModelCoreInterface::model->GetBlocks())this->blocks.push_back(p);
+    for(CStl*   p :this->CadModelCoreInterface::model->GetStls  ())this->stls.push_back(p);
 
     //排他処理
     for(CEdge* edge: this->edges){
@@ -208,6 +214,9 @@ void ObjectList::UpdateObject  (){
     }
     for(CBlock* block: this->blocks){
         for(CFace* f : block->faces)this->faces.removeAll(f);
+    }
+    for(CStl* stl: this->stls){
+        for(CEdge* f : stl->edges)this->edges.removeAll(f);
     }
 
     //ツリーにセット

@@ -37,6 +37,7 @@ Pos CEdge::GetNearLine(const Pos& pos1,const Pos& pos2)const{
 }
 void CEdge::DrawGL(Pos,Pos)const{
     if(!this->isVisible())return;
+/*
     glBegin(GL_LINE_STRIP);
     //線の分割描画
     for(double i=0;i<=1;i += 1.0/CEdge::LINE_NEAR_DIVIDE){
@@ -46,7 +47,7 @@ void CEdge::DrawGL(Pos,Pos)const{
                    this->GetMiddleDivide(i).z());
     }
     glEnd();
-
+*/
     if(this->start != nullptr && this->end != nullptr && *this->start != *this->end){
         //矢印
         Pos cc = (this->GetMiddleDivide(0.90) - this->GetMiddleDivide(0.89));
