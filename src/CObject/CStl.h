@@ -3,6 +3,7 @@
 #include "CPoint.h"
 #include "CLine.h"
 #include <QFile>
+#include <QTextStream>
 
 class CStl :public CObject
 {
