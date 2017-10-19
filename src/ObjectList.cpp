@@ -216,7 +216,7 @@ void ObjectList::UpdateObject  (){
         for(CFace* f : block->faces)this->faces.removeAll(f);
     }
     for(CStl* stl: this->stls){
-        for(CEdge* f : stl->edges)this->edges.removeAll(f);
+        for(CPoint* p : stl->points)this->points.removeAll(p);
     }
 
     //ツリーにセット

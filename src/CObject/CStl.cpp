@@ -44,6 +44,7 @@ CStl* CStl::CreateFromFile(QString filepath){
             if(index[j] == -1){
                 index[j] = ans->points.size();
                 ans->points.push_back(new CPoint(pp));
+                ans->points.back()->SetLock(true);
             }
         }
         //存在しなければ追加
@@ -71,6 +72,9 @@ CStl* CStl::CreateFromFile(QString filepath){
 }
 
 void CStl::DrawGL(Pos camera,Pos center)const{
+    for(int i=0;i<this->edges.size();i++){
+        this->edges[i]->DrawGL(camera,center);
+    }
 }
 
 //中間点操作

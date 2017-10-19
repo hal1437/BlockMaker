@@ -30,33 +30,27 @@ void SolidEditForm::ColorSelect(CObject* obj){
     else                                          glColor3f(0,0,1);
 }
 
-//カメラ方向セット
-
 
 void SolidEditForm::keyPressEvent    (QKeyEvent *event){
     //キーイベント
     if(!this->controller->isSketcheing()){
-        if(event->key() == Qt::Key_Up    )this->setCameraRotate(M_PI/2,0);
-        if(event->key() == Qt::Key_Left  )this->setCameraRotate(0,0);
-        if(event->key() == Qt::Key_Right )this->setCameraRotate(0,-M_PI/2);
-        if(event->key() == Qt::Key_Down  )this->setCameraRotate(M_PI/4,-M_PI/4);
+        if(event->key() == Qt::Key_Up    )this->SetCameraRotate(M_PI/2,0);
+        if(event->key() == Qt::Key_Left  )this->SetCameraRotate(0,0);
+        if(event->key() == Qt::Key_Right )this->SetCameraRotate(0,-M_PI/2);
         if(event->key() == Qt::Key_Down  ){
-            TimeDivider* t[3],*r;
-            for(int i = 0;i< 3;i++){
-                t[i] = TimeDivider::TimeDivide(this->center.mat[i],0,500);
-                connect(t[i],SIGNAL(PerTime()),this,SLOT(repaint()));
-            }
-            r = TimeDivider::TimeDivide(this->round,1.0,500);
-            connect(r,SIGNAL(PerTime()),this,SLOT(repaint()));
+            this->SetCameraRotate(M_PI/4,-M_PI/4);
+            this->SetCameraCenter(Pos(0,0,0));
+            this->SetZoomRate(1.0);
         }
     }
+    //キー状態保存
     shift_pressed = event->modifiers() & Qt::ShiftModifier;
     ctrl_pressed  = event->modifiers() & Qt::MetaModifier;
 
     //スケッチ終了
     if(event->key() == Qt::Key_Escape){
-        this->controller->hang_point = nullptr;
         this->make_controller->Escape();
+        this->controller->hang_point = nullptr;
         this->controller->sketch_face = nullptr; //スケッチ終了
     }
 
@@ -78,14 +72,26 @@ void SolidEditForm::StartSketch(CFace* face){
     double theta1_ = std::atan2(cross.y(),std::sqrt(cross.x()*cross.x()+cross.z()*cross.z()));
     double theta2_ = std::atan2(-cross.x(),cross.z());
 
-    this->setCameraRotate(theta1_,theta2_);
+    this->SetCameraRotate(theta1_,theta2_);
 }
-void SolidEditForm::setCameraRotate(double theta1,double theta2){
+void SolidEditForm::SetCameraRotate(double theta1,double theta2){
     TimeDivider *p1,*p2;
     p1 = TimeDivider::TimeDivide(this->controller->theta1  ,theta1,500);
     p2 = TimeDivider::TimeDivide(this->controller->theta2  ,theta2,500);
     connect(p1,SIGNAL(PerTime()),this,SLOT(repaint()));
     connect(p2,SIGNAL(PerTime()),this,SLOT(repaint()));
+}
+
+void SolidEditForm::SetCameraCenter(Pos point){
+    TimeDivider* t[3];
+    for(int i = 0;i< 3;i++){
+        t[i] = TimeDivider::TimeDivide(this->center.mat[i],point.mat[i],500);
+        connect(t[i],SIGNAL(PerTime()),this,SLOT(repaint()));
+    }
+}
+void SolidEditForm::SetZoomRate(double round){
+    TimeDivider* r = TimeDivider::TimeDivide(this->round,1.0,500);
+    connect(r,SIGNAL(PerTime()),this,SLOT(repaint()));
 }
 void SolidEditForm::keyReleaseEvent  (QKeyEvent *event){
     shift_pressed = event->modifiers() & Qt::ShiftModifier;
@@ -113,7 +119,6 @@ void SolidEditForm::mouseReleaseEvent(QMouseEvent *event){
     }
     //ドラッグでなければ
     if(this->first_click == Pos(event->pos().x(),event->pos().y())){
-
         //オブジェクト選択
         if(state == MAKE_OBJECT::Edit){
             QVector<CObject*> objects;
@@ -197,6 +202,13 @@ void SolidEditForm::mouseDoubleClickEvent(QMouseEvent *event){
 
         }
     }
+
+    //注視点移動
+    if(state == MAKE_OBJECT::Edit &&
+       !this->model->GetSelected().isEmpty() && this->model->GetSelected().first()->is<CPoint>()){
+        this->SetCameraCenter(*dynamic_cast<CPoint*>(this->model->GetSelected().first()));
+    }
+
 }
 
 void SolidEditForm::wheelEvent(QWheelEvent *event){
@@ -297,6 +309,7 @@ void SolidEditForm::paintGL(){
     //オブジェクト描画
     glLineWidth(2);
     glColor3f(0,0,1);//青
+    for(CStl*   stl   : this->model->GetStls  ())stl  ->DrawGL(this->camera,this->center);
     for(CBlock* block : this->model->GetBlocks())block->DrawGL(this->camera,this->center);
     for(CFace*  face  : this->model->GetFaces ())face ->DrawGL(this->camera,this->center);
     for(CEdge*  edge  : this->model->GetEdges ())edge ->DrawGL(this->camera,this->center);

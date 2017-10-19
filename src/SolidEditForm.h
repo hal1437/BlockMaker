@@ -62,10 +62,13 @@ public:
     void initializeGL();        //  OpenGL初期化
     void resizeGL(int, int);    //  ウィジットリサイズ時のハンドラ
     void paintGL();             //  描画処理
+
 public slots:
 
     void StartSketch(CFace* face);
-    void setCameraRotate(double theta1,double theta2);
+    void SetCameraRotate(double theta1,double theta2);
+    void SetCameraCenter(Pos point);
+    void SetZoomRate(double round);
     void SetState(MAKE_OBJECT state); //生成種類設定
     void CEdgeChanged(QVector<CEdge*> e);
     void CBlockChanged(QVector<CBlock*> e);

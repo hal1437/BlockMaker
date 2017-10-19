@@ -55,6 +55,9 @@ public slots:
     void Create3Face();  //三面を更新する。
     void CreateOrigin(); //原点を更新する。
 
+signals:
+    //カメラ注視点変更
+    void ChangeCameraCenter(Pos center);
 };
 
 #endif // SOLIDEDITCONTROLLER_H
