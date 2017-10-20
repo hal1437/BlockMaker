@@ -7,6 +7,7 @@
 #include <limits>
 #include <random>
 #include "CadModelCore.h"
+#include "CadModelSearch.h"
 #include "SolidEditForm.h"
 
 #include "Dialog/SmartDimensionDialog.h"
@@ -29,6 +30,7 @@ public:
     ~MainWindow();
 private:
     Ui::MainWindow *ui;
+    CadModelSearch search;
     bool shift_press =false;
     MoveTransformDialog* move_diag;
     PropertyDefinitionDialog* prop_diag;

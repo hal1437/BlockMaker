@@ -5,11 +5,12 @@
 void MainWindow::SetModel(CadModelCore* model){
     //モデルと結合
     this->model = model;
-    connect(this->model,SIGNAL(UpdateSelected()),this,SLOT(RefreshUI()));
     this->ui->ObjectTree->SetModel(this->model);
     this->ui->SolidEdit ->SetModel(this->model);
     this->move_diag->     SetModel(this->model);
     this->prop_diag->     SetModel(this->model);
+    search.SetModel(model);
+    connect(this->model,SIGNAL(UpdateSelected()),this,SLOT(RefreshUI()));
 }
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -138,13 +139,13 @@ void MainWindow::RefreshUI(){
     }
 
     //ブロック生成可否判定
+    QVector<CEdge*> edges;
+    for(CObject* obj:this->model->GetSelected())if(obj->is<CEdge>())edges.push_back(dynamic_cast<CEdge*>(obj));
+    ui->ToolFace  ->setEnabled(search.SearchEdgeMakeFace(edges).size() > 0);
+    //ui->ToolBlocks->setEnabled(search.SearchFaceMakeBlock(edges).size() > 0);
+    //ui->ToolFace  ->setEnabled(CFace ::Creatable(this->model->GetSelected()));
     ui->ToolBlocks->setEnabled(CBlock::Creatable(this->model->GetSelected()));
-    //ブロック生成可否判定
-    ui->ToolFace->setEnabled(CFace::Creatable(this->model->GetSelected()));
-    //スマート寸法は1つから
-    ui->ToolDimension->setEnabled(this->model->GetSelected().size() >= 1);
-    //リスト要素数で出力ボタンの無効化を決定
-    //ui->ExportButton->setEnabled(this->ui->BlockList->count() > 0);
+    //ui->ToolDimension->setEnabled(this->model->GetSelected().size() >= 1);
 
     this->repaint();
 }
@@ -265,11 +266,9 @@ void MainWindow::MakeBlock(){
 }
 void MainWindow::MakeFace(){
     CFace* face = new CFace(this);
-    QVector<CEdge*> ee;
-    for(QObject* obj: this->model->GetSelected()){
-        ee.push_back(dynamic_cast<CEdge*>(obj));
-    }
-    face->Create(ee);
+    QVector<CEdge*> edges;
+    for(CObject* obj:this->model->GetSelected())if(obj->is<CEdge>())edges.push_back(dynamic_cast<CEdge*>(obj));
+    face->Create(this->search.SearchEdgeMakeFace(edges));
     this->model->AddFaces(face);
     this->model->GetSelected().clear();//選択解除
 }
