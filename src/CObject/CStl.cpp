@@ -14,11 +14,8 @@ CStl* CStl::CreateFromFile(QString filepath){
     ans->name = name;
     ans->name.resize(80);
 
-    //テキスト判別文字
-    const char solid[7] = "solid ";
-
     //テキスト
-    if(std::equal(name,name+5,solid)){
+    if(std::find(name,name+80,'\n') != name+80){
         qDebug() << "テキスト";
         QTextStream t_in(&file);
         t_in.seek(0);
