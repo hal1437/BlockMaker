@@ -1,5 +1,40 @@
 #include "CStl.h"
 
+CStl* CStl::AddTriangle(CStl* stl,Pos pos[3]){
+    //点の追加
+    int index[3] = {-1,-1,-1};//posがpoint内に存在する時のインデックス
+    for(int i=0;i<3;i++){
+        //点の重複チェック
+        for(int j=0;j<stl->points.size();j++){
+            if(*stl->points[j] == pos[i]){
+                index[i] = j;
+            }
+        }
+        //なければ追加
+        if(index[i] == -1){
+            index[i] = stl->points.size();
+            stl->points.push_back(new CPoint(pos[i]));
+            stl->points.back()->SetLock(true);
+        }
+    }
+    //存在しなければ追加
+    QVector<CEdge*> ee = {new CLine(stl->points[index[0]],stl->points[index[1]]),
+                          new CLine(stl->points[index[1]],stl->points[index[2]]),
+                          new CLine(stl->points[index[2]],stl->points[index[0]])};
+    for(int j=0;j<3;j++){
+        if(std::find_if(stl->edges.begin(),stl->edges.end(),[&](CEdge* e){
+            return ((e->start == ee[j]->start && e->end == ee[j]->end  ) ||
+                    (e->start == ee[j]->end   && e->end == ee[j]->start) );
+        }) == stl->edges.end()){
+            stl->edges.push_back(ee[j]);
+        }
+    }
+    //面の追加
+    CFace* face = new CFace();
+    face->Create(ee);
+    stl->faces.push_back(face);
+}
+
 CStl* CStl::CreateFromFile(QString filepath){
     CStl* ans = new CStl();
     QFile file(filepath);
@@ -35,7 +70,7 @@ CStl* CStl::CreateFromFile(QString filepath){
             }
             //座標点
             if(list[0] == "outer"){
-                int index[3] = {-1,-1,-1};
+                Pos pos[3];
                 for(int i=0;i<3;i++){
                     QString str_s = t_in.readLine();
                     QStringList list_s = str_s.split(' ');
@@ -43,30 +78,9 @@ CStl* CStl::CreateFromFile(QString filepath){
                     for(erase_index=0;list_s[erase_index] == "";erase_index++);
                     if(erase_index > 0)list_s.erase(list_s.begin(),list_s.begin()+erase_index);
 
-                    Pos pp(list_s[1].toDouble(),list_s[2].toDouble(),list_s[3].toDouble());
-                    for(int k=0;k<ans->points.size();k++){
-                        if(*ans->points[k] == pp){
-                            index[i] = k;
-                        }
-                    }
-                    if(index[i] == -1){
-                        index[i] = ans->points.size();
-                        ans->points.push_back(new CPoint(pp));
-                        ans->points.back()->SetLock(true);
-                    }
+                    pos[i] = Pos(list_s[1].toDouble(),list_s[2].toDouble(),list_s[3].toDouble());
                 }
-                //存在しなければ追加
-                CEdge* ee[3] = {new CLine(ans->points[index[0]],ans->points[index[1]]),
-                                new CLine(ans->points[index[1]],ans->points[index[2]]),
-                                new CLine(ans->points[index[2]],ans->points[index[0]])};
-                for(int j=0;j<3;j++){
-                    if(std::find_if(ans->edges.begin(),ans->edges.end(),[&](CEdge* e){
-                        return ((e->start == ee[j]->start && e->end == ee[j]->end  ) ||
-                                (e->start == ee[j]->end   && e->end == ee[j]->start) );
-                    }) == ans->edges.end()){
-                        ans->edges.push_back(ee[j]);
-                    }
-                }
+                AddTriangle(ans,pos);
             }
         }
 
@@ -80,7 +94,6 @@ CStl* CStl::CreateFromFile(QString filepath){
         for(int i =0;i< triangle_size;i++){
             float norm[3];
             float point[3][3];
-            int index[3] = {-1,-1,-1};
             std::uint16_t no_used;
 
             //法線ベクトル
@@ -88,38 +101,18 @@ CStl* CStl::CreateFromFile(QString filepath){
                 in.readRawData (reinterpret_cast<char*>(&norm[j]),4);
             }
             //三角形座標
+            Pos pos[3];
             for(int j=0;j<3;j++){
                 for(int k=0;k<3;k++){
                     in.readRawData (reinterpret_cast<char*>(&point[j][k]),4);
                 }
                 //構築
-                Pos pp(point[j][0],point[j][1],point[j][2]);
-                for(int k=0;k<ans->points.size();k++){
-                    if(*ans->points[k] == pp){
-                        index[j] = k;
-                    }
-                }
-                if(index[j] == -1){
-                    index[j] = ans->points.size();
-                    ans->points.push_back(new CPoint(pp));
-                    ans->points.back()->SetLock(true);
-                }
+                pos[j] = Pos(point[j][0],point[j][1],point[j][2]);
             }
-            //存在しなければ追加
-            CEdge* ee[3] = {new CLine(ans->points[index[0]],ans->points[index[1]]),
-                            new CLine(ans->points[index[1]],ans->points[index[2]]),
-                            new CLine(ans->points[index[2]],ans->points[index[0]])};
-            for(int j=0;j<3;j++){
-                if(std::find_if(ans->edges.begin(),ans->edges.end(),[&](CEdge* e){
-                    return ((e->start == ee[j]->start && e->end == ee[j]->end  ) ||
-                            (e->start == ee[j]->end   && e->end == ee[j]->start) );
-                }) == ans->edges.end()){
-                    ans->edges.push_back(ee[j]);
-                }
-            }
+            AddTriangle(ans,pos);
 
             //未使用データ
-            in.readRawData (reinterpret_cast<char*>(&no_used),2);
+            in.readRawData(reinterpret_cast<char*>(&no_used),2);
         }
     }
 

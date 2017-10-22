@@ -2,6 +2,7 @@
 #define CSTL_H
 #include "CPoint.h"
 #include "CLine.h"
+#include "CFace.h"
 #include <QFile>
 #include <QTextStream>
 
@@ -10,9 +11,12 @@ class CStl :public CObject
     Q_OBJECT
 
 public:
-    QString name;           //STL名
-    QVector<CPoint*> points;//点群
-    QVector<CEdge* > edges; //線群
+    QString name;            //STL名
+    QVector<CPoint*> points; //点群
+    QVector<CEdge* > edges;  //線群
+    QVector<CFace* > faces;  //面群
+private:
+    static CStl* AddTriangle(CStl* stl,Pos pos[3]);
 public:
     static CStl* CreateFromFile(QString filepath);
 
