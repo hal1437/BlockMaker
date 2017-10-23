@@ -101,7 +101,12 @@ void ExportDialog::Export(QString filename)const{
 
         file.OutStringInline("edgeGrading");
         for(int i=0;i<12;i++){
-            grading_args.push_back(block->GetEdgeSequence(i)->getGrading());
+            qDebug() << i << block->isEdgeReverse(i);
+            if(block->isEdgeReverse(i)){
+                grading_args.push_back(1.0/block->GetEdgeSequence(i)->getGrading());
+            }else{
+                grading_args.push_back(block->GetEdgeSequence(i)->getGrading());
+            }
         }
         file.OutVectorInline(grading_args);
         file.OutNewline();

@@ -33,7 +33,7 @@ CPoint* CBlock::GetBasePoint()const{
     double LIMIT_LENGTH = 0;
     QVector<CPoint*> vertex = this->GetAllPoints();
     for(CPoint* pos:vertex){
-        QVector<double> vs = {pos->x(),pos->y(),pos->z(),LIMIT_LENGTH};
+        QVector<double> vs = {std::abs(pos->x()),std::abs(pos->y()),std::abs(pos->z()),LIMIT_LENGTH};
         LIMIT_LENGTH = *std::max_element(vs.begin(),vs.end());
     }
     //角の算出
@@ -134,6 +134,16 @@ CPoint* CBlock::GetPointSequence(int index)const{
     CEdge* base_edges[3]={nullptr,nullptr,nullptr};
     QVector<CEdge*> edges = this->GetAllEdges();
 
+    //edgesをクローンに入れ替え
+    QVector<CEdge*> swap_tmp;
+    for(CEdge* edge:edges){
+        CEdge* clone = dynamic_cast<CEdge*>(edge->Clone());
+        clone->start = edge->start;
+        clone->end   = edge->end;
+        swap_tmp.push_back(clone);
+    }
+    edges = swap_tmp;
+
     //原点を含むエッジ以外を削除
     edges.erase(std::remove_if(edges.begin(),edges.end(),[&](CEdge* edge){
         return (edge->start != ans[0] && edge->end != ans[0]);
@@ -216,6 +226,22 @@ CEdge* CBlock::GetEdgeSequence(int index) const{
         return (e->start == p1 && e->end == p2) || (e->start == p2 && e->end == p1);
     });
     return edge;
+}
+
+bool CBlock::isEdgeReverse(int index){
+    //始点と終点を取得
+    QVector<QVector<int>> edge_comb = {{0,1},{1,2},{3,2},{0,3},{4,5},{5,6},
+                                       {7,6},{4,7},{0,4},{1,5},{2,6},{3,7}};
+
+    //始点と終点を持つ点を探す
+    QVector<CEdge*> edges = this->GetAllEdges();
+    CPoint* p1 = this->GetPointSequence(edge_comb[index][0]);
+    CPoint* p2 = this->GetPointSequence(edge_comb[index][1]);
+    CEdge* edge = *std::find_if(edges.begin(),edges.end(),[&](CEdge* e){
+        return (e->start == p1 && e->end == p2) || (e->start == p2 && e->end == p1);
+    });
+    if(edge->start == p2)return true;
+    else return false;
 }
 
 

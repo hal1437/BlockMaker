@@ -60,7 +60,7 @@ void CEdge::DrawGL(Pos,Pos)const{
                    this->GetMiddleDivide(0.9).y(),
                    this->GetMiddleDivide(0.9).z());
         double ARROW_ROUND = length/100;
-        for(double i=0;i<=2*M_PI;i+= M_PI*2/3){
+        for(double i=0;i<=2*M_PI;i+= M_PI*1/8){
             Pos c = Pos(ARROW_ROUND*std::sin(i),ARROW_ROUND*std::cos(i),0).Dot(Quat::getRotateXMatrix(theta1).Dot(Quat::getRotateYMatrix(theta2)));
             Pos pp = p+c;
             glVertex3f(pp.x(),

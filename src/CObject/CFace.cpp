@@ -397,8 +397,9 @@ void CFace::RecalcMesh(){
             double rate_1 = CEdge::GetDivisionRate(v_max-1,  this->GetGrading(1),j);
             double rate_3 = CEdge::GetDivisionRate(v_max-1,1/this->GetGrading(3),j);
 
-            double rate_p1 = (rate_2-rate_0) * (  j  /(u_max-1)) + rate_0;
-            double rate_p2 = (rate_1-rate_3) * (  i  /(v_max-1)) + rate_3;
+            double rate_p1 = (rate_2-rate_0) * (  j  /(v_max-1)) + rate_0;
+            double rate_p2 = (rate_1-rate_3) * (  i  /(u_max-1)) + rate_3;
+
             //座標計算
             v_pp[j] = this->GetPosFromUV(rate_p1,rate_p2);
         }
@@ -479,7 +480,7 @@ void CFace::ChangeChildCallback(QVector<CObject*> edges){
             //対角エッジの分割数同期
             for(int i=0;i<this->edges.size();i++){
                 if(this->edges[i] == edge){
-                    this->edges[(i+2)%this->edges.size()]->setDivide(dynamic_cast<CEdge*>(edge)->getDivide());
+                    this->edges[(i+2)%this->edges.size()]->setDivide(edge->getDivide());
                 }
             }
         }

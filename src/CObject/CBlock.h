@@ -34,6 +34,7 @@ public:
     virtual QVector<CFace* > GetAllFaces()const;  //構成面取得
     virtual CPoint* GetPointSequence(int index) const;//番号順点取得
     virtual CEdge*  GetEdgeSequence (int index) const;//番号順線取得
+    virtual bool isEdgeReverse(int index);//番号のエッジが反転しているか
 
     //子の操作
     virtual CFace*   GetFace (int index);
