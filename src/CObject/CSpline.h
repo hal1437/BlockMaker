@@ -20,7 +20,7 @@ class CSpline : public CEdge
 {
     Q_OBJECT
 private:
-    const static int DIVISION = 10;//分解数
+    const static int DIVISION = 100;//分解数
     const static int LINE_NEAR_DIVIDE = 30; //近似直線判定関数の分割数
 protected:
     std::vector<CPoint*> pos;

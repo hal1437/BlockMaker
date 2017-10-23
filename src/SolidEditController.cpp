@@ -102,24 +102,25 @@ bool SolidEditController::isSketcheing()const{
 
 
 CObject* SolidEditController::getHangedObject(Pos center, Pos dir)const{
-    CObject* ans = nullptr;
+    QVector<QPair<CObject*,double>>ans;
 
     //点の選択
     for(CPoint* p:this->model->GetPoints()){
         if(p->isVisible()){
-            if((Pos::LineNearPoint(center,center+dir, *p) - *p).Length() < CPoint::COLLISION_SIZE && hang_point != p){
+            double length = (Pos::LineNearPoint(center,center+dir, *p) - *p).Length();
+            if(length < CPoint::COLLISION_SIZE && hang_point != p){
                 //スケッチ中なら、平面上に存在する条件を追加
                 if(this->isSketcheing()){
                     if(this->sketch_face->isComprehension(*p)){
-                        ans = p;
+                        ans.push_back(qMakePair(p,length));
                     }
                 }else{
-                    ans = p;
+                    ans.push_back(qMakePair(p,length));
                 }
             }
         }
     }
-    if(ans == nullptr){
+    if(ans.size() == 0){
         //エッジの選択
         for(CEdge* e : this->model->GetEdges()){
             if(hang_point == e->start || hang_point == e->end || !e->isVisible())continue;
@@ -127,20 +128,26 @@ CObject* SolidEditController::getHangedObject(Pos center, Pos dir)const{
             const double DIVIDE = 100;
             for(int i=0;i<=DIVIDE;i++){
                 Pos p = e->GetMiddleDivide(i/DIVIDE);
-                if((Pos::LineNearPoint(center,center+dir, p) - p).Length() < CPoint::COLLISION_SIZE){
+                double length = (Pos::LineNearPoint(center,center+dir, p) - p).Length();
+                if(length  < CPoint::COLLISION_SIZE){
                     //スケッチ中なら、平面上に存在する条件を追加
                     if(this->isSketcheing()){
                         if(this->sketch_face->isComprehension(*e->start) && this->sketch_face->isComprehension(*e->end)){
-                            ans = e;
+                            ans.push_back(qMakePair(e,length));
                         }
                     }else{
-                        ans = e;
+                        ans.push_back(qMakePair(e,length));
                     }
                 }
             }
         }
     }
-    return ans;
+    if(ans.size() == 0)return nullptr;
+    else{
+        return std::min_element(ans.begin(),ans.end(),[](QPair<CObject*,double> lhs,QPair<CObject*,double> rhs){
+            return (lhs.second < rhs.second);
+        })->first;
+    }
 }
 
 CFace* SolidEditController::getHangedFace(Pos center,Pos camera_pos)const{

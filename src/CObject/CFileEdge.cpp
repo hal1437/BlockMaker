@@ -41,7 +41,7 @@ void CFileEdge::DrawGL(Pos camera,Pos center)const{
     for(int i =0;i<this->pos.size();i++){
         this->pos[i]->SetVisible(this->isVisibleDetail());
     }
-    this->CEdge::DrawGL(camera,center);
+    this->CSpline::DrawGL(camera,center);
 }
 
 CREATE_RESULT CFileEdge::Create(CPoint *pos){

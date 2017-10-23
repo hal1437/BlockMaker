@@ -17,9 +17,11 @@ QVector<CEdge*> CadModelSearch::SearchEdgeMakeFace (QVector<CEdge*> select){
     //対象外
     if(select.size() <= 1)return QVector<CEdge*>();
     if(select.size() >= 4){
-        //if(CFace::Creatable(select))return select;
-        //else
-        return QVector<CEdge*>();
+        QVector<CObject*> objects;
+        //CObjectに変換
+        for(CEdge* edge:select)objects.push_back(edge);
+        if(CFace::Creatable(objects))return select;
+        else return QVector<CEdge*>();
     }
 
     //選択されたオブジェクトは排除
