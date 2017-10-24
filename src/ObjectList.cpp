@@ -158,6 +158,12 @@ void ObjectList::pushSelectedPoint(CPoint* point,QTreeWidgetItem* current){
         this->CadModelCoreInterface::model->AddSelected(point);
     }
 }
+void ObjectList::pushSelectedStl  (CStl*   stl  ,QTreeWidgetItem* current){
+    current->setIcon(0,this->getIcon(stl));
+    if(current->isSelected()){
+        this->CadModelCoreInterface::model->AddSelected(stl);
+    }
+}
 void ObjectList::pullSelectedBlock(CBlock* block,QTreeWidgetItem* current){
     current->setIcon(0,this->getIcon(block));
     current->setSelected(exist(this->CadModelCoreInterface::model->GetSelected(),block));
@@ -183,7 +189,10 @@ void ObjectList::pullSelectedPoint(CPoint* point,QTreeWidgetItem* current){
     current->setIcon(0,this->getIcon(point));
     current->setSelected(exist(this->CadModelCoreInterface::model->GetSelected(),point));
 }
-
+void ObjectList::pullSelectedStl  (CStl*   stl  ,QTreeWidgetItem* current){
+    current->setIcon(0,this->getIcon(stl));
+    current->setSelected(exist(this->CadModelCoreInterface::model->GetSelected(),stl));
+}
 
 void ObjectList::SetModel(CadModelCore* m){
     this->CadModelCoreInterface::model = m;
@@ -199,11 +208,11 @@ void ObjectList::UpdateObject  (){
     this->faces.clear();
     this->blocks.clear();
     this->stls.clear();
-    for(CPoint* p :this->CadModelCoreInterface::model->GetPoints())this->points.push_back(p);
-    for(CEdge*  p :this->CadModelCoreInterface::model->GetEdges ())this->edges.push_back(p);
-    for(CFace*  p :this->CadModelCoreInterface::model->GetFaces ())this->faces.push_back(p);
-    for(CBlock* p :this->CadModelCoreInterface::model->GetBlocks())this->blocks.push_back(p);
     for(CStl*   p :this->CadModelCoreInterface::model->GetStls  ())this->stls.push_back(p);
+    for(CBlock* p :this->CadModelCoreInterface::model->GetBlocks())this->blocks.push_back(p);
+    for(CFace*  p :this->CadModelCoreInterface::model->GetFaces ())this->faces.push_back(p);
+    for(CEdge*  p :this->CadModelCoreInterface::model->GetEdges ())this->edges.push_back(p);
+    for(CPoint* p :this->CadModelCoreInterface::model->GetPoints())this->points.push_back(p);
 
     //排他処理
     for(CEdge* edge: this->edges){
@@ -223,11 +232,11 @@ void ObjectList::UpdateObject  (){
     disconnect(this->CadModelCoreInterface::model,SIGNAL(UpdateSelected()),this,SLOT(PullSelected()));//一時的にコネクト解除
     disconnect(this,SIGNAL(itemSelectionChanged()),this,SLOT(PushSelected()));
     this->clear();
+    for(int i=0;i<this->stls  .size();i++)AddStlToTree  (this->stls  [i],nullptr,i+1);
     for(int i=0;i<this->blocks.size();i++)AddBlockToTree(this->blocks[i],nullptr,i+1);
     for(int i=0;i<this->faces .size();i++)AddFaceToTree (this->faces [i],nullptr,i+1);
     for(int i=0;i<this->edges .size();i++)AddEdgeToTree (this->edges [i],nullptr,i+1);
     for(int i=0;i<this->points.size();i++)AddPointToTree(this->points[i],nullptr,i+1);
-    for(int i=0;i<this->stls  .size();i++)AddStlToTree  (this->stls  [i],nullptr,i+1);
     connect(this->CadModelCoreInterface::model,SIGNAL(UpdateSelected()),this,SLOT(PullSelected()));//再コネクト
     connect(this,SIGNAL(itemSelectionChanged()),this,SLOT(PushSelected()));
 }
@@ -238,6 +247,7 @@ void ObjectList::PullSelected(){
     int count = 0;
     disconnect(this->CadModelCoreInterface::model,SIGNAL(UpdateSelected()),this,SLOT(PullSelected()));//一時的にコネクト解除
     disconnect(this,SIGNAL(itemSelectionChanged()),this,SLOT(PushSelected()));
+    for(int i=0;i<this->stls  .size();i++,count++)pullSelectedStl  (this->stls  [i],this->topLevelItem(count));
     for(int i=0;i<this->blocks.size();i++,count++)pullSelectedBlock(this->blocks[i],this->topLevelItem(count));
     for(int i=0;i<this->faces .size();i++,count++)pullSelectedFace (this->faces [i],this->topLevelItem(count));
     for(int i=0;i<this->edges .size();i++,count++)pullSelectedEdge (this->edges [i],this->topLevelItem(count));
@@ -253,6 +263,7 @@ void ObjectList::PushSelected(){
     disconnect(this->CadModelCoreInterface::model,SIGNAL(UpdateSelected()),this,SLOT(PullSelected()));//一時的にコネクト解除
     disconnect(this,SIGNAL(itemSelectionChanged()),this,SLOT(PushSelected()));
     this->CadModelCoreInterface::model->SelectedClear();
+    for(int i=0;i<this->stls  .size();i++,count++)pushSelectedStl  (this->stls  [i],this->topLevelItem(count));
     for(int i=0;i<this->blocks.size();i++,count++)pushSelectedBlock(this->blocks[i],this->topLevelItem(count));
     for(int i=0;i<this->faces .size();i++,count++)pushSelectedFace (this->faces [i],this->topLevelItem(count));
     for(int i=0;i<this->edges .size();i++,count++)pushSelectedEdge (this->edges [i],this->topLevelItem(count));

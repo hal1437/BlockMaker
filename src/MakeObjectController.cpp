@@ -62,7 +62,7 @@ CREATE_RESULT MakeObjectController::MakeJoint(CEdge* obj,Pos pos,CObject* merge)
 
 
 void MakeObjectController::StartMaking(MAKE_OBJECT type,Pos pos,CObject* merge){
-    if(type == MAKE_OBJECT::Point){    //点
+    if(type == MAKE_OBJECT::Point){  //点
         CPoint* new_pos = new CPoint(pos);
         //追加処理
         this->model->AddPoints(new_pos);

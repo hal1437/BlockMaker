@@ -16,6 +16,9 @@ public:
     //点と平面の最近点を取得（平面の法線、平面上の任意の点、点の座標）
     static Pos GetHitPosFaceToPoint(Pos face_norm,Pos face_center,Pos pos);
 
+    //点が平面に存在するかチェック（平面の法線、平面上の任意の点、点の座標）
+    static bool ChackPointOnFace(Pos face_norm,Pos face_center,Pos pos);
+
 public:
 
     Collision();

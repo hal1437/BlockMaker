@@ -1,7 +1,6 @@
 #include "SolidEditForm.h"
 #include "ui_SolidEditForm.h"
 
-
 void SolidEditForm::MakeObject(){
     CObject* hanged = this->GetHangedObject();
     if(state != MAKE_OBJECT::Edit){
@@ -34,10 +33,10 @@ void SolidEditForm::ColorSelect(CObject* obj){
 void SolidEditForm::keyPressEvent    (QKeyEvent *event){
     //キーイベント
     if(!this->controller->isSketcheing()){
-        if(event->key() == Qt::Key_Up    )this->SetCameraRotate(M_PI/2,0);
-        if(event->key() == Qt::Key_Left  )this->SetCameraRotate(0,0);
-        if(event->key() == Qt::Key_Right )this->SetCameraRotate(0,-M_PI/2);
-        if(event->key() == Qt::Key_Down  ){
+        if(event->key() == Qt::Key_Up    )this->SetCameraRotate(M_PI/2,0);  //平面
+        if(event->key() == Qt::Key_Left  )this->SetCameraRotate(0,0);       //正面
+        if(event->key() == Qt::Key_Right )this->SetCameraRotate(0,-M_PI/2); //右側面
+        if(event->key() == Qt::Key_Down  ){        //視点リセット
             this->SetCameraRotate(M_PI/4,-M_PI/4);
             this->SetCameraCenter(Pos(0,0,0));
             this->SetZoomRate(1.0);
@@ -51,7 +50,8 @@ void SolidEditForm::keyPressEvent    (QKeyEvent *event){
     if(event->key() == Qt::Key_Escape){
         this->make_controller->Escape();
         this->controller->hang_point = nullptr;
-        this->controller->sketch_face = nullptr; //スケッチ終了
+        this->controller->projection_center = Pos();
+        this->controller->projection_norm = Pos();
     }
 
     this->repaint();
@@ -60,15 +60,19 @@ void SolidEditForm::StartSketch(CFace* face){
     if(this->controller->isSketcheing())return;
     this->model->SelectedClear();//選択解除
 
-    this->controller->sketch_face = face;
-    Pos cross = face->GetNorm();
-    cross = cross.GetNormalize();
+    //平均点を中心とする
+    this->controller->projection_center = Pos();
+    for(int i=0;i<face->GetChildCount();i++ ){
+        this->controller->projection_center += *face->GetPointSequence(i);
+    }
+    this->controller->projection_center /= face->GetChildCount();
+    this->controller->projection_norm = face->GetNorm().GetNormalize();
 
     //法線ベクトルを近い方に変更
+    Pos cross = face->GetNorm().GetNormalize();
     if(cross.DotPos(this->camera - this->center) <  0){
         cross = -cross;
     }
-
     double theta1_ = std::atan2(cross.y(),std::sqrt(cross.x()*cross.x()+cross.z()*cross.z()));
     double theta2_ = std::atan2(-cross.x(),cross.z());
 
@@ -149,10 +153,10 @@ void SolidEditForm::mouseMoveEvent   (QMouseEvent *event){
     this->screen_pos =  Pos(event->pos().x() - this->width()/2,-(event->pos().y() - this->height()/2)) * 2 * round;
     if(this->controller->isSketcheing()){
         //スケッチ中であれば平面上に点を配置
-        Pos Line_base1 = this->screen_pos.Dot(this->controller->getCameraMatrix())+ this->center;
-        Pos Line_base2 = Pos(0,0,1)      .Dot(this->controller->getCameraMatrix())+ this->center;
-        this->mouse_pos  =  Collision::GetHitPosFaceToLine(this->controller->sketch_face->GetNorm(),
-                                                           *this->controller->sketch_face->GetPointSequence(0),
+        Pos Line_base1 = this->screen_pos.Dot(this->controller->getCameraMatrix()) + this->center;
+        Pos Line_base2 = Pos(0,0,1)      .Dot(this->controller->getCameraMatrix()) + this->center;
+        this->mouse_pos  =  Collision::GetHitPosFaceToLine(this->controller->projection_norm,
+                                                           this->controller->projection_center,
                                                            Line_base1,Line_base2);
     }else{
         //カメラ角度から算出
@@ -169,7 +173,7 @@ void SolidEditForm::mouseMoveEvent   (QMouseEvent *event){
         emit MousePosChanged(*dynamic_cast<CPoint*>(hang));
     }
 
-    if(this->drag_base != Pos(0,0) && !this->controller->isSketcheing()){
+    if(this->drag_base != Pos(0,0) ){
         if(ctrl_pressed){
             Pos delta(-(event->pos().x()-this->drag_base.x()) ,event->pos().y()-this->drag_base.y());
             this->center = (delta*round).Dot(this->controller->getCameraMatrix()) + this->center;
@@ -212,7 +216,12 @@ void SolidEditForm::mouseDoubleClickEvent(QMouseEvent *event){
 }
 
 void SolidEditForm::wheelEvent(QWheelEvent *event){
-    this->round += static_cast<double>(event->angleDelta().y())/MOUSE_ZOOM_RATE;
+    const double zoom_rate = 0.999;
+    int count = std::abs(event->angleDelta().y());
+    for(int i=0;i<count;i++){
+        if(event->angleDelta().y() > 0)this->round /= zoom_rate;
+        else                           this->round *= zoom_rate;
+    }
     repaint();
 }
 
@@ -277,9 +286,10 @@ void SolidEditForm::paintGL(){
     glDepthFunc(GL_LEQUAL);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    //幾何拘束描画
+    //カメラ変換行列
     Quat quat = Quat::getRotateXMatrix(this->controller->theta1).Dot(Quat::getRotateYMatrix(this->controller->theta2));
 
+    //幾何拘束描画
     QVector<std::pair<Pos,QVector<QString>>> rest_maps;
     for(Restraint* rest : this->model->GetRestraints()){
         for(Pos pp:rest->GetIconPoint()){
@@ -307,9 +317,10 @@ void SolidEditForm::paintGL(){
     }
 
     //オブジェクト描画
+    glColor3f(0.5,0.5,0.5);//灰
+    for(CStl*   stl   : this->model->GetStls  ())stl  ->DrawGL(this->camera,this->center);
     glLineWidth(2);
     glColor3f(0,0,1);//青
-    for(CStl*   stl   : this->model->GetStls  ())stl  ->DrawGL(this->camera,this->center);
     for(CBlock* block : this->model->GetBlocks())block->DrawGL(this->camera,this->center);
     for(CFace*  face  : this->model->GetFaces ())face ->DrawGL(this->camera,this->center);
     for(CEdge*  edge  : this->model->GetEdges ())edge ->DrawGL(this->camera,this->center);
@@ -318,9 +329,8 @@ void SolidEditForm::paintGL(){
     //描画面と色のリスト作成
     QVector<std::pair<CFace*,QVector<int>>> faces;
     for(int i=0;i< 3;i++){
-        faces.push_back(std::make_pair(CFace::base[i]    ,QVector<int>({0,0,0,0})));//右側面
+        faces.push_back(std::make_pair(CFace::base[i]    ,QVector<int>({0,0,0,0})));
     }
-    faces.push_back(std::make_pair(this->controller->sketch_face,QVector<int>({1,1,0,1})));//スケッチ面
     //面の描画
     glLineWidth(2);
     for(std::pair<CFace*,QVector<int>>f: faces){
@@ -331,6 +341,7 @@ void SolidEditForm::paintGL(){
     }
 
     //選択オブジェクト描画
+    glDepthFunc(GL_ALWAYS);//奥行き方向補正を無視
     glColor3f(0,1,1);//水色
     for(CObject* p: this->model->GetSelected()){
         p->DrawGL(this->camera,this->center);
@@ -346,15 +357,25 @@ void SolidEditForm::paintGL(){
     //座標線の描画
     glLineWidth(4);
     glDepthFunc(GL_ALWAYS);//奥行き方向補正を無視
+    Pos cc = (Pos(100-this->width(),100-this->height(),1)*round).Dot(this->controller->getCameraMatrix()) + this->center;
     for(int i=0;i<3;i++){
         glBegin(GL_LINES);
         glColor3f((i==0), (i==1), (i==2));
 
-        Pos cc = (Pos(100-this->width(),100-this->height(),1)*round).Dot(this->controller->getCameraMatrix()) + this->center;
         Pos ex = cc + Pos(50*(i==0)*round, 50*(i==1)*round, 50*(i==2)*round);
 
         glVertex3f(cc.x(),cc.y(),cc.z());
         glVertex3f(ex.x(),ex.y(),ex.z());
+        glEnd();
+    }
+    //投影法線の描画
+    if(this->controller->isSketcheing()){
+        glBegin(GL_LINES);
+        glColor3f(1,1,0);
+        glVertex3f(cc.x(),cc.y(),cc.z());
+        glVertex3f(cc.x() + 50 * this->controller->projection_norm.x(),
+                   cc.y() + 50 * this->controller->projection_norm.y(),
+                   cc.z() + 50 * this->controller->projection_norm.z());
         glEnd();
     }
 

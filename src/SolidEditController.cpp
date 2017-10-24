@@ -97,7 +97,7 @@ Quat SolidEditController::getCameraMatrix()const{
 }
 
 bool SolidEditController::isSketcheing()const{
-    return (this->sketch_face != nullptr);
+    return (projection_norm != Pos());
 }
 
 
@@ -111,7 +111,7 @@ CObject* SolidEditController::getHangedObject(Pos center, Pos dir)const{
             if(length < CPoint::COLLISION_SIZE && hang_point != p){
                 //スケッチ中なら、平面上に存在する条件を追加
                 if(this->isSketcheing()){
-                    if(this->sketch_face->isComprehension(*p)){
+                    if(Collision::ChackPointOnFace(projection_norm,projection_center,*p)){
                         ans.push_back(qMakePair(p,length));
                     }
                 }else{
@@ -132,7 +132,8 @@ CObject* SolidEditController::getHangedObject(Pos center, Pos dir)const{
                 if(length  < CPoint::COLLISION_SIZE){
                     //スケッチ中なら、平面上に存在する条件を追加
                     if(this->isSketcheing()){
-                        if(this->sketch_face->isComprehension(*e->start) && this->sketch_face->isComprehension(*e->end)){
+                        if(Collision::ChackPointOnFace(projection_norm,projection_center,*e->start) &&
+                           Collision::ChackPointOnFace(projection_norm,projection_center,*e->end)){
                             ans.push_back(qMakePair(e,length));
                         }
                     }else{

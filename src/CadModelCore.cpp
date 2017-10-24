@@ -8,9 +8,16 @@ bool CadModelCore::ExportFoamFile(QString filename)const{
     //バージョン出力
     out << 3 << std::endl;
 
+    //STL出力
+    out << this->Stls.size() << std::endl;
+    for(CStl* stl:this->Stls){
+         out << "STL," << stl->filepath.toStdString().c_str() << std::endl;
+    }
+
     //頂点リスト出力
     out << this->Points.size() << std::endl;
     for(CPoint* pos: this->Points){
+
         //座標
         out << pos->getName().toStdString() << ",";
         out << pos->x() << "," ;
@@ -106,6 +113,16 @@ bool CadModelCore::ImportFoamFile(QString filename){
     //バージョン取得
     int version;
     in >> version;
+
+    //STL取得
+    int stl_num;
+    in >> stl_num;
+    for(int i=0;i<stl_num;i++){
+        std::string str;
+        in >> str;
+        QStringList sl = QString(str.c_str()).split(',');
+        this->Stls.push_back(CStl::CreateFromFile(sl[1]));
+    }
 
     //頂点リスト取得
     int vertex_num;
@@ -231,6 +248,7 @@ bool CadModelCore::ImportFoamFile(QString filename){
         //モデルに追加
         this->Blocks.push_back(make);
     }
+
     //更新
     emit UpdatePoints();
     emit UpdateEdges();

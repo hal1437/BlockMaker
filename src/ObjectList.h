@@ -34,10 +34,12 @@ private:
     void pullSelectedEdge (CEdge*  edge ,QTreeWidgetItem* current);
     void pullSelectedFace (CFace*  face ,QTreeWidgetItem* current);
     void pullSelectedBlock(CBlock* block,QTreeWidgetItem* current);
+    void pullSelectedStl  (CStl*   stl  ,QTreeWidgetItem* current);
     void pushSelectedPoint(CPoint* point,QTreeWidgetItem* current);
     void pushSelectedEdge (CEdge*  edge ,QTreeWidgetItem* current);
     void pushSelectedFace (CFace*  face ,QTreeWidgetItem* current);
     void pushSelectedBlock(CBlock* block,QTreeWidgetItem* current);
+    void pushSelectedStl  (CStl*   stl  ,QTreeWidgetItem* current);
 
 public:
     void SetModel(CadModelCore* m);

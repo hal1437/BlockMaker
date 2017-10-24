@@ -37,6 +37,7 @@ CStl* CStl::AddTriangle(CStl* stl,Pos pos[3]){
 
 CStl* CStl::CreateFromFile(QString filepath){
     CStl* ans = new CStl();
+    ans->filepath = filepath;
     QFile file(filepath);
     if (!file.open(QIODevice::ReadOnly))return nullptr;
 
@@ -116,16 +117,29 @@ CStl* CStl::CreateFromFile(QString filepath){
         }
     }
 
-    qDebug() << ans->name;
-    qDebug() << "頂点数:" << ans->points.size();
-    qDebug() << "エッジ数:" << ans->edges.size();
+    qDebug() << "STL読み込み完了";
+    qDebug() << "STL名　：" << ans->name;
+    qDebug() << "頂点数　：" << ans->points.size();
+    qDebug() << "エッジ数：" << ans->edges.size();
+    qDebug() << "面数　　：" << ans->faces.size();
 
     return ans;
 }
 
 void CStl::DrawGL(Pos camera,Pos center)const{
-    for(int i=0;i<this->edges.size();i++){
-        this->edges[i]->DrawGL(camera,center);
+    if(this->isVisible() == false)return;
+
+    //線の描画
+    for(CEdge* edge:this->edges){
+        glLineWidth(1);
+        glBegin(GL_LINES);
+        glVertex3f(edge->GetMiddleDivide(0).x(),edge->GetMiddleDivide(0).y(),edge->GetMiddleDivide(0).z());
+        glVertex3f(edge->GetMiddleDivide(1).x(),edge->GetMiddleDivide(1).y(),edge->GetMiddleDivide(1).z());
+        glEnd();
+
+    }
+    for(CFace* face:this->faces){
+        face->DrawGL(camera,center);
     }
 }
 

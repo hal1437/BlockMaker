@@ -11,6 +11,7 @@ class CStl :public CObject
     Q_OBJECT
 
 public:
+    QString filepath;        //ファイルパス
     QString name;            //STL名
     QVector<CPoint*> points; //点群
     QVector<CEdge* > edges;  //線群

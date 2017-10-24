@@ -12,6 +12,10 @@ Pos Collision::GetHitPosFaceToPoint(Pos face_norm,Pos face_center,Pos pos){
     double PA_N = (pos-face_center).DotPos(face_norm);
     return (pos - (face_norm * PA_N));
 }
+bool Collision::ChackPointOnFace(Pos face_norm,Pos face_center,Pos pos){
+    return face_norm.DotPos(pos-face_center) < 1.0e-10;
+}
+
 
 
 Collision::Collision(){}
