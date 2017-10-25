@@ -25,6 +25,7 @@ public:
     virtual void DrawGL(Pos camera,Pos center)const; //三次元描画関数
 
     //中間点操作
+    virtual QVector<CPoint*> GetAllChildren()const;
     virtual CObject* GetChild(int index);
     virtual void     SetChild(int index,CObject* obj);
     virtual int      GetChildCount()const;

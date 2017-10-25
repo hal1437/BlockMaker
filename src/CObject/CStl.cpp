@@ -18,21 +18,28 @@ CStl* CStl::AddTriangle(CStl* stl,Pos pos[3]){
         }
     }
     //存在しなければ追加
-    QVector<CEdge*> ee = {new CLine(stl->points[index[0]],stl->points[index[1]]),
-                          new CLine(stl->points[index[1]],stl->points[index[2]]),
-                          new CLine(stl->points[index[2]],stl->points[index[0]])};
+    QVector<CEdge*> ee;
     for(int j=0;j<3;j++){
-        if(std::find_if(stl->edges.begin(),stl->edges.end(),[&](CEdge* e){
-            return ((e->start == ee[j]->start && e->end == ee[j]->end  ) ||
-                    (e->start == ee[j]->end   && e->end == ee[j]->start) );
-        }) == stl->edges.end()){
+        //検索
+        QVector<CEdge*>::iterator it = std::find_if(stl->edges.begin(),stl->edges.end(),[&](CEdge* e){
+            return ((e->start == stl->points[index[   j   ]] && e->end == stl->points[index[(j+1)%3]]  ) ||
+                    (e->start == stl->points[index[(j+1)%3]] && e->end == stl->points[index[   j   ]]) );
+        });
+        if(it == stl->edges.end()){
+            //存在しない
+            ee.push_back(new CLine(stl->points[index[   j   ]],
+                                   stl->points[index[(j+1)%3]]));
             stl->edges.push_back(ee[j]);
+        }else{
+            //存在する
+            ee.push_back(*it);
         }
     }
     //面の追加
     CFace* face = new CFace();
     face->Create(ee);
     stl->faces.push_back(face);
+    return stl;
 }
 
 CStl* CStl::CreateFromFile(QString filepath){
@@ -143,7 +150,10 @@ void CStl::DrawGL(Pos camera,Pos center)const{
     }
 }
 
-//中間点操作
+QVector<CPoint *> CStl::GetAllChildren() const{
+    return this->points;
+}
+
 CObject* CStl::GetChild(int index){
     return this->edges[index];
 }

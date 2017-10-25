@@ -6,13 +6,7 @@ bool CadModelCore::ExportFoamFile(QString filename)const{
     if(!out)return false;
 
     //バージョン出力
-    out << 3 << std::endl;
-
-    //STL出力
-    out << this->Stls.size() << std::endl;
-    for(CStl* stl:this->Stls){
-         out << "STL," << stl->filepath.toStdString().c_str() << std::endl;
-    }
+    out << 4 << std::endl;
 
     //頂点リスト出力
     out << this->Points.size() << std::endl;
@@ -95,6 +89,31 @@ bool CadModelCore::ExportFoamFile(QString filename)const{
 
         out << std::endl;
     }
+    //STL出力
+    out << this->Stls.size() << std::endl;
+    for(CStl* stl:this->Stls){
+         out << "STL," << stl->filepath.toStdString().c_str() << std::endl;
+         //点の出力
+         out << "STL_Points";
+         for(CPoint* pos:stl->points){
+             out << "," << IndexOf(this->Points,pos);
+         }
+         out << std::endl;
+         out << "STL_Edges";
+         for(CEdge* edge:stl->edges){
+             out << "," << IndexOf(this->Points,edge->start)
+                 << "," << IndexOf(this->Points,edge->end);
+         }
+         out << std::endl;
+         out << "STL_Faces";
+         for(CFace* face:stl->faces){
+             out << "," << IndexOf(stl->edges,face->edges[0])
+                 << "," << IndexOf(stl->edges,face->edges[1])
+                 << "," << IndexOf(stl->edges,face->edges[2]);
+         }
+         out << std::endl;
+    }
+
     return true;
 }
 bool CadModelCore::ImportFoamFile(QString filename){
@@ -113,16 +132,6 @@ bool CadModelCore::ImportFoamFile(QString filename){
     //バージョン取得
     int version;
     in >> version;
-
-    //STL取得
-    int stl_num;
-    in >> stl_num;
-    for(int i=0;i<stl_num;i++){
-        std::string str;
-        in >> str;
-        QStringList sl = QString(str.c_str()).split(',');
-        this->Stls.push_back(CStl::CreateFromFile(sl[1]));
-    }
 
     //頂点リスト取得
     int vertex_num;
@@ -248,6 +257,41 @@ bool CadModelCore::ImportFoamFile(QString filename){
         //モデルに追加
         this->Blocks.push_back(make);
     }
+    //STL取得
+    int stl_num;
+    in >> stl_num;
+    for(int i=0;i<stl_num;i++){
+        std::string str;
+        in >> str;
+        QStringList sl = QString(str.c_str()).split(',');
+        CStl* stl = new CStl();
+        //点の構成
+        in >> str;
+        sl = QString(str.c_str()).split(',');
+        for(int j=1;j < sl.size();j++){
+            stl->points.push_back(this->Points[sl[j].toInt()]);
+        }
+        //線の構成
+        in >> str;
+        sl = QString(str.c_str()).split(',');
+        for(int j=1;j < sl.size();j+=2){
+            CLine* edge = new CLine();
+            edge->start = this->Points[sl[j].toInt()];
+            edge->end   = this->Points[sl[j+1].toInt()];
+            stl->edges.push_back(edge);
+        }
+        //面の構成
+        in >> str;
+        sl = QString(str.c_str()).split(',');
+        for(int j=1;j < sl.size();j+=3){
+            CFace* face = new CFace();
+            face->Create({stl->edges[sl[j].toInt()],
+                          stl->edges[sl[j+1].toInt()],
+                          stl->edges[sl[j+2].toInt()]});
+            stl->faces.push_back(face);
+        }
+        this->Stls.push_back(stl);
+    }
 
     //更新
     emit UpdatePoints();
@@ -292,7 +336,7 @@ void CadModelCore::AutoMerge_impl(QVector<CPoint*> points){
     for(int i=0;i<points.size();i++){
         QVector<CPoint*> same;
         same.push_back(points[i]);
-        for(int j=0;j<points.size();j++){
+        for(int j=i;j<points.size();j++){
             if(points[i] != points[j] && *points[i] == *points[j]){
                 same.push_back(points[j]);
                 points.removeAll(points[j]);
