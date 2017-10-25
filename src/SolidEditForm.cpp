@@ -3,7 +3,7 @@
 
 void SolidEditForm::MakeObject(){
     CObject* hanged = this->GetHangedObject();
-    if(state != MAKE_OBJECT::Edit){
+    if(state != MAKE_OBJECT::Edit ){
         //生成
         this->make_controller->Making(state,this->mouse_pos,hanged);
         //最終点を保持
@@ -106,7 +106,7 @@ void SolidEditForm::mousePressEvent  (QMouseEvent *event){
     this->first_click = Pos(event->pos().x(),event->pos().y());
 
     //操作
-    if(this->state == MAKE_OBJECT::Edit){
+    if(this->state == MAKE_OBJECT::Edit || this->ctrl_pressed){
         //移動
         if(this->GetHangedObject()->is<CPoint>() && this->controller->isSketcheing()){
             this->controller->hang_point = dynamic_cast<CPoint*>(this->GetHangedObject());
@@ -153,11 +153,11 @@ void SolidEditForm::mouseMoveEvent   (QMouseEvent *event){
     this->screen_pos =  Pos(event->pos().x() - this->width()/2,-(event->pos().y() - this->height()/2)) * 2 * round;
     if(this->controller->isSketcheing()){
         //スケッチ中であれば平面上に点を配置
-        Pos Line_base1 = this->screen_pos.Dot(this->controller->getCameraMatrix()) + this->center;
-        Pos Line_base2 = Pos(0,0,1)      .Dot(this->controller->getCameraMatrix()) + this->center;
+        Pos Line_base1 = this->screen_pos.Dot(this->controller->getCameraMatrix());
+        Pos Line_base2 = Pos(0,0,1)      .Dot(this->controller->getCameraMatrix());
         this->mouse_pos  =  Collision::GetHitPosFaceToLine(this->controller->projection_norm,
                                                            this->controller->projection_center,
-                                                           Line_base1,Line_base2);
+                                                           Line_base1,Line_base2) + this->center;
     }else{
         //カメラ角度から算出
         this->mouse_pos = this->screen_pos.Dot(this->controller->getCameraMatrix()) + this->center;
@@ -373,9 +373,9 @@ void SolidEditForm::paintGL(){
         glBegin(GL_LINES);
         glColor3f(1,1,0);
         glVertex3f(cc.x(),cc.y(),cc.z());
-        glVertex3f(cc.x() + 50 * this->controller->projection_norm.x(),
-                   cc.y() + 50 * this->controller->projection_norm.y(),
-                   cc.z() + 50 * this->controller->projection_norm.z());
+        glVertex3f(cc.x() + 50 * this->controller->projection_norm.x() * round,
+                   cc.y() + 50 * this->controller->projection_norm.y() * round,
+                   cc.z() + 50 * this->controller->projection_norm.z() * round);
         glEnd();
     }
 

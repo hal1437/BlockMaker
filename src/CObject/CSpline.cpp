@@ -70,13 +70,21 @@ CREATE_RESULT CSpline::Create(CPoint *pos){
 void CSpline::DrawGL(Pos camera,Pos center)const{
     glBegin(GL_LINE_STRIP);
     //線の分割描画
-    for(double i=0;i<=1;i += 1.0/CSpline::LINE_NEAR_DIVIDE){
-        if(i+1.0/CSpline::LINE_NEAR_DIVIDE > 1)i=1;
+    for(double i=0;i<=1;i += 1.0/(CSpline::LINE_NEAR_DIVIDE*(this->pos.size()+1))){
+        if(i+1.0/(CSpline::LINE_NEAR_DIVIDE*(this->pos.size()+1)) > 1)i=1;
         glVertex3f(this->GetMiddleDivide(i).x(),
                    this->GetMiddleDivide(i).y(),
                    this->GetMiddleDivide(i).z());
     }
     glEnd();
+    const double ARROW_DIVIDE_RATE = 0.9;
+    const double ARROW_LENGTH_RATE = 0.1;
+    for(int i=0;i<this->pos.size()+1;i++){
+        double begin = 1.0 / (this->pos.size()+1) * i;
+        double end   = 1.0 / (this->pos.size()+1) * (i+1);
+        DrawArrow(begin+(end-begin)*ARROW_DIVIDE_RATE,
+                  begin+(end-begin)*(ARROW_DIVIDE_RATE-ARROW_LENGTH_RATE));
+    }
     CEdge::DrawGL(camera,center);
 }
 

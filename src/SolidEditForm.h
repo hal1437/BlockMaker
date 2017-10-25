@@ -74,7 +74,7 @@ public slots:
     void CBlockChanged(QVector<CBlock*> e);
 
 signals:
-    void MousePosChanged(Pos );
+    void MousePosChanged(Pos);
 
 public:
     explicit SolidEditForm(QWidget *parent = 0);

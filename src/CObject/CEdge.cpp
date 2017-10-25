@@ -35,40 +35,39 @@ Pos CEdge::GetNearLine(const Pos& pos1,const Pos& pos2)const{
     }
     return ans;
 }
+void CEdge::DrawArrow(double start,double end)const{
+    //差分値
+    Pos cc = (this->GetMiddleDivide(start) - this->GetMiddleDivide(end));
+
+    //変換行列作成
+    double theta1 = std::atan2(cc.y(),std::sqrt(cc.x()*cc.x()+cc.z()*cc.z()));
+    double theta2 = std::atan2(-cc.x(),cc.z());
+    Quat quat = Quat::getRotateXMatrix(theta1).Dot(Quat::getRotateYMatrix(theta2));
+
+    //矢印作成準備
+    double length = cc.Length();
+    Pos p = this->GetMiddleDivide(end);// + cc * (-10);
+    double ARROW_ROUND = length/8; //長さ
+    const int ANGLE_COUNT = 16;
+    glBegin(GL_POLYGON);
+    glVertex3f(this->GetMiddleDivide(start).x(),
+               this->GetMiddleDivide(start).y(),
+               this->GetMiddleDivide(start).z());
+    for(int i=0;i<=ANGLE_COUNT;i++){
+        double a = 2*M_PI / ANGLE_COUNT * i;
+        Pos c = Pos(ARROW_ROUND * std::sin(a),ARROW_ROUND * std::cos(a),0).Dot(quat);
+        Pos pp = p+c;
+        glVertex3f(pp.x(),pp.y(),pp.z());
+    }
+    glEnd();
+}
+
 void CEdge::DrawGL(Pos,Pos)const{
     if(!this->isVisible())return;
 /*
-    glBegin(GL_LINE_STRIP);
-    //線の分割描画
-    for(double i=0;i<=1;i += 1.0/CEdge::LINE_NEAR_DIVIDE){
-        if(i+1.0/CEdge::LINE_NEAR_DIVIDE > 1)i=1;
-        glVertex3f(this->GetMiddleDivide(i).x(),
-                   this->GetMiddleDivide(i).y(),
-                   this->GetMiddleDivide(i).z());
-    }
-    glEnd();
-*/
     if(this->start != nullptr && this->end != nullptr && *this->start != *this->end){
-        //矢印
-        Pos cc = (this->GetMiddleDivide(0.90) - this->GetMiddleDivide(0.89));
-        double theta1 = std::atan2(cc.y(),std::sqrt(cc.x()*cc.x()+cc.z()*cc.z()));
-        double theta2 = std::atan2(-cc.x(),cc.z());
-        double length = (*this->end - *this->start).Length();//(camera- center).Length();
-        glBegin(GL_POLYGON);
-        Pos p = this->GetMiddleDivide(0.91)+cc*(-10);
-        glVertex3f(this->GetMiddleDivide(0.9).x(),
-                   this->GetMiddleDivide(0.9).y(),
-                   this->GetMiddleDivide(0.9).z());
-        double ARROW_ROUND = length/100;
-        for(double i=0;i<=2*M_PI;i+= M_PI*1/8){
-            Pos c = Pos(ARROW_ROUND*std::sin(i),ARROW_ROUND*std::cos(i),0).Dot(Quat::getRotateXMatrix(theta1).Dot(Quat::getRotateYMatrix(theta2)));
-            Pos pp = p+c;
-            glVertex3f(pp.x(),
-                       pp.y(),
-                       pp.z());
-        }
-        glEnd();
-    }
+        DrawArrow(0.90,0.89);
+    }*/
     //分割ライン表示
     if(this->isVisibleDetail() && this->getDivide() > 0){
         for(double i = 1;i<this->getDivide();i++){

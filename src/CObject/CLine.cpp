@@ -15,6 +15,7 @@ void CLine::DrawGL(Pos camera,Pos center)const{
     glVertex3f(this->GetMiddleDivide(0).x(),this->GetMiddleDivide(0).y(),this->GetMiddleDivide(0).z());
     glVertex3f(this->GetMiddleDivide(1).x(),this->GetMiddleDivide(1).y(),this->GetMiddleDivide(1).z());
     glEnd();
+    DrawArrow(0.90,0.80);
     CEdge::DrawGL(camera,center);
 }
 

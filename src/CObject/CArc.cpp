@@ -50,6 +50,7 @@ void CArc::DrawGL(Pos camera,Pos center)const{
                        this->GetMiddleDivide(i).z());
         }
         glEnd();
+        DrawArrow(0.90,0.80);
         CEdge::DrawGL(camera,center);
     }
 }
