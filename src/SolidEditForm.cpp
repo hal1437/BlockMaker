@@ -177,7 +177,7 @@ void SolidEditForm::mouseMoveEvent   (QMouseEvent *event){
         if(ctrl_pressed){
             Pos delta(-(event->pos().x()-this->drag_base.x()) ,event->pos().y()-this->drag_base.y());
             this->center = (delta*round).Dot(this->controller->getCameraMatrix()) + this->center;
-        }else{
+        }else if(this->controller->hang_point == nullptr){
             //カメラ角度変更
             this->controller->theta1 += static_cast<double>(event->pos().y() - this->drag_base.y())/SENSITIVITY;
             this->controller->theta2 += static_cast<double>(event->pos().x() - this->drag_base.x())/SENSITIVITY;
