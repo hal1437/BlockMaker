@@ -499,6 +499,18 @@ double CFace::GetLengthFaceToLine(Pos center ,Pos dir){
 
     //交点を取得
     Pos p = Collision::GetHitPosFaceToLine(norm,*this->GetPointSequence(0),center,dir);
+    return dir.GetNormalize().DotPos(p - center);
+}
+
+bool CFace::CheckHitFaceToLine(Pos center ,Pos dir){
+    //法線ベクトルの算出
+    Pos norm = this->GetNorm();
+
+    //面と平行
+    if((dir).DotPos(norm) == 0)return false;
+
+    //交点を取得
+    Pos p = Collision::GetHitPosFaceToLine(norm,*this->GetPointSequence(0),center,dir);
 
     //四角形内であるか
     double sum=0;
@@ -506,14 +518,10 @@ double CFace::GetLengthFaceToLine(Pos center ,Pos dir){
         sum += Pos::Angle(*this->GetPointSequence(i)-p,*this->GetPointSequence((i+1)%this->edges.size())-p);
     }
     if(std::abs(sum-360) > 0.000001){
-        return -1;
+        return false;
     }else{
-        return (center - p).Length();
+        return true;
     }
-}
-
-bool CFace::CheckHitFaceToLine(Pos center ,Pos dir){
-    return (this->GetLengthFaceToLine(center,dir) != -1);
 }
 
 

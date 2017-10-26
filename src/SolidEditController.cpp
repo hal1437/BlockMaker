@@ -157,7 +157,7 @@ CFace* SolidEditController::getHangedFace(Pos center,Pos camera_pos)const{
     //最も近い面を選択する
     QVector<std::pair<double,CFace*>> rank;
     for(CFace* f:this->model->GetFaces()){
-        if(f->isVisible()){
+        if(f->isVisible() && f->CheckHitFaceToLine(camera_pos,center-camera_pos)){
             rank.push_back(std::make_pair(f->GetLengthFaceToLine(camera_pos,center-camera_pos),f));
         }
     }
