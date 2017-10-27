@@ -395,6 +395,7 @@ void CadModelCore::Delete(CObject* obj){
     if(obj->is<CStl  >())this->Delete(dynamic_cast<CStl*  >(obj));
 }
 void CadModelCore::Delete(CPoint* obj){
+    if(obj == CPoint::origin)return ;
     for(CEdge* parent:this->GetParent(obj))this->Delete(parent);
     this->GetPoints().removeAll(obj);
     UpdatePointsEmittor();
@@ -405,6 +406,7 @@ void CadModelCore::Delete(CEdge*  obj){
     UpdateEdgesEmittor();
 }
 void CadModelCore::Delete(CFace*  obj){
+    if(exist(CFace::base,obj))return ;
     for(CBlock* parent:this->GetParent(obj))this->Delete(parent);
     this->GetFaces().removeAll(obj);
     UpdateFacesEmittor();
