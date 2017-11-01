@@ -53,6 +53,7 @@ bool CadModelCore::ExportFoamFile(QString filename)const{
     faces_out.erase(std::remove_if(faces_out.begin(),faces_out.end(),[](CFace* face){
         return exist(CFace::base,face);
     }),faces_out.end());
+
     out << faces_out.size() << std::endl;
     for(CFace* face: faces_out){
         //面タイプ
@@ -82,7 +83,7 @@ bool CadModelCore::ExportFoamFile(QString filename)const{
         out << "," << block->getName().toStdString().c_str();
 
         //平面インデックス
-        for(int i=0;i< 6;i++)out << "," << IndexOf(this->Faces,block->faces[i]);
+        for(int i=0;i< 6;i++)out << "," << IndexOf(faces_out,block->faces[i]);
         //分割数
         //for(int i=0;i< 3;i++)out << "," << block->div[i];
         //詳細表示
