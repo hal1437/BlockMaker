@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>254</width>
-    <height>226</height>
+    <height>235</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -42,21 +42,42 @@
     <layout class="QGridLayout" name="gridLayout">
      <item row="0" column="1">
       <widget class="QDoubleSpinBox" name="XSpinBox">
+       <property name="wrapping">
+        <bool>false</bool>
+       </property>
+       <property name="specialValueText">
+        <string>0</string>
+       </property>
+       <property name="accelerated">
+        <bool>false</bool>
+       </property>
+       <property name="showGroupSeparator" stdset="0">
+        <bool>false</bool>
+       </property>
+       <property name="prefix">
+        <string/>
+       </property>
+       <property name="suffix">
+        <string/>
+       </property>
        <property name="decimals">
-        <number>3</number>
+        <number>6</number>
        </property>
        <property name="minimum">
-        <double>-10000.000000000000000</double>
+        <double>-1000000000000000.000000000000000</double>
        </property>
        <property name="maximum">
-        <double>10000.000000000000000</double>
+        <double>1000000000000000.000000000000000</double>
+       </property>
+       <property name="value">
+        <double>0.000000000000000</double>
        </property>
       </widget>
      </item>
      <item row="1" column="1">
       <widget class="QDoubleSpinBox" name="YSpinBox">
        <property name="decimals">
-        <number>3</number>
+        <number>6</number>
        </property>
        <property name="minimum">
         <double>-10000.000000000000000</double>
@@ -90,7 +111,7 @@
      <item row="2" column="1">
       <widget class="QDoubleSpinBox" name="ZSpinBox">
        <property name="decimals">
-        <number>3</number>
+        <number>6</number>
        </property>
        <property name="minimum">
         <double>-10000.000000000000000</double>

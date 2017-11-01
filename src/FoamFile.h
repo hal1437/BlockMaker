@@ -81,7 +81,7 @@ QString FoamFile::VectorToString(QVector<T> vector){
     QString ans;
     ans += "(";
     for(int i=0;i<vector.size();i++){
-        ans += QString::number(vector[i]);
+        ans += QString::number(vector[i],'g',15);
         if(i==vector.size() - 1)ans += ")";
         else                    ans += " ";
     }
