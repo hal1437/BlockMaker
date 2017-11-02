@@ -2,29 +2,33 @@
 
 
 bool CadModelCore::ExportFoamFile(QString filename)const{
-    std::ofstream out(filename.toStdString().c_str());
-    if(!out)return false;
+    QFile file(filename.toStdString().c_str());
+    QTextStream out(&file);
+    if (!file.open(QIODevice::WriteOnly)){
+        QMessageBox::information(nullptr, "ファイルが開けません",file.errorString());
+        return false;
+    }
 
     //バージョン出力
-    out << 4 << std::endl;
+    out << 4 << endl;
 
     //頂点リスト出力
-    out << this->Points.size() << std::endl;
+    out << this->Points.size() << endl;
     for(CPoint* pos: this->Points){
 
         //座標
-        out << pos->getName().toStdString() << ",";
-        out << pos->x() << "," ;
-        out << pos->y() << "," ;
-        out << pos->z() << std::endl;
+        out << pos->getName() << ",";
+        out << QString::number(pos->x(),'g',15) << "," ;
+        out << QString::number(pos->y(),'g',15) << "," ;
+        out << QString::number(pos->z(),'g',15) << endl;
     }
 
     //エッジリスト出力
-    out << this->Edges.size() << std::endl;
+    out << this->Edges.size() << endl;
     for(CEdge* edge: this->Edges){
 
         //エッジタイプ
-        std::string name;
+        QString name;
         if(edge->is<CLine>  ())name = "CLine";
         if(edge->is<CArc>   ())name = "CArc";
         if(edge->is<CSpline>())name = "CSpline";
@@ -45,7 +49,7 @@ bool CadModelCore::ExportFoamFile(QString filename)const{
         //詳細表示
         out << "," << edge->isVisibleDetail();
         //改行
-        out << std::endl;
+        out << endl;
     }
 
     //面リスト出力
@@ -54,7 +58,7 @@ bool CadModelCore::ExportFoamFile(QString filename)const{
         return exist(CFace::base,face);
     }),faces_out.end());
 
-    out << faces_out.size() << std::endl;
+    out << faces_out.size() << endl;
     for(CFace* face: faces_out){
         //面タイプ
         out << "CFace";
@@ -66,16 +70,16 @@ bool CadModelCore::ExportFoamFile(QString filename)const{
             out << "," << IndexOf(this->Edges,face->edges[i]);
         }
         //境界名
-        out << "," << face->getName().toStdString();
+        out << "," << face->getName();
         //境界タイプ
-        out << "," << Boundary::BoundaryTypeToString(face->getBoundary()).toStdString();
+        out << "," << Boundary::BoundaryTypeToString(face->getBoundary());
         //詳細表示
         out << "," << face->isVisibleDetail();
         //改行
-        out << std::endl;
+        out << endl;
     }
     //立体リスト出力
-    out << this->Blocks.size() << std::endl;
+    out << this->Blocks.size() << endl;
     for(CBlock* block: this->Blocks){
         //立体タイプ
         out << "CBlock";
@@ -89,31 +93,31 @@ bool CadModelCore::ExportFoamFile(QString filename)const{
         //詳細表示
         out << "," << block->isVisibleDetail();
 
-        out << std::endl;
+        out << endl;
     }
     //STL出力
-    out << this->Stls.size() << std::endl;
+    out << this->Stls.size() << endl;
     for(CStl* stl:this->Stls){
-         out << "STL," << stl->filepath.toStdString().c_str() << std::endl;
+         out << "STL," << stl->filepath.toStdString().c_str() << endl;
          //点の出力
          out << "STL_Points";
          for(CPoint* pos:stl->points){
              out << "," << IndexOf(this->Points,pos);
          }
-         out << std::endl;
+         out << endl;
          out << "STL_Edges";
          for(CEdge* edge:stl->edges){
              out << "," << IndexOf(this->Points,edge->start)
                  << "," << IndexOf(this->Points,edge->end);
          }
-         out << std::endl;
+         out << endl;
          out << "STL_Faces";
          for(CFace* face:stl->faces){
              out << "," << IndexOf(stl->edges,face->edges[0])
                  << "," << IndexOf(stl->edges,face->edges[1])
                  << "," << IndexOf(stl->edges,face->edges[2]);
          }
-         out << std::endl;
+         out << endl;
     }
 
     return true;

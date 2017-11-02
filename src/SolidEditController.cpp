@@ -21,7 +21,9 @@ Quat SolidEditController::getConvertTopToSide()const{
 
 CFace* SolidEditController::getFrontFace_impl(Quat convert,Quat invert)const{
     //正面を軸として変換を通し各平面の大きさを取得する関数
-    if(this->model->GetBlocks().empty()){
+
+    //何もない時
+    if(this->model->GetPoints().empty()){
         CFace* face = new CFace();
         QVector<CPoint*> poses;
         poses.push_back(new CPoint(Pos( DEFAULT_FACE_LEGTH, DEFAULT_FACE_LEGTH,0).Dot(invert)));
@@ -37,17 +39,11 @@ CFace* SolidEditController::getFrontFace_impl(Quat convert,Quat invert)const{
     }
 
     double top=0,bottom=0,right=0,left=0;
-    for(CBlock* block:this->model->GetBlocks()){
-        for(CFace* face:block->faces){
-            for(CEdge* edge:face->edges){
-                for(int j=0;j<edge->GetChildCount();j++){
-                    right  = std::max(right ,((*edge->GetPoint(j)).Dot(convert)).mat[0]);
-                    left   = std::min(left  ,((*edge->GetPoint(j)).Dot(convert)).mat[0]);
-                    top    = std::max(top   ,((*edge->GetPoint(j)).Dot(convert)).mat[1]);
-                    bottom = std::min(bottom,((*edge->GetPoint(j)).Dot(convert)).mat[1]);
-                }
-            }
-        }
+    for(CPoint* pos:this->model->GetPoints()){
+        right  = std::max(right ,(pos->Dot(convert)).mat[0]);
+        left   = std::min(left  ,(pos->Dot(convert)).mat[0]);
+        top    = std::max(top   ,(pos->Dot(convert)).mat[1]);
+        bottom = std::min(bottom,(pos->Dot(convert)).mat[1]);
     }
     double height_delta = top - bottom;
     double widht_delta  = right  - left;
@@ -101,13 +97,13 @@ bool SolidEditController::isSketcheing()const{
 }
 
 
-CObject* SolidEditController::getHangedObject(Pos center, Pos dir)const{
+CObject* SolidEditController::getHangedObject(Pos center, Pos dir,double zoom_rate)const{
     QVector<QPair<CObject*,double>>ans;
 
     //点の選択
     for(CPoint* p:this->model->GetPoints()){
         if(p->isVisible()){
-            double length = (Pos::LineNearPoint(center,center+dir, *p) - *p).Length();
+            double length = (Pos::LineNearPoint(center,center+dir, *p) - *p).Length() / zoom_rate;
             if(length < CPoint::COLLISION_SIZE && hang_point != p){
                 //スケッチ中なら、平面上に存在する条件を追加
                 if(this->isSketcheing()){
@@ -128,7 +124,7 @@ CObject* SolidEditController::getHangedObject(Pos center, Pos dir)const{
             const double DIVIDE = 100;
             for(int i=0;i<=DIVIDE;i++){
                 Pos p = e->GetMiddleDivide(i/DIVIDE);
-                double length = (Pos::LineNearPoint(center,center+dir, p) - p).Length();
+                double length = (Pos::LineNearPoint(center,center+dir, p) - p).Length() / zoom_rate;
                 if(length  < CPoint::COLLISION_SIZE){
                     //スケッチ中なら、平面上に存在する条件を追加
                     if(this->isSketcheing()){
@@ -151,8 +147,8 @@ CObject* SolidEditController::getHangedObject(Pos center, Pos dir)const{
     }
 }
 
-CFace* SolidEditController::getHangedFace(Pos center,Pos camera_pos)const{
-    if(this->getHangedObject(center,camera_pos-center) != nullptr) return nullptr;
+CFace* SolidEditController::getHangedFace(Pos center,Pos camera_pos,double zoom_rate)const{
+    if(this->getHangedObject(center,camera_pos-center,zoom_rate) != nullptr) return nullptr;
 
     //最も近い面を選択する
     QVector<std::pair<double,CFace*>> rank;
@@ -161,11 +157,14 @@ CFace* SolidEditController::getHangedFace(Pos center,Pos camera_pos)const{
             rank.push_back(std::make_pair(f->GetLengthFaceToLine(camera_pos,center-camera_pos),f));
         }
     }
-
+    //非接触面は削除
     rank.erase(std::remove_if(rank.begin(),rank.end(),[](std::pair<double,CFace*> v){
         return v.first==-1;
     }),rank.end());
+
     if(rank.size()==0) return nullptr;
+
+    //近い順に並び替え
     std::pair<double,CFace*> a = *std::min_element(rank.begin(),rank.end(),[](std::pair<double,CFace*> lhs,std::pair<double,CFace*> rhs){
         return lhs.first < rhs.first;
     });
@@ -183,7 +182,10 @@ SolidEditController::~SolidEditController()
 
 void SolidEditController::Create3Face(){
     for(int i=0;i<3;i++){
-        if(CFace::base[i] != nullptr) delete CFace::base[i];
+        if(CFace::base[i] != nullptr){
+            this->model->RemoveFaces(CFace::base[i]);
+            delete CFace::base[i];
+        }
     }
     CFace::base[0] = this->getFrontFace();
     CFace::base[1] = this->getTopFace();

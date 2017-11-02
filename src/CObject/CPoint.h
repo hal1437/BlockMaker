@@ -11,7 +11,7 @@ private:
     const static int DRAWING_CIRCLE_SIZE = 5; //描画円半径
 public:
     static CPoint* origin; //原点
-    const static int COLLISION_SIZE = 8;      //当たり判定半径
+    const static int COLLISION_SIZE = 10;      //当たり判定半径
 
     DEFINE_FLAG(ControlPoint,false) //制御点
     DEFINE_FLAG(Moving      ,false) //移動中

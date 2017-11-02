@@ -46,8 +46,8 @@ public:
 
     bool isSketcheing() const;            //スケッチ中
 
-    CObject* getHangedObject(Pos center, Pos dir)const;
-    CFace* getHangedFace(Pos center, Pos camera_pos)const;//直下面
+    CObject* getHangedObject(Pos center, Pos dir       ,double zoom_rate)const;
+    CFace*   getHangedFace  (Pos center, Pos camera_pos,double zoom_rate)const;//直下面
 
     explicit SolidEditController(QObject *parent = 0);
     ~SolidEditController();

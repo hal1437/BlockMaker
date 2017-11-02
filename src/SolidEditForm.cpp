@@ -8,6 +8,9 @@ void SolidEditForm::MakeObject(){
         this->make_controller->Making(state,this->mouse_pos,hanged);
         //最終点を保持
         this->controller->hang_point = this->make_controller->GetLastPos();
+
+        this->controller->Create3Face();
+
     }
     this->repaint();
 }
@@ -16,11 +19,12 @@ CFace* SolidEditForm::GetHangedFace(){
     if(this->controller->isSketcheing())return nullptr;
     Pos  hang_center = (Pos(0,0,1) + this->screen_pos).Dot(this->controller->getCameraMatrix());
     return  this->controller->getHangedFace(this->center + hang_center,
-                                            this->camera + hang_center);
+                                            this->camera + hang_center,
+                                            this->round);
 }
 CObject* SolidEditForm::GetHangedObject(){
     Pos  hang_center = this->center + (Pos(0,0,1) + this->screen_pos).Dot(this->controller->getCameraMatrix());
-    return this->controller->getHangedObject(hang_center,(this->camera - this->center).GetNormalize());
+    return this->controller->getHangedObject(hang_center,(this->camera - this->center).GetNormalize(),this->round);
 }
 void SolidEditForm::ColorSelect(CObject* obj){
     CObject* hang = this->GetHangedObject();
@@ -285,6 +289,9 @@ void SolidEditForm::paintGL(){
     glEnable(GL_BLEND);
     glDepthFunc(GL_LEQUAL);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    //三平面再生成
+    //if(this->model != nullptr)this->controller->Create3Face();
 
     //カメラ変換行列
     Quat quat = Quat::getRotateXMatrix(this->controller->theta1).Dot(Quat::getRotateYMatrix(this->controller->theta2));

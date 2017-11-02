@@ -160,7 +160,7 @@ signals:
 
 class CadModelCoreInterface{
 protected:
-    CadModelCore* model;
+    CadModelCore* model = nullptr;
 public:
     virtual void SetModel(CadModelCore* m){this->model = m;}
 };
