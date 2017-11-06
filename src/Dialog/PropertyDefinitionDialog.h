@@ -11,6 +11,7 @@
 #include <CadModelCore.h>
 #include <CObject/CEdge.h>
 #include <CObject/CFace.h>
+#include <Dialog/BoundaryDefinitionDialog.h>
 
 namespace Ui {
 class PropertyDefinitionDialog;
@@ -26,11 +27,8 @@ private:
         EMPTY
     };
 
-    QVector<QString> boundary_combo_text = {"empty (2次元)","patch (パッチ)","wall (壁)",
-                                            "symmetryPlane (対称面)","cyclic (周期境界)",
-                                            "cyclicAMI (不整合周期境界)","wedge (2次元軸対称)",
-                                            "None (連続)"};
-    CONSTRUCTED constructed = CONSTRUCTED::EMPTY;
+
+    CONSTRUCTED constructed = CONSTRUCTED::EMPTY;//表示タイプ
 
     //All
     QLabel    name_label;
@@ -39,6 +37,7 @@ private:
     //Face
     QLabel    face_boundary_label;
     QComboBox face_boundary_combo;
+    QPushButton face_boundary_button;
 
     //Edge
     QLabel    edge_divide_label;
@@ -59,6 +58,7 @@ public:
     ~PropertyDefinitionDialog();
 
 public slots:
+    void ShowBoundayDefinitionDialog();
     void UpdateLayout();
     void Accept();
 

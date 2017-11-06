@@ -1,5 +1,8 @@
 #include "CFace.h"
 
+CFace* CFace::base[3];
+
+
 #define SWITCHING_STRING_TO_boundary_TYPE(TYPE,COMP)\
 if(COMP == #TYPE)return Boundary::Type::TYPE;
 
@@ -7,14 +10,14 @@ if(COMP == #TYPE)return Boundary::Type::TYPE;
 if(COMP == Boundary::Type::TYPE) return #TYPE;\
 
 Boundary::Type Boundary::StringToBoundaryType(QString str){
-    SWITCHING_STRING_TO_boundary_TYPE(empty,str)
-    SWITCHING_STRING_TO_boundary_TYPE(patch,str)
-    SWITCHING_STRING_TO_boundary_TYPE(wall,str)
+    SWITCHING_STRING_TO_boundary_TYPE(empty        ,str)
+    SWITCHING_STRING_TO_boundary_TYPE(patch        ,str)
+    SWITCHING_STRING_TO_boundary_TYPE(wall         ,str)
     SWITCHING_STRING_TO_boundary_TYPE(symmetryPlane,str)
-    SWITCHING_STRING_TO_boundary_TYPE(cyclic,str)
-    SWITCHING_STRING_TO_boundary_TYPE(cyclicAMI,str)
-    SWITCHING_STRING_TO_boundary_TYPE(wedge,str)
-    SWITCHING_STRING_TO_boundary_TYPE(none,str)
+    SWITCHING_STRING_TO_boundary_TYPE(cyclic       ,str)
+    SWITCHING_STRING_TO_boundary_TYPE(cyclicAMI    ,str)
+    SWITCHING_STRING_TO_boundary_TYPE(wedge        ,str)
+    SWITCHING_STRING_TO_boundary_TYPE(none         ,str)
     return Boundary::Type::none;
 }
 QString Boundary::BoundaryTypeToString(Boundary::Type type){
@@ -28,8 +31,6 @@ QString Boundary::BoundaryTypeToString(Boundary::Type type){
     SWITCHING_boundary_TYPE_TO_STRING(none         ,type)
     return "none";
 }
-
-CFace* CFace::base[3];
 
 bool CFace::Creatable(QVector<CObject*> lines){
     if(std::any_of(lines.begin(),lines.end(),[](CObject* p){return !p->is<CEdge>();}))return false;
@@ -469,7 +470,8 @@ CFace::CFace(QObject* parent):
     CObject(parent)
 {
     this->name = "Noname";
-    this->boundary = Boundary::Type::empty;
+    this->boundary.type = Boundary::Type::none;
+    this->boundary.name = "境界条件未定義";
 }
 
 CFace::~CFace(){}

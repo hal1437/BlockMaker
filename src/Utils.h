@@ -40,7 +40,14 @@ template<class C,class V>
 int IndexOf(const C& array,const V& value){
     typename C::const_iterator result = std::find(std::begin(array),std::end(array),value);
     if(result == std::end(array))return -1;
-    else                           return std::distance(std::begin(array),result);
+    else                         return std::distance(std::begin(array),result);
+}
+
+template<class C,class COMP>
+int IndexOf_if(const C& array,COMP comp){
+    typename C::const_iterator result = std::find_if(std::begin(array),std::end(array),comp);
+    if(result == std::end(array))return -1;
+    else                         return std::distance(std::begin(array),result);
 }
 //配列内から要素を全て削除
 template<class C,class V>
@@ -58,12 +65,12 @@ T Mod(T lhs,const U& rhs){
 }
 
 //Changeシグナル対象変数マクロ
-#define OBSERVE_MEMBER(TYPE,CALL,NAME)             \
+#define OBSERVE_MEMBER(TYPE,CALL,NAME)        \
 protected:                                    \
     TYPE NAME;                                \
 public:                                       \
     TYPE get##CALL()const{return this->NAME;} \
-    void set##CALL(const TYPE& v){            \
+    void set##CALL(TYPE v){                   \
         if(this->NAME != v){                  \
             this->NAME = v;                   \
             emit Changed(this);               \

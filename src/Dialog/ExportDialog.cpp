@@ -155,8 +155,8 @@ void ExportDialog::Export(QString filename)const{
             //頂点番号リスト出力
             QVector<CPoint*> vp = this->GetBoundaryPos(block,static_cast<BoundaryDir>(i));
             for(CPoint* v:vp){
-                if(face->getBoundary() == Boundary::Type::none)continue;//連続は登録しない
-                boundary_list[face->getName()].first = face->getBoundary();
+                if(face->getBoundary().type == Boundary::Type::none)continue;//連続は登録しない
+                boundary_list[face->getName()].first = face->getBoundary().type;
                 boundary_list[face->getName()].second.push_back(GetPosIndex(v));
             }
         }

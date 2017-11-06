@@ -72,7 +72,7 @@ bool CadModelCore::ExportFoamFile(QString filename)const{
         //境界名
         out << "," << face->getName();
         //境界タイプ
-        out << "," << Boundary::BoundaryTypeToString(face->getBoundary());
+        out << "," << Boundary::BoundaryTypeToString(face->getBoundary().type);
         //詳細表示
         out << "," << face->isVisibleDetail();
         //改行
@@ -232,7 +232,7 @@ bool CadModelCore::ImportFoamFile(QString filename){
         //境界名
         make->setName(sl[sl.size()-3]);
         //境界名
-        make->setBoundary(Boundary::StringToBoundaryType(sl[sl.size()-2]));
+        //make->setBoundary(Boundary::StringToBoundaryType(sl[sl.size()-2]));
         //詳細表示取得
         make->SetVisibleDetail(sl[sl.size()-1]=="1");
 

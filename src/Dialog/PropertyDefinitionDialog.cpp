@@ -11,13 +11,14 @@ std::count_if(ARRAY.begin(),ARRAY.end(),[&](CObject* obj){\
 void PropertyDefinitionDialog::ConstructFace(){
     //Face用レイアウト構築
     this->constructed = CONSTRUCTED::FACE;
-    this->face_boundary_label.show();
-    this->face_boundary_combo.show();
+    this->face_boundary_label .show();
+    this->face_boundary_combo .show();
+    this->face_boundary_button.show();
     QVector<CObject*> selected = this->model->GetSelected();
 
     //全ての境界条件が同じであれば
     if(SELECTED_SAME_VALUE(selected,CFace*,Boundary)){
-        this->face_boundary_combo.setCurrentIndex(static_cast<int>(dynamic_cast<CFace*>(selected.first())->getBoundary()));
+        this->face_boundary_combo.setCurrentIndex(static_cast<int>(dynamic_cast<CFace*>(selected.first())->getBoundary().type));
     }
 }
 
@@ -59,14 +60,16 @@ PropertyDefinitionDialog::PropertyDefinitionDialog(QWidget *parent) :
     ui->setupUi(this);
     connect(this->ui->ApplyButton,SIGNAL(pressed()),this,SLOT(Accept()));
     connect(this->ui->CloseButton,SIGNAL(pressed()),this,SLOT(close()));
+    connect(&face_boundary_button,SIGNAL(pressed()),this,SLOT(ShowBoundayDefinitionDialog()));
     this->setWindowTitle("Property");
     this->setWindowFlags(Qt::Dialog | Qt::WindowStaysOnTopHint);
 
     //初期値設定
-    this->name_label         .setText("オブジェクト名");
-    this->face_boundary_label.setText("境界タイプ");
-    this->edge_divide_label  .setText("分割数");
-    this->edge_grading_label .setText("エッジ寄せ係数");
+    this->name_label          .setText("オブジェクト名");
+    this->face_boundary_label .setText("境界タイプ");
+    this->face_boundary_button.setText("...");
+    this->edge_divide_label   .setText("分割数");
+    this->edge_grading_label  .setText("エッジ寄せ係数");
     this->edge_divide_spin .setValue(0);
     this->edge_divide_spin .setMaximum(9999);
     this->edge_divide_spin .setMinimum(0);
@@ -76,21 +79,20 @@ PropertyDefinitionDialog::PropertyDefinitionDialog(QWidget *parent) :
     this->edge_grading_spin.setSingleStep(0.01);
     this->edge_grading_spin.setDecimals(6);
 
-
     //コンボボックス指定
-    for(QString str: boundary_combo_text){
-        this->face_boundary_combo.addItem(str);
+    for(Boundary boundary: BoundaryDefinitionDialog::boundary_list){
+        this->face_boundary_combo.addItem(boundary.name + " <" + Boundary::BoundaryTypeToString(boundary.type) + ">");
     }
-    this->face_boundary_combo.setCurrentText(boundary_combo_text[boundary_combo_text.size()-1]);
 
-    this->ui->Grid->addWidget(&this->name_label         ,0,0);
-    this->ui->Grid->addWidget(&this->name_edit          ,0,1);
-    this->ui->Grid->addWidget(&this->face_boundary_label,1,0);
-    this->ui->Grid->addWidget(&this->face_boundary_combo,1,1);
-    this->ui->Grid->addWidget(&this->edge_divide_label  ,2,0);
-    this->ui->Grid->addWidget(&this->edge_divide_spin   ,2,1);
-    this->ui->Grid->addWidget(&this->edge_grading_label ,3,0);
-    this->ui->Grid->addWidget(&this->edge_grading_spin  ,3,1);
+    this->ui->Grid->addWidget(&this->name_label          ,0,0);
+    this->ui->Grid->addWidget(&this->name_edit           ,0,1);
+    this->ui->Grid->addWidget(&this->face_boundary_label ,1,0);
+    this->ui->Grid->addWidget(&this->face_boundary_combo ,1,1);
+    this->ui->Grid->addWidget(&this->face_boundary_button,1,2);
+    this->ui->Grid->addWidget(&this->edge_divide_label   ,2,0);
+    this->ui->Grid->addWidget(&this->edge_divide_spin    ,2,1);
+    this->ui->Grid->addWidget(&this->edge_grading_label  ,3,0);
+    this->ui->Grid->addWidget(&this->edge_grading_spin   ,3,1);
 }
 PropertyDefinitionDialog::~PropertyDefinitionDialog()
 {
@@ -99,14 +101,15 @@ PropertyDefinitionDialog::~PropertyDefinitionDialog()
 
 void PropertyDefinitionDialog::UpdateLayout(){
     //レイアウト解除
-    this->name_label.hide();
-    this->name_edit.hide();
-    this->face_boundary_label.hide();
-    this->face_boundary_combo.hide();
-    this->edge_divide_label.hide();
-    this->edge_divide_spin.hide();
-    this->edge_grading_label.hide();
-    this->edge_grading_spin.hide();
+    this->name_label          .hide();
+    this->name_edit           .hide();
+    this->face_boundary_label .hide();
+    this->face_boundary_combo .hide();
+    this->face_boundary_button.hide();
+    this->edge_divide_label   .hide();
+    this->edge_divide_spin    .hide();
+    this->edge_grading_label  .hide();
+    this->edge_grading_spin   .hide();
     QVector<CObject*> selected = this->model->GetSelected();
     if(selected.size() > 0){
         //全て名前が同じであれば
@@ -135,6 +138,23 @@ void PropertyDefinitionDialog::UpdateLayout(){
     else this->constructed = CONSTRUCTED::EMPTY;
     this->resize(this->sizeHint());
     this->repaint();
+}
+
+void PropertyDefinitionDialog::ShowBoundayDefinitionDialog(){
+    BoundaryDefinitionDialog* diag = new BoundaryDefinitionDialog();
+    diag->SetModel(model);
+    diag->exec();
+
+    //コンボ状態保存
+    QString save = this->face_boundary_combo.currentText();
+
+    //コンボ更新
+    this->face_boundary_combo.clear();
+    for(Boundary boundary: BoundaryDefinitionDialog::boundary_list){
+        this->face_boundary_combo.addItem(boundary.name + " <" + Boundary::BoundaryTypeToString(boundary.type) + ">");
+    }
+    //コンボ状態復元
+    this->face_boundary_combo.setCurrentText(save);
 }
 
 void PropertyDefinitionDialog::Accept(){
@@ -177,9 +197,12 @@ void PropertyDefinitionDialog::Accept(){
         if(this->constructed == CONSTRUCTED::FACE){
             //境界タイプ
             if(this->face_boundary_combo.currentText() != ""){
-                int index = IndexOf(this->boundary_combo_text,this->face_boundary_combo.currentText());
+
+                int index = IndexOf_if(BoundaryDefinitionDialog::boundary_list,[&](Boundary b){
+                    return (b.name + " <" + Boundary::BoundaryTypeToString(b.type) + ">") == face_boundary_combo.currentText();
+                });
                 if(index != -1){
-                    dynamic_cast<CFace*>(obj)->setBoundary(static_cast<Boundary::Type>(index));
+                    dynamic_cast<CFace*>(obj)->setBoundary(BoundaryDefinitionDialog::boundary_list[index]);
                 }
             }
         }

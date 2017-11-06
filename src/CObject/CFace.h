@@ -4,7 +4,7 @@
 #include "CEdge.h"
 #include "Collision.h"
 
-//境界面
+//境界面クラス
 class Boundary{
 public:
     //境界の種類
@@ -22,8 +22,12 @@ public:
     //文字列からBoundary::Typeに変換
     static Type    StringToBoundaryType(QString str);
     static QString BoundaryTypeToString(Boundary::Type type);
+public:
+    QString name;
+    Type type;
+    bool operator==(Boundary rhs)const{return (this->name == rhs.name && this->type == rhs.type);}
+    bool operator!=(Boundary rhs)const{return !(*this == rhs);}
 };
-
 
 //平面オブジェクト
 class CFace : public CObject
@@ -33,7 +37,7 @@ public:
     static CFace* base[3]; //正面,平面,右側面
 
     QVector<CEdge*> edges;                  // 構成線
-    OBSERVE_MEMBER(Boundary::Type,Boundary,boundary) // 境界タイプ
+    OBSERVE_MEMBER(Boundary,Boundary,boundary) // 境界タイプ
     DEFINE_FLAG(VisibleDetail,true)         // 分割フレーム表示
     DEFINE_FLAG(Polygon,true)               // ポリゴン判定
     DEFINE_FLAG(FaceBlend,true)             // 面透過判定
