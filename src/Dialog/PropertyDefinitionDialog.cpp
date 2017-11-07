@@ -110,7 +110,13 @@ void PropertyDefinitionDialog::UpdateLayout(){
     this->edge_divide_spin    .hide();
     this->edge_grading_label  .hide();
     this->edge_grading_spin   .hide();
+
+    //表示タイプ選定
     QVector<CObject*> selected = this->model->GetSelected();
+    if     (selected.size() > 0 && std::all_of(selected.begin(),selected.end(),[](CObject* obj){return obj->is<CEdge>();}))this->ConstructEdge();
+    else if(selected.size() > 0 && std::all_of(selected.begin(),selected.end(),[](CObject* obj){return obj->is<CFace>();}))this->ConstructFace();
+    else this->constructed = CONSTRUCTED::EMPTY;
+
     if(selected.size() > 0){
         //全て名前が同じであれば
         if(SELECTED_SAME_VALUE(selected,CObject*,Name)){
@@ -126,6 +132,7 @@ void PropertyDefinitionDialog::UpdateLayout(){
            exist(selected,CFace::base[0]) ||
            exist(selected,CFace::base[1]) ||
            exist(selected,CFace::base[2])){
+            this->constructed = CONSTRUCTED::EMPTY;
             this->name_label.setEnabled(false);
             this->name_edit .setEnabled(false);
         }else{
@@ -133,9 +140,6 @@ void PropertyDefinitionDialog::UpdateLayout(){
             this->name_edit .setEnabled(true);
         }
     }
-    if     (selected.size() > 0 && std::all_of(selected.begin(),selected.end(),[](CObject* obj){return obj->is<CEdge>();}))this->ConstructEdge();
-    else if(selected.size() > 0 && std::all_of(selected.begin(),selected.end(),[](CObject* obj){return obj->is<CFace>();}))this->ConstructFace();
-    else this->constructed = CONSTRUCTED::EMPTY;
     this->resize(this->sizeHint());
     this->repaint();
 }

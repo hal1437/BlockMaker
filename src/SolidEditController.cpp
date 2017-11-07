@@ -21,10 +21,12 @@ Quat SolidEditController::getConvertTopToSide()const{
 
 CFace* SolidEditController::getFrontFace_impl(Quat convert,Quat invert)const{
     //正面を軸として変換を通し各平面の大きさを取得する関数
+    CFace* face = new CFace();
+    face->SetPolygon(false);
+    face->SetVisibleDetail(false);
 
     //何もない時
     if(this->model->GetPoints().empty()){
-        CFace* face = new CFace();
         QVector<CPoint*> poses;
         poses.push_back(new CPoint(Pos( DEFAULT_FACE_LEGTH, DEFAULT_FACE_LEGTH,0).Dot(invert)));
         poses.push_back(new CPoint(Pos(-DEFAULT_FACE_LEGTH, DEFAULT_FACE_LEGTH,0).Dot(invert)));
@@ -34,7 +36,6 @@ CFace* SolidEditController::getFrontFace_impl(Quat convert,Quat invert)const{
         face->edges.push_back(new CLine(poses[1],poses[2]));
         face->edges.push_back(new CLine(poses[2],poses[3]));
         face->edges.push_back(new CLine(poses[3],poses[0]));
-        face->SetPolygon(false);
         return face;
     }
 
@@ -62,7 +63,6 @@ CFace* SolidEditController::getFrontFace_impl(Quat convert,Quat invert)const{
     right  += widht_delta *0.1;
     left   -= widht_delta *0.1;
 
-    CFace* face = new CFace();
     QVector<CPoint*> poses;
     poses.push_back(new CPoint(Pos( right ,top   ,0).Dot(invert)));
     poses.push_back(new CPoint(Pos( right ,bottom,0).Dot(invert)));
@@ -72,7 +72,6 @@ CFace* SolidEditController::getFrontFace_impl(Quat convert,Quat invert)const{
     face->edges.push_back(new CLine(poses[1],poses[2]));
     face->edges.push_back(new CLine(poses[2],poses[3]));
     face->edges.push_back(new CLine(poses[3],poses[0]));
-    face->SetPolygon(false);
     for(CPoint* pos:poses){
         pos->SetControlPoint(true);
     }
@@ -80,13 +79,19 @@ CFace* SolidEditController::getFrontFace_impl(Quat convert,Quat invert)const{
 }
 
 CFace* SolidEditController::getFrontFace()const{//正面
-    return this->getFrontFace_impl(Quat::getIdentityMatrix(),Quat::getIdentityMatrix());
+    CFace* face = this->getFrontFace_impl(Quat::getIdentityMatrix(),Quat::getIdentityMatrix());
+    face->setName("正面");
+    return face;
 }
 CFace* SolidEditController::getTopFace  ()const{//平面
-    return this->getFrontFace_impl(this->getConvertTopToFront(),this->getConvertFrontToTop());
+    CFace* face = this->getFrontFace_impl(this->getConvertTopToFront(),this->getConvertFrontToTop());
+    face->setName("平面");
+    return face;
 }
 CFace* SolidEditController::getSideFace ()const{//右側面
-    return this->getFrontFace_impl(this->getConvertFrontToSide(),this->getConvertSideToFront());
+    CFace* face = this->getFrontFace_impl(this->getConvertFrontToSide(),this->getConvertSideToFront());
+    face->setName("右側面");
+    return face;
 }
 Quat SolidEditController::getCameraMatrix()const{
     return Quat::getRotateXMatrix(theta1).Dot(Quat::getRotateYMatrix(theta2));
@@ -181,21 +186,20 @@ SolidEditController::~SolidEditController()
 }
 
 void SolidEditController::Create3Face(){
-    for(int i=0;i<3;i++){
-        if(CFace::base[i] != nullptr){
-            this->model->RemoveFaces(CFace::base[i]);
-            delete CFace::base[i];
+    if(exist(CFace::base,nullptr)){
+        //新規作成
+        CFace::base[0] = this->getFrontFace();
+        CFace::base[1] = this->getTopFace();
+        CFace::base[2] = this->getSideFace();
+        for(int i =0;i<3;i++){
+            this->model->AddFaces(CFace::base[i]);
         }
-    }
-    CFace::base[0] = this->getFrontFace();
-    CFace::base[1] = this->getTopFace();
-    CFace::base[2] = this->getSideFace();
-    CFace::base[0]->setName("正面");
-    CFace::base[1]->setName("平面");
-    CFace::base[2]->setName("右側面");
-    for(int i=0;i<3;i++){
-        CFace::base[i]->SetVisibleDetail(false);
-        this->model->AddFaces(CFace::base[i]);
+    }else{
+        //引き継ぎ
+        CFace* refresh[3] ={this->getFrontFace(),this->getTopFace(),this->getSideFace()};
+        for(int i =0;i<3;i++){
+            CFace::base[i]->edges = refresh[i]->edges;
+        }
     }
 }
 void SolidEditController::CreateOrigin(){
