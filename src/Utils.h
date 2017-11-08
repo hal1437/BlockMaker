@@ -29,6 +29,11 @@ template<class C,class V>
 bool exist(const C& array,const V& value){
     return std::find(std::begin(array),std::end(array),value) != std::end(array);
 }
+//配列内に要素が存在しているかの確認
+template<class C,class V>
+bool exist_if(const C& array,const V& func){
+    return std::find_if(std::begin(array),std::end(array),func) != std::end(array);
+}
 //配列内の重複要素を削除
 template<class C>
 void unique(C& array){

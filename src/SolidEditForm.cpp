@@ -271,6 +271,7 @@ void SolidEditForm::paintGL(){
     if(this->round              <  0     ) this->round = 0.00001;
     this->camera = this->center + Pos(0,0,round).Dot(this->controller->getCameraMatrix());
 
+    //OpenGLカメラ設定
     glMatrixMode(GL_PROJECTION);  //行列モード切替
     glLoadIdentity();
     glOrtho(-this->width() *(round),
@@ -282,16 +283,12 @@ void SolidEditForm::paintGL(){
     gluLookAt(camera.x(), camera.y(), camera.z(),
               center.x(), center.y(), center.z(),
                        0,          1,          0);
-
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glClearColor(0.7,0.7,0.7,1);//背景
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
     glDepthFunc(GL_LEQUAL);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-    //三平面再生成
-    //if(this->model != nullptr)this->controller->Create3Face();
 
     //カメラ変換行列
     Quat quat = Quat::getRotateXMatrix(this->controller->theta1).Dot(Quat::getRotateYMatrix(this->controller->theta2));
@@ -323,9 +320,11 @@ void SolidEditForm::paintGL(){
         }
     }
 
-    //オブジェクト描画
+    //STL描画
     glColor3f(0.5,0.5,0.5);//灰
     for(CStl*   stl   : this->model->GetStls  ())stl  ->DrawGL(this->camera,this->center);
+
+    //オブジェクト描画
     glLineWidth(2);
     glColor3f(0,0,1);//青
     for(CBlock* block : this->model->GetBlocks())block->DrawGL(this->camera,this->center);
@@ -334,37 +333,34 @@ void SolidEditForm::paintGL(){
     for(CPoint* pos   : this->model->GetPoints())pos  ->DrawGL(this->camera,this->center);
 
     //描画面と色のリスト作成
-    QVector<std::pair<CFace*,QVector<int>>> faces;
-    for(int i=0;i< 3;i++){
-        faces.push_back(std::make_pair(CFace::base[i]    ,QVector<int>({0,0,0,0})));
-    }
-    //面の描画
+    //三平面の描画
     glLineWidth(2);
-    for(std::pair<CFace*,QVector<int>>f: faces){
-        if(f.first != nullptr){
-            glColor4f(f.second[0], f.second[1], f.second[2],f.second[3]);
-            f.first->DrawGL(this->camera,this->center);
-        }
+    for(CFace* face:CFace::base){
+        glColor4f(0, 0, 0, 0); //完全透明(法線の色に設定される)
+        face->DrawGL(this->camera,this->center);
     }
 
     //選択オブジェクト描画
-    glDepthFunc(GL_ALWAYS);//奥行き方向補正を無視
-    glColor3f(0,1,1);//水色
+    glDepthFunc(GL_ALWAYS); //奥行き方向補正を無視
+    glColor3f(0,1,1); //水色
     for(CObject* p: this->model->GetSelected()){
         p->DrawGL(this->camera,this->center);
     }
 
     //直下オブジェクトの描画
     glColor3f(1,1,1);//白
-    CObject* hang_obj[] = {this->GetHangedObject(),this->GetHangedFace()} ;
-    for(CObject* p: hang_obj){
-        if(p != nullptr)p->DrawGL(this->camera,this->center);
+    CObject* hanged[] = {this->GetHangedObject(),this->GetHangedFace()};
+    for(CObject* p: hanged){
+        //何か選択されていれば
+        if(p!=nullptr){
+            p->DrawGL(this->camera,this->center);
+        }
     }
 
     //座標線の描画
     glLineWidth(4);
     glDepthFunc(GL_ALWAYS);//奥行き方向補正を無視
-    Pos cc = (Pos(100-this->width(),100-this->height(),1)*round).Dot(this->controller->getCameraMatrix()) + this->center;
+    Pos cc = ((Pos(100,100,1)-Pos(this->width(),this->height(),0))*round).Dot(quat) + this->center;
     for(int i=0;i<3;i++){
         glBegin(GL_LINES);
         glColor3f((i==0), (i==1), (i==2));

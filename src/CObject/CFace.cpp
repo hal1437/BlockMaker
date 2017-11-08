@@ -56,6 +56,13 @@ bool CFace::Creatable(QVector<CObject*> lines){
 }
 void CFace::Create(QVector<CEdge*> edges){
     this->edges = edges;
+    for(int i=0;i<edges.size();i++){
+        if(std::count(edges.begin(),edges.end(),edges[i]) > 1){
+            qDebug() <<"warning! " << this << " is having same edges";
+        }
+    }
+
+
     if(edges.size()==4){
         this->ReorderEdges();
         this->RecalcMesh();
@@ -241,11 +248,13 @@ CEdge*  CFace::GetEdgeSequence(int index)const{
 }
 void CFace::DrawGL(Pos,Pos)const{
     if(!this->isVisible())return;
+
+    //色を保存
+    float currentColor[4];
+    glGetFloatv(GL_CURRENT_COLOR,currentColor);
+
     if(this->isPolygon()){
         //薄い色に変更
-        float currentColor[4];
-        glGetFloatv(GL_CURRENT_COLOR,currentColor);
-
         if(this->isFaceBlend()){
             glColor4f(currentColor[0],currentColor[1],currentColor[2], 0.1);
             glDepthMask(GL_FALSE);
@@ -269,17 +278,14 @@ void CFace::DrawGL(Pos,Pos)const{
             //面描画
             DrawFillGL();
         }
-
         //色を復元
         glColor4f(currentColor[0],currentColor[1],currentColor[2], currentColor[3]);
+
         //分割メッシュ描画
         if(this->isVisibleDetail())this->DrawMeshGL();
     }else{
 
-        //外枠のみ
-        float currentColor[4];
-        glGetFloatv(GL_CURRENT_COLOR,currentColor);
-
+        //色を法線にあった色に変更
         Pos norm = this->GetNorm();
         //完全透過色であれば
         if(currentColor[3] == 0){
@@ -288,17 +294,19 @@ void CFace::DrawGL(Pos,Pos)const{
                       std::abs(norm.z()),
                       1.0);
         }
+        //枠のみ描画
         glBegin(GL_LINE_LOOP);
         for(int i=0;i<this->edges.size();i++){
             glVertex3f(this->GetPointSequence(i)->x(),
                        this->GetPointSequence(i)->y(),
                        this->GetPointSequence(i)->z());
         }
-        //色を復元
-        glColor4f(currentColor[0],currentColor[1],currentColor[2], currentColor[3]);
-
         glEnd();
+
     }
+    //色を復元
+    glColor4f(currentColor[0],currentColor[1],currentColor[2], currentColor[3]);
+
     glDepthMask(GL_TRUE);
 
 }

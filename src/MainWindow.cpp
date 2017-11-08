@@ -140,11 +140,11 @@ void MainWindow::RefreshUI(){
 
     //ブロック生成可否判定
     QVector<CEdge*> edges;
+    QVector<CFace*> faces;
     for(CObject* obj:this->model->GetSelected())if(obj->is<CEdge>())edges.push_back(dynamic_cast<CEdge*>(obj));
+    for(CObject* obj:this->model->GetSelected())if(obj->is<CFace>())faces.push_back(dynamic_cast<CFace*>(obj));
     ui->ToolFace  ->setEnabled(search.SearchEdgeMakeFace(edges).size() > 0);
-    //ui->ToolBlocks->setEnabled(search.SearchFaceMakeBlock(edges).size() > 0);
-    //ui->ToolFace  ->setEnabled(CFace ::Creatable(this->model->GetSelected()));
-    ui->ToolBlocks->setEnabled(CBlock::Creatable(this->model->GetSelected()));
+    ui->ToolBlocks->setEnabled(search.SearchFaceMakeBlock(faces).size() > 0);
     //ui->ToolDimension->setEnabled(this->model->GetSelected().size() >= 1);
 
     this->repaint();
@@ -259,6 +259,13 @@ void MainWindow::MakeBlock(){
     QVector<CFace*> faces;
     for(CObject* obj:this->model->GetSelected()){
         faces.push_back(dynamic_cast<CFace*>(obj));
+    }
+    faces = this->search.SearchFaceMakeBlock(faces);
+    //faceがモデルになければ追加しておく
+    for(CFace* face:faces){
+        if(!exist(this->model->GetFaces(),face)){
+            this->model->AddFaces(face);
+        }
     }
     block->Create(faces);
     this->model->AddBlocks(block);
