@@ -167,6 +167,20 @@ CFace* SolidEditController::getHangedFace(Pos center,Pos camera_pos,double zoom_
         return v.first==-1;
     }),rank.end());
 
+    //三平面以外が含まれていれば
+    if(std::any_of(rank.begin(),rank.end(),[](std::pair<double,CFace*> rank_v){
+        return !exist(CFace::base,rank_v.second);
+    })){
+        //三平面を削除
+        for(int i=0;i<rank.size();i++){
+            if(exist(CFace::base,rank[i].second)){
+                rank.removeAll(rank[i]);
+                i--;
+            }
+        }
+    }
+
+
     if(rank.size()==0) return nullptr;
 
     //近い順に並び替え

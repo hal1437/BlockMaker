@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>750</width>
-    <height>471</height>
+    <width>782</width>
+    <height>461</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -32,7 +32,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>750</width>
+     <width>782</width>
      <height>22</height>
     </rect>
    </property>
@@ -101,7 +101,7 @@
   <widget class="QStatusBar" name="statusBar"/>
   <widget class="QDockWidget" name="ObjectDock">
    <property name="sizePolicy">
-    <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
      <horstretch>0</horstretch>
      <verstretch>0</verstretch>
     </sizepolicy>
@@ -109,7 +109,7 @@
    <property name="minimumSize">
     <size>
      <width>149</width>
-     <height>317</height>
+     <height>254</height>
     </size>
    </property>
    <property name="maximumSize">
@@ -118,13 +118,46 @@
      <height>524287</height>
     </size>
    </property>
+   <property name="mouseTracking">
+    <bool>false</bool>
+   </property>
+   <property name="floating">
+    <bool>false</bool>
+   </property>
+   <property name="features">
+    <set>QDockWidget::AllDockWidgetFeatures</set>
+   </property>
+   <property name="allowedAreas">
+    <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
+   </property>
+   <property name="windowTitle">
+    <string/>
+   </property>
    <attribute name="dockWidgetArea">
     <number>1</number>
    </attribute>
    <widget class="QWidget" name="dockWidgetContents_3">
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+    <property name="maximumSize">
+     <size>
+      <width>400</width>
+      <height>16777215</height>
+     </size>
+    </property>
     <layout class="QVBoxLayout" name="verticalLayout_6">
+     <property name="leftMargin">
+      <number>12</number>
+     </property>
      <item>
       <layout class="QVBoxLayout" name="verticalLayout">
+       <property name="sizeConstraint">
+        <enum>QLayout::SetDefaultConstraint</enum>
+       </property>
        <item>
         <widget class="QGroupBox" name="groupBox_4">
          <property name="title">
