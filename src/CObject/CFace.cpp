@@ -61,8 +61,6 @@ void CFace::Create(QVector<CEdge*> edges){
             qDebug() <<"warning! " << this << " is having same edges";
         }
     }
-
-
     if(edges.size()==4){
         this->ReorderEdges();
         this->RecalcMesh();
@@ -256,10 +254,10 @@ void CFace::DrawGL(Pos,Pos)const{
     if(this->isPolygon()){
         //薄い色に変更
         if(this->isFaceBlend()){
+            //通常の色
             glColor4f(currentColor[0],currentColor[1],currentColor[2], 0.1);
-            glDepthMask(GL_FALSE);
         }else{
-            glDepthMask(GL_TRUE);
+            //ブロック構築用
             glColor4f(currentColor[0] * 0.2 + 0.5,
                       currentColor[1] * 0.2 + 0.5,
                       currentColor[2] * 0.2 + 0.6,
@@ -280,9 +278,6 @@ void CFace::DrawGL(Pos,Pos)const{
         }
         //色を復元
         glColor4f(currentColor[0],currentColor[1],currentColor[2], currentColor[3]);
-
-        //分割メッシュ描画
-        if(this->isVisibleDetail())this->DrawMeshGL();
     }else{
 
         //色を法線にあった色に変更
@@ -307,7 +302,7 @@ void CFace::DrawGL(Pos,Pos)const{
     //色を復元
     glColor4f(currentColor[0],currentColor[1],currentColor[2], currentColor[3]);
 
-    glDepthMask(GL_TRUE);
+    //glDepthMask(GL_TRUE);
 
 }
 bool CFace::DrawNormArrowGL()const{

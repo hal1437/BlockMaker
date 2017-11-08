@@ -179,8 +179,7 @@ CFace* SolidEditController::getHangedFace(Pos center,Pos camera_pos,double zoom_
             }
         }
     }
-
-
+    //存在しなければぬるぽ
     if(rank.size()==0) return nullptr;
 
     //近い順に並び替え

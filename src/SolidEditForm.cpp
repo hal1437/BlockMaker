@@ -285,8 +285,8 @@ void SolidEditForm::paintGL(){
                        0,          1,          0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glClearColor(0.7,0.7,0.7,1);//背景
-    glEnable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
+    glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -328,11 +328,12 @@ void SolidEditForm::paintGL(){
     glLineWidth(2);
     glColor3f(0,0,1);//青
     for(CBlock* block : this->model->GetBlocks())block->DrawGL(this->camera,this->center);
-    for(CFace*  face  : this->model->GetFaces ())face ->DrawGL(this->camera,this->center);
+    for(CFace*  face  : this->model->GetFaces ())if(!face->isFaceBlend())face ->DrawGL(this->camera,this->center);
+    for(CFace*  face  : this->model->GetFaces ())face ->DrawMeshGL();
     for(CEdge*  edge  : this->model->GetEdges ())edge ->DrawGL(this->camera,this->center);
     for(CPoint* pos   : this->model->GetPoints())pos  ->DrawGL(this->camera,this->center);
+    for(CFace*  face  : this->model->GetFaces ())if(face->isFaceBlend())face ->DrawGL(this->camera,this->center);
 
-    //描画面と色のリスト作成
     //三平面の描画
     glLineWidth(2);
     for(CFace* face:CFace::base){
