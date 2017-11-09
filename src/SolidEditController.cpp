@@ -25,8 +25,16 @@ CFace* SolidEditController::getFrontFace_impl(Quat convert,Quat invert)const{
     face->SetPolygon(false);
     face->SetVisibleDetail(false);
 
+    double top=0,bottom=0,right=0,left=0;
+    for(CPoint* pos:this->model->GetPoints()){
+        right  = std::max(right ,(pos->Dot(convert)).mat[0]);
+        left   = std::min(left  ,(pos->Dot(convert)).mat[0]);
+        top    = std::max(top   ,(pos->Dot(convert)).mat[1]);
+        bottom = std::min(bottom,(pos->Dot(convert)).mat[1]);
+    }
     //何もない時
-    if(this->model->GetPoints().empty()){
+    if(this->model->GetPoints().empty() ||
+       (top==0 && bottom==0 && right==0 && left==0)){
         QVector<CPoint*> poses;
         poses.push_back(new CPoint(Pos( DEFAULT_FACE_LEGTH, DEFAULT_FACE_LEGTH,0).Dot(invert)));
         poses.push_back(new CPoint(Pos(-DEFAULT_FACE_LEGTH, DEFAULT_FACE_LEGTH,0).Dot(invert)));
@@ -39,13 +47,6 @@ CFace* SolidEditController::getFrontFace_impl(Quat convert,Quat invert)const{
         return face;
     }
 
-    double top=0,bottom=0,right=0,left=0;
-    for(CPoint* pos:this->model->GetPoints()){
-        right  = std::max(right ,(pos->Dot(convert)).mat[0]);
-        left   = std::min(left  ,(pos->Dot(convert)).mat[0]);
-        top    = std::max(top   ,(pos->Dot(convert)).mat[1]);
-        bottom = std::min(bottom,(pos->Dot(convert)).mat[1]);
-    }
     double height_delta = top - bottom;
     double widht_delta  = right  - left;
 

@@ -29,11 +29,11 @@ CREATE_RESULT CArc::Create(CPoint *pos){
 void CArc::DrawGL(Pos camera,Pos center)const{
     if(!this->isVisible())return;
     if(this->end == nullptr){
-        glBegin(GL_LINES);
         Pos cc = camera - center;
         double theta1 = std::atan2(cc.y(),std::sqrt(cc.x()*cc.x()+cc.z()*cc.z()));
         double theta2 = std::atan2(-cc.x(),cc.z());
         //点線円の描画
+        glBegin(GL_LINES);
         for(double k=0;k < 2*M_PI;k += M_PI/32){
             const int length = (*this->start-*this->center).Length();
             Pos p = Pos(length*std::sin(k),length*std::cos(k),0).Dot(Quat::getRotateXMatrix(theta1).Dot(Quat::getRotateYMatrix(theta2)));
@@ -42,12 +42,20 @@ void CArc::DrawGL(Pos camera,Pos center)const{
         glEnd();
     }else{
         glBegin(GL_LINE_STRIP);
-        //線の分割描画
+        //円弧の分割描画
         for(double i=0;i<=1;i += 1.0/CArc::LINE_NEAR_DIVIDE){
             if(i+1.0/CArc::LINE_NEAR_DIVIDE > 1)i=1;
             glVertex3f(this->GetMiddleDivide(i).x(),
                        this->GetMiddleDivide(i).y(),
                        this->GetMiddleDivide(i).z());
+        }
+        glEnd();
+        glBegin(GL_LINES);
+        //円弧の分割描画
+        for(double i=0;i<=1;i += 1.0/CArc::LINE_NEAR_DIVIDE){
+            if(i+1.0/CArc::LINE_NEAR_DIVIDE > 1)i=1;
+            Pos p = (*this->end - *this->start) * i + *this->start;
+            glVertex3f(p.x(),p.y(),p.z());
         }
         glEnd();
         DrawArrow(0.90,0.80);

@@ -16,7 +16,7 @@ public:
         cyclic        = 4,
         cyclicAMI     = 5,
         wedge         = 6,
-        none          = 7,//連続
+        undefined     = 7,//連続
     };
 
     //文字列からBoundary::Typeに変換

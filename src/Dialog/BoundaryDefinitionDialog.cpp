@@ -8,6 +8,7 @@ void BoundaryDefinitionDialog::SetModel(CadModelCore *m){
     this->model = m;
     LoadTable();
     connect(this->model,SIGNAL(UpdateAnyObject()),this,SLOT(LoadTable()));
+    connect(this->table,SIGNAL(cellChanged(int,int)),this,SLOT(CellChanged(int,int)));
 }
 void BoundaryDefinitionDialog::SaveTable(){
     //状態を保存
@@ -16,6 +17,7 @@ void BoundaryDefinitionDialog::SaveTable(){
         Boundary bound;
         bound.name = this->table->item(i,0)->text();
         bound.type = Boundary::StringToBoundaryType(dynamic_cast<QComboBox*>(this->table->cellWidget(i,1))->currentText().split(" ")[0]);
+        if(bound.name == "")bound.name = "Noname";
         this->boundary_list.push_back(bound);
     }
 }
@@ -37,7 +39,8 @@ void BoundaryDefinitionDialog::LoadTable(){
         //コンボ設定
         for(QString str :this->boundary_combo_text){
             combo->addItem(str);
-            if(str.split(" ")[0] == Boundary::BoundaryTypeToString(this->boundary_list[i].type)){
+            qDebug() << str << this->boundary_combo_text[static_cast<int>(this->boundary_list[i].type)];
+            if(str == this->boundary_combo_text[static_cast<int>(this->boundary_list[i].type)]){
                 combo->setCurrentText(str);
             }
         }
@@ -138,5 +141,7 @@ void BoundaryDefinitionDialog::MinusButtonPushed(){
 void BoundaryDefinitionDialog::ComboChanged(int){
     SaveTable();
 }
-
+void BoundaryDefinitionDialog::CellChanged(int,int){
+    SaveTable();
+}
 

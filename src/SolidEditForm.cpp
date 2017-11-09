@@ -216,7 +216,6 @@ void SolidEditForm::mouseDoubleClickEvent(QMouseEvent *event){
        !this->model->GetSelected().isEmpty() && this->model->GetSelected().first()->is<CPoint>()){
         this->SetCameraCenter(*dynamic_cast<CPoint*>(this->model->GetSelected().first()));
     }
-
 }
 
 void SolidEditForm::wheelEvent(QWheelEvent *event){
@@ -254,7 +253,7 @@ void SolidEditForm::resizeGL(int w, int h){
     glLoadIdentity();
     glOrtho(-w,w,
             -h,h,
-            -100000000,100000000);
+            -1.0e60,1.0e60);
 
     glMatrixMode(GL_MODELVIEW); //行列モードを戻す
     glLoadIdentity();
@@ -277,7 +276,7 @@ void SolidEditForm::paintGL(){
     glOrtho(-this->width() *(round),
              this->width() *(round),
             -this->height()*(round),
-             this->height()*(round),-10000,10000);
+             this->height()*(round),-1.0e60,1.0e60);
     glMatrixMode(GL_MODELVIEW); //行列モードを戻す
     glLoadIdentity();
     gluLookAt(camera.x(), camera.y(), camera.z(),
@@ -327,12 +326,12 @@ void SolidEditForm::paintGL(){
     //オブジェクト描画
     glLineWidth(2);
     glColor3f(0,0,1);//青
+    for(CFace*  face  : this->model->GetFaces ())if(face->isFaceBlend())face ->DrawGL(this->camera,this->center);
     for(CBlock* block : this->model->GetBlocks())block->DrawGL(this->camera,this->center);
-    for(CFace*  face  : this->model->GetFaces ())if(!face->isFaceBlend())face ->DrawGL(this->camera,this->center);
     for(CFace*  face  : this->model->GetFaces ())face ->DrawMeshGL();
     for(CEdge*  edge  : this->model->GetEdges ())edge ->DrawGL(this->camera,this->center);
     for(CPoint* pos   : this->model->GetPoints())pos  ->DrawGL(this->camera,this->center);
-    for(CFace*  face  : this->model->GetFaces ())if(face->isFaceBlend())face ->DrawGL(this->camera,this->center);
+    for(CFace*  face  : this->model->GetFaces ())if(!face->isFaceBlend())face->DrawGL(this->camera,this->center);
 
     //三平面の描画
     glLineWidth(2);

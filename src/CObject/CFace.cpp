@@ -17,8 +17,8 @@ Boundary::Type Boundary::StringToBoundaryType(QString str){
     SWITCHING_STRING_TO_boundary_TYPE(cyclic       ,str)
     SWITCHING_STRING_TO_boundary_TYPE(cyclicAMI    ,str)
     SWITCHING_STRING_TO_boundary_TYPE(wedge        ,str)
-    SWITCHING_STRING_TO_boundary_TYPE(none         ,str)
-    return Boundary::Type::none;
+    SWITCHING_STRING_TO_boundary_TYPE(undefined    ,str)
+    return Boundary::Type::undefined;
 }
 QString Boundary::BoundaryTypeToString(Boundary::Type type){
     SWITCHING_boundary_TYPE_TO_STRING(empty        ,type)
@@ -28,7 +28,7 @@ QString Boundary::BoundaryTypeToString(Boundary::Type type){
     SWITCHING_boundary_TYPE_TO_STRING(cyclic       ,type)
     SWITCHING_boundary_TYPE_TO_STRING(cyclicAMI    ,type)
     SWITCHING_boundary_TYPE_TO_STRING(wedge        ,type)
-    SWITCHING_boundary_TYPE_TO_STRING(none         ,type)
+    SWITCHING_boundary_TYPE_TO_STRING(undefined    ,type)
     return "none";
 }
 
@@ -276,8 +276,6 @@ void CFace::DrawGL(Pos,Pos)const{
             //面描画
             DrawFillGL();
         }
-        //色を復元
-        glColor4f(currentColor[0],currentColor[1],currentColor[2], currentColor[3]);
     }else{
 
         //色を法線にあった色に変更
@@ -473,7 +471,7 @@ CFace::CFace(QObject* parent):
     CObject(parent)
 {
     this->name = "Noname";
-    this->boundary.type = Boundary::Type::none;
+    this->boundary.type = Boundary::Type::undefined;
     this->boundary.name = "境界条件未定義";
 }
 

@@ -21,7 +21,7 @@ public:
     QVector<QString> boundary_combo_text = {"empty (2次元)","patch (パッチ)","wall (壁)",
                                             "symmetryPlane (対称面)","cyclic (周期境界)",
                                             "cyclicAMI (不整合周期境界)","wedge (2次元軸対称)",
-                                            "None (連続)"};
+                                            "Undefined (未定義)"};
 public:
     QTableWidget*  table;
     QPushButton* plus ;
@@ -36,6 +36,7 @@ public slots:
     void PlusButtonPushed();
     void MinusButtonPushed();
     void ComboChanged(int);
+    void CellChanged(int,int);
 };
 
 #endif // BOUNDARYDEFINITIONDIALOG_H

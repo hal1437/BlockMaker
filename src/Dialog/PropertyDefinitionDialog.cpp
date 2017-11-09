@@ -16,9 +16,16 @@ void PropertyDefinitionDialog::ConstructFace(){
     this->face_boundary_button.show();
     QVector<CObject*> selected = this->model->GetSelected();
 
+    //コンボ更新
+    this->face_boundary_combo.clear();
+    for(Boundary boundary: BoundaryDefinitionDialog::boundary_list){
+        this->face_boundary_combo.addItem(boundary.name + " <" + Boundary::BoundaryTypeToString(boundary.type) + ">");
+    }
+
     //全ての境界条件が同じであれば
     if(SELECTED_SAME_VALUE(selected,CFace*,Boundary)){
-        this->face_boundary_combo.setCurrentIndex(static_cast<int>(dynamic_cast<CFace*>(selected.first())->getBoundary().type));
+        Boundary boundary = dynamic_cast<CFace*>(selected.first())->getBoundary();
+        this->face_boundary_combo.setCurrentText(boundary.name + " <" + Boundary::BoundaryTypeToString(boundary.type) + ">");
     }
 }
 
@@ -150,7 +157,7 @@ void PropertyDefinitionDialog::ShowBoundayDefinitionDialog(){
     diag->exec();
 
     //コンボ状態保存
-    QString save = this->face_boundary_combo.currentText();
+    int save = this->face_boundary_combo.currentIndex();
 
     //コンボ更新
     this->face_boundary_combo.clear();
@@ -158,7 +165,7 @@ void PropertyDefinitionDialog::ShowBoundayDefinitionDialog(){
         this->face_boundary_combo.addItem(boundary.name + " <" + Boundary::BoundaryTypeToString(boundary.type) + ">");
     }
     //コンボ状態復元
-    this->face_boundary_combo.setCurrentText(save);
+    this->face_boundary_combo.setCurrentIndex(save);
 }
 
 void PropertyDefinitionDialog::Accept(){
