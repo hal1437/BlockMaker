@@ -100,6 +100,11 @@ PropertyDefinitionDialog::PropertyDefinitionDialog(QWidget *parent) :
     this->ui->Grid->addWidget(&this->edge_divide_spin    ,2,1);
     this->ui->Grid->addWidget(&this->edge_grading_label  ,3,0);
     this->ui->Grid->addWidget(&this->edge_grading_spin   ,3,1);
+    connect(&name_edit          ,SIGNAL(textChanged(QString))    ,this,SLOT(LineEditChanged(QString)));
+    connect(&edge_divide_spin   ,SIGNAL(valueChanged(int))       ,this,SLOT(SpinChanged(int)));
+    connect(&edge_grading_spin  ,SIGNAL(valueChanged(double))    ,this,SLOT(DoubleSpinChanged(double)));
+    connect(&face_boundary_combo,SIGNAL(currentIndexChanged(int)),this,SLOT(ComboChanged(int)));
+
 }
 PropertyDefinitionDialog::~PropertyDefinitionDialog()
 {
@@ -108,6 +113,10 @@ PropertyDefinitionDialog::~PropertyDefinitionDialog()
 
 void PropertyDefinitionDialog::UpdateLayout(){
     //レイアウト解除
+    disconnect(&name_edit          ,SIGNAL(textChanged(QString))    ,this,SLOT(LineEditChanged(QString)));
+    disconnect(&edge_divide_spin   ,SIGNAL(valueChanged(int))       ,this,SLOT(SpinChanged(int)));
+    disconnect(&edge_grading_spin  ,SIGNAL(valueChanged(double))    ,this,SLOT(DoubleSpinChanged(double)));
+    disconnect(&face_boundary_combo,SIGNAL(currentIndexChanged(int)),this,SLOT(ComboChanged(int)));
     this->name_label          .hide();
     this->name_edit           .hide();
     this->face_boundary_label .hide();
@@ -149,12 +158,18 @@ void PropertyDefinitionDialog::UpdateLayout(){
     }
     this->resize(this->sizeHint());
     this->repaint();
+    connect(&name_edit          ,SIGNAL(textChanged(QString))    ,this,SLOT(LineEditChanged(QString)));
+    connect(&edge_divide_spin   ,SIGNAL(valueChanged(int))       ,this,SLOT(SpinChanged(int)));
+    connect(&edge_grading_spin  ,SIGNAL(valueChanged(double))    ,this,SLOT(DoubleSpinChanged(double)));
+    connect(&face_boundary_combo,SIGNAL(currentIndexChanged(int)),this,SLOT(ComboChanged(int)));
+
 }
 
 void PropertyDefinitionDialog::ShowBoundayDefinitionDialog(){
     BoundaryDefinitionDialog* diag = new BoundaryDefinitionDialog();
     diag->SetModel(model);
     diag->exec();
+    disconnect(&face_boundary_combo,SIGNAL(currentIndexChanged(int)),this,SLOT(ComboChanged(int)));
 
     //コンボ状態保存
     int save = this->face_boundary_combo.currentIndex();
@@ -166,6 +181,7 @@ void PropertyDefinitionDialog::ShowBoundayDefinitionDialog(){
     }
     //コンボ状態復元
     this->face_boundary_combo.setCurrentIndex(save);
+    connect(&face_boundary_combo,SIGNAL(currentIndexChanged(int)),this,SLOT(ComboChanged(int)));
 }
 
 void PropertyDefinitionDialog::Accept(){
@@ -230,5 +246,22 @@ void PropertyDefinitionDialog::Accept(){
     for(CObject* obj:paused) obj->ObserveRestart();
 
     emit RepaintRequest();
+    this->ui->ApplyButton->setText("Apply");
+}
+
+void PropertyDefinitionDialog::Changed(){
+    this->ui->ApplyButton->setText("*Apply");
+}
+void PropertyDefinitionDialog::LineEditChanged(QString){
+    this->Changed();
+}
+void PropertyDefinitionDialog::SpinChanged(int){
+    this->Changed();
+}
+void PropertyDefinitionDialog::DoubleSpinChanged(double){
+    this->Changed();
+}
+void PropertyDefinitionDialog::ComboChanged(int){
+    this->Changed();
 }
 

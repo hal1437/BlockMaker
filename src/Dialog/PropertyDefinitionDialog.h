@@ -62,6 +62,12 @@ public slots:
     void UpdateLayout();
     void Accept();
 
+    void Changed();
+    void LineEditChanged(QString);
+    void SpinChanged(int);
+    void DoubleSpinChanged(double);
+    void ComboChanged(int);
+
 private:
     Ui::PropertyDefinitionDialog *ui;
 

@@ -22,6 +22,8 @@ void BoundaryDefinitionDialog::SaveTable(){
     }
 }
 void BoundaryDefinitionDialog::LoadTable(){
+    disconnect(this->table,SIGNAL(cellChanged(int,int)),this,SLOT(CellChanged(int,int)));
+
     //表示更新
     this->table->clear();
     //テーブル構築
@@ -39,7 +41,6 @@ void BoundaryDefinitionDialog::LoadTable(){
         //コンボ設定
         for(QString str :this->boundary_combo_text){
             combo->addItem(str);
-            qDebug() << str << this->boundary_combo_text[static_cast<int>(this->boundary_list[i].type)];
             if(str == this->boundary_combo_text[static_cast<int>(this->boundary_list[i].type)]){
                 combo->setCurrentText(str);
             }
@@ -59,8 +60,19 @@ void BoundaryDefinitionDialog::LoadTable(){
         this->table->setItem      (i,0,new QTableWidgetItem(this->boundary_list[i].name));
         this->table->setCellWidget(i,1,combo);
         this->table->setItem      (i,2,new QTableWidgetItem(QString::number(ref_count)));
+        this->table->item(i,2)->setFlags(this->table->item(i,2)->flags() & Qt::ItemIsEditable);
+
+
+        //境界条件未定義<undefined>は変更不可
+        if(this->boundary_list[i].name == CFace().getBoundary().name &&
+           this->boundary_list[i].type == CFace().getBoundary().type ){
+            this->table->item(i,0)->setFlags(this->table->item(i,0)->flags() & Qt::ItemIsEditable);
+            combo->setDisabled(true);
+        }
+
         connect(combo,SIGNAL(currentIndexChanged(int)),this,SLOT(ComboChanged(int)));
     }
+    connect(this->table,SIGNAL(cellChanged(int,int)),this,SLOT(CellChanged(int,int)));
 }
 
 BoundaryDefinitionDialog::BoundaryDefinitionDialog()
@@ -79,9 +91,6 @@ BoundaryDefinitionDialog::BoundaryDefinitionDialog()
     this->setLayout(v_l);
     connect(this->plus ,SIGNAL(pressed()),this,SLOT(PlusButtonPushed ()));
     connect(this->minus,SIGNAL(pressed()),this,SLOT(MinusButtonPushed()));
-
-    //テーブル構築
-    LoadTable();
 }
 void BoundaryDefinitionDialog::PlusButtonPushed(){
     QDialog* diag = new QDialog(this);
@@ -109,7 +118,7 @@ void BoundaryDefinitionDialog::PlusButtonPushed(){
     if(diag->exec()){
         //新要素追加
         Boundary bound;
-        bound.type = Boundary::StringToBoundaryType(combo->currentText().split(" ")[0]);
+        bound.type = static_cast<Boundary::Type>(combo->currentIndex());
         bound.name = edit->text();
         this->boundary_list.push_back(bound);
         //再読み込み
