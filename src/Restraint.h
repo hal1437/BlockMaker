@@ -10,7 +10,7 @@
 
 //拘束生成条件マクロ:全て同じ型
 #define ALL_SAME_TYPE_RESTRAINTABLE(TYPE,MIN_COUNT)                                                                         \
-static bool Restraintable(const QVector<CObject *> nodes){                                                                  \
+ static bool Restraintable(const QVector<CObject *> nodes){                                                                  \
     return (nodes.size()>=MIN_COUNT && std::all_of(nodes.begin(),nodes.end(),[](CObject* obj){return obj->is<TYPE>();}));   \
 }
 //拘束生成条件マクロ:1対n
@@ -44,6 +44,7 @@ virtual void ChangeObjectCallback(CObject*){    \
 enum RestraintType{
     EQUAL      , //等しい値
     CONCURRENT , //平行
+    VERTICAL   , //垂直
     LOCK       , //固定
     UNLOCK     , //固定解除
     MATCH      , //一致
@@ -124,6 +125,20 @@ public:
     virtual bool isComplete();
     ConcurrentRestraint(QVector<CObject*> nodes = QVector<CObject*>()):Restraint(nodes){}
 };
+//垂直
+class VerticalRestraint: public Restraint{
+    Q_OBJECT
+public:
+    //CEdgeを2つ以上含む、かつ他のCEdgeの端点が1つめのCEdgeに一致している
+    static bool Restraintable(const QVector<CObject *> nodes);
+    DEFINE_ICON_PATH(":/Restraint/CrossRestraint.png")
+    DEFINE_RESTRAINT_NAME("垂直")
+
+    virtual void Calc();
+    virtual bool isComplete();
+    VerticalRestraint(QVector<CObject*> nodes = QVector<CObject*>()):Restraint(nodes){}
+};
+
 
 //固定
 class LockRestraint: public Restraint{

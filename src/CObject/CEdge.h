@@ -37,11 +37,16 @@ public:
     virtual void     SetEndPos(CObject* obj);
 
     //近接点
-    virtual Pos GetNearPos (const Pos& hand)const = 0;
-    virtual Pos GetNearLine(const Pos& pos1,const Pos& pos2)const;
+    virtual bool isOnEdge   (const Pos& hand)const;
+    virtual Pos  GetNearPos (const Pos& hand)const = 0;
+    virtual Pos  GetNearLine(const Pos& pos1,const Pos& pos2)const;
 
     //複製
     virtual CObject* Clone()const = 0;
+
+    //探索系
+    Pos    GetDifferentialVec   (Pos pos)const; //posの位置で微分した基底ベクトル取得
+    double GetMiddleParamFromPos(Pos pos)const; //tを求める
 
     CEdge(QObject* parent=nullptr);
     CEdge(CPoint* start,CPoint* end,QObject* parent=nullptr);

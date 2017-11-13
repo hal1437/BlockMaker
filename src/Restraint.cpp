@@ -18,6 +18,7 @@ QVector<Restraint*> Restraint::Restraintable(const QVector<CObject*> nodes){
     QVector<Restraint*> ans;
     if(EqualLengthRestraint::Restraintable(nodes))ans.push_back(new EqualLengthRestraint(nodes));
     if( ConcurrentRestraint::Restraintable(nodes))ans.push_back(new ConcurrentRestraint (nodes));
+    if(   VerticalRestraint::Restraintable(nodes))ans.push_back(new VerticalRestraint   (nodes));
     if(       LockRestraint::Restraintable(nodes))ans.push_back(new LockRestraint       (nodes));
     if(     UnlockRestraint::Restraintable(nodes))ans.push_back(new UnlockRestraint     (nodes));
     if(      MatchRestraint::Restraintable(nodes))ans.push_back(new MatchRestraint     (nodes));
@@ -104,6 +105,56 @@ void ConcurrentRestraint::Calc(){
         //emit Changed();
     }
 }
+
+bool VerticalRestraint::Restraintable(const QVector<CObject *> nodes){
+    return true;
+}
+bool VerticalRestraint::isComplete(){
+    CEdge* base_edge = dynamic_cast<CEdge*>(this->nodes[0]);
+    //すべてのEdgeの端点が初めのEdgeと一致している
+    if(std::any_of(this->nodes.begin()+1,this->nodes.end(),[&](CObject* obj){
+        CEdge* edge = dynamic_cast<CEdge*>(obj);
+        return (base_edge->isOnEdge(*edge->start))  &&
+               (base_edge->isOnEdge(*edge->end  ));
+    }))return false;
+
+    //すべてのEdgeの端点が水平方向に成分を持たない
+    if(std::any_of(this->nodes.begin()+1,this->nodes.end(),[&](CObject* obj){
+        CEdge* edge = dynamic_cast<CEdge*>(obj);
+        CPoint *base,*move;//起点,移動点
+        if(base_edge->isOnEdge(*edge->start)){
+            move = edge->end;
+            base = edge->start;
+        }else{
+            move = edge->start;
+            base = edge->end;
+        }
+        qDebug() << base_edge->GetDifferentialVec(*base).DotPos(*move-*base);
+        return std::abs(base_edge->GetDifferentialVec(*base).DotPos(*move-*base)) > CObject::SAME_POINT_EPS;
+    }))return false;
+
+    return true;
+}
+void VerticalRestraint::Calc(){
+    //先頭のCEdgeと同じ向きに変更する。
+    for(int i = 1;i<this->nodes.size();i++){
+        CEdge* base_edge = dynamic_cast<CEdge*>(this->nodes[0]);
+        CEdge* move_edge = dynamic_cast<CEdge*>(this->nodes[i]);
+        CPoint *base,*move;//起点,移動点
+        if(base_edge->isOnEdge(*move_edge->start)){
+            move = move_edge->end;
+            base = move_edge->start;
+        }else{
+            move = move_edge->start;
+            base = move_edge->end;
+        }
+        double length = (*move_edge->end - *move_edge->start).Length();//ベクトルの長さ
+        Pos diff = base_edge->GetDifferentialVec(*base);//Edge方向のベクトル
+        Pos moved = *move - diff * (diff.DotPos((*move-*base)));//水平方向成分を取り去った点
+        move->MoveAbsolute((moved - *base).GetNormalize() * length + *base);
+    }
+}
+
 
 bool LockRestraint::isComplete(){
     bool unlocked = false;

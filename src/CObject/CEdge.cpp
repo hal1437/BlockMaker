@@ -24,6 +24,9 @@ double CEdge::GetDivisionRate(int divide,double grading,int count){
     return sum_rate;
 }
 
+bool CEdge::isOnEdge(const Pos& hand)const{
+    return (this->GetNearPos(hand) - hand).Length() < CObject::SAME_POINT_EPS;
+}
 Pos CEdge::GetNearLine(const Pos& pos1,const Pos& pos2)const{
     //GetNearPosによる近似
     Pos ans = *this->start;
@@ -97,6 +100,43 @@ void CEdge::SetStartPos(CObject* obj){
 
 void CEdge::SetEndPos(CObject* obj){
     this->SetChild(this->GetChildCount()-1,obj);
+}
+
+Pos    CEdge::GetDifferentialVec   (Pos pos)const{
+    const double DIFF_DELTA = 0.001;//差分
+    double t = this->GetMiddleParamFromPos(pos);
+    if     (t + DIFF_DELTA > 1.0)return (this->GetMiddleDivide(1.0)        - this->GetMiddleDivide(1.0-DIFF_DELTA)).GetNormalize(); //後退差分
+    else if(t - DIFF_DELTA < 0.0)return (this->GetMiddleDivide(DIFF_DELTA) - this->GetMiddleDivide(0.0)           ).GetNormalize(); //前方差分
+    else {
+        //中央差分
+        return (this->GetMiddleDivide(t + DIFF_DELTA) - this->GetMiddleDivide(t - DIFF_DELTA)).GetNormalize();
+    }
+}
+
+double CEdge::GetMiddleParamFromPos(Pos pos)const{
+    //二分探索
+    const double EPS = 0.00001;     //許容誤差
+    const int COUNT_LIMIT = 1000;   //反復回数制限
+    int count = 0;                  //反復回数
+    double min = 0.0 , max = 1.0;   //二分探索変数
+
+    //反復計算
+    while(max - min > EPS && count < COUNT_LIMIT){
+        //反復計算
+        double half = (max - min)/2;//半分
+        if((this->GetMiddleDivide(min) - pos).Length() < (this->GetMiddleDivide(max) - pos).Length()){
+            //minの方が近い
+            max -= half;
+        }else{
+            //maxの方が近い
+            min += half;
+        }
+        count++;
+    }
+    if(count >= COUNT_LIMIT){
+        qDebug() << "warning! CadModelSearch::GetMiddleDivideFromPos is divergenced!";
+    }
+    return (max+min)/2;
 }
 
 CEdge::CEdge(QObject* parent):

@@ -308,13 +308,8 @@ void SolidEditForm::paintGL(){
             glDrawPixels(img.width(), img.height(), GL_RGBA, GL_UNSIGNED_BYTE, glimg.bits());
         }
     }
-
     const int ALL_OBJECT_WIDTH = 3;
     glLineWidth(ALL_OBJECT_WIDTH*2/3);
-
-    //オブジェクト描画：選択
-    glDepthFunc(GL_ALWAYS); //奥行き方向補正を無視
-    for(CObject* p: this->model->GetSelected())paintObject(p,{0,1,1,1},ALL_OBJECT_WIDTH);
 
     glDepthFunc(GL_LEQUAL);
     //オブジェクト描画：STL
@@ -328,9 +323,13 @@ void SolidEditForm::paintGL(){
     //オブジェクト描画：平面
     for(CFace*  face  : this->model->GetFaces ())face->DrawMeshGL();//非透過の面
     for(CFace*  face  : this->model->GetFaces ())if(!face->isFaceBlend())paintObject(face  ,{0,0,1,1},ALL_OBJECT_WIDTH);//非透過の面
-    if(hanged->is<CFace>())                      paintObject(hanged,{1,1,1,1},ALL_OBJECT_WIDTH);//選択物体(平面)
     for(CFace*  face  : this->model->GetFaces ())if( face->isFaceBlend())paintObject(face  ,{0,0,1,1},ALL_OBJECT_WIDTH);//透過の面
     for(CFace*  face  : CFace::base             )paintObject(face  ,{0,0,0,0},ALL_OBJECT_WIDTH);//三平面
+    if(hanged->is<CFace>())                      paintObject(hanged,{1,1,1,1},ALL_OBJECT_WIDTH);//選択物体(平面)
+
+    //オブジェクト描画：選択
+    glDepthFunc(GL_ALWAYS); //奥行き方向補正を無視
+    for(CObject* p: this->model->GetSelected())paintObject(p,{0,1,1,1},ALL_OBJECT_WIDTH);
 
     //座標線の描画
     glLineWidth(5);

@@ -19,7 +19,7 @@ bool CadModelSearch::HavePoint(CEdge* e1,CPoint* pos){
 
 
 //面生成補完関数
-QVector<CEdge*> CadModelSearch::SearchEdgeMakeFace (QVector<CEdge*> select){
+QVector<CEdge*> CadModelSearch::SearchEdgeMakeFace (QVector<CEdge*> select)const{
     QVector<QVector<CEdge*>> ans;
 
     //作成対象外
@@ -118,7 +118,7 @@ QVector<CEdge*> CadModelSearch::SearchEdgeMakeFace (QVector<CEdge*> select){
     if(ans.size() == 1)return ans.first();
     else return QVector<CEdge*>();
 }
-QVector<CEdge*> CadModelSearch::SearchEdgeMakeBlock(QVector<CEdge*> select){
+QVector<CEdge*> CadModelSearch::SearchEdgeMakeBlock(QVector<CEdge*> select)const{
 /*
     QVector<QVector<CEdge*>> ans;
 
@@ -185,8 +185,7 @@ QVector<CEdge*> CadModelSearch::SearchEdgeMakeBlock(QVector<CEdge*> select){
     else
     return ans.first();*/
 }
-
-QVector<CFace*> CadModelSearch::SearchFaceMakeBlock(QVector<CFace*> select){
+QVector<CFace*> CadModelSearch::SearchFaceMakeBlock(QVector<CFace*> select)const{
     QVector<QVector<CFace*>> ans;
 
     //作成対象外
