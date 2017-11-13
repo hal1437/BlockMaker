@@ -152,18 +152,25 @@ Pos CSpline::GetMiddleDivide(double t)const{
 
 Pos CSpline::GetNearPos(const Pos& pos)const{
     if(this->pos.size() >= 1){
-        QVector<Pos> pp;
-        const double dt = 1.0/DIVISION;
-        double t, m;
-        m = (double)(this->pos.size()+1);
-        for(t=0; t<=m; t += dt){
-            if(t + dt > m)t=m;
-            pp.push_back(Pos(xs.culc(t), ys.culc(t),zs.culc(t)));
+        //二分探索
+        const double EPS = 0.00001;
+        double min = 0.0,max = this->pos.size()+1;
+        Pos min_p = Pos(xs.culc( 0 ), ys.culc( 0 ),zs.culc( 0 ));
+        Pos max_p = Pos(xs.culc(max), ys.culc(max),zs.culc(max));
+        while(max-min > EPS){
+            double half = (max+min)/2;
+            Pos half_p = Pos(xs.culc(half), ys.culc(half),zs.culc(half));
+            if((min_p - pos).Length() < (max_p - pos).Length()){
+                max   = half;
+                max_p = half_p;
+            }else{
+                min   = half;
+                min_p = half_p;
+            }
+            qDebug() << min << max;
         }
-        //もっとも近いもの
-        return *std::min_element(pp.begin(),pp.end(),[&](Pos lhs,Pos rhs){
-            return ((pos-lhs).Length() < (pos-rhs).Length());
-        });
+        double d = (max + min)/2;
+        return Pos(xs.culc(d), ys.culc(d),zs.culc(d));
     }else{
         //いつもの直線のアレ
         return Pos::LineNearPoint(*this->start,*this->end,pos);
