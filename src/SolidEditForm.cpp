@@ -241,25 +241,14 @@ void SolidEditForm::SetModel(CadModelCore* model){
 
 void SolidEditForm::initializeGL(){
     glEnable(GL_POLYGON_SMOOTH);
+    //深度テスト有効化
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LEQUAL);
     glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-    //glutInitDisplayMode(GLUT_RGBA| GLUT_DOUBLE | GLUT_DEPTH);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 void SolidEditForm::resizeGL(int w, int h){
-    glClearColor(0.7,0.7,0.7,1);
-
-    glMatrixMode(GL_PROJECTION);  //行列モード切替
-    glLoadIdentity();
-    glOrtho(-w,w,
-            -h,h,
-            -1.0e60,1.0e60);
-
-    glMatrixMode(GL_MODELVIEW); //行列モードを戻す
-    glLoadIdentity();
-    gluLookAt(camera.x(), camera.y(), camera.z(),
-              center.x(), center.y(), center.z(),
-              0, 1, 0);
 }
 
 void SolidEditForm::paintGL(){
@@ -276,21 +265,22 @@ void SolidEditForm::paintGL(){
     glOrtho(-this->width() *(round),
              this->width() *(round),
             -this->height()*(round),
-             this->height()*(round),-1.0e60,1.0e60);
+             this->height()*(round),-1.0e5,1.0e5);
     glMatrixMode(GL_MODELVIEW); //行列モードを戻す
     glLoadIdentity();
     gluLookAt(camera.x(), camera.y(), camera.z(),
               center.x(), center.y(), center.z(),
                        0,          1,          0);
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glClearColor(0.7,0.7,0.7,1);//背景
-    glEnable(GL_BLEND);
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LEQUAL);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     //カメラ変換行列
     Quat quat = Quat::getRotateXMatrix(this->controller->theta1).Dot(Quat::getRotateYMatrix(this->controller->theta2));
+
+    //直下オブジェクト選定
+    CObject* hanged = this->GetHangedFace();
+    if(hanged == nullptr)hanged = this->GetHangedObject();
 
     //幾何拘束描画
     QVector<std::pair<Pos,QVector<QString>>> rest_maps;
@@ -319,46 +309,31 @@ void SolidEditForm::paintGL(){
         }
     }
 
-    //STL描画
-    glColor3f(0.5,0.5,0.5);//灰
-    for(CStl*   stl   : this->model->GetStls  ())stl  ->DrawGL(this->camera,this->center);
+    const int ALL_OBJECT_WIDTH = 3;
+    glLineWidth(ALL_OBJECT_WIDTH*2/3);
 
-    //オブジェクト描画
-    glLineWidth(2);
-    glColor3f(0,0,1);//青
-    for(CFace*  face  : this->model->GetFaces ())if(face->isFaceBlend())face ->DrawGL(this->camera,this->center);
-    for(CBlock* block : this->model->GetBlocks())block->DrawGL(this->camera,this->center);
-    for(CFace*  face  : this->model->GetFaces ())face ->DrawMeshGL();
-    for(CEdge*  edge  : this->model->GetEdges ())edge ->DrawGL(this->camera,this->center);
-    for(CPoint* pos   : this->model->GetPoints())pos  ->DrawGL(this->camera,this->center);
-    for(CFace*  face  : this->model->GetFaces ())if(!face->isFaceBlend())face->DrawGL(this->camera,this->center);
-
-    //三平面の描画
-    glLineWidth(2);
-    for(CFace* face:CFace::base){
-        glColor4f(0, 0, 0, 0); //完全透明(法線の色に設定される)
-        face->DrawGL(this->camera,this->center);
-    }
-
-    //選択オブジェクト描画
+    //オブジェクト描画：選択
     glDepthFunc(GL_ALWAYS); //奥行き方向補正を無視
-    glColor3f(0,1,1); //水色
-    for(CObject* p: this->model->GetSelected()){
-        p->DrawGL(this->camera,this->center);
-    }
+    for(CObject* p: this->model->GetSelected())paintObject(p,{0,1,1,1},ALL_OBJECT_WIDTH);
 
-    //直下オブジェクトの描画
-    glColor3f(1,1,1);//白
-    CObject* hanged[] = {this->GetHangedObject(),this->GetHangedFace()};
-    for(CObject* p: hanged){
-        //何か選択されていれば
-        if(p!=nullptr){
-            p->DrawGL(this->camera,this->center);
-        }
-    }
+    glDepthFunc(GL_LEQUAL);
+    //オブジェクト描画：STL
+    for(CStl*   stl   : this->model->GetStls  ())paintObject(stl  ,{0.5,0.5,0.5,1},ALL_OBJECT_WIDTH);//STL
+    //オブジェクト描画：線
+    for(CEdge*  edge  : this->model->GetEdges ())paintObject(edge  ,{0,0,1,1},ALL_OBJECT_WIDTH);//通常の物体
+    if(hanged->is<CEdge>())                      paintObject(hanged,{1,1,1,1},ALL_OBJECT_WIDTH);//選択物体(線)
+    //オブジェクト描画：点
+    for(CPoint* pos   : this->model->GetPoints())paintObject(pos   ,{0,0,1,1},ALL_OBJECT_WIDTH);//通常の物体
+    if(hanged->is<CPoint>())                     paintObject(hanged,{1,1,1,1},ALL_OBJECT_WIDTH);//選択物体(線)
+    //オブジェクト描画：平面
+    for(CFace*  face  : this->model->GetFaces ())face->DrawMeshGL();//非透過の面
+    for(CFace*  face  : this->model->GetFaces ())if(!face->isFaceBlend())paintObject(face  ,{0,0,1,1},ALL_OBJECT_WIDTH);//非透過の面
+    if(hanged->is<CFace>())                      paintObject(hanged,{1,1,1,1},ALL_OBJECT_WIDTH);//選択物体(平面)
+    for(CFace*  face  : this->model->GetFaces ())if( face->isFaceBlend())paintObject(face  ,{0,0,1,1},ALL_OBJECT_WIDTH);//透過の面
+    for(CFace*  face  : CFace::base             )paintObject(face  ,{0,0,0,0},ALL_OBJECT_WIDTH);//三平面
 
     //座標線の描画
-    glLineWidth(4);
+    glLineWidth(5);
     glDepthFunc(GL_ALWAYS);//奥行き方向補正を無視
     Pos cc = ((Pos(100,100,1)-Pos(this->width(),this->height(),0))*round).Dot(quat) + this->center;
     for(int i=0;i<3;i++){
@@ -384,6 +359,27 @@ void SolidEditForm::paintGL(){
 
     glFlush();
 }
+void SolidEditForm::paintObject(CObject* obj,QVector<float> color,int tick){
+    //色を保存
+    int old_width;
+    float old_color[4];
+
+    //色と線の太さを保存
+    glGetFloatv  (GL_CURRENT_COLOR,old_color);
+    glGetIntegerv(GL_LINE_WIDTH   ,&old_width);
+
+    //色と線の太さを設定
+    glLineWidth(tick);
+    glColor4f(color[0],color[1],color[2],color[3]);//白に変更
+
+    //描画
+    obj->DrawGL(this->camera,this->center); // 選択面の描画
+
+    //色と線の太さを復元
+    glLineWidth(old_width);
+    glColor4f(old_color[0],old_color[1],old_color[2], old_color[3]);
+}
+
 
 
 void SolidEditForm::SetState(MAKE_OBJECT state){

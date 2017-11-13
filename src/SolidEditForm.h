@@ -59,9 +59,10 @@ public:
     void wheelEvent       (QWheelEvent *event);
 
     void SetModel(CadModelCore* model);
-    void initializeGL();        //  OpenGL初期化
-    void resizeGL(int, int);    //  ウィジットリサイズ時のハンドラ
-    void paintGL();             //  描画処理
+    void initializeGL();              //  OpenGL初期化
+    void resizeGL(int, int);          //  ウィジットリサイズ時のハンドラ
+    void paintGL();                   //  描画処理
+    void paintObject(CObject* obj,QVector<float> color,int tick); //  選択したオブジェクトを描画する
 
 public slots:
 

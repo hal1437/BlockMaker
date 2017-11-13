@@ -256,7 +256,10 @@ void CFace::DrawGL(Pos,Pos)const{
         if(this->isFaceBlend()){
             //通常の色
             glColor4f(currentColor[0],currentColor[1],currentColor[2], 0.1);
+
+            //glDepthMask(GL_FALSE);
         }else{
+            glDepthMask(GL_TRUE);
             //ブロック構築用
             glColor4f(currentColor[0] * 0.2 + 0.5,
                       currentColor[1] * 0.2 + 0.5,
@@ -300,7 +303,7 @@ void CFace::DrawGL(Pos,Pos)const{
     //色を復元
     glColor4f(currentColor[0],currentColor[1],currentColor[2], currentColor[3]);
 
-    //glDepthMask(GL_TRUE);
+    glDepthMask(GL_TRUE);
 
 }
 bool CFace::DrawNormArrowGL()const{
