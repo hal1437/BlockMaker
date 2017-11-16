@@ -289,16 +289,16 @@ void CFace::DrawGL(Pos,Pos)const{
                       std::abs(norm.y()),
                       std::abs(norm.z()),
                       1.0);
-        }
-        //枠のみ描画
-        glBegin(GL_LINE_LOOP);
-        for(int i=0;i<this->edges.size();i++){
-            glVertex3f(this->GetPointSequence(i)->x(),
-                       this->GetPointSequence(i)->y(),
-                       this->GetPointSequence(i)->z());
-        }
-        glEnd();
 
+            //枠のみ描画
+            glBegin(GL_LINE_LOOP);
+            for(int i=0;i<this->edges.size();i++){
+                glVertex3f(this->GetPointSequence(i)->x(),
+                           this->GetPointSequence(i)->y(),
+                           this->GetPointSequence(i)->z());
+            }
+            glEnd();
+        }
     }
     //色を復元
     glColor4f(currentColor[0],currentColor[1],currentColor[2], currentColor[3]);

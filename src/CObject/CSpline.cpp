@@ -77,6 +77,8 @@ void CSpline::DrawGL(Pos camera,Pos center)const{
                    this->GetMiddleDivide(i).z());
     }
     glEnd();
+
+    //矢印の描画
     const double ARROW_DIVIDE_RATE = 0.9;
     const double ARROW_LENGTH_RATE = 0.1;
     for(int i=0;i<this->pos.size()+1;i++){
@@ -151,30 +153,46 @@ Pos CSpline::GetMiddleDivide(double t)const{
 }
 
 Pos CSpline::GetNearPos(const Pos& pos)const{
-    if(this->pos.size() >= 1){
+    //各区間の中での最近傍
+    QVector<double> pp;
+    std::function<bool(double,double)> comp_func = [&](double min,double max){
+        Pos min_p = this->GetMiddleDivide(min);
+        Pos max_p = this->GetMiddleDivide(max);
+        return (min_p - pos).Length() < (max_p - pos).Length();
+    };
+    for(int i = 0 ;i <= this->pos.size();i++){
         //二分探索
-        const double EPS = 0.00001;
-        double min = 0.0,max = this->pos.size()+1;
-        Pos min_p = Pos(xs.culc( 0 ), ys.culc( 0 ),zs.culc( 0 ));
-        Pos max_p = Pos(xs.culc(max), ys.culc(max),zs.culc(max));
-        while(max-min > EPS){
-            double half = (max+min)/2;
-            Pos half_p = Pos(xs.culc(half), ys.culc(half),zs.culc(half));
-            if((min_p - pos).Length() < (max_p - pos).Length()){
-                max   = half;
-                max_p = half_p;
-            }else{
-                min   = half;
-                min_p = half_p;
-            }
-            qDebug() << min << max;
-        }
-        double d = (max + min)/2;
-        return Pos(xs.culc(d), ys.culc(d),zs.culc(d));
-    }else{
-        //いつもの直線のアレ
-        return Pos::LineNearPoint(*this->start,*this->end,pos);
+        double d = BinarySearch(    i/static_cast<double>(this->pos.size()+1),
+                                (i+1)/static_cast<double>(this->pos.size()+1),
+                                 comp_func);
+        pp.push_back(d);
     }
+    double most = *std::min_element(pp.begin(),pp.end(),comp_func);
+    return this->GetMiddleDivide(most);
+}
+Pos CSpline::GetNearLine(const Pos& pos1,const Pos& pos2)const{
+    Pos dir = (pos1 - pos2).GetNormalize();
+    Pos pos = -dir * pos1.DotPos(dir) + pos1;
+    //投影比較関数
+    std::function<bool(double,double)> comp_func = [&](double min,double max){
+        Pos p1 = this->GetMiddleDivide(min);
+        Pos p2 = this->GetMiddleDivide(max);
+        p1 = -dir * p1.DotPos(dir) + p1;
+        p2 = -dir * p2.DotPos(dir) + p2;
+        return ((p1 - pos).Length() < (p2 - pos).Length());
+    };
+
+    QVector<double> pp;
+    for(int i = 0 ;i <= this->pos.size();i++){
+        //二分探索
+        double d = BinarySearch(    i/static_cast<double>(this->pos.size()+1),
+                                (i+1)/static_cast<double>(this->pos.size()+1),
+                                 comp_func);
+        pp.push_back(d);
+    }
+    double most = *std::min_element(pp.begin(),pp.end(),comp_func);
+    qDebug() << most;
+    return this->GetMiddleDivide(most);
 }
 
 void CSpline::RefreshNodes(){

@@ -20,8 +20,8 @@ class CSpline : public CEdge
 {
     Q_OBJECT
 private:
-    const static int DIVISION = 10;//分解数
-    const static int LINE_NEAR_DIVIDE = 10; //近似直線判定関数の分割数
+    const static int DIVISION = 100;//分解数
+    const static int LINE_NEAR_DIVIDE = 50; //近似直線判定関数の分割数
 protected:
     std::vector<CPoint*> pos;
     Spline xs;
@@ -43,7 +43,7 @@ public:
 
     //近接点
     virtual Pos GetNearPos (const Pos& hand)const;
-    //virtual Pos GetNearLine(const Pos& pos1,const Pos& pos2)const;
+    virtual Pos GetNearLine(const Pos& pos1,const Pos& pos2)const;
 
     //複製
     CEdge* Clone()const;

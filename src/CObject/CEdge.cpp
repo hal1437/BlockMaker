@@ -27,16 +27,29 @@ double CEdge::GetDivisionRate(int divide,double grading,int count){
 bool CEdge::isOnEdge(const Pos& hand)const{
     return (this->GetNearPos(hand) - hand).Length() < CObject::SAME_POINT_EPS;
 }
+
+Pos CEdge::GetNearPos(const Pos& pos)const{
+    //二分探索
+    double d = BinarySearch(0.0,1.0,[&](double min,double max){
+        return ((this->GetMiddleDivide(min) - pos).Length() <
+                (this->GetMiddleDivide(max) - pos).Length());
+    });
+    return this->GetMiddleDivide(d);
+}
 Pos CEdge::GetNearLine(const Pos& pos1,const Pos& pos2)const{
-    //GetNearPosによる近似
-    Pos ans = *this->start;
-    for(double i=0;i<1;i += 1.0/LINE_NEAR_DIVIDE){
-        //より線に近い方を保存
-        ans = std::max(this->GetMiddleDivide(i),ans,[&](Pos p1,Pos p2){
-            return Pos::LineNearPoint(pos1,pos2,p1) < Pos::LineNearPoint(pos1,pos2,p2);
-        });
-    }
-    return ans;
+    //投影して二分探索
+    Pos dir = (pos1 - pos2).GetNormalize();
+    Pos pos = -dir * pos1.DotPos(dir) + pos1;
+    double p = BinarySearch(0,1,[&](double min,double max){
+        Pos p1 = this->GetMiddleDivide(min);
+        Pos p2 = this->GetMiddleDivide(max);
+        p1 = -dir * p1.DotPos(dir) + p1;
+        p2 = -dir * p2.DotPos(dir) + p2;
+        return ((p1 - pos).Length() < (p2 - pos).Length());
+    });
+
+    qDebug() << p;
+    return this->GetMiddleDivide(p);
 }
 void CEdge::DrawArrow(double start,double end)const{
     //差分値
@@ -115,28 +128,9 @@ Pos    CEdge::GetDifferentialVec   (Pos pos)const{
 
 double CEdge::GetMiddleParamFromPos(Pos pos)const{
     //二分探索
-    const double EPS = 0.00001;     //許容誤差
-    const int COUNT_LIMIT = 1000;   //反復回数制限
-    int count = 0;                  //反復回数
-    double min = 0.0 , max = 1.0;   //二分探索変数
-
-    //反復計算
-    while(max - min > EPS && count < COUNT_LIMIT){
-        //反復計算
-        double half = (max - min)/2;//半分
-        if((this->GetMiddleDivide(min) - pos).Length() < (this->GetMiddleDivide(max) - pos).Length()){
-            //minの方が近い
-            max -= half;
-        }else{
-            //maxの方が近い
-            min += half;
-        }
-        count++;
-    }
-    if(count >= COUNT_LIMIT){
-        qDebug() << "warning! CadModelSearch::GetMiddleDivideFromPos is divergenced!";
-    }
-    return (max+min)/2;
+    return BinarySearch(0.0,1.0,[&](double min,double max){
+        return (this->GetMiddleDivide(min) - pos).Length() < (this->GetMiddleDivide(max) - pos).Length();
+    });
 }
 
 CEdge::CEdge(QObject* parent):

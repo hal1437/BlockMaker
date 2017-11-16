@@ -125,22 +125,23 @@ CObject* SolidEditController::getHangedObject(Pos center, Pos dir,double zoom_ra
     if(ans.size() == 0){
         //エッジの選択
         for(CEdge* e : this->model->GetEdges()){
+            //例外として選択不可
             if(hang_point == e->start || hang_point == e->end || !e->isVisible())continue;
             //近似点選択
-            const double DIVIDE = 100;
-            for(int i=0;i<=DIVIDE;i++){
-                Pos p = e->GetMiddleDivide(i/DIVIDE);
-                double length = (Pos::LineNearPoint(center,center+dir, p) - p).Length() / zoom_rate;
-                if(length  < CPoint::COLLISION_SIZE){
-                    //スケッチ中なら、平面上に存在する条件を追加
-                    if(this->isSketcheing()){
-                        if(Collision::ChackPointOnFace(projection_norm,projection_center,*e->start) &&
-                           Collision::ChackPointOnFace(projection_norm,projection_center,*e->end)){
-                            ans.push_back(qMakePair(e,length));
-                        }
-                    }else{
+            Pos near = e->GetNearLine(center,center+dir);
+            CPoint* pp = new CPoint(near);
+            pp->DrawGL(center+dir,center);
+
+            double length = (Pos::LineNearPoint(center,center+dir, near) - near).Length() / zoom_rate;
+            if(length  < CPoint::COLLISION_SIZE){
+                //スケッチ中なら、平面上に存在する条件を追加
+                if(this->isSketcheing()){
+                    if(Collision::ChackPointOnFace(projection_norm,projection_center,*e->start) &&
+                       Collision::ChackPointOnFace(projection_norm,projection_center,*e->end)){
                         ans.push_back(qMakePair(e,length));
                     }
+                }else{
+                    ans.push_back(qMakePair(e,length));
                 }
             }
         }

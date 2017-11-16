@@ -311,6 +311,7 @@ void SolidEditForm::paintGL(){
     const int ALL_OBJECT_WIDTH = 3;
     glLineWidth(ALL_OBJECT_WIDTH*2/3);
 
+    glColor3f(0,0,1);
     glDepthFunc(GL_LEQUAL);
     //オブジェクト描画：STL
     for(CStl*   stl   : this->model->GetStls  ())paintObject(stl  ,{0.5,0.5,0.5,1},ALL_OBJECT_WIDTH);//STL
@@ -322,15 +323,15 @@ void SolidEditForm::paintGL(){
     if(hanged->is<CPoint>())                     paintObject(hanged,{1,1,1,1},ALL_OBJECT_WIDTH);//選択物体(線)
     //オブジェクト描画：平面
     for(CFace*  face  : this->model->GetFaces ())face->DrawMeshGL();//非透過の面
+    for(CFace*  face  : CFace::base             )paintObject(face  ,{0,0,0,0},ALL_OBJECT_WIDTH);//三平面
     for(CFace*  face  : this->model->GetFaces ())if(!face->isFaceBlend())paintObject(face  ,{0,0,1,1},ALL_OBJECT_WIDTH);//非透過の面
     for(CFace*  face  : this->model->GetFaces ())if( face->isFaceBlend())paintObject(face  ,{0,0,1,1},ALL_OBJECT_WIDTH);//透過の面
-    for(CFace*  face  : CFace::base             )paintObject(face  ,{0,0,0,0},ALL_OBJECT_WIDTH);//三平面
     if(hanged->is<CFace>())                      paintObject(hanged,{1,1,1,1},ALL_OBJECT_WIDTH);//選択物体(平面)
-
+/*
     //オブジェクト描画：選択
     glDepthFunc(GL_ALWAYS); //奥行き方向補正を無視
     for(CObject* p: this->model->GetSelected())paintObject(p,{0,1,1,1},ALL_OBJECT_WIDTH);
-
+*/
     //座標線の描画
     glLineWidth(5);
     glDepthFunc(GL_ALWAYS);//奥行き方向補正を無視
@@ -363,13 +364,21 @@ void SolidEditForm::paintObject(CObject* obj,QVector<float> color,int tick){
     int old_width;
     float old_color[4];
 
+    //選択オブジェクトであれば
+    if(exist(this->model->GetSelected(),obj)){
+        color[0] = 0;
+        color[1] = 1;
+        color[2] = 1;
+        color[3] = 1;
+    }
+
     //色と線の太さを保存
-    glGetFloatv  (GL_CURRENT_COLOR,old_color);
     glGetIntegerv(GL_LINE_WIDTH   ,&old_width);
+    glGetFloatv  (GL_CURRENT_COLOR,old_color);
 
     //色と線の太さを設定
     glLineWidth(tick);
-    glColor4f(color[0],color[1],color[2],color[3]);//白に変更
+    glColor4f(color[0],color[1],color[2],color[3]);//引数の色に設定
 
     //描画
     obj->DrawGL(this->camera,this->center); // 選択面の描画
@@ -378,8 +387,6 @@ void SolidEditForm::paintObject(CObject* obj,QVector<float> color,int tick){
     glLineWidth(old_width);
     glColor4f(old_color[0],old_color[1],old_color[2], old_color[3]);
 }
-
-
 
 void SolidEditForm::SetState(MAKE_OBJECT state){
     this->state = state;

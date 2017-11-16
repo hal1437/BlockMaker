@@ -107,6 +107,16 @@ void ConcurrentRestraint::Calc(){
 }
 
 bool VerticalRestraint::Restraintable(const QVector<CObject *> nodes){
+    if(nodes.size() < 2)return false;
+    if(std::any_of(nodes.begin(),nodes.end(),[](CObject* obj){return !obj->is<CEdge>();}))return false;
+
+    CEdge* base_edge = dynamic_cast<CEdge*>(nodes[0]);
+    if(std::any_of(nodes.begin()+1,nodes.end(),[&](CObject* obj){
+        CEdge* edge = dynamic_cast<CEdge*>(obj);
+        return (!base_edge->isOnEdge(*edge->start)) &&
+               (!base_edge->isOnEdge(*edge->end  ));
+    }))return false;
+
     return true;
 }
 bool VerticalRestraint::isComplete(){
@@ -114,8 +124,8 @@ bool VerticalRestraint::isComplete(){
     //すべてのEdgeの端点が初めのEdgeと一致している
     if(std::any_of(this->nodes.begin()+1,this->nodes.end(),[&](CObject* obj){
         CEdge* edge = dynamic_cast<CEdge*>(obj);
-        return (base_edge->isOnEdge(*edge->start))  &&
-               (base_edge->isOnEdge(*edge->end  ));
+        return (!base_edge->isOnEdge(*edge->start))  &&
+               (!base_edge->isOnEdge(*edge->end  ));
     }))return false;
 
     //すべてのEdgeの端点が水平方向に成分を持たない
