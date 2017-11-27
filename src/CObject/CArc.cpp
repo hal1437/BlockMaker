@@ -113,6 +113,7 @@ Pos CArc::GetNearPos (const Pos& hand)const{
     return Pos::CircleNearPoint(*this->center,round,hand);
 }
 
+
 CEdge* CArc::Clone()const{
     CArc* ptr   = new CArc(this->parent());
     ptr->start  = new CPoint(*this->start ,ptr);

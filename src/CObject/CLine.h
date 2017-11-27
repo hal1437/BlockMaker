@@ -21,7 +21,7 @@ public:
 
     //近接点
     virtual Pos GetNearPos (const Pos& hand)const;
-    //virtual Pos GetNearLine(const Pos& pos1,const Pos& pos2)const;
+    virtual Pos GetNearLine(const Pos& pos1,const Pos& pos2)const;
 
     //複製
     virtual CEdge* Clone()const;

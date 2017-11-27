@@ -60,6 +60,22 @@ Pos CLine::GetNearPos(const Pos& hand)const{
     //点と直線の最近点
     return Pos::LineNearPoint(*this->start,*this->end,hand);
 }
+Pos CLine::GetNearLine(const Pos& pos1,const Pos& pos2)const{
+    //pos1とpos2に投影
+    Pos dir = (pos2-pos1).GetNormalize();
+    Pos start_ = *this->start - dir * dir.DotPos(*this->start);
+    Pos end_   = *this->end   - dir * dir.DotPos(*this->end);
+
+    //点と直線の最近点
+    Pos start_end_dir = (*this->end - *this->start).GetNormalize();
+    Pos near = Pos::LineNearPoint(start_,end_,pos1);
+
+    //判定
+    if(( start_end_dir).DotPos(near - end_  ) > 0)return *this->end;//end方向はみ出し
+    if((-start_end_dir).DotPos(near - start_) > 0)return *this->start;//start方向はみ出し
+    return near;
+}
+
 
 CEdge* CLine::Clone()const{
     CLine* ptr = new CLine(this->parent());

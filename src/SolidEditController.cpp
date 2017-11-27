@@ -22,7 +22,6 @@ Quat SolidEditController::getConvertTopToSide()const{
 CFace* SolidEditController::getFrontFace_impl(Quat convert,Quat invert)const{
     //正面を軸として変換を通し各平面の大きさを取得する関数
     CFace* face = new CFace();
-    face->SetPolygon(false);
     face->SetVisibleDetail(false);
 
     double top=0,bottom=0,right=0,left=0;

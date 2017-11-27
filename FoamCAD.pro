@@ -44,7 +44,8 @@ SOURCES += src/main.cpp\
     src/CObject/CFileEdge.cpp \
     src/CadModelSearch.cpp \
     src/CObject/CStl.cpp \
-    src/Dialog/BoundaryDefinitionDialog.cpp
+    src/Dialog/BoundaryDefinitionDialog.cpp \
+    src/Algorithm.cpp
 
 HEADERS  += src/MainWindow.h \
     src/Point.h \
@@ -77,7 +78,8 @@ HEADERS  += src/MainWindow.h \
     src/CObject/CFileEdge.h \
     src/CadModelSearch.h \
     src/CObject/CStl.h \
-    src/Dialog/BoundaryDefinitionDialog.h
+    src/Dialog/BoundaryDefinitionDialog.h \
+    src/Algorithm.h
 
 FORMS    += src/MainWindow.ui \
     src/Dialog/SmartDimensionDialog.ui \

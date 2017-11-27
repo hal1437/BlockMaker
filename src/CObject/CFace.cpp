@@ -251,54 +251,49 @@ void CFace::DrawGL(Pos,Pos)const{
     float currentColor[4];
     glGetFloatv(GL_CURRENT_COLOR,currentColor);
 
-    if(this->isPolygon()){
+    //完全透過色であれば色を法線にあった色に変更
+    if(currentColor[3] == 0){
+        Pos norm = this->GetNorm();
+        glColor4f(std::abs(norm.x()),
+                  std::abs(norm.y()),
+                  std::abs(norm.z()),
+                  1.0);
+    }
+
+    if(!exist(CFace::base,this)){
         //薄い色に変更
         if(this->isFaceBlend()){
-            //通常の色
+            //Aを薄める
             glColor4f(currentColor[0],currentColor[1],currentColor[2], 0.1);
-
-            //glDepthMask(GL_FALSE);
         }else{
-            glDepthMask(GL_TRUE);
-            //ブロック構築用
+            //ブロック構築用面
             glColor4f(currentColor[0] * 0.2 + 0.5,
                       currentColor[1] * 0.2 + 0.5,
                       currentColor[2] * 0.2 + 0.6,
                       1.0);
         }
 
-        //四角形以外ならば
         if(this->edges.size() != 4){
-            //塗りつぶし描画
+            //多角形描画
             glBegin(GL_POLYGON);
             for(CPoint* pp :this->GetAllChildren()){
                 glVertex3f(pp->x(),pp->y(),pp->z());
             }
             glEnd();
         }else{
-            //面描画
+            //通常面描画
             DrawFillGL();
         }
     }else{
 
-        //色を法線にあった色に変更
-        Pos norm = this->GetNorm();
-        //完全透過色であれば
-        if(currentColor[3] == 0){
-            glColor4f(std::abs(norm.x()),
-                      std::abs(norm.y()),
-                      std::abs(norm.z()),
-                      1.0);
-
-            //枠のみ描画
-            glBegin(GL_LINE_LOOP);
-            for(int i=0;i<this->edges.size();i++){
-                glVertex3f(this->GetPointSequence(i)->x(),
-                           this->GetPointSequence(i)->y(),
-                           this->GetPointSequence(i)->z());
-            }
-            glEnd();
+        //枠のみ描画
+        glBegin(GL_LINE_LOOP);
+        for(int i=0;i<this->edges.size();i++){
+            glVertex3f(this->GetPointSequence(i)->x(),
+                       this->GetPointSequence(i)->y(),
+                       this->GetPointSequence(i)->z());
         }
+        glEnd();
     }
     //色を復元
     glColor4f(currentColor[0],currentColor[1],currentColor[2], currentColor[3]);
@@ -321,15 +316,15 @@ bool CFace::DrawNormArrowGL()const{
     return true;
 }
 void CFace::DrawFillGL()const{
-    //塗りつぶし描画
+    //メッシュ分割に依存した描画
     glBegin(GL_QUADS);
     for(double i=0;i<this->mesh_memory.size()-1;i++){//u方向ループ
         for(double j=0;j<this->mesh_memory.first().size()-1;j++){//v方向ループ
             Pos pp[4] = {
-                this->mesh_memory[i][j],
-                this->mesh_memory[i+1][j],
+                this->mesh_memory[ i ][ j ],
+                this->mesh_memory[i+1][ j ],
                 this->mesh_memory[i+1][j+1],
-                this->mesh_memory[i][j+1],
+                this->mesh_memory[ i ][j+1],
             };
             for(int k=0;k<4;k++){
                 glVertex3f(pp[k].x(),pp[k].y(),pp[k].z());

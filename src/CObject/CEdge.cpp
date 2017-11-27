@@ -29,26 +29,27 @@ bool CEdge::isOnEdge(const Pos& hand)const{
 }
 
 Pos CEdge::GetNearPos(const Pos& pos)const{
-    //二分探索
-    double d = BinarySearch(0.0,1.0,[&](double min,double max){
-        return ((this->GetMiddleDivide(min) - pos).Length() <
-                (this->GetMiddleDivide(max) - pos).Length());
-    });
-    return this->GetMiddleDivide(d);
-}
-Pos CEdge::GetNearLine(const Pos& pos1,const Pos& pos2)const{
-    //投影して二分探索
-    Pos dir = (pos1 - pos2).GetNormalize();
-    Pos pos = -dir * pos1.DotPos(dir) + pos1;
-    double p = BinarySearch(0,1,[&](double min,double max){
-        Pos p1 = this->GetMiddleDivide(min);
-        Pos p2 = this->GetMiddleDivide(max);
-        p1 = -dir * p1.DotPos(dir) + p1;
-        p2 = -dir * p2.DotPos(dir) + p2;
-        return ((p1 - pos).Length() < (p2 - pos).Length());
+    //距離関数を三分探索
+    double p = MinimumSearch(0.0,1.0,[&](double t){
+        return (this->GetMiddleDivide(t) - pos).Length();
     });
 
-    qDebug() << p;
+    //Lが最小になる値を求める
+    return this->GetMiddleDivide(p);
+}
+
+Pos CEdge::GetNearLine(const Pos& pos1,const Pos& pos2)const{
+    //pos1とpos2の直線で投影
+    Pos dir = (pos1 - pos2).GetNormalize();   //投影方向
+
+    //距離関数L(t)
+    double p = MinimumSearch(0.0,1.0,[&](double t){
+        Pos pos_t     = this->GetMiddleDivide(t);       //tの点
+        Pos pos_t_pro = pos_t - dir * dir.DotPos(pos_t); //tの点を投影
+        return (pos_t_pro - pos1).Length();
+    });
+
+    //Lが最小になる値を求める
     return this->GetMiddleDivide(p);
 }
 void CEdge::DrawArrow(double start,double end)const{
@@ -80,10 +81,11 @@ void CEdge::DrawArrow(double start,double end)const{
 
 void CEdge::DrawGL(Pos,Pos)const{
     if(!this->isVisible())return;
-/*
+    /*
     if(this->start != nullptr && this->end != nullptr && *this->start != *this->end){
         DrawArrow(0.90,0.89);
-    }*/
+    }
+    */
     //分割ライン表示
     if(this->isVisibleDetail() && this->getDivide() > 0){
         for(double i = 1;i<this->getDivide();i++){
