@@ -27,26 +27,79 @@ void PropertyDefinitionDialog::ConstructFace(){
         Boundary boundary = dynamic_cast<CFace*>(selected.first())->getBoundary();
         this->face_boundary_combo.setCurrentText(boundary.name + " <" + Boundary::BoundaryTypeToString(boundary.type) + ">");
     }
+    this->resize(250,100);
 }
 
 void PropertyDefinitionDialog::ConstructEdge(){
     //Edge用レイアウト構築
     this->constructed = CONSTRUCTED::EDGE;
-    this->edge_divide_label.show();
-    this->edge_divide_spin.show();
-    this->edge_grading_label.show();
-    this->edge_grading_spin.show();
+    this->edge_all_divide_label.show();
+    this->edge_all_divide_spin .show();
+    this->edge_add_grading_button.show();
+    this->edge_remove_grading_button.show();
+    this->edge_multi_grading_table.show();
+
+    //テーブル設定
+    this->edge_multi_grading_table.clear();
+    this->edge_multi_grading_table.setColumnCount(3);
+    this->edge_multi_grading_table.setHorizontalHeaderItem(0,new QTableWidgetItem("方向割合"));
+    this->edge_multi_grading_table.setHorizontalHeaderItem(1,new QTableWidgetItem("分割割合"));
+    this->edge_multi_grading_table.setHorizontalHeaderItem(2,new QTableWidgetItem("エッジ寄せ係数"));
+    this->edge_multi_grading_table.setColumnWidth(0,80);
+    this->edge_multi_grading_table.setColumnWidth(1,80);
+    this->edge_multi_grading_table.setColumnWidth(2,120);
+    this->edge_dir_spins.clear();
+    this->edge_divide_spins.clear();
+    this->edge_grading_spins.clear();
 
     //全て分割数が同じであれば
     QVector<CObject*> selected = this->model->GetSelected();
     if(SELECTED_SAME_VALUE(selected,CEdge*,Divide)){
-        this->edge_divide_spin.setValue(dynamic_cast<CEdge*>(selected.first())->getDivide());
+        this->edge_all_divide_spin.setValue(dynamic_cast<CEdge*>(selected.first())->getDivide());
     }
     //全てのメッシュ寄せ係数が同じであれば
     if(SELECTED_SAME_VALUE(selected,CEdge*,Grading)){
-        this->edge_grading_spin.setValue(dynamic_cast<CEdge*>(selected.first())->getGrading());
+        CEdge::Grading g = dynamic_cast<CEdge*>(selected.first())->getGrading();
+        //列数設定
+        this->edge_multi_grading_table.setRowCount(g.elements.size());
+        //セットアップ
+        for(int i=0;i<g.elements.size();i++){
+            //新規スピンボックス設定
+            this->edge_dir_spins    .push_back(new QDoubleSpinBox());
+            this->edge_divide_spins .push_back(new QDoubleSpinBox());
+            this->edge_grading_spins.push_back(new QDoubleSpinBox());
+
+            //値設定
+            this->SetupDoubleSpin(this->edge_dir_spins    .last(),
+                                  this->edge_divide_spins .last(),
+                                  this->edge_grading_spins.last());
+            this->edge_dir_spins    .last()->setValue(g.elements[i].dir);
+            this->edge_divide_spins .last()->setValue(g.elements[i].cell);
+            this->edge_grading_spins.last()->setValue(g.elements[i].grading);
+
+            //新規設定
+            this->edge_multi_grading_table.setCellWidget(i,0,this->edge_dir_spins.last());
+            this->edge_multi_grading_table.setCellWidget(i,1,this->edge_divide_spins.last());
+            this->edge_multi_grading_table.setCellWidget(i,2,this->edge_grading_spins.last());
+        }
     }
+    this->resize(350,250 + this->edge_multi_grading_table.rowCount()*this->edge_multi_grading_table.rowHeight(0));
 }
+void PropertyDefinitionDialog::SetupDoubleSpin(QDoubleSpinBox* dir,QDoubleSpinBox* divide,QDoubleSpinBox* grading)const{
+    dir->setDecimals(4);
+    dir->setMaximum(1.0);
+    dir->setMinimum(0.0);
+    dir->setSingleStep(0.01);
+    divide->setDecimals(4);
+    divide->setMaximum(1.0);
+    divide->setMinimum(0.0);
+    divide->setSingleStep(0.01);
+    grading->setDecimals(4);
+    grading->setMaximum(1.0);
+    grading->setMinimum(0.0);
+    grading->setSingleStep(0.01);
+}
+
 bool PropertyDefinitionDialog::CheckAvailable()const{
     QVector<CObject*> selected = this->model->GetSelected();
     if(selected.size() > 0 && std::all_of(selected.begin(),selected.end(),[](CObject* obj){return obj->is<CEdge>();}))return true;
@@ -72,39 +125,35 @@ PropertyDefinitionDialog::PropertyDefinitionDialog(QWidget *parent) :
     this->setWindowFlags(Qt::Dialog | Qt::WindowStaysOnTopHint);
 
     //初期値設定
-    this->name_label          .setText("オブジェクト名");
-    this->face_boundary_label .setText("境界タイプ");
-    this->face_boundary_button.setText("...");
-    this->edge_divide_label   .setText("分割数");
-    this->edge_grading_label  .setText("エッジ寄せ係数");
-    this->edge_divide_spin .setValue(0);
-    this->edge_divide_spin .setMaximum(9999);
-    this->edge_divide_spin .setMinimum(0);
-    this->edge_grading_spin.setValue(0);
-    this->edge_grading_spin.setMaximum(10000);
-    this->edge_grading_spin.setMinimum(0);
-    this->edge_grading_spin.setSingleStep(0.01);
-    this->edge_grading_spin.setDecimals(6);
+    this->name_label             .setText("オブジェクト名");
+    this->face_boundary_label    .setText("境界タイプ");
+    this->face_boundary_button   .setText("...");
+    this->edge_all_divide_label  .setText("分割数");
+    this->edge_add_grading_button.setText("+");
+    this->edge_remove_grading_button.setText("-");
 
     //コンボボックス指定
     for(Boundary boundary: BoundaryDefinitionDialog::boundary_list){
         this->face_boundary_combo.addItem(boundary.name + " <" + Boundary::BoundaryTypeToString(boundary.type) + ">");
     }
 
-    this->ui->Grid->addWidget(&this->name_label          ,0,0);
-    this->ui->Grid->addWidget(&this->name_edit           ,0,1);
-    this->ui->Grid->addWidget(&this->face_boundary_label ,1,0);
-    this->ui->Grid->addWidget(&this->face_boundary_combo ,1,1);
-    this->ui->Grid->addWidget(&this->face_boundary_button,1,2);
-    this->ui->Grid->addWidget(&this->edge_divide_label   ,2,0);
-    this->ui->Grid->addWidget(&this->edge_divide_spin    ,2,1);
-    this->ui->Grid->addWidget(&this->edge_grading_label  ,3,0);
-    this->ui->Grid->addWidget(&this->edge_grading_spin   ,3,1);
-    connect(&name_edit          ,SIGNAL(textChanged(QString))    ,this,SLOT(LineEditChanged(QString)));
-    connect(&edge_divide_spin   ,SIGNAL(valueChanged(int))       ,this,SLOT(SpinChanged(int)));
-    connect(&edge_grading_spin  ,SIGNAL(valueChanged(double))    ,this,SLOT(DoubleSpinChanged(double)));
-    connect(&face_boundary_combo,SIGNAL(currentIndexChanged(int)),this,SLOT(ComboChanged(int)));
+    this->ui->Grid->addWidget(&this->name_label                 ,0,0);
+    this->ui->Grid->addWidget(&this->name_edit                  ,0,1);
+    this->ui->Grid->addWidget(&this->face_boundary_label        ,1,0);
+    this->ui->Grid->addWidget(&this->face_boundary_combo        ,1,1);
+    this->ui->Grid->addWidget(&this->face_boundary_button       ,1,2);
+    this->ui->Grid->addWidget(&this->edge_all_divide_label      ,2,0);
+    this->ui->Grid->addWidget(&this->edge_all_divide_spin       ,2,1);
+    this->ui->Grid->addWidget(&this->edge_multi_grading_table   ,3,0,1,2);
+    this->ui->Grid->addWidget(&this->edge_add_grading_button    ,4,0);
+    this->ui->Grid->addWidget(&this->edge_remove_grading_button ,4,1);
 
+    connect(&edge_add_grading_button   ,SIGNAL(pressed())               ,this,SLOT(AddMultiGradingTable()));
+    connect(&edge_remove_grading_button,SIGNAL(pressed())               ,this,SLOT(RemoveMultiGradingTable()));
+    connect(&name_edit              ,SIGNAL(textChanged(QString))    ,this,SLOT(LineEditChanged(QString)));
+    //connect(&edge_divide_spin   ,SIGNAL(valueChanged(int))       ,this,SLOT(SpinChanged(int)));
+    //connect(&edge_grading_spin  ,SIGNAL(valueChanged(double))    ,this,SLOT(DoubleSpinChanged(double)));
+    connect(&face_boundary_combo    ,SIGNAL(currentIndexChanged(int)),this,SLOT(ComboChanged(int)));
 }
 PropertyDefinitionDialog::~PropertyDefinitionDialog()
 {
@@ -114,24 +163,28 @@ PropertyDefinitionDialog::~PropertyDefinitionDialog()
 void PropertyDefinitionDialog::UpdateLayout(){
     //レイアウト解除
     disconnect(&name_edit          ,SIGNAL(textChanged(QString))    ,this,SLOT(LineEditChanged(QString)));
-    disconnect(&edge_divide_spin   ,SIGNAL(valueChanged(int))       ,this,SLOT(SpinChanged(int)));
-    disconnect(&edge_grading_spin  ,SIGNAL(valueChanged(double))    ,this,SLOT(DoubleSpinChanged(double)));
+    //disconnect(&edge_divide_spin   ,SIGNAL(valueChanged(int))       ,this,SLOT(SpinChanged(int)));
+    //disconnect(&edge_grading_spin  ,SIGNAL(valueChanged(double))    ,this,SLOT(DoubleSpinChanged(double)));
     disconnect(&face_boundary_combo,SIGNAL(currentIndexChanged(int)),this,SLOT(ComboChanged(int)));
-    this->name_label          .hide();
-    this->name_edit           .hide();
-    this->face_boundary_label .hide();
-    this->face_boundary_combo .hide();
-    this->face_boundary_button.hide();
-    this->edge_divide_label   .hide();
-    this->edge_divide_spin    .hide();
-    this->edge_grading_label  .hide();
-    this->edge_grading_spin   .hide();
+    this->name_label           .hide();
+    this->name_edit            .hide();
+    this->face_boundary_label  .hide();
+    this->face_boundary_combo  .hide();
+    this->face_boundary_button .hide();
+    this->edge_all_divide_label.hide();
+    this->edge_all_divide_spin .hide();
+    this->edge_add_grading_button.hide();
+    this->edge_remove_grading_button.hide();
+    this->edge_multi_grading_table.hide();
 
     //表示タイプ選定
     QVector<CObject*> selected = this->model->GetSelected();
     if     (selected.size() > 0 && std::all_of(selected.begin(),selected.end(),[](CObject* obj){return obj->is<CEdge>();}))this->ConstructEdge();
     else if(selected.size() > 0 && std::all_of(selected.begin(),selected.end(),[](CObject* obj){return obj->is<CFace>();}))this->ConstructFace();
-    else this->constructed = CONSTRUCTED::EMPTY;
+    else{
+        this->resize(100,20);
+        this->constructed = CONSTRUCTED::EMPTY;
+    }
 
     if(selected.size() > 0){
         //全て名前が同じであれば
@@ -156,11 +209,10 @@ void PropertyDefinitionDialog::UpdateLayout(){
             this->name_edit .setEnabled(true);
         }
     }
-    this->resize(this->sizeHint());
     this->repaint();
     connect(&name_edit          ,SIGNAL(textChanged(QString))    ,this,SLOT(LineEditChanged(QString)));
-    connect(&edge_divide_spin   ,SIGNAL(valueChanged(int))       ,this,SLOT(SpinChanged(int)));
-    connect(&edge_grading_spin  ,SIGNAL(valueChanged(double))    ,this,SLOT(DoubleSpinChanged(double)));
+    //connect(&edge_divide_spin   ,SIGNAL(valueChanged(int))       ,this,SLOT(SpinChanged(int)));
+    //connect(&edge_grading_spin  ,SIGNAL(valueChanged(double))    ,this,SLOT(DoubleSpinChanged(double)));
     connect(&face_boundary_combo,SIGNAL(currentIndexChanged(int)),this,SLOT(ComboChanged(int)));
 
 }
@@ -236,9 +288,9 @@ void PropertyDefinitionDialog::Accept(){
         //線
         if(this->constructed == CONSTRUCTED::EDGE){
             //分割数
-            if(this->edge_divide_spin .value() != 0)dynamic_cast<CEdge*>(obj)->setDivide (this->edge_divide_spin.value());
+            //if(this->edge_divide_spin .value() != 0)dynamic_cast<CEdge*>(obj)->setDivide (this->edge_divide_spin.value());
             //メッシュ寄せ係数
-            if(this->edge_grading_spin.value() != 0)dynamic_cast<CEdge*>(obj)->setGrading(this->edge_grading_spin.value());
+            //if(this->edge_grading_spin.value() != 0)dynamic_cast<CEdge*>(obj)->setGrading(this->edge_grading_spin.value());
         }
     }
 
@@ -247,6 +299,47 @@ void PropertyDefinitionDialog::Accept(){
 
     emit RepaintRequest();
     this->ui->ApplyButton->setText("Apply");
+}
+void PropertyDefinitionDialog::AddMultiGradingTable(){
+    //1行追加
+    int rows = this->edge_multi_grading_table.rowCount();
+    this->edge_multi_grading_table.setRowCount(rows+1);
+
+    //新規スピンボックス設定
+    this->edge_dir_spins    .push_back(new QDoubleSpinBox());
+    this->edge_divide_spins .push_back(new QDoubleSpinBox());
+    this->edge_grading_spins.push_back(new QDoubleSpinBox());
+
+    //値設定
+    this->SetupDoubleSpin(this->edge_dir_spins    .last(),
+                          this->edge_divide_spins .last(),
+                          this->edge_grading_spins.last());
+    this->edge_dir_spins    .last()->setValue(0.0);
+    this->edge_divide_spins .last()->setValue(0.0);
+    this->edge_grading_spins.last()->setValue(1.0);
+
+    //新規設定
+    this->edge_multi_grading_table.setCellWidget(rows,0,this->edge_dir_spins.last());
+    this->edge_multi_grading_table.setCellWidget(rows,1,this->edge_divide_spins.last());
+    this->edge_multi_grading_table.setCellWidget(rows,2,this->edge_grading_spins.last());
+}
+void PropertyDefinitionDialog::RemoveMultiGradingTable(){
+    QList<QTableWidgetSelectionRange> range = this->edge_multi_grading_table.selectedRanges();
+    QVector<int> indexes;
+    for(QTableWidgetSelectionRange r:range){
+        for(int i = r.topRow();i <= r.bottomRow();i++){
+            if(!exist(indexes,i) && i != 0){
+                indexes.push_back(i);
+            }
+        }
+    }
+    //ソートする
+    unique(indexes);
+    std::sort(indexes.begin(),indexes.end(),std::greater<int>());
+    //削除
+    for(int i : indexes){
+        this->edge_multi_grading_table.removeRow(i);
+    }
 }
 
 void PropertyDefinitionDialog::Changed(){

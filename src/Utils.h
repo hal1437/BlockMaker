@@ -72,7 +72,7 @@ protected:                                    \
 public:                                       \
     TYPE get##CALL()const{return this->NAME;} \
     void set##CALL(TYPE v){                   \
-        if(this->NAME != v){                  \
+        if(!(this->NAME == v)){               \
             this->NAME = v;                   \
             emit Changed(this);               \
         }                                     \

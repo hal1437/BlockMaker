@@ -6,15 +6,19 @@ void FoamFile::TabOut(){
 }
 
 void FoamFile::StartDictionaryDifinition(QString title){
-    this->TabOut();
-    ofs << title << NEWLINE;
+    if(title != ""){
+        this->TabOut();
+        ofs << title << NEWLINE;
+    }
     this->TabOut();
     ofs << "{"   << NEWLINE;
     this->defs.push_back(DEFINITON::DICTIONARY);
 }
 void FoamFile::StartListDifinition(QString title){
-    this->TabOut();
-    ofs << title << NEWLINE;
+    if(title != ""){
+        this->TabOut();
+        ofs << title << NEWLINE;
+    }
     this->TabOut();
     ofs << "("   << NEWLINE;
     this->defs.push_back(DEFINITON::LIST);

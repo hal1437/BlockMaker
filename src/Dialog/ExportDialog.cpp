@@ -95,21 +95,28 @@ void ExportDialog::Export(QString filename)const{
         div_indices.push_back(block->GetEdgeSequence(3)->getDivide());
         div_indices.push_back(block->GetEdgeSequence(8)->getDivide());
         file.OutVectorInline(div_indices);
+        file.OutNewline();
 
         //分割パラメータ
-        QVector<double> grading_args;
 
-        file.OutStringInline("edgeGrading");
+        //全てedgeGradingで記述する。
+        file.StartListDifinition("edgeGrading");
         for(int i=0;i<12;i++){
-            qDebug() << i << block->isEdgeReverse(i);
-            if(block->isEdgeReverse(i)){
-                grading_args.push_back(1.0/block->GetEdgeSequence(i)->getGrading());
-            }else{
-                grading_args.push_back(block->GetEdgeSequence(i)->getGrading());
+            CEdge::Grading grading = block->GetEdgeSequence(i)->getGrading();
+
+            file.StartListDifinition("");
+            for(CEdge::Grading::GradingElement elm: grading.elements){
+                QVector<double> args;
+                args.push_back(elm.dir);
+                args.push_back(elm.cell);
+                args.push_back(block->isEdgeReverse(i) ? 1.0/elm.grading : elm.grading);
+                file.OutVector(args);
             }
+            file.EndScope();
         }
-        file.OutVectorInline(grading_args);
-        file.OutNewline();
+        file.EndScope();
+
+        //file.OutVectorInline(grading_args);
     }    
     file.EndScope();
 

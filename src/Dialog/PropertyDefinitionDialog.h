@@ -35,19 +35,25 @@ private:
     QLineEdit name_edit;
 
     //Face
-    QLabel    face_boundary_label;
-    QComboBox face_boundary_combo;
+    QLabel      face_boundary_label;
+    QComboBox   face_boundary_combo;
     QPushButton face_boundary_button;
 
     //Edge
-    QLabel    edge_divide_label;
-    QSpinBox  edge_divide_spin;
-    QLabel    edge_grading_label;
-    QDoubleSpinBox  edge_grading_spin;
+    QLabel             edge_all_divide_label;
+    QTableWidget       edge_multi_grading_table;  //MultiGradingテーブル
+    QPushButton        edge_add_grading_button;   //MultiGrading行追加ボタン
+    QPushButton        edge_remove_grading_button;   //MultiGrading行削除ボタン
+    QSpinBox           edge_all_divide_spin;      //総分割数
+    QVector<QDoubleSpinBox*> edge_dir_spins;      //長さ割合
+    QVector<QDoubleSpinBox*> edge_divide_spins;   //分割数割合
+    QVector<QDoubleSpinBox*> edge_grading_spins;  //分割寄せ割合
 
 private:
     void ConstructFace();//Face用レイアウト定義
     void ConstructEdge();//Edge用レイアウト定義
+
+    void SetupDoubleSpin(QDoubleSpinBox* dir,QDoubleSpinBox* divide,QDoubleSpinBox* grading)const;
 
 public:
 
@@ -61,6 +67,8 @@ public slots:
     void ShowBoundayDefinitionDialog();
     void UpdateLayout();
     void Accept();
+    void AddMultiGradingTable();
+    void RemoveMultiGradingTable();
 
     void Changed();
     void LineEditChanged(QString);

@@ -45,7 +45,7 @@ bool CadModelCore::ExportFoamFile(QString filename)const{
         //分割数
         out << "," << edge->getDivide();
         //エッジ寄せ係数
-        out << "," << edge->getGrading();
+        //out << "," << edge->getGrading();
         //詳細表示
         out << "," << edge->isVisibleDetail();
         //改行
@@ -201,7 +201,7 @@ bool CadModelCore::ImportFoamFile(QString filename){
             //分割数取得
             make->setDivide(sl[sl.size()-3].toInt());
             //分割数取得
-            make->setGrading(sl[sl.size()-2].toDouble());
+            //make->setGrading(sl[sl.size()-2].toDouble());
             //詳細表示取得
             make->SetVisibleDetail(sl[sl.size()-1]=="1");
             //モデルに追加

@@ -11,14 +11,29 @@ class CEdge :public CObject
 public:
     const static int COLLISION_SIZE   = 5; //当たり判定半径
 
+    //エッジ寄せ係数
+    struct Grading{
+        struct GradingElement{
+            double dir;     //方向割合
+            double cell;    //分割数割合
+            double grading; //寄せ係数
+            bool operator==(GradingElement rhs)const{return std::tie(this->dir,this->cell,this->grading) == std::tie(rhs.dir,rhs.cell,rhs.grading); }
+        };
+        QVector<GradingElement> elements;
+        Grading GetReverse()const;//反転したものを取得
+        bool operator==(Grading rhs)const{return this->elements == rhs.elements; }
+        GradingElement& operator[](int index){return this->elements[index]; }
+    };
+
+
 public:
     CPoint* start; //エッジの始点
     CPoint* end;   //エッジの終点
-    OBSERVE_MEMBER(double,Grading,grading)//エッジ寄せ
-    OBSERVE_MEMBER(int   ,Divide ,divide)//分割数
+    OBSERVE_MEMBER(Grading,Grading,grading)//エッジ寄せ係数
+    OBSERVE_MEMBER(int    ,Divide ,divide)//分割数
 public:
     //分割レート取得
-    static double GetDivisionRate(int divide, double grading, int count);
+    static double GetDivisionRate(int divide,Grading grading, int count);
 
 public:
     virtual CREATE_RESULT Create(CPoint* pos) = 0;   //作成関数

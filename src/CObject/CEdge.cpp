@@ -1,15 +1,41 @@
 #include "CEdge.h"
 
-double CEdge::GetDivisionRate(int divide,double grading,int count){
+
+CEdge::Grading CEdge::Grading::GetReverse()const{
+    CEdge::Grading ans = *this;
+    std::reverse(ans.elements.begin(),ans.elements.end());
+    for(GradingElement& elm:ans.elements){
+        elm.grading = 1.0/elm.grading; //反転
+    }
+    return ans;
+}
+
+
+double CEdge::GetDivisionRate(int divide,Grading grading,int count){
     if(divide == 1){
         if(count == 0)return 0;
         if(count == 1)return 1;
     }
+    if(divide == count)return 1;
+
+    //部分問題始点と終点を探す
+    double min = 0,max = 0,cc = count;
+    int i;
+    for(i = 0;;i++){
+        cc  -= (divide * grading[i].cell); // カウント減少
+        if(cc < 0){
+            max = min + grading[i].dir;
+            break;
+        }
+        min += grading[i].dir;   //方向割合増加
+    }
+
+    //min~maxを0~1と見て通常の分割寄せのアレをやる
     double A,B,sum=0,p,d;
 
-    //エッジからpとLを抽出
-    d = divide;
-    p = grading;
+    //設定からpとLを抽出
+    d = divide * grading[i].cell;
+    p = grading[i].grading;
 
     //指数関数パラメータ計算
     B = log(p) / (d-1);
@@ -21,7 +47,8 @@ double CEdge::GetDivisionRate(int divide,double grading,int count){
     for(int i = 1;i <= count;i++){
         sum_rate += A*exp(B*i);
     }
-    return sum_rate;
+
+    return sum_rate / (max-min) + min;
 }
 
 bool CEdge::isOnEdge(const Pos& hand)const{
@@ -138,7 +165,7 @@ CEdge::CEdge(QObject* parent):
     CObject(parent)
 {
     this->divide  = 1;
-    this->grading = 1.0;
+    this->grading.elements.push_back({1.0,1.0,1.0});
     this->start = this->end = nullptr;
     this->SetVisibleDetail(false);
 }

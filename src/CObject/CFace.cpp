@@ -392,10 +392,10 @@ void CFace::RecalcMesh(){
         v_pp.resize(v_max);
         for(double j=0;j<v_max;j++){//v方向ループ
             //倍率計算
-            double rate_0 = CEdge::GetDivisionRate(u_max-1,  this->GetGrading(0),i);
-            double rate_2 = CEdge::GetDivisionRate(u_max-1,1/this->GetGrading(2),i);
-            double rate_1 = CEdge::GetDivisionRate(v_max-1,  this->GetGrading(1),j);
-            double rate_3 = CEdge::GetDivisionRate(v_max-1,1/this->GetGrading(3),j);
+            double rate_0 = CEdge::GetDivisionRate(u_max-1,this->GetGrading(0),i);
+            double rate_2 = CEdge::GetDivisionRate(u_max-1,this->GetGrading(2).GetReverse(),i);
+            double rate_1 = CEdge::GetDivisionRate(v_max-1,this->GetGrading(1),j);
+            double rate_3 = CEdge::GetDivisionRate(v_max-1,this->GetGrading(3).GetReverse(),j);
 
             double rate_p1 = (rate_2-rate_0) * (  j  /(v_max-1)) + rate_0;
             double rate_p2 = (rate_1-rate_3) * (  i  /(u_max-1)) + rate_3;
@@ -431,10 +431,10 @@ Pos      CFace::GetEdgeMiddle(int index,double t)const{
     if(this->reorder[index] == -1)return this->GetEdge(index)->GetMiddleDivide(1.0 - t);
     else                          return this->GetEdge(index)->GetMiddleDivide(t);
 }
-double   CFace::GetGrading(int index)const{
+CEdge::Grading   CFace::GetGrading(int index)const{
     if(this->reorder.isEmpty())return (this->GetEdge(index)->getGrading());
-    if(this->reorder[index] == -1)return (1/this->GetEdge(index)->getGrading());
-    else                          return (  this->GetEdge(index)->getGrading());
+    if(this->reorder[index] == -1)return (this->GetEdge(index)->getGrading().GetReverse());
+    else                          return (this->GetEdge(index)->getGrading());
 }
 
 Pos CFace::GetNearPos (const Pos& pos)const{

@@ -42,6 +42,7 @@ void CArc::DrawGL(Pos camera,Pos center)const{
         }
         glEnd();
     }else{
+
         glBegin(GL_LINE_STRIP);
         //円弧の分割描画
         for(double i=0;i<=1;i += 1.0/CArc::LINE_NEAR_DIVIDE){

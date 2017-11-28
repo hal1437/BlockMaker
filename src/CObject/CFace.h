@@ -78,7 +78,7 @@ public:
     virtual void     SetChild(int index,CObject* obj);
     virtual int      GetChildCount()const;
     virtual Pos      GetEdgeMiddle(int index,double t)const; //reorderに依存する中間点取得
-    virtual double   GetGrading   (int index)const;          //reorderに依存するエッジ寄せ係数取得
+    virtual CEdge::Grading GetGrading(int index)const;       //reorderに依存するエッジ寄せ係数取得
 
     //近接点
     virtual Pos GetNearPos (const Pos& hand)const;
