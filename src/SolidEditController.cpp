@@ -105,34 +105,45 @@ bool SolidEditController::isSketcheing()const{
 CObject* SolidEditController::getHangedObject(Pos center, Pos dir,double zoom_rate)const{
     QVector<QPair<CObject*,double>>ans;
 
+    //カメラ座標と方向を2点に変換
+    Pos pos1 = center;
+    Pos pos2 = center+dir;
     //点の選択
     for(CPoint* p:this->model->GetPoints()){
-        if(p->isVisible()){
-            double length = (Pos::LineNearPoint(center,center+dir, *p) - *p).Length() / zoom_rate;
-            if(length < CPoint::COLLISION_SIZE && hang_point != p){
-                //スケッチ中なら、平面上に存在する条件を追加
-                if(this->isSketcheing()){
-                    if(Collision::ChackPointOnFace(projection_norm,projection_center,*p)){
-                        ans.push_back(qMakePair(p,length));
-                    }
-                }else{
+        //不可視ならパス
+        if(!p->isVisible())continue;
+       //最短距離
+        double length = (Pos::LineNearPoint(pos1,pos2, *p) - *p).Length() / zoom_rate;
+
+        //範囲内かつ、つかみ点でない
+        if(length < CPoint::COLLISION_SIZE && hang_point != p){
+            //スケッチ中なら、平面上に存在する条件を追加
+            if(this->isSketcheing()){
+                if(Collision::ChackPointOnFace(projection_norm,projection_center,*p)){
                     ans.push_back(qMakePair(p,length));
                 }
+            }else{
+                ans.push_back(qMakePair(p,length));
             }
         }
     }
+
+    //点が一つも選択されていなければ
     if(ans.size() == 0){
         //エッジの選択
         for(CEdge* e : this->model->GetEdges()){
             //例外として選択不可
             if(hang_point == e->start || hang_point == e->end || !e->isVisible())continue;
+
             //近似点選択
             Pos near = e->GetNearLine(center,center+dir);
-            CPoint* pp = new CPoint(near);
-            pp->DrawGL(center+dir,center);
+            //CPoint* pp = new CPoint(near);
+            //pp->DrawGL(center+dir,center);
 
-            double length = (Pos::LineNearPoint(center,center+dir, near) - near).Length() / zoom_rate;
-            if(length  < CPoint::COLLISION_SIZE){
+            //最短距離
+            double length = (Pos::LineNearPoint(pos1,pos2, near) - near).Length() / zoom_rate;
+
+            if(length  < CLine::COLLISION_SIZE){
                 //スケッチ中なら、平面上に存在する条件を追加
                 if(this->isSketcheing()){
                     if(Collision::ChackPointOnFace(projection_norm,projection_center,*e->start) &&
@@ -147,6 +158,7 @@ CObject* SolidEditController::getHangedObject(Pos center, Pos dir,double zoom_ra
     }
     if(ans.size() == 0)return nullptr;
     else{
+        //複数の候補が存在する場合は、もっとも近い点のものを選択する。
         return std::min_element(ans.begin(),ans.end(),[](QPair<CObject*,double> lhs,QPair<CObject*,double> rhs){
             return (lhs.second < rhs.second);
         })->first;

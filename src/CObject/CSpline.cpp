@@ -172,31 +172,24 @@ Pos CSpline::GetNearLine(const Pos& pos1,const Pos& pos2)const{
     //制御点ごとの区間を三分探索
     QVector<double> dd;
     Pos dir = (pos1 - pos2).GetNormalize();   //投影方向
-    //投影関数
-    auto Pro = [&](Pos pos){
-        return  pos - dir * dir.DotPos(pos); //tの点を投影
-    };
+
     //距離関数
     auto L = [&](double t){
-        return (Pro(this->GetMiddleDivide(t)) - pos1).Length();
+        return (this->GetMiddleDivide(t).Projection(dir) - pos1).Length();
     };
 
+    //区間ごとに距離関数の最小値を集める
     for(int i=0;i<=this->pos.size();i++){
         double p = MinimumSearch(   i /(this->pos.size()+1.0),
                                  (i+1)/(this->pos.size()+1.0),
                                  L);
         dd.push_back(p);
     }
-    qDebug()<< "=====" ;
-    for(double d : dd){
-        qDebug() << d << L(d);
-    }
 
     //Lが最小になる値を求める
     Pos p = this->GetMiddleDivide(*std::min_element(dd.begin(),dd.end(),[&](double lhs,double rhs){
         return L(lhs) < L(rhs);
     }));
-    qDebug() << p;
     return  p;
 }
 

@@ -283,6 +283,12 @@ public:
         return current(x(),y(),0);
     }
 
+    //自身を引数によって投影した点を取得
+    current Projection(current dir)const{
+        dir = dir.GetNormalize();
+        return (*this) - dir * (*this).DotPos(dir);
+    }
+
     current& Transform(QTransform rhs){
         QPointF p(x(),y());
         p = p * rhs;
