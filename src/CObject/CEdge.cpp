@@ -127,11 +127,10 @@ Pos    CEdge::GetDifferentialVec   (Pos pos)const{
         return (this->GetMiddleDivide(t + DIFF_DELTA) - this->GetMiddleDivide(t - DIFF_DELTA)).GetNormalize();
     }
 }
-
 double CEdge::GetMiddleParamFromPos(Pos pos)const{
-    //二分探索
-    return BinarySearch(0.0,1.0,[&](double min,double max){
-        return (this->GetMiddleDivide(min) - pos).Length() < (this->GetMiddleDivide(max) - pos).Length();
+    //もっともPosに近く点を三分探索で求める。
+    return MinimumSearch(0.0,1.0,[&](double t){
+        return (this->GetMiddleDivide(t) - pos).Length();
     });
 }
 

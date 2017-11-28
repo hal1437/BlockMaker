@@ -155,17 +155,21 @@ Pos CSpline::GetMiddleDivide(double t)const{
 Pos CSpline::GetNearPos(const Pos& pos)const{
     //制御点ごとの区間を三分探索
     QVector<double> dd;
+    auto L = [&](double t){
+        return (this->GetMiddleDivide(t) - pos).Length();
+    };
     for(int i=0;i<=this->pos.size();i++){
         double p = MinimumSearch(   i /(this->pos.size()+1.0),
                                  (i+1)/(this->pos.size()+1.0),
-                                 [&](double t){
-            return (this->GetMiddleDivide(t) - pos).Length();
-        });
+                                 L);
         dd.push_back(p);
     }
 
     //Lが最小になる値を求める
-    return this->GetMiddleDivide(*std::min_element(dd.begin(),dd.end()));
+    Pos p = this->GetMiddleDivide(*std::min_element(dd.begin(),dd.end(),[&](double lhs,double rhs){
+        return L(lhs) < L(rhs);
+    }));
+    return p;
 }
 
 Pos CSpline::GetNearLine(const Pos& pos1,const Pos& pos2)const{

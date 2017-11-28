@@ -29,6 +29,7 @@ CREATE_RESULT CArc::Create(CPoint *pos){
 void CArc::DrawGL(Pos camera,Pos center)const{
     if(!this->isVisible())return;
     if(this->end == nullptr){
+        //通常描画
         Pos cc = camera - center;
         double theta1 = std::atan2(cc.y(),std::sqrt(cc.x()*cc.x()+cc.z()*cc.z()));
         double theta2 = std::atan2(-cc.x(),cc.z());
