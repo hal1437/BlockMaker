@@ -20,14 +20,17 @@ double CEdge::GetDivisionRate(int divide,Grading grading,int count){
 
     //部分問題始点と終点を探す
     double min = 0,max = 0,cc = count;
+    int count_begin = 0;
     int i;
     for(i = 0;;i++){
-        cc  -= (divide * grading[i].cell); // カウント減少
+        cc  -= (divide *grading[i].cell ); // カウント減少
         if(cc < 0){
-            max = min + grading[i].dir;
+
+            max = min + (grading[i].dir);
             break;
         }
         min += grading[i].dir;   //方向割合増加
+        count_begin += divide * (grading[i].cell);
     }
 
     //min~maxを0~1と見て通常の分割寄せのアレをやる
@@ -44,11 +47,10 @@ double CEdge::GetDivisionRate(int divide,Grading grading,int count){
 
     //指定番号までの総和
     double sum_rate=0;
-    for(int i = 1;i <= count;i++){
+    for(int i = 1;i <= (count-count_begin);i++){
         sum_rate += A*exp(B*i);
     }
-
-    return sum_rate / (max-min) + min;
+    return sum_rate * (max-min) + min;
 }
 
 bool CEdge::isOnEdge(const Pos& hand)const{

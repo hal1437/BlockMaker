@@ -82,21 +82,39 @@ void PropertyDefinitionDialog::ConstructEdge(){
             this->edge_multi_grading_table.setCellWidget(i,1,this->edge_divide_spins.last());
             this->edge_multi_grading_table.setCellWidget(i,2,this->edge_grading_spins.last());
         }
+    }else{
+        //新規スピンボックス設定
+        this->edge_dir_spins    .push_back(new QDoubleSpinBox());
+        this->edge_divide_spins .push_back(new QDoubleSpinBox());
+        this->edge_grading_spins.push_back(new QDoubleSpinBox());
+
+        //値設定
+        this->SetupDoubleSpin(this->edge_dir_spins    .last(),
+                              this->edge_divide_spins .last(),
+                              this->edge_grading_spins.last());
+        this->edge_dir_spins    .last()->setValue(1.0);
+        this->edge_divide_spins .last()->setValue(1.0);
+        this->edge_grading_spins.last()->setValue(1.0);
+
+        //新規設定
+        this->edge_multi_grading_table.setCellWidget(0,0,this->edge_dir_spins.last());
+        this->edge_multi_grading_table.setCellWidget(0,1,this->edge_divide_spins.last());
+        this->edge_multi_grading_table.setCellWidget(0,2,this->edge_grading_spins.last());
     }
     this->resize(350,250 + this->edge_multi_grading_table.rowCount()*this->edge_multi_grading_table.rowHeight(0));
 }
 void PropertyDefinitionDialog::SetupDoubleSpin(QDoubleSpinBox* dir,QDoubleSpinBox* divide,QDoubleSpinBox* grading)const{
     dir->setDecimals(4);
-    dir->setMaximum(1.0);
-    dir->setMinimum(0.0);
+    dir->setMaximum(1.0e10);
+    dir->setMinimum(0.0e-10);
     dir->setSingleStep(0.01);
     divide->setDecimals(4);
-    divide->setMaximum(1.0);
-    divide->setMinimum(0.0);
+    divide->setMaximum(1.0e10);
+    divide->setMinimum(0.0e-10);
     divide->setSingleStep(0.01);
     grading->setDecimals(4);
-    grading->setMaximum(1.0);
-    grading->setMinimum(0.0);
+    grading->setMaximum(1.0e10);
+    grading->setMinimum(1.0e-10);
     grading->setSingleStep(0.01);
 }
 
@@ -131,6 +149,8 @@ PropertyDefinitionDialog::PropertyDefinitionDialog(QWidget *parent) :
     this->edge_all_divide_label  .setText("分割数");
     this->edge_add_grading_button.setText("+");
     this->edge_remove_grading_button.setText("-");
+    this->edge_all_divide_spin   .setMaximum(100000);
+    this->edge_all_divide_spin   .setMinimum(1);
 
     //コンボボックス指定
     for(Boundary boundary: BoundaryDefinitionDialog::boundary_list){
@@ -288,9 +308,22 @@ void PropertyDefinitionDialog::Accept(){
         //線
         if(this->constructed == CONSTRUCTED::EDGE){
             //分割数
-            //if(this->edge_divide_spin .value() != 0)dynamic_cast<CEdge*>(obj)->setDivide (this->edge_divide_spin.value());
+            if(this->edge_all_divide_spin .value() != 0)dynamic_cast<CEdge*>(obj)->setDivide (this->edge_all_divide_spin.value());
             //メッシュ寄せ係数
-            //if(this->edge_grading_spin.value() != 0)dynamic_cast<CEdge*>(obj)->setGrading(this->edge_grading_spin.value());
+            CEdge::Grading g;
+            double sum_dir =0,sum_cell =0;
+            for(int i =0;i<this->edge_divide_spins.size();i++){
+                sum_dir  += this->edge_dir_spins[i]   ->value();
+                sum_cell += this->edge_divide_spins[i]->value();
+            }
+            for(int i =0;i<this->edge_divide_spins.size();i++){
+                CEdge::Grading::GradingElement elm;
+                elm.dir     = this->edge_dir_spins[i]    ->value() / sum_dir;
+                elm.cell    = this->edge_divide_spins[i] ->value() / sum_cell;
+                elm.grading = this->edge_grading_spins[i]->value();
+                g.elements.push_back(elm);
+            }
+            dynamic_cast<CEdge*>(obj)->setGrading(g);
         }
     }
 
@@ -322,6 +355,8 @@ void PropertyDefinitionDialog::AddMultiGradingTable(){
     this->edge_multi_grading_table.setCellWidget(rows,0,this->edge_dir_spins.last());
     this->edge_multi_grading_table.setCellWidget(rows,1,this->edge_divide_spins.last());
     this->edge_multi_grading_table.setCellWidget(rows,2,this->edge_grading_spins.last());
+
+    this->resize(this->width(),this->height() + this->edge_multi_grading_table.rowHeight(0));
 }
 void PropertyDefinitionDialog::RemoveMultiGradingTable(){
     QList<QTableWidgetSelectionRange> range = this->edge_multi_grading_table.selectedRanges();
@@ -339,6 +374,7 @@ void PropertyDefinitionDialog::RemoveMultiGradingTable(){
     //削除
     for(int i : indexes){
         this->edge_multi_grading_table.removeRow(i);
+        this->resize(this->width(),this->height() - this->edge_multi_grading_table.rowHeight(0));
     }
 }
 
