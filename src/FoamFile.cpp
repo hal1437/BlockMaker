@@ -52,8 +52,11 @@ void FoamFile::EndScope(){
         return;
     }
     for(int i=0;i<this->defs.size() - 1;i++) ofs << TAB;
-    if(defs[defs.size()-1] == DEFINITON::DICTIONARY) ofs << "}"  << NEWLINE;
-    if(defs[defs.size()-1] == DEFINITON::LIST      ) ofs << ");"  << NEWLINE;
+    if(defs[defs.size()-1] == DEFINITON::DICTIONARY) ofs << "}";
+    if(defs[defs.size()-1] == DEFINITON::LIST      ) ofs << ")";
+    if(defs.size() == 1)ofs  << ";";
+
+    ofs << NEWLINE;
     defs.pop_back();
     if(defs.size()==0)ofs << NEWLINE;
 }

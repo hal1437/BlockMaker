@@ -105,11 +105,14 @@ void ExportDialog::Export(QString filename)const{
             CEdge::Grading grading = block->GetEdgeSequence(i)->getGrading();
 
             file.StartListDifinition("");
-            for(CEdge::Grading::GradingElement elm: grading.elements){
+            CEdge::Grading gr;
+            if(block->isEdgeReverse(i)) gr = grading.GetReverse();
+            else                        gr = grading;
+            for(CEdge::Grading::GradingElement elm: gr.elements){
                 QVector<double> args;
                 args.push_back(elm.dir);
                 args.push_back(elm.cell);
-                args.push_back(block->isEdgeReverse(i) ? 1.0/elm.grading : elm.grading);
+                args.push_back(elm.grading);
                 file.OutVector(args);
             }
             file.EndScope();

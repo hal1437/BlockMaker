@@ -374,6 +374,9 @@ void PropertyDefinitionDialog::RemoveMultiGradingTable(){
     //削除
     for(int i : indexes){
         this->edge_multi_grading_table.removeRow(i);
+        this->edge_dir_spins.removeAt(i);
+        this->edge_divide_spins.removeAt(i);
+        this->edge_grading_spins.removeAt(i);
         this->resize(this->width(),this->height() - this->edge_multi_grading_table.rowHeight(0));
     }
 }

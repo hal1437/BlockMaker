@@ -214,10 +214,6 @@ CPoint* CBlock::GetPointSequence(int index)const{
     return ans[6];
 }
 CEdge* CBlock::GetEdgeSequence(int index) const{
-    //始点と終点を取得
-    QVector<QVector<int>> edge_comb = {{0,1},{1,2},{3,2},{0,3},{4,5},{5,6},
-                                       {7,6},{4,7},{0,4},{1,5},{2,6},{3,7}};
-
     //始点と終点を持つ点を探す
     QVector<CEdge*> edges = this->GetAllEdges();
     CPoint* p1 = this->GetPointSequence(edge_comb[index][0]);
@@ -229,10 +225,6 @@ CEdge* CBlock::GetEdgeSequence(int index) const{
 }
 
 bool CBlock::isEdgeReverse(int index){
-    //始点と終点を取得
-    QVector<QVector<int>> edge_comb = {{0,1},{1,2},{3,2},{0,3},{4,5},{5,6},
-                                       {7,6},{4,7},{0,4},{1,5},{2,6},{3,7}};
-
     //始点と終点を持つ点を探す
     QVector<CEdge*> edges = this->GetAllEdges();
     CPoint* p1 = this->GetPointSequence(edge_comb[index][0]);
