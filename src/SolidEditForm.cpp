@@ -325,6 +325,9 @@ void SolidEditForm::paintGL(){
     for(CFace*  face  : this->model->GetFaces ())face->DrawMeshGL();//非透過の面
     for(CFace*  face  : this->model->GetFaces ())if(!face->isFaceBlend())paintObject(face  ,{0,0,1,1},ALL_OBJECT_WIDTH);//非透過の面
     for(CFace*  face  : this->model->GetFaces ())if( face->isFaceBlend())paintObject(face  ,{0,0,1,1},ALL_OBJECT_WIDTH);//透過の面
+    for(CFace*  base  : CFace::base             )paintObject(base  ,{std::abs(base->GetNorm().x()),
+                                                                     std::abs(base->GetNorm().y()),
+                                                                     std::abs(base->GetNorm().z()),1},ALL_OBJECT_WIDTH);//三平面
     if(hanged->is<CFace>())                      paintObject(hanged,{1,1,1,1},ALL_OBJECT_WIDTH);//選択物体(平面)
 
     //座標線の描画
@@ -354,15 +357,11 @@ void SolidEditForm::paintGL(){
 
     glFlush();
 }
-void SolidEditForm::paintObject(CObject* obj,QVector<float> color,int tick){
+void SolidEditForm::paintObject(CObject* obj,QVector<double> color,int tick){
     //色を保存
     int old_width;
     float old_color[4];
 
-    //三平面
-    if(exist(CFace::base,obj)){
-        color[3] = 0; // 透過(法線に基づく色に設定)
-    }
     //選択オブジェクトであれば
     if(exist(this->model->GetSelected(),obj)){
         color[0] = 0;

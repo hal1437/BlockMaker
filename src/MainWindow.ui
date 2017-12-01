@@ -81,6 +81,8 @@
     <bool>false</bool>
    </attribute>
    <addaction name="separator"/>
+   <addaction name="actionProjection"/>
+   <addaction name="separator"/>
    <addaction name="ToolPoint"/>
    <addaction name="ToolLine"/>
    <addaction name="ToolArc"/>
@@ -496,6 +498,14 @@
    </property>
    <property name="toolTip">
     <string>STL</string>
+   </property>
+  </action>
+  <action name="actionProjection">
+   <property name="text">
+    <string>Projection</string>
+   </property>
+   <property name="toolTip">
+    <string>Projection</string>
    </property>
   </action>
  </widget>

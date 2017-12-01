@@ -251,15 +251,6 @@ void CFace::DrawGL(Pos,Pos)const{
     float currentColor[4];
     glGetFloatv(GL_CURRENT_COLOR,currentColor);
 
-    //完全透過色であれば色を法線にあった色に変更
-    if(currentColor[3] == 0){
-        Pos norm = this->GetNorm();
-        glColor4f(std::abs(norm.x()),
-                  std::abs(norm.y()),
-                  std::abs(norm.z()),
-                  1.0);
-    }
-
     if(!exist(CFace::base,this)){
         //薄い色に変更
         if(this->isFaceBlend()){
@@ -285,7 +276,6 @@ void CFace::DrawGL(Pos,Pos)const{
             DrawFillGL();
         }
     }else{
-
         //枠のみ描画
         glBegin(GL_LINE_LOOP);
         for(int i=0;i<this->edges.size();i++){
