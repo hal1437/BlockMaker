@@ -77,7 +77,7 @@ bool CFace::isComprehension(Pos pos)const{
     if(this->edges.size()<3)return true;
     else {
         //法線ベクトルとの内積が0であれば平面上に存在する。
-        return this->GetNorm().DotPos(pos-*this->GetPointSequence(0)) < 1.0e-10;
+        return std::abs(this->GetNorm().DotPos(pos-*this->GetPointSequence(0))) < 1.0e-10;
     }
 }
 
@@ -92,7 +92,7 @@ Pos CFace::GetNorm()const{
 
     if(this->edges.size() < 2 || (vec1-vec2).Length()<SAME_POINT_EPS)return Pos();
     else{
-        return Pos(vec1.Cross(vec2)).GetNormalize();
+        return vec1.CrossPos(vec2).GetNormalize();
     }
 }
 Pos CFace::GetNorm(double u,double v)const{
@@ -103,7 +103,7 @@ Pos CFace::GetNorm(double u,double v)const{
 
     if(this->edges.size() < 2)return Pos();
     else{
-        return Pos(vec1.Cross(vec2)).GetNormalize();
+        return vec1.CrossPos(vec2).GetNormalize();
     }
 }
 

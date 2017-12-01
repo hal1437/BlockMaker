@@ -123,7 +123,7 @@ public:
         return ans;
     }
     //外積
-    current Cross(Matrix<T,W,H> rhs){// W*H * N*W
+    current Cross(Matrix<T,W,H> rhs)const{// W*H * N*W
         static_assert(H==1,"This Matrix height is not 1.");
         current ans;
         ans.mat[0] = this->mat[1] * rhs.mat[2] - this->mat[2] * rhs.mat[1];
@@ -272,6 +272,11 @@ public:
     }
     double DotPos2D(cr_current rhs)const{
         return x() * rhs.x() + y() * rhs.y();
+    }
+    current CrossPos(cr_current rhs)const{
+        current p = current(this->Cross(rhs));
+        p.mat[3] = 1;
+        return p;
     }
     current GetNormalize()const{
         return current(x()/Length(),y()/Length(),z()/Length());
