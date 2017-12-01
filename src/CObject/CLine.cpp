@@ -81,6 +81,8 @@ CEdge* CLine::Clone()const{
     CLine* ptr = new CLine(this->parent());
     ptr->SetStartPos(new CPoint(*this->start,ptr));
     ptr->SetEndPos  (new CPoint(*this->end  ,ptr));
+    ptr->ObserveChild(ptr->start);
+    ptr->ObserveChild(ptr->end);
     ptr->grading = this->grading;
     ptr->divide  = this->divide;
     return ptr;

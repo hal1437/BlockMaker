@@ -56,7 +56,7 @@ CREATE_RESULT CFileEdge::Create(CPoint *pos){
         this->pos.push_back(end);
         this->end = pos;
         this->end->SetLock(true);//終点もロック
-        RefreshNodes();
+        Refresh();
     }
     return CREATE_RESULT::ENDLESS;
 }
@@ -76,7 +76,7 @@ void CFileEdge::ChangeChildCallback(QVector<CObject *> children){
             child->SetLock(true);
         }
         this->start_base = *this->start;
-        RefreshNodes();
+        Refresh();
     }
 }
 

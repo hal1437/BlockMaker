@@ -48,8 +48,8 @@ public:
     //複製
     CEdge* Clone()const;
 
-
-    void RefreshNodes();
+    //更新
+    virtual void Refresh();
 
     CSpline(QObject* parent = nullptr);
     CSpline(CPoint* start,CPoint* end,QObject* parent = nullptr);

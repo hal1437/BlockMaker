@@ -323,7 +323,6 @@ void SolidEditForm::paintGL(){
     if(hanged->is<CPoint>())                     paintObject(hanged,{1,1,1,1},ALL_OBJECT_WIDTH);//選択物体(線)
     //オブジェクト描画：平面
     for(CFace*  face  : this->model->GetFaces ())face->DrawMeshGL();//非透過の面
-    for(CFace*  face  : CFace::base             )paintObject(face  ,{0,0,0,0},ALL_OBJECT_WIDTH);//三平面
     for(CFace*  face  : this->model->GetFaces ())if(!face->isFaceBlend())paintObject(face  ,{0,0,1,1},ALL_OBJECT_WIDTH);//非透過の面
     for(CFace*  face  : this->model->GetFaces ())if( face->isFaceBlend())paintObject(face  ,{0,0,1,1},ALL_OBJECT_WIDTH);//透過の面
     if(hanged->is<CFace>())                      paintObject(hanged,{1,1,1,1},ALL_OBJECT_WIDTH);//選択物体(平面)

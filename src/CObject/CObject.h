@@ -73,17 +73,18 @@ public:
     virtual int      GetChildCount()const = 0;
     virtual QVector<CPoint*> GetAllChildren()const;
 
-    //近接点
+    //最近傍点の取得
     virtual Pos GetNearPos (const Pos& hand)const=0;
     virtual Pos GetNearLine(const Pos& pos1,const Pos& pos2)const=0;
 
     //複製
     virtual  CObject* Clone()const = 0;
+    //更新
+    virtual  void Refresh();
 
     //子監視関連
     void ObservePause  ();//監視を一時停止
     void ObserveRestart();//監視を再開
-
 
     //コンストラクタ
     explicit CObject(QObject* parent=nullptr);

@@ -41,6 +41,9 @@ QVector<CPoint *> CObject::GetAllChildren()const{
     return ans;
 }
 
+void CObject::Refresh(){
+}
+
 
 void CObject::ObservePause  (){
     this->observe_pause = true;

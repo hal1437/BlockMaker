@@ -62,7 +62,7 @@ CREATE_RESULT CSpline::Create(CPoint *pos){
         //endを更新
         this->pos.push_back(end);
         this->end = pos;
-        RefreshNodes();
+        Refresh();
 
     }
     return CREATE_RESULT::ENDLESS;
@@ -197,7 +197,7 @@ Pos CSpline::GetNearLine(const Pos& pos1,const Pos& pos2)const{
     return  p;
 }
 
-void CSpline::RefreshNodes(){
+void CSpline::Refresh(){
     std::vector<double> x,y,z;
     if(this->start != nullptr){
         x.push_back(this->start->x());
@@ -233,11 +233,16 @@ CEdge* CSpline::Clone()const{
     CSpline* ptr = new CSpline(this->parent());
     ptr->start   = new CPoint(*this->start ,ptr);
     ptr->end     = new CPoint(*this->end   ,ptr);
-    for(int i=0;i<this->GetChildCount();i++){
-        ptr->pos.push_back(new CPoint(*dynamic_cast<CPoint*>(dynamic_cast<const CObject*>(this)->GetChild(i)),ptr));
+    ptr->ObserveChild(ptr->start);
+    ptr->ObserveChild(ptr->end);
+    for(int i=0;i<this->pos.size();i++){
+        CPoint* pp = new CPoint(*this->pos[i],ptr);
+        ptr->ObserveChild(pp);
+        ptr->pos.push_back(pp);
     }
     ptr->grading = this->grading;
     ptr->divide  = this->divide;
+    ptr->Refresh();
     return ptr;
 }
 
@@ -247,7 +252,7 @@ CSpline::~CSpline()
 }
 //点移動コールバックオーバーライド
 void CSpline::ChangeChildCallback(QVector<CObject *> ){
-    RefreshNodes();
+    Refresh();
 }
 
 
