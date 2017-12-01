@@ -274,6 +274,49 @@ QVector<CFace*> CadModelSearch::SearchFaceMakeBlock(QVector<CFace*> select)const
     else return QVector<CFace*>();
 }
 
+bool   CadModelSearch::Projectable(QVector<CObject*>objects){
+    //全て点
+    if(std::all_of(objects.begin(),objects.end(),[](CObject* obj){return obj->is<CPoint>();}) && objects.size() >= 3){
+        Pos center = *dynamic_cast<CPoint*>(objects[0]);
+        Pos p1     = *dynamic_cast<CPoint*>(objects[1]);
+        Pos p2     = *dynamic_cast<CPoint*>(objects[2]);
+        Pos f_norm = Pos(p1.Cross(p2)).GetNormalize();
+        if(objects.size() == 3)return true;
+
+        //かつ同一平面上
+        if(std::all_of(objects.begin(),objects.end(),[&](CObject* obj){
+            return Collision::ChackPointOnFace(f_norm,center,*dynamic_cast<CPoint*>(obj));
+        })){
+            return true;
+        }else{
+            return false;
+        }
+    }
+    //面
+    if(objects.size() == 1 && objects.first()->is<CFace>())return true;
+
+    return false;
+}
+CFace* CadModelSearch::CreateProjectionFace(QVector<CObject*> objects){
+    //全て点
+    if(std::all_of(objects.begin(),objects.end(),[](CObject* obj){return obj->is<CPoint>();}) && objects.size() >= 3){
+        CFace* answer = new CFace();
+        QVector<CEdge*> egdes;
+        for(int i =0;i<objects.size();i++){
+            egdes.push_back(new CLine(dynamic_cast<CPoint*>(objects[i]),dynamic_cast<CPoint*>(objects[(i+1)%objects.size()])));
+        }
+        answer->Create(egdes);
+        return answer;
+    }
+    //面
+    if(objects.size() == 1 && objects.first()->is<CFace>()){
+        CObject* face = dynamic_cast<CFace*>(objects.first())->Clone();
+        return dynamic_cast<CFace*>(face);
+    }
+
+    return nullptr;
+}
+
 CadModelSearch::CadModelSearch()
 {
 

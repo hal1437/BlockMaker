@@ -53,33 +53,25 @@ void SolidEditForm::keyPressEvent    (QKeyEvent *event){
     //スケッチ終了
     if(event->key() == Qt::Key_Escape){
         this->make_controller->Escape();
-        this->controller->hang_point = nullptr;
-        this->controller->projection_center = Pos();
-        this->controller->projection_norm = Pos();
+        this->controller->hang_point      = nullptr;
+        this->controller->projection_face = nullptr;
     }
 
     this->repaint();
 }
-void SolidEditForm::StartSketch(CFace* face){
+void SolidEditForm::StartProjection(CFace* face){
     if(this->controller->isSketcheing())return;
+    this->controller->projection_face = face;
     this->model->SelectedClear();//選択解除
-
-    //平均点を中心とする
-    this->controller->projection_center = Pos();
-    for(int i=0;i<face->GetChildCount();i++ ){
-        this->controller->projection_center += *face->GetPointSequence(i);
-    }
-    this->controller->projection_center /= face->GetChildCount();
-    this->controller->projection_norm = face->GetNorm().GetNormalize();
 
     //法線ベクトルを近い方に変更
     Pos cross = face->GetNorm().GetNormalize();
     if(cross.DotPos(this->camera - this->center) <  0){
         cross = -cross;
     }
+    //カメラ変換
     double theta1_ = std::atan2(cross.y(),std::sqrt(cross.x()*cross.x()+cross.z()*cross.z()));
     double theta2_ = std::atan2(-cross.x(),cross.z());
-
     this->SetCameraRotate(theta1_,theta2_);
 }
 void SolidEditForm::SetCameraRotate(double theta1,double theta2){
@@ -159,8 +151,8 @@ void SolidEditForm::mouseMoveEvent   (QMouseEvent *event){
         //スケッチ中であれば平面上に点を配置
         Pos Line_base1 = this->screen_pos.Dot(this->controller->getCameraMatrix());
         Pos Line_base2 = Pos(0,0,1)      .Dot(this->controller->getCameraMatrix());
-        this->mouse_pos  =  Collision::GetHitPosFaceToLine(this->controller->projection_norm,
-                                                           this->controller->projection_center,
+        this->mouse_pos  =  Collision::GetHitPosFaceToLine(this->controller->projection_face->GetNorm(),
+                                                           *this->controller->projection_face->GetAllChildren()[0],
                                                            Line_base1,Line_base2) + this->center;
     }else{
         //カメラ角度から算出
@@ -203,7 +195,7 @@ void SolidEditForm::mouseDoubleClickEvent(QMouseEvent *event){
         CFace* f = this->GetHangedFace();
         if(f != nullptr){
             //スケッチ開始
-            this->StartSketch(f);
+            this->StartProjection(f);
         }else{
             this->mousePressEvent(event);
             this->mouseReleaseEvent(event);
@@ -329,9 +321,10 @@ void SolidEditForm::paintGL(){
                                                                      std::abs(base->GetNorm().y()),
                                                                      std::abs(base->GetNorm().z()),1},ALL_OBJECT_WIDTH);//三平面
     if(hanged->is<CFace>())                      paintObject(hanged,{1,1,1,1},ALL_OBJECT_WIDTH);//選択物体(平面)
+    if(this->controller->isSketcheing())         paintObject(this->controller->projection_face,{1,1,0,1},ALL_OBJECT_WIDTH);//選択物体(平面)
 
     //座標線の描画
-    glLineWidth(5);
+    glLineWidth(3);
     glDepthFunc(GL_ALWAYS);//奥行き方向補正を無視
     Pos cc = ((Pos(100,100,1)-Pos(this->width(),this->height(),0))*round).Dot(quat) + this->center;
     for(int i=0;i<3;i++){
@@ -349,9 +342,9 @@ void SolidEditForm::paintGL(){
         glBegin(GL_LINES);
         glColor3f(1,1,0);
         glVertex3f(cc.x(),cc.y(),cc.z());
-        glVertex3f(cc.x() + 50 * this->controller->projection_norm.x() * round,
-                   cc.y() + 50 * this->controller->projection_norm.y() * round,
-                   cc.z() + 50 * this->controller->projection_norm.z() * round);
+        glVertex3f(cc.x() + 50 * this->controller->projection_face->GetNorm().x() * round,
+                   cc.y() + 50 * this->controller->projection_face->GetNorm().y() * round,
+                   cc.z() + 50 * this->controller->projection_face->GetNorm().z() * round);
         glEnd();
     }
 

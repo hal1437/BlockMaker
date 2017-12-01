@@ -64,9 +64,11 @@ void CFace::Create(QVector<CEdge*> edges){
     if(edges.size()==4){
         this->ReorderEdges();
         this->RecalcMesh();
-    }
-    for(CEdge* e :this->edges){
-        this->ObserveChild(e);
+
+        //子を監視
+        for(CEdge* e :this->edges){
+            this->ObserveChild(e);
+        }
     }
 }
 
@@ -251,7 +253,7 @@ void CFace::DrawGL(Pos,Pos)const{
     float currentColor[4];
     glGetFloatv(GL_CURRENT_COLOR,currentColor);
 
-    if(!exist(CFace::base,this)){
+    if(!this->isContours()){
         //薄い色に変更
         if(this->isFaceBlend()){
             //Aを薄める
@@ -370,6 +372,7 @@ void CFace::ReorderEdges(){
     }
 }
 void CFace::RecalcMesh(){
+    if(this->edges.size() != 4)return ;
     //メッシュ分割描画
     int u_max = std::min(this->GetEdge(0)->getDivide(),this->GetEdge(2)->getDivide())+1;//u方向分割
     int v_max = std::min(this->GetEdge(1)->getDivide(),this->GetEdge(3)->getDivide())+1;//v方向分割

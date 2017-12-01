@@ -66,7 +66,7 @@ public:
 
 public slots:
 
-    void StartSketch(CFace* face);
+    void StartProjection(CFace* face);
     void SetCameraRotate(double theta1,double theta2);
     void SetCameraCenter(Pos point);
     void SetZoomRate(double round);

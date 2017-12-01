@@ -98,7 +98,7 @@ Quat SolidEditController::getCameraMatrix()const{
 }
 
 bool SolidEditController::isSketcheing()const{
-    return (projection_norm != Pos());
+    return (this->projection_face != nullptr);
 }
 
 
@@ -119,7 +119,7 @@ CObject* SolidEditController::getHangedObject(Pos center, Pos dir,double zoom_ra
         if(length < CPoint::COLLISION_SIZE && hang_point != p){
             //スケッチ中なら、平面上に存在する条件を追加
             if(this->isSketcheing()){
-                if(Collision::ChackPointOnFace(projection_norm,projection_center,*p)){
+                if(this->projection_face->isComprehension(*p)){
                     ans.push_back(qMakePair(p,length));
                 }
             }else{
@@ -146,8 +146,8 @@ CObject* SolidEditController::getHangedObject(Pos center, Pos dir,double zoom_ra
             if(length  < CLine::COLLISION_SIZE){
                 //スケッチ中なら、平面上に存在する条件を追加
                 if(this->isSketcheing()){
-                    if(Collision::ChackPointOnFace(projection_norm,projection_center,*e->start) &&
-                       Collision::ChackPointOnFace(projection_norm,projection_center,*e->end)){
+                    if(this->projection_face->isComprehension(*e->start) &&
+                       this->projection_face->isComprehension(*e->end)){
                         ans.push_back(qMakePair(e,length));
                     }
                 }else{
@@ -219,6 +219,7 @@ void SolidEditController::Create3Face(){
         CFace::base[2] = this->getSideFace();
         for(int i =0;i<3;i++){
             this->model->AddFaces(CFace::base[i]);
+            CFace::base[i]->SetContours(true);
         }
     }else{
         //引き継ぎ

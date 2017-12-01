@@ -21,6 +21,12 @@ public:
     QVector<CEdge*> SearchEdgeMakeBlock(QVector<CEdge*> select)const;
     QVector<CFace*> SearchFaceMakeBlock(QVector<CFace*> select)const;
 
+    //投影チェック、投影面生成
+    static bool   Projectable(QVector<CObject*>objects);
+    static CFace* CreateProjectionFace(QVector<CObject*>objects);
+
+public:
+    //モデルを必要とするためインタンスが必要
     CadModelSearch();
 };
 

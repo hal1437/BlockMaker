@@ -30,6 +30,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->ToolFace         ,SIGNAL(triggered()) ,this,SLOT(MakeFace()));
     connect(ui->actionSave       ,SIGNAL(triggered()) ,this,SLOT(Save()));
     connect(ui->actionOpen       ,SIGNAL(triggered()) ,this,SLOT(Load()));
+    connect(ui->ToolProjection   ,SIGNAL(triggered()) ,this,SLOT(StartProjection()));
 
     //リスト変更系
     connect(ui->RestraintList ,SIGNAL(itemClicked(QListWidgetItem*)) ,this ,SLOT(MakeRestraint(QListWidgetItem*)));
@@ -52,6 +53,7 @@ MainWindow::MainWindow(QWidget *parent) :
     //ドック関係
     connect(this->ui->actionShowObjectList,SIGNAL(triggered()),this,SLOT(ShowObjectList()));
     connect(this->ui->actionExport        ,SIGNAL(triggered()),this,SLOT(Export()));
+
 
     ConnectSignals();
     ui->ToolBlocks->setEnabled(false);
@@ -105,12 +107,12 @@ void MainWindow::Delete(){
 }
 
 void MainWindow::ConnectSignals(){
-    connect(ui->ToolPoint   ,SIGNAL(toggled(bool)),this,SLOT(ToggledPoint(bool)));
-    connect(ui->ToolArc     ,SIGNAL(toggled(bool)),this,SLOT(ToggledArc(bool)));
-    connect(ui->ToolLine    ,SIGNAL(toggled(bool)),this,SLOT(ToggledLine(bool)));
-    connect(ui->ToolSpline  ,SIGNAL(toggled(bool)),this,SLOT(ToggledSpline(bool)));
-    connect(ui->ToolFileEdge,SIGNAL(triggered(bool)),this,SLOT(ToggledFileEdge(bool)));
-    connect(ui->ToolSTL     ,SIGNAL(triggered(bool)),this,SLOT(ToggledSTL(bool)));
+    connect(ui->ToolPoint     ,SIGNAL(toggled(bool))  ,this,SLOT(ToggledPoint(bool)));
+    connect(ui->ToolArc       ,SIGNAL(toggled(bool))  ,this,SLOT(ToggledArc(bool)));
+    connect(ui->ToolLine      ,SIGNAL(toggled(bool))  ,this,SLOT(ToggledLine(bool)));
+    connect(ui->ToolSpline    ,SIGNAL(toggled(bool))  ,this,SLOT(ToggledSpline(bool)));
+    connect(ui->ToolFileEdge  ,SIGNAL(triggered(bool)),this,SLOT(ToggledFileEdge(bool)));
+    connect(ui->ToolSTL       ,SIGNAL(triggered(bool)),this,SLOT(ToggledSTL(bool)));
 }
 
 void MainWindow::DisconnectSignals(){
@@ -138,14 +140,14 @@ void MainWindow::RefreshUI(){
         ui->RestraintList->item(ui->RestraintList->count()-1)->setIcon(QIcon(r->GetIconPath()));
     }
 
-    //ブロック生成可否判定
+    //ボタン有効化/無効化
     QVector<CEdge*> edges;
     QVector<CFace*> faces;
     for(CObject* obj:this->model->GetSelected())if(obj->is<CEdge>())edges.push_back(dynamic_cast<CEdge*>(obj));
     for(CObject* obj:this->model->GetSelected())if(obj->is<CFace>())faces.push_back(dynamic_cast<CFace*>(obj));
-    ui->ToolFace  ->setEnabled(search.SearchEdgeMakeFace(edges).size() > 0);
-    ui->ToolBlocks->setEnabled(search.SearchFaceMakeBlock(faces).size() > 0);
-    //ui->ToolDimension->setEnabled(this->model->GetSelected().size() >= 1);
+    ui->ToolFace      ->setEnabled(search.SearchEdgeMakeFace(edges) .size() > 0);   //面作成ボタン
+    ui->ToolBlocks    ->setEnabled(search.SearchFaceMakeBlock(faces).size() > 0);   //立体作成ボタン
+    ui->ToolProjection->setEnabled(search.Projectable(this->model->GetSelected())); //投影ボタン
 
     this->repaint();
 }
@@ -269,7 +271,7 @@ void MainWindow::MakeBlock(){
     }
     block->Create(faces);
     this->model->AddBlocks(block);
-    this->model->GetSelected().clear();//選択解除
+    this->model->SelectedClear();//選択解除
 }
 void MainWindow::MakeFace(){
     CFace* face = new CFace(this);
@@ -277,7 +279,14 @@ void MainWindow::MakeFace(){
     for(CObject* obj:this->model->GetSelected())if(obj->is<CEdge>())edges.push_back(dynamic_cast<CEdge*>(obj));
     face->Create(this->search.SearchEdgeMakeFace(edges));
     this->model->AddFaces(face);
-    this->model->GetSelected().clear();//選択解除
+    this->model->SelectedClear();//選択解除
+}
+void MainWindow::StartProjection(){
+    CFace* face = this->search.CreateProjectionFace(this->model->GetSelected());
+    face->SetContours(true);
+    this->ui->SolidEdit->StartProjection(face);
+    this->model->SelectedClear();//選択解除
+    this->repaint();
 }
 
 void MainWindow::RefreshStatusBar(Pos pos){

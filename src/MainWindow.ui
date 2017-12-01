@@ -81,7 +81,7 @@
     <bool>false</bool>
    </attribute>
    <addaction name="separator"/>
-   <addaction name="actionProjection"/>
+   <addaction name="ToolProjection"/>
    <addaction name="separator"/>
    <addaction name="ToolPoint"/>
    <addaction name="ToolLine"/>
@@ -500,7 +500,10 @@
     <string>STL</string>
    </property>
   </action>
-  <action name="actionProjection">
+  <action name="ToolProjection">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Projection</string>
    </property>

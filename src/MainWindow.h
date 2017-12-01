@@ -53,13 +53,13 @@ public slots:
     void ClearButton();       //全ボタンリセット
     void RefreshUI();         //UI更新
 
-    void ToggledPoint   (bool checked);
-    void ToggledLine    (bool checked);
-    void ToggledArc     (bool checked);
-    void ToggledSpline  (bool checked);
-    void ToggledFileEdge(bool checked);
-    void ToggledSTL     (bool checked);
-    void ToggleConflict(bool conflict);
+    void ToggledPoint   (bool checked);//点
+    void ToggledLine    (bool checked);//直線
+    void ToggledArc     (bool checked);//円弧
+    void ToggledSpline  (bool checked);//スプライン
+    void ToggledFileEdge(bool checked);//外部ファイル
+    void ToggledSTL     (bool checked);//STL
+    void ToggleConflict (bool conflict);//競合
 
     void ShowProperty();          //プロパティダイアログ表示
     void ShowMoveTransform();     //移動ダイアログ表示
@@ -68,6 +68,7 @@ public slots:
     void MakeRestraint(QListWidgetItem *);   //拘束作成
     void MakeBlock();       //ブロック作成
     void MakeFace();        //面作成
+    void StartProjection(); //投影開始
 
     void RefreshStatusBar(Pos pos);        //ステータスバー更新
 

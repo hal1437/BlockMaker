@@ -20,8 +20,7 @@ public:
     constexpr static int DEFAULT_FACE_LEGTH = 100;
 
     CPoint* hang_point = nullptr;//最終生成点
-    Pos projection_norm; //投影基底ベクトル
-    Pos projection_center; //投影
+    CFace* projection_face = nullptr; //投影面
 
     //正面を単位行列とした時の各面変換への行列
     Quat getConvertFrontToSide()const;
