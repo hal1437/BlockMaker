@@ -159,16 +159,18 @@ void SolidEditForm::mouseMoveEvent   (QMouseEvent *event){
         this->mouse_pos = this->screen_pos.Dot(this->controller->getCameraMatrix()) + this->center;
     }
 
+    Pos delta = this->screen_pos.Dot(this->controller->getCameraMatrix());
+
     //シグナル発生
     CObject* hang = this->GetHangedObject();
-    if(hang == nullptr){
-        emit MousePosChanged(this->mouse_pos);
-    }else if (!hang->is<CPoint>()){
-        emit MousePosChanged(hang->GetNearPos(this->mouse_pos));
-    }else{
-        emit MousePosChanged(*dynamic_cast<CPoint*>(hang));
-    }
+    if(hang != nullptr){
 
+        this->mouse_pos = hang->GetNearLine(this->camera + delta,this->center + delta);
+    }
+    emit MousePosChanged(this->mouse_pos);
+
+
+    //ドラッグであれば
     if(this->drag_base != Pos(0,0) ){
         if(ctrl_pressed){
             Pos delta(-(event->pos().x()-this->drag_base.x()) ,event->pos().y()-this->drag_base.y());
@@ -183,7 +185,7 @@ void SolidEditForm::mouseMoveEvent   (QMouseEvent *event){
         this->drag_base = Pos(event->pos().x(),event->pos().y());
     }
 
-    //最終保持座標を更新
+    //保持点の座標を更新
     if(this->controller->hang_point != nullptr){
         this->controller->hang_point->MoveAbsolute(this->mouse_pos);
     }
@@ -305,14 +307,14 @@ void SolidEditForm::paintGL(){
 
     glColor3f(0,0,1);
     glDepthFunc(GL_LEQUAL);
-    //オブジェクト描画：STL
-    for(CStl*   stl   : this->model->GetStls  ())paintObject(stl  ,{0.5,0.5,0.5,1},ALL_OBJECT_WIDTH);//STL
     //オブジェクト描画：線
     for(CEdge*  edge  : this->model->GetEdges ())paintObject(edge  ,{0,0,1,1},ALL_OBJECT_WIDTH);//通常の物体
     if(hanged->is<CEdge>())                      paintObject(hanged,{1,1,1,1},ALL_OBJECT_WIDTH);//選択物体(線)
     //オブジェクト描画：点
     for(CPoint* pos   : this->model->GetPoints())paintObject(pos   ,{0,0,1,1},ALL_OBJECT_WIDTH);//通常の物体
     if(hanged->is<CPoint>())                     paintObject(hanged,{1,1,1,1},ALL_OBJECT_WIDTH);//選択物体(線)
+    //オブジェクト描画：STL
+    for(CStl*   stl   : this->model->GetStls  ())paintObject(stl  ,{0.5,0.5,0.5,1},ALL_OBJECT_WIDTH);//STL
     //オブジェクト描画：平面
     for(CFace*  face  : this->model->GetFaces ())face->DrawMeshGL();//非透過の面
     for(CFace*  face  : this->model->GetFaces ())if(!face->isFaceBlend())paintObject(face  ,{0,0,1,1},ALL_OBJECT_WIDTH);//非透過の面
@@ -324,7 +326,7 @@ void SolidEditForm::paintGL(){
     if(hanged->is<CFace>())                      paintObject(hanged,{1,1,1,1},ALL_OBJECT_WIDTH);//選択物体(平面)
     if(this->controller->isSketcheing())         paintObject(this->controller->projection_face,{1,1,0,1},ALL_OBJECT_WIDTH);//選択物体(平面)
 
-    if(this->move_diag != nullptr){
+    if(this->move_diag != nullptr && this->move_diag->isVisible()){
         this->move_diag->DrawTranslated(camera,center);
     }
 

@@ -34,8 +34,8 @@ private:
     MAKE_OBJECT state = MAKE_OBJECT::Edit;    //生成種類
 
     Pos camera; //カメラ位置
-    Pos center; //カメラ注意点
-    double round = 1;  //半径
+    Pos center;   //カメラ注意点
+    double round = 1;  //表示半径
 
     bool shift_pressed = false; //shiftボタン
     bool ctrl_pressed  = false; //ctrlボタン

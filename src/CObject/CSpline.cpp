@@ -158,6 +158,7 @@ Pos CSpline::GetNearPos(const Pos& pos)const{
     auto L = [&](double t){
         return (this->GetMiddleDivide(t) - pos).Length();
     };
+    //区間ごとに
     for(int i=0;i<=this->pos.size();i++){
         double p = MinimumSearch(   i /(this->pos.size()+1.0),
                                  (i+1)/(this->pos.size()+1.0),
