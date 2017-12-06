@@ -14,7 +14,6 @@
 #include "Dialog/SmartDimension.h"
 #include "Restraint.h"
 
-
 //監視変数追加
 #define OBSERVER_BASE(TYPE,NAME)                    \
 private:                                            \
@@ -71,15 +70,14 @@ class CadModelCore:public QObject
 
 public:
     //オブジェクト定義
-    DEFINE_OBSERVER_COBJECT(CObject*  ,Selected  )
-    DEFINE_OBSERVER_COBJECT(CPoint*   ,Points    )
-    DEFINE_OBSERVER_COBJECT(CEdge*    ,Edges     )
-    DEFINE_OBSERVER_COBJECT(CFace*    ,Faces     )
-    DEFINE_OBSERVER_COBJECT(CBlock*   ,Blocks    )
-    DEFINE_OBSERVER_COBJECT(CStl*     ,Stls      )
+    DEFINE_OBSERVER_COBJECT(CObject*  ,Selected  )//選択
+    DEFINE_OBSERVER_COBJECT(CPoint*   ,Points    )//点
+    DEFINE_OBSERVER_COBJECT(CEdge*    ,Edges     )//線
+    DEFINE_OBSERVER_COBJECT(CFace*    ,Faces     )//面
+    DEFINE_OBSERVER_COBJECT(CBlock*   ,Blocks    )//立体
+    DEFINE_OBSERVER_COBJECT(CStl*     ,Stls      )//STL
 
     DEFINE_OBSERVER_RESTRAINT(Restraint*      ,Restraints)
-    //DEFINE_OBSERVER(SmartDimension* ,Dimensions)
 
 public:
     CPoint* origin; //原点
@@ -111,7 +109,7 @@ public:
 
 public slots:
 
-    //Emittor
+    //エミッター
     DEFINE_EMITTOR(UpdateSelected)
     DEFINE_EMITTOR(UpdatePoints)
     DEFINE_EMITTOR(UpdateEdges)
@@ -141,7 +139,8 @@ public:
     ~CadModelCore();
 
 signals:
-    void SelectObjectChanged();
+
+    //更新シグナル
     void UpdateSelected  ();
     void UpdatePoints    ();
     void UpdateEdges     ();
@@ -152,6 +151,7 @@ signals:
     void UpdateDimensions();
     void UpdateAnyObject ();
     void UpdateAnyAction ();
+    //変更シグナル
     void ChangedPoints   (QVector<CPoint*>);
     void ChangedEdges    (QVector<CEdge* >);
     void ChangedFaces    (QVector<CFace* >);

@@ -451,7 +451,6 @@ CadModelCore::CadModelCore(QWidget *parent):
     connect(this,SIGNAL(UpdateBlocks()),this,SLOT(UpdateAnyObjectEmittor()));
     connect(this,SIGNAL(UpdateStls  ()),this,SLOT(UpdateAnyObjectEmittor()));
     connect(this,SIGNAL(UpdateSelected     ()),this,SLOT(UpdateAnyActionEmittor()));
-    connect(this,SIGNAL(SelectObjectChanged()),this,SLOT(UpdateAnyActionEmittor()));
     connect(this,SIGNAL(UpdateAnyObject    ()),this,SLOT(UpdateAnyActionEmittor()));
     connect(this,SIGNAL(UpdateRestraints   ()),this,SLOT(UpdateAnyActionEmittor()));
     connect(this,SIGNAL(UpdateDimensions   ()),this,SLOT(UpdateAnyActionEmittor()));

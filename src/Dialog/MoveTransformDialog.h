@@ -15,11 +15,29 @@ class MoveTransformDialog : public QDialog,public CadModelCoreInterface
 
 private:
     Ui::MoveTransformDialog *ui;
-    QVector<CPoint*> GetSelectedPoint();
+
+    //移動タイプ
+    enum TRANSFORM_METHOD{
+        RELATIVE, //追従
+        ABSOLUTE  //絶対
+    };
+private:
+    QVector<CPoint*> ConvertChildPoint(QVector<CObject*> objects)const; //引数の点を取得する
+    TRANSFORM_METHOD GetTransformMethod()const;                        //移動タイプ取得
+
 public:
+    QVector<CObject*> translated;//予測オブジェクト
+
+    void SetModel(CadModelCore *m);
+
+    //変更後の予測位置を描画
+    void DrawTranslated(Pos camera,Pos center);
 
     void keyPressEvent(QKeyEvent *event);
     void keyReleaseEvent(QKeyEvent *event);
+
+    void AbsoluteMove(QVector<CObject*> objects, Pos pos);
+    void RelativeMove(QVector<CObject*> objects, Pos diff);
 
     explicit MoveTransformDialog(QWidget *parent = 0);
     ~MoveTransformDialog();
@@ -28,10 +46,14 @@ public slots:
     void PauseChanged();
     void RestartChanged();
 
-    void AbsoluteMove(Pos pos);
-    void RelativeMove(Pos diff);
+    //変更後の予測位置を表示
+    void RefreshTranslated();
+
+    void ValueChangedEmitter(double v);
+
     void Accept();
     void Duplicate();
+    void Closed();
 //    void UpdateObjects(); //オブジェクト更新
 
 signals:

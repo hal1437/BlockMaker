@@ -320,8 +320,14 @@ void SolidEditForm::paintGL(){
     for(CFace*  base  : CFace::base             )paintObject(base  ,{std::abs(base->GetNorm().x()),
                                                                      std::abs(base->GetNorm().y()),
                                                                      std::abs(base->GetNorm().z()),1},ALL_OBJECT_WIDTH);//三平面
+
     if(hanged->is<CFace>())                      paintObject(hanged,{1,1,1,1},ALL_OBJECT_WIDTH);//選択物体(平面)
     if(this->controller->isSketcheing())         paintObject(this->controller->projection_face,{1,1,0,1},ALL_OBJECT_WIDTH);//選択物体(平面)
+
+    if(this->move_diag != nullptr){
+        this->move_diag->DrawTranslated(camera,center);
+    }
+
 
     //座標線の描画
     glLineWidth(3);

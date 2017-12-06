@@ -72,7 +72,6 @@ void CFace::Create(QVector<CEdge*> edges){
     }
 }
 
-
 bool CFace::isComprehension(Pos pos)const{
     if(this->edges.size()<3)return true;
     else {

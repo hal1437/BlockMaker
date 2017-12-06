@@ -5,6 +5,7 @@
 #include <QMouseEvent>
 #include <QOpenGLWidget>
 #include <QGLWidget>
+#include "Dialog/MoveTransformDialog.h"
 #include "MakeObjectController.h"
 #include "SolidEditController.h"
 #include "TimeDivider.h"
@@ -40,11 +41,12 @@ private:
     bool ctrl_pressed  = false; //ctrlボタン
     Pos drag_base;   //ドラッグ起点
     Pos first_click; //クリック起点
+public:
+    //移動ダイアログセット時には移動予測点を描画する。
+    MoveTransformDialog* move_diag = nullptr;
 
 private:
-
     void MakeObject(); //オブジェクト生成
-
     CFace*   GetHangedFace  ();     //直下面を取得
     CObject* GetHangedObject();     //直下オブジェクトを取得
     void ColorSelect(CObject* obj); //オブジェクト色選択

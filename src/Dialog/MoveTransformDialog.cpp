@@ -9,18 +9,47 @@ MoveTransformDialog::MoveTransformDialog(QWidget *parent) :
     connect(this->ui->ApplyButton    ,SIGNAL(clicked()),this,SLOT(Accept()));
     connect(this->ui->DuplicateButton,SIGNAL(clicked()),this,SLOT(Duplicate()));
     connect(this->ui->CloseButton    ,SIGNAL(clicked()),this,SLOT(close()));
+    connect(this->ui->XSpinBox,SIGNAL(valueChanged(double)) ,this,SLOT(ValueChangedEmitter(double)));
+    connect(this->ui->YSpinBox,SIGNAL(valueChanged(double)) ,this,SLOT(ValueChangedEmitter(double)));
+    connect(this->ui->ZSpinBox,SIGNAL(valueChanged(double)) ,this,SLOT(ValueChangedEmitter(double)));
+    connect(this              ,SIGNAL(rejected()),this,SLOT(Closed()));
     this->setWindowTitle("MoveTransform");
     this->setWindowFlags(Qt::Dialog | Qt::WindowStaysOnTopHint);
 }
-
 MoveTransformDialog::~MoveTransformDialog()
 {
     delete ui;
 }
 
-QVector<CPoint*> MoveTransformDialog::GetSelectedPoint(){
-    QVector<CPoint*> ans;
+void MoveTransformDialog::SetModel(CadModelCore *m){
+    this->model = m;
+    connect(this->model,SIGNAL(UpdateSelected()),this,SLOT(RefreshTranslated()));
+}
+MoveTransformDialog::TRANSFORM_METHOD MoveTransformDialog::GetTransformMethod()const{
+    if(this->ui->MovingCombo->currentText() == "追従")return RELATIVE;
+    if(this->ui->MovingCombo->currentText() == "強制")return ABSOLUTE;
+    qDebug() << "[MoveTransformDialog::getTransformMethod()] this->ui->MovingCombo->currentText() is unknown";
+}
+
+void MoveTransformDialog::RefreshTranslated(){
+    translated.clear();
+    //複製
     for(CObject* obj:this->model->GetSelected()){
+        translated.push_back(obj->Clone());
+    }
+
+    Pos pp = Pos(this->ui->XSpinBox->value(),
+                 this->ui->YSpinBox->value(),
+                 this->ui->ZSpinBox->value());
+
+    if(this->GetTransformMethod() == ABSOLUTE) this->AbsoluteMove(translated,pp);
+    else                                       this->RelativeMove(translated,pp);
+    emit RepaintRequest();
+}
+
+QVector<CPoint*> MoveTransformDialog::ConvertChildPoint(QVector<CObject *> objects)const{
+    QVector<CPoint*> ans;
+    for(CObject* obj:objects){
         for(CPoint* child:obj->GetAllChildren()){
             ans.push_back(child);
         }
@@ -39,13 +68,39 @@ void MoveTransformDialog::keyPressEvent(QKeyEvent *event){
         this->Accept();
     }
 }
-
 void MoveTransformDialog::keyReleaseEvent(QKeyEvent *event){
     if(event->key() == Qt::Key_Shift){
         this->ui->XSpinBox->setValue(-this->ui->XSpinBox->value());
         this->ui->YSpinBox->setValue(-this->ui->YSpinBox->value());
         this->ui->ZSpinBox->setValue(-this->ui->ZSpinBox->value());
     }
+}
+
+void MoveTransformDialog::AbsoluteMove(QVector<CObject *> objects, Pos pos){
+    //選択された点の平均値を絶対移動
+    QVector<CPoint*> points =  this->ConvertChildPoint(objects);
+
+    //中心点を取得
+    Pos delta;
+    for(CPoint* p :points)delta += *p;
+    delta /= points.size();
+
+    //移動
+    PauseChanged();//更新停止
+    for(CPoint* p :points){
+        if(this->GetTransformMethod() == TRANSFORM_METHOD::ABSOLUTE)p->MoveAbsolute(*p - delta + pos);
+        if(this->GetTransformMethod() == TRANSFORM_METHOD::RELATIVE)*p = *p - delta + pos;
+    }
+    RestartChanged();//更新再開
+}
+void MoveTransformDialog::RelativeMove(QVector<CObject *> objects, Pos diff){
+    //選択された点を相対移動
+    PauseChanged();//更新停止
+    for(CPoint* p :this->ConvertChildPoint(objects)){
+        if(this->ui->MovingCombo->currentText() == "追従")p->MoveRelative(diff);
+        if(this->ui->MovingCombo->currentText() == "強制")*p += diff;
+    }
+    RestartChanged();//更新再開
 }
 
 
@@ -59,57 +114,40 @@ void MoveTransformDialog::RestartChanged(){
         obj->ObserveRestart();
     }
 }
-void MoveTransformDialog::AbsoluteMove(Pos pos){
-    //選択された点の平均値を絶対移動
-    Pos delta;
-    QVector<CPoint*> array =  this->GetSelectedPoint();
-    for(CPoint* p :array)delta += *p;
-    delta /= array.size();
-
-    //移動
-    PauseChanged();
-    for(CPoint* p :array){
-        if(this->ui->MovingCombo->currentText() == "追従")p->MoveAbsolute(*p-delta+pos);
-        if(this->ui->MovingCombo->currentText() == "強制")*p = *p-delta+pos;
+void MoveTransformDialog::DrawTranslated(Pos camera,Pos center){
+    glColor3f(1,1,0);
+    for(CObject* obj:this->translated){
+        obj->DrawGL(camera,center);
     }
-    RestartChanged();
 }
-
-void MoveTransformDialog::RelativeMove(Pos diff){
-    //選択された点を相対移動
-    PauseChanged();
-    for(CPoint* p :this->GetSelectedPoint()){
-        if(this->ui->MovingCombo->currentText() == "追従")p->MoveRelative(diff);
-        if(this->ui->MovingCombo->currentText() == "強制")*p += diff;
-    }
-    RestartChanged();
+void MoveTransformDialog::ValueChangedEmitter(double){
+    RefreshTranslated();
 }
 
 void MoveTransformDialog::Accept(){
+    //値
+    Pos value = Pos(this->ui->XSpinBox->value(),
+                    this->ui->YSpinBox->value(),
+                    this->ui->ZSpinBox->value());
+    if(this->ui->RelativeRadio->isChecked())RelativeMove(this->model->GetSelected(),value);
+    if(this->ui->AbsoluteRadio->isChecked())AbsoluteMove(this->model->GetSelected(),value);
+    /*
+    for(CBlock* block:this->model->GetBlocks()){
+        //block->RefreshDividePoint();
+    }*/
+    RefreshTranslated();
+}
+void MoveTransformDialog::Duplicate(){
+    //値
     Pos value = Pos(this->ui->XSpinBox->value(),
                     this->ui->YSpinBox->value(),
                     this->ui->ZSpinBox->value());
 
-    if(this->ui->RelativeRadio->isChecked()){
-        RelativeMove(value);
-    }
-    if(this->ui->AbsoluteRadio->isChecked()){
-        AbsoluteMove(value);
-    }
-    for(CBlock* block:this->model->GetBlocks()){
-        //block->RefreshDividePoint();
-    }
-    emit RepaintRequest();
-}
-void MoveTransformDialog::Duplicate(){
-    Pos value = Pos(this->ui->XSpinBox->value(),
-                    this->ui->YSpinBox->value(),
-                    this->ui->ZSpinBox->value());
     QVector<CPoint*> pp;
     for(CObject* s : this->model->GetSelected()){
-        CObject* dup = s->Clone();
-        this->model->AutoMerge(dup);
-        this->model->AddObject(dup);
+        CObject* dup = s->Clone();   //複製
+        this->model->AutoMerge(dup); //オートマージ
+        this->model->AddObject(dup); //モデルに追加
         for(CPoint* pos:dup->GetAllChildren()){
             pp.push_back(pos);
         }
@@ -133,5 +171,12 @@ void MoveTransformDialog::Duplicate(){
 
     this->model->AutoMerge();
 }
+
+void MoveTransformDialog::Closed(){
+    //予測表示を停止
+    this->translated.clear();
+    emit RepaintRequest();
+}
+
 
 

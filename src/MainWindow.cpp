@@ -7,8 +7,8 @@ void MainWindow::SetModel(CadModelCore* model){
     this->model = model;
     this->ui->ObjectTree->SetModel(this->model);
     this->ui->SolidEdit ->SetModel(this->model);
-    this->move_diag->     SetModel(this->model);
-    this->prop_diag->     SetModel(this->model);
+    this->move_diag     ->SetModel(this->model);
+    this->prop_diag     ->SetModel(this->model);
     search.SetModel(model);
     connect(this->model,SIGNAL(UpdateSelected()),this,SLOT(RefreshUI()));
 }
@@ -40,10 +40,11 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(this->ui->SolidEdit,SIGNAL(MousePosChanged(Pos)),this,SLOT(RefreshStatusBar(Pos)));
 
     //移動ダイアログ関係
-    move_diag = new MoveTransformDialog(this);
-    this->installEventFilter(move_diag);
-    connect(move_diag,SIGNAL(RepaintRequest()),this,SLOT(repaint()));
-    connect(move_diag,SIGNAL(RepaintRequest()),ui->SolidEdit,SLOT(repaint()));
+    this->move_diag = new MoveTransformDialog(this);
+    this->installEventFilter(this->move_diag);
+    connect(this->move_diag,SIGNAL(RepaintRequest()),this,SLOT(repaint()));
+    connect(this->move_diag,SIGNAL(RepaintRequest()),ui->SolidEdit,SLOT(repaint()));
+    this->ui->SolidEdit->move_diag = this->move_diag;
 
     //プロパティダイアログ関係
     prop_diag = new PropertyDefinitionDialog(this);
@@ -222,7 +223,7 @@ void MainWindow::ShowProperty(){
 }
 
 void MainWindow::ShowMoveTransform(){
-    move_diag->show();
+    this->move_diag->show();
 }
 void MainWindow::ShowGridFilter(){
     static GridFilterDialog* diag = new GridFilterDialog(this);

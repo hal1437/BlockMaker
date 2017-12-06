@@ -32,7 +32,7 @@ private:
     Ui::MainWindow *ui;
     CadModelSearch search;
     bool shift_press =false;
-    MoveTransformDialog* move_diag;
+    MoveTransformDialog*      move_diag;
     PropertyDefinitionDialog* prop_diag;
     QVector<Restraint*> creatable; //作成可能な拘束
 
