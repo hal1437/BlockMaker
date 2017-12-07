@@ -6,7 +6,8 @@ class CArc : public CEdge
 {
     Q_OBJECT
 protected:
-    double round = 0;//半径
+    double round_s = 0;//半径
+    double round_e = 0;//半径
     const static int LINE_NEAR_DIVIDE = 30; //近似直線判定関数の分割数
 
 public:
@@ -15,7 +16,7 @@ public:
 
 public:
     //半径操作関数
-    double GetRound()const;
+    //double GetRound()const;
 
     //作成関数(完了時:true , 継続時:false)
     virtual CREATE_RESULT Create(CPoint* pos);

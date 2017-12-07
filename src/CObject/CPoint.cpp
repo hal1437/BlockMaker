@@ -1,6 +1,7 @@
 #include "CPoint.h"
 
 CPoint* CPoint::origin;
+CPoint* CPoint::hanged;
 
 CREATE_RESULT CPoint::Create(CPoint *pos){
     this->x() = pos->x();
@@ -52,11 +53,11 @@ void CPoint::MoveAbsolute(const Pos& diff){
     this->MoveRelative(diff - *this);
 }
 void CPoint::MoveRelative(const Pos& diff){
-    if(isLock() == false && !isControlPoint() && !this->isMoving()){
-        this->SetMoving(true);  //再帰呼び出し制限
+    if(diff.Length() > SAME_POINT_EPS && isLock() == false && !isControlPoint() /*&& !this->isMoving()*/){
+        //this->SetMoving(true);  //再帰呼び出し制限
         *this += diff;//移動
         emit Changed(this);
-        this->SetMoving(false); //再帰呼び出し制限解除
+        //this->SetMoving(false); //再帰呼び出し制限解除
     }
 }
 

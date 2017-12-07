@@ -19,7 +19,7 @@ class SolidEditController:public QObject ,public CadModelCoreInterface
 public:
     constexpr static int DEFAULT_FACE_LEGTH = 100;
 
-    CPoint* hang_point = nullptr;//最終生成点
+    //CPoint* hang_point = nullptr;//最終生成点
     CFace* projection_face = nullptr; //投影面
 
     //正面を単位行列とした時の各面変換への行列

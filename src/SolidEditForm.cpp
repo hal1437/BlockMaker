@@ -7,7 +7,7 @@ void SolidEditForm::MakeObject(){
         //生成
         this->make_controller->Making(state,this->mouse_pos,hanged);
         //最終点を保持
-        this->controller->hang_point = this->make_controller->GetLastPos();
+        CPoint::hanged = this->make_controller->GetLastPos();
 
         this->controller->Create3Face();
 
@@ -53,7 +53,7 @@ void SolidEditForm::keyPressEvent    (QKeyEvent *event){
     //スケッチ終了
     if(event->key() == Qt::Key_Escape){
         this->make_controller->Escape();
-        this->controller->hang_point      = nullptr;
+        CPoint::hanged      = nullptr;
         this->controller->projection_face = nullptr;
     }
 
@@ -105,7 +105,7 @@ void SolidEditForm::mousePressEvent  (QMouseEvent *event){
     if(this->state == MAKE_OBJECT::Edit || this->ctrl_pressed){
         //移動
         if(this->GetHangedObject()->is<CPoint>() && this->controller->isSketcheing()){
-            this->controller->hang_point = dynamic_cast<CPoint*>(this->GetHangedObject());
+            CPoint::hanged = dynamic_cast<CPoint*>(this->GetHangedObject());
         }
     }else{
         //追加操作
@@ -115,7 +115,7 @@ void SolidEditForm::mousePressEvent  (QMouseEvent *event){
 void SolidEditForm::mouseReleaseEvent(QMouseEvent *event){
     //保持点手放し
     if(state == MAKE_OBJECT::Edit){
-        this->controller->hang_point = nullptr;
+        CPoint::hanged = nullptr;
     }
     //ドラッグでなければ
     if(this->first_click == Pos(event->pos().x(),event->pos().y())){
@@ -175,7 +175,7 @@ void SolidEditForm::mouseMoveEvent   (QMouseEvent *event){
         if(ctrl_pressed){
             Pos delta(-(event->pos().x()-this->drag_base.x()) ,event->pos().y()-this->drag_base.y());
             this->center = (delta*round).Dot(this->controller->getCameraMatrix()) + this->center;
-        }else if(this->controller->hang_point == nullptr){
+        }else if(CPoint::hanged == nullptr){
             //カメラ角度変更
             this->controller->theta1 += static_cast<double>(event->pos().y() - this->drag_base.y())/SENSITIVITY;
             this->controller->theta2 += static_cast<double>(event->pos().x() - this->drag_base.x())/SENSITIVITY;
@@ -186,8 +186,8 @@ void SolidEditForm::mouseMoveEvent   (QMouseEvent *event){
     }
 
     //保持点の座標を更新
-    if(this->controller->hang_point != nullptr){
-        this->controller->hang_point->MoveAbsolute(this->mouse_pos);
+    if(CPoint::hanged != nullptr){
+        CPoint::hanged->MoveAbsolute(this->mouse_pos);
     }
     repaint();
 }

@@ -34,6 +34,7 @@ public:
     static constexpr double  COLLISION_SIZE = 6;      //当たり判定半径
     static constexpr double  DRAWING_LINE_SIZE = 3;   //描画線幅
     static constexpr double  SAME_POINT_EPS = 1.0e-8; //同一点誤差
+    static constexpr double  SAME_ANGLE_EPS = 1.0e-8; //同一点誤差
     static double            drawing_scale;           //描画スケール
 
 public:

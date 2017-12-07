@@ -116,7 +116,7 @@ CObject* SolidEditController::getHangedObject(Pos center, Pos dir,double zoom_ra
         double length = (Pos::LineNearPoint(pos1,pos2, *p) - *p).Length() / zoom_rate;
 
         //範囲内かつ、つかみ点でない
-        if(length < CPoint::COLLISION_SIZE && hang_point != p){
+        if(length < CPoint::COLLISION_SIZE && CPoint::hanged != p){
             //スケッチ中なら、平面上に存在する条件を追加
             if(this->isSketcheing()){
                 if(this->projection_face->isComprehension(*p)){
@@ -133,7 +133,7 @@ CObject* SolidEditController::getHangedObject(Pos center, Pos dir,double zoom_ra
         //エッジの選択
         for(CEdge* e : this->model->GetEdges()){
             //例外として選択不可
-            if(hang_point == e->start || hang_point == e->end || !e->isVisible())continue;
+            if(CPoint::hanged == e->start || CPoint::hanged == e->end || !e->isVisible())continue;
 
             //近似点選択
             Pos near = e->GetNearLine(center,center+dir);
