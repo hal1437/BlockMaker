@@ -209,8 +209,8 @@ void MainWindow::ToggledSTL(bool){
             }*/
             this->model->SetPause(false);
         }
-
     }
+    this->ui->SolidEdit->repaint();
 }
 
 void MainWindow::ToggleConflict(bool conflict){

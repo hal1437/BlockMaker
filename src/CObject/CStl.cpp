@@ -6,7 +6,7 @@ CStl* CStl::AddTriangle(CStl* stl,Pos pos[3]){
     for(int i=0;i<3;i++){
         //点の重複チェック
         for(int j=0;j<stl->points.size();j++){
-            if(*stl->points[j] == pos[i]){
+            if((*stl->points[j] - pos[i]).Length() < SAME_POINT_EPS){
                 index[i] = j;
             }
         }
@@ -143,8 +143,8 @@ void CStl::DrawGL(Pos camera,Pos center)const{
         glVertex3f(edge->GetMiddleDivide(0).x(),edge->GetMiddleDivide(0).y(),edge->GetMiddleDivide(0).z());
         glVertex3f(edge->GetMiddleDivide(1).x(),edge->GetMiddleDivide(1).y(),edge->GetMiddleDivide(1).z());
         glEnd();
-
     }
+    //面の描画
     for(CFace* face:this->faces){
         face->DrawGL(camera,center);
     }

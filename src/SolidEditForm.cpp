@@ -308,24 +308,24 @@ void SolidEditForm::paintGL(){
     glColor3f(0,0,1);
     glDepthFunc(GL_LEQUAL);
     //オブジェクト描画：線
-    for(CEdge*  edge  : this->model->GetEdges ())paintObject(edge  ,{0,0,1,1},ALL_OBJECT_WIDTH);//通常の物体
-    if(hanged->is<CEdge>())                      paintObject(hanged,{1,1,1,1},ALL_OBJECT_WIDTH);//選択物体(線)
+    for(CEdge*  edge  : this->model->GetEdges ())paintObject(edge  ,{0,0,1,1},ALL_OBJECT_WIDTH); //通常の物体
+    if(hanged->is<CEdge>())                      paintObject(hanged,{1,1,1,1},ALL_OBJECT_WIDTH); //選択物体(線)
     //オブジェクト描画：点
-    for(CPoint* pos   : this->model->GetPoints())paintObject(pos   ,{0,0,1,1},ALL_OBJECT_WIDTH);//通常の物体
-    if(hanged->is<CPoint>())                     paintObject(hanged,{1,1,1,1},ALL_OBJECT_WIDTH);//選択物体(線)
+    for(CPoint* pos   : this->model->GetPoints())paintObject(pos   ,{0,0,1,1},ALL_OBJECT_WIDTH); //通常の物体
+    if(hanged->is<CPoint>())                     paintObject(hanged,{1,1,1,1},ALL_OBJECT_WIDTH); //選択物体(線)
+    //オブジェクト描画：平面
+    for(CFace*  face  : this->model->GetFaces ())face->DrawMeshGL(); //非透過の面
+    for(CFace*  face  : this->model->GetFaces ())if(!face->isFaceBlend() && !exist(CFace::base,face))paintObject(face  ,{0,0,1,1},ALL_OBJECT_WIDTH); //非透過の面
+    for(CFace*  base  : CFace::base             )paintObject(base  ,{std::abs(base->GetNorm().x()),std::abs(base->GetNorm().y()),std::abs(base->GetNorm().z()),1},ALL_OBJECT_WIDTH); //三平面
+    for(CFace*  face  : this->model->GetFaces ())if( face->isFaceBlend() && !exist(CFace::base,face))paintObject(face  ,{0,0,1,1},ALL_OBJECT_WIDTH); //透過の面
+    //直下面
+    if(hanged->is<CFace>())                      paintObject(hanged,{1,1,1,1},ALL_OBJECT_WIDTH);//選択物体(平面)
+    //投影面
+    if(this->controller->isSketcheing())         paintObject(this->controller->projection_face,{1,1,0,1},ALL_OBJECT_WIDTH);//選択物体(平面)
     //オブジェクト描画：STL
     for(CStl*   stl   : this->model->GetStls  ())paintObject(stl  ,{0.5,0.5,0.5,1},ALL_OBJECT_WIDTH);//STL
-    //オブジェクト描画：平面
-    for(CFace*  face  : this->model->GetFaces ())face->DrawMeshGL();//非透過の面
-    for(CFace*  face  : this->model->GetFaces ())if(!face->isFaceBlend())paintObject(face  ,{0,0,1,1},ALL_OBJECT_WIDTH);//非透過の面
-    for(CFace*  face  : this->model->GetFaces ())if( face->isFaceBlend())paintObject(face  ,{0,0,1,1},ALL_OBJECT_WIDTH);//透過の面
-    for(CFace*  base  : CFace::base             )paintObject(base  ,{std::abs(base->GetNorm().x()),
-                                                                     std::abs(base->GetNorm().y()),
-                                                                     std::abs(base->GetNorm().z()),1},ALL_OBJECT_WIDTH);//三平面
 
-    if(hanged->is<CFace>())                      paintObject(hanged,{1,1,1,1},ALL_OBJECT_WIDTH);//選択物体(平面)
-    if(this->controller->isSketcheing())         paintObject(this->controller->projection_face,{1,1,0,1},ALL_OBJECT_WIDTH);//選択物体(平面)
-
+    //移動予測
     if(this->move_diag != nullptr && this->move_diag->isVisible()){
         this->move_diag->DrawTranslated(camera,center);
     }
