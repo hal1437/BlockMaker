@@ -101,7 +101,6 @@ bool SolidEditController::isSketcheing()const{
     return (this->projection_face != nullptr);
 }
 
-
 CObject* SolidEditController::getHangedObject(Pos center, Pos dir,double zoom_rate)const{
     QVector<QPair<CObject*,double>>ans;
 

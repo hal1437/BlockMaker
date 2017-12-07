@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>254</width>
-    <height>235</height>
+    <height>190</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -119,31 +119,6 @@
        <property name="maximum">
         <double>10000.000000000000000</double>
        </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_2">
-     <item>
-      <widget class="QLabel" name="label_4">
-       <property name="text">
-        <string>移動タイプ</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QComboBox" name="MovingCombo">
-       <item>
-        <property name="text">
-         <string>追従</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>強制</string>
-        </property>
-       </item>
       </widget>
      </item>
     </layout>

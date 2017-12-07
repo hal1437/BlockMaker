@@ -112,7 +112,10 @@ CStl* CStl::CreateFromFile(QString filepath){
             Pos pos[3];
             for(int j=0;j<3;j++){
                 for(int k=0;k<3;k++){
-                    in.readRawData (reinterpret_cast<char*>(&point[j][k]),4);
+                    char cc[4];
+                    in.readRawData (cc,4);
+                    for(int ii = 0;ii<4;ii++)
+                    reinterpret_cast<char*>(&point[j][k])[ii] = cc[ii];
                 }
                 //構築
                 pos[j] = Pos(point[j][0],point[j][1],point[j][2]);

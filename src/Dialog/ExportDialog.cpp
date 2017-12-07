@@ -92,7 +92,7 @@ void ExportDialog::Export(QString filename)const{
         //分割数
         QVector<int> div_indices;
         div_indices.push_back(block->GetEdgeSequence(0)->getDivide());
-        div_indices.push_back(block->GetEdgeSequence(3)->getDivide());
+        div_indices.push_back(block->GetEdgeSequence(4)->getDivide());
         div_indices.push_back(block->GetEdgeSequence(8)->getDivide());
         file.OutVectorInline(div_indices);
         file.OutNewline();
@@ -102,6 +102,7 @@ void ExportDialog::Export(QString filename)const{
         //全てedgeGradingで記述する。
         file.StartListDifinition("edgeGrading");
         for(int i=0;i<12;i++){
+            //全てmulti-gradingで出力
             CEdge::Grading grading = block->GetEdgeSequence(i)->getGrading();
 
             file.StartListDifinition("");

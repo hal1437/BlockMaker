@@ -18,7 +18,7 @@ private:
 
     //移動タイプ
     enum TRANSFORM_METHOD{
-        RELATIVE, //追従
+        RELATIVE, //相対
         ABSOLUTE  //絶対
     };
 private:
@@ -49,7 +49,8 @@ public slots:
     //変更後の予測位置を表示
     void RefreshTranslated();
 
-    void ValueChangedEmitter(double v);
+    void RadioChangedEmitter(bool);
+    void ValueChangedEmitter(double);
 
     void Accept();
     void Duplicate();
