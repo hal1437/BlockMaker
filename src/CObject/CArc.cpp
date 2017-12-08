@@ -102,6 +102,7 @@ void     CArc::SetChild(int index,CObject* obj){
     if(index == 0)this->start  = dynamic_cast<CPoint*>(obj);
     if(index == 1)this->center = dynamic_cast<CPoint*>(obj);
     if(index == 2)this->end    = dynamic_cast<CPoint*>(obj);
+    this->ChangeChildCallback({obj});
     ObserveChild(this->GetChild(index));
 }
 
@@ -165,10 +166,10 @@ void CArc::ChangeChildCallback(QVector<CObject*> child){
     if(this->start==nullptr || this->end==nullptr)return;
 
     //保持点ならば同一半形状の動きのみ行う
-    if(exist(child,this->start) && CPoint::hanged == this->start){
+    if(exist(child,this->start) && CPoint::hanged == this->start && *this->start != *this->center){
         this->start->MoveAbsolute((*this->start   - *this->center).GetNormalize() * round_s + *this->center);
     }
-    if(exist(child,this->end) && CPoint::hanged == this->end){
+    if(exist(child,this->end) && CPoint::hanged == this->end && *this->end   != *this->center){
         this->end->MoveAbsolute((*this->end   - *this->center).GetNormalize() * round_e + *this->center);
     }
     if(*this->start != *this->center)round_s = (*this->start - *this->center).Length();

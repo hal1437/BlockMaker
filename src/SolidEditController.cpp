@@ -100,6 +100,10 @@ Quat SolidEditController::getCameraMatrix()const{
 bool SolidEditController::isSketcheing()const{
     return (this->projection_face != nullptr);
 }
+void SolidEditController::SetModel(CadModelCore *m){
+    this->model = m;
+    connect(this->model,SIGNAL(UpdateAnyObject()),this,SLOT(Create3Face()));
+}
 
 CObject* SolidEditController::getHangedObject(Pos center, Pos dir,double zoom_rate)const{
     QVector<QPair<CObject*,double>>ans;

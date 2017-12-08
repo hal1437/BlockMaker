@@ -25,14 +25,16 @@ public slots:                                       \
 //通常追加マクロ
 #define OBSERVER_IO_COBJECT(TYPE,NAME)                                      \
 inline void Add##NAME(TYPE value){                                          \
-    connect(value,SIGNAL(Changed()),this,SLOT(Update##NAME##Emittor()));    \
+    connect(value,SIGNAL(Changed   ()                 ),this,SLOT(Update##NAME##Emittor()));    \
+    connect(value,SIGNAL(Conflicted(CObject*,Conflict)),this,SLOT(ConflictAntObjectEmittor(CObject*,Conflict)));    \
     if(!exist(NAME,value)){                                                 \
         NAME.push_back(value);                                              \
         emit Update##NAME();                                                \
     }                                                                       \
 }                                                                           \
 inline void Remove##NAME(TYPE value){                                       \
-    disconnect(value,SIGNAL(Changed()),this,SLOT(Update##NAME##Emittor())); \
+    disconnect(value,SIGNAL(Changed   ()                 ),this,SLOT(Update##NAME##Emittor()));    \
+    disconnect(value,SIGNAL(Conflicted(CObject*,Conflict)),this,SLOT(ConflictAntObjectEmittor(CObject*,Conflict)));    \
     NAME.removeAll(value);                                                  \
     emit Update##NAME();                                                    \
 }
@@ -120,6 +122,7 @@ public slots:
     DEFINE_EMITTOR(UpdateDimensions)
     DEFINE_EMITTOR(UpdateAnyObject)
     DEFINE_EMITTOR(UpdateAnyAction)
+    void ConflictAntObjectEmittor(CObject* object,Conflict conf);
 
     //削除
     void Delete(CObject*   obj);
@@ -141,21 +144,23 @@ public:
 signals:
 
     //更新シグナル
-    void UpdateSelected  ();
-    void UpdatePoints    ();
-    void UpdateEdges     ();
-    void UpdateFaces     ();
-    void UpdateBlocks    ();
-    void UpdateStls      ();
-    void UpdateRestraints();
-    void UpdateDimensions();
-    void UpdateAnyObject ();
-    void UpdateAnyAction ();
+    void UpdateSelected   ();
+    void UpdatePoints     ();
+    void UpdateEdges      ();
+    void UpdateFaces      ();
+    void UpdateBlocks     ();
+    void UpdateStls       ();
+    void UpdateRestraints ();
+    void UpdateDimensions ();
+    void UpdateAnyObject  ();
+    void UpdateAnyAction  ();
+
     //変更シグナル
     void ChangedPoints   (QVector<CPoint*>);
     void ChangedEdges    (QVector<CEdge* >);
     void ChangedFaces    (QVector<CFace* >);
     void ChangedBlocks   (QVector<CBlock*>);
+    void ConflictAnyObject(CObject* object,Conflict conf);
 };
 
 class CadModelCoreInterface{

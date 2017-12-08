@@ -171,8 +171,6 @@ PropertyDefinitionDialog::PropertyDefinitionDialog(QWidget *parent) :
     connect(&edge_add_grading_button   ,SIGNAL(pressed())               ,this,SLOT(AddMultiGradingTable()));
     connect(&edge_remove_grading_button,SIGNAL(pressed())               ,this,SLOT(RemoveMultiGradingTable()));
     connect(&name_edit              ,SIGNAL(textChanged(QString))    ,this,SLOT(LineEditChanged(QString)));
-    //connect(&edge_divide_spin   ,SIGNAL(valueChanged(int))       ,this,SLOT(SpinChanged(int)));
-    //connect(&edge_grading_spin  ,SIGNAL(valueChanged(double))    ,this,SLOT(DoubleSpinChanged(double)));
     connect(&face_boundary_combo    ,SIGNAL(currentIndexChanged(int)),this,SLOT(ComboChanged(int)));
 }
 PropertyDefinitionDialog::~PropertyDefinitionDialog()
@@ -183,8 +181,6 @@ PropertyDefinitionDialog::~PropertyDefinitionDialog()
 void PropertyDefinitionDialog::UpdateLayout(){
     //レイアウト解除
     disconnect(&name_edit          ,SIGNAL(textChanged(QString))    ,this,SLOT(LineEditChanged(QString)));
-    //disconnect(&edge_divide_spin   ,SIGNAL(valueChanged(int))       ,this,SLOT(SpinChanged(int)));
-    //disconnect(&edge_grading_spin  ,SIGNAL(valueChanged(double))    ,this,SLOT(DoubleSpinChanged(double)));
     disconnect(&face_boundary_combo,SIGNAL(currentIndexChanged(int)),this,SLOT(ComboChanged(int)));
     this->name_label           .hide();
     this->name_edit            .hide();

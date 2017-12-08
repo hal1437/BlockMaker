@@ -43,19 +43,18 @@ public:
     ~MoveTransformDialog();
 
 public slots:
-    void PauseChanged();
-    void RestartChanged();
+    void PauseChanged(QVector<CObject *> objects);  //更新停止
+    void RestartChanged(QVector<CObject *> objects);//更新再開
 
     //変更後の予測位置を表示
     void RefreshTranslated();
 
-    void RadioChangedEmitter(bool);
-    void ValueChangedEmitter(double);
+    void RadioChangedEmitter(bool);   //ラジオボタン変更時
+    void ValueChangedEmitter(double); //値変更時
 
-    void Accept();
-    void Duplicate();
-    void Closed();
-//    void UpdateObjects(); //オブジェクト更新
+    void Accept();    //適用時
+    void Duplicate(); //複製時
+    void Closed();    //終了時
 
 signals:
     void RepaintRequest();

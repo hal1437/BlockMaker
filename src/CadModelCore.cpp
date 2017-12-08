@@ -429,6 +429,12 @@ void CadModelCore::Delete(Restraint* obj){
     UpdateRestraintsEmittor();
 }
 
+void CadModelCore::ConflictAntObjectEmittor(CObject* object,Conflict conf){
+    if(this->isPause() == false){
+        emit ConflictAnyObject(object,conf);
+    }
+}
+
 void CadModelCore::UpdatePause(){
 }
 

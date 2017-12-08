@@ -313,13 +313,12 @@ void SolidEditForm::paintGL(){
     //オブジェクト描画：点
     for(CPoint* pos   : this->model->GetPoints())paintObject(pos   ,{0,0,1,1},ALL_OBJECT_WIDTH); //通常の物体
     if(hanged->is<CPoint>())                     paintObject(hanged,{1,1,1,1},ALL_OBJECT_WIDTH); //選択物体(線)
-    //移動予測
-    if(this->move_diag != nullptr && this->move_diag->isVisible()){
-        this->move_diag->DrawTranslated(camera,center);
-    }
-    //オブジェクト描画：平面
+    //オブジェクト描画：平面(非透過)
     for(CFace*  face  : this->model->GetFaces ())face->DrawMeshGL(); //非透過の面
     for(CFace*  face  : this->model->GetFaces ())if(!face->isFaceBlend() && !exist(CFace::base,face))paintObject(face  ,{0,0,1,1},ALL_OBJECT_WIDTH); //非透過の面
+    //移動予測オブジェクト
+    if(this->move_diag != nullptr && this->move_diag->isVisible())this->move_diag->DrawTranslated(camera,center);
+    //オブジェクト描画：平面(透過)
     for(CFace*  base  : CFace::base             )paintObject(base  ,{std::abs(base->GetNorm().x()),std::abs(base->GetNorm().y()),std::abs(base->GetNorm().z()),1},ALL_OBJECT_WIDTH); //三平面
     for(CFace*  face  : this->model->GetFaces ())if( face->isFaceBlend() && !exist(CFace::base,face))paintObject(face  ,{0,0,1,1},ALL_OBJECT_WIDTH); //透過の面
     //直下面

@@ -43,7 +43,8 @@ public:
     CFace* getSideFace ()const;//右側面
     Quat   getCameraMatrix()const;//カメラ変換行列取得
 
-    bool isSketcheing() const;            //スケッチ中
+    void SetModel(CadModelCore *m);
+    bool isSketcheing() const; //スケッチ中ならば
 
     CObject* getHangedObject(Pos center, Pos dir       ,double zoom_rate)const;
     CFace*   getHangedFace  (Pos center, Pos camera_pos,double zoom_rate)const;//直下面

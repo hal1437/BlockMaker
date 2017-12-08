@@ -72,7 +72,9 @@ public slots:
 
     void RefreshStatusBar(Pos pos);        //ステータスバー更新
 
-    void ShowObjectList();
+    void ShowObjectList();    //オブジェクトリスト表示
+    void ShowRestraintList(); //幾何拘束リスト表示
+    void ShowConflictList();  //競合リスト表示
 
     void Save();
     void Load();

@@ -4,6 +4,7 @@
 #include <QPainter>
 #include <QTransform>
 #include <QDebug>
+#include <Conflict.h>
 #include "Point.h"
 
 //OpenGLのインクルード
@@ -24,7 +25,6 @@ enum CREATE_RESULT{
     THREESHOT = 3,//三回で終了
     ENDLESS   = -1,//何回でも可能
 };
-
 
 //CADオブジェクト
 class CObject:public QObject
@@ -95,6 +95,9 @@ signals:
     //移動シグナル
     void Changed();
     void Changed(CObject* child);
+
+    //競合シグナル
+    void Conflicted(CObject* object,Conflict conf);
 
 public slots:
     //変更コールバック保存

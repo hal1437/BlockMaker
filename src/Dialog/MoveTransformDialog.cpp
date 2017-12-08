@@ -34,12 +34,11 @@ void MoveTransformDialog::RefreshTranslated(){
         translated.push_back(obj->Clone());
     }
 
-    Pos pp = Pos(this->ui->XSpinBox->value(),
-                 this->ui->YSpinBox->value(),
-                 this->ui->ZSpinBox->value());
-
-    if(this->GetTransformMethod() == ABSOLUTE) this->AbsoluteMove(translated,pp);
-    else                                       this->RelativeMove(translated,pp);
+    Pos value = Pos(this->ui->XSpinBox->value(),
+                    this->ui->YSpinBox->value(),
+                    this->ui->ZSpinBox->value());
+    if(this->GetTransformMethod() == ABSOLUTE) this->AbsoluteMove(translated,value);
+    else                                       this->RelativeMove(translated,value);
     emit RepaintRequest();
 }
 
@@ -56,6 +55,7 @@ QVector<CPoint*> MoveTransformDialog::ConvertChildPoint(QVector<CObject *> objec
 MoveTransformDialog::TRANSFORM_METHOD MoveTransformDialog::GetTransformMethod()const{
     if(this->ui->RelativeRadio->isChecked())return RELATIVE;
     if(this->ui->AbsoluteRadio->isChecked())return ABSOLUTE;
+    // ????
 }
 
 void MoveTransformDialog::keyPressEvent(QKeyEvent *event){
@@ -86,37 +86,42 @@ void MoveTransformDialog::AbsoluteMove(QVector<CObject *> objects, Pos pos){
     delta /= points.size();
 
     //移動
-    PauseChanged();//更新停止
+    PauseChanged(objects);//更新停止
     for(CPoint* p :points){
         p->MoveAbsolute(*p - delta + pos);
     }
-    RestartChanged();//更新再開
+    RestartChanged(objects);//更新再開
 }
 void MoveTransformDialog::RelativeMove(QVector<CObject *> objects, Pos diff){
     //選択された点を相対移動
-    PauseChanged();//更新停止
+    PauseChanged(objects);//更新停止
     for(CPoint* p :this->ConvertChildPoint(objects)){
         p->MoveRelative(diff);
     }
-    RestartChanged();//更新再開
+    RestartChanged(objects);//更新再開
 }
 
-
-void MoveTransformDialog::PauseChanged(){
-    for(CObject* obj:this->model->GetSelected()){
+void MoveTransformDialog::PauseChanged(QVector<CObject *> objects){
+    for(CObject* obj: objects){
         obj->ObservePause();
     }
 }
-void MoveTransformDialog::RestartChanged(){
-    for(CObject* obj:this->model->GetSelected()){
+void MoveTransformDialog::RestartChanged(QVector<CObject *> objects){
+    for(CObject* obj:objects){
         obj->ObserveRestart();
     }
 }
 void MoveTransformDialog::DrawTranslated(Pos camera,Pos center){
+    //色を保存
+    float old_color[4];
+    glGetFloatv  (GL_CURRENT_COLOR,old_color);
+
     glColor3f(1,1,0);
     for(CObject* obj:this->translated){
         obj->DrawGL(camera,center);
     }
+    //色を復元
+    glColor4f(old_color[0],old_color[1],old_color[2], old_color[3]);
 }
 void MoveTransformDialog::ValueChangedEmitter(double){
     RefreshTranslated();
@@ -130,12 +135,13 @@ void MoveTransformDialog::Accept(){
     Pos value = Pos(this->ui->XSpinBox->value(),
                     this->ui->YSpinBox->value(),
                     this->ui->ZSpinBox->value());
-    if(this->ui->RelativeRadio->isChecked())RelativeMove(this->model->GetSelected(),value);
-    if(this->ui->AbsoluteRadio->isChecked())AbsoluteMove(this->model->GetSelected(),value);
+    if(this->GetTransformMethod() == ABSOLUTE) this->AbsoluteMove(this->model->GetSelected(),value);
+    else                                       this->RelativeMove(this->model->GetSelected(),value);
     /*
     for(CBlock* block:this->model->GetBlocks()){
         //block->RefreshDividePoint();
     }*/
+    this->model->UpdateAnyObjectEmittor();
     RefreshTranslated();
 }
 void MoveTransformDialog::Duplicate(){
@@ -159,6 +165,8 @@ void MoveTransformDialog::Duplicate(){
     //移動
     if(this->GetTransformMethod() == ABSOLUTE)this->AbsoluteMove(pp,value);
     else                                      this->RelativeMove(pp,value);
+
+    this->model->UpdateAnyObjectEmittor();
     this->model->AutoMerge();
 }
 

@@ -52,8 +52,11 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(prop_diag,SIGNAL(RepaintRequest()),ui->SolidEdit,SLOT(repaint()));
 
     //ドック関係
-    connect(this->ui->actionShowObjectList,SIGNAL(triggered()),this,SLOT(ShowObjectList()));
+    connect(this->ui->actionShowObjectList   ,SIGNAL(triggered()),this,SLOT(ShowObjectList()));
+    connect(this->ui->actionShowRestraintList,SIGNAL(triggered()),this,SLOT(ShowRestraintList()));
+    connect(this->ui->actionShowConflictList ,SIGNAL(triggered()),this,SLOT(ShowConflictList()));
     connect(this->ui->actionExport        ,SIGNAL(triggered()),this,SLOT(Export()));
+    this->ui->ConflictDeck->hide();
 
 
     ConnectSignals();
@@ -299,7 +302,13 @@ void MainWindow::RefreshStatusBar(Pos pos){
 void MainWindow::ShowObjectList(){
     this->ui->ObjectDock->show();
 }
+void MainWindow::ShowRestraintList(){
+    this->ui->RestraintDeck->show();
+}
+void MainWindow::ShowConflictList(){
+    this->ui->ConflictDeck->show();
 
+}
 void MainWindow::Save(){
     QString filepath = QFileDialog::getSaveFileName(this,
                                                     "Save file",
