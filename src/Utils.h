@@ -8,17 +8,21 @@
 #define MOUSE_ZOOM_RATE 10000.0
 #define NearlyEqual(RHS,LHS) (std::abs(RHS-LHS) < 0.000001)
 
-//シグナル発生スロット
+//エミッター:シグナルを発生させる関数
 #define DEFINE_EMITTOR(NAME)        \
 void NAME##Emittor(){               \
-    if(this->isPause() == false){   \
-        emit NAME();                \
-    }                               \
+    emit NAME();                    \
 }
 #define DEFINE_EMITTOR_ARG(NAME,ARG) \
 void NAME##Emittor(){                \
-    emit NAME(ARG);              \
+    emit NAME(ARG);                  \
 }
+
+//シンクロナイズ : シグナル発生時に別のシグナルを発生させる(要エミッター)
+#define SYNCHRONIZE_SIGNAL(VALUE1,V1_SIGNAL,VALUE2,V2_SLOT)               \
+    connect(VALUE1,SIGNAL(V1_SIGNAL()),VALUE2 ,SLOT(V2_SLOT##Emittor()));
+#define UNSYNCHRONIZE_SIGNAL(VALUE1,V1_SIGNAL,VALUE2,V2_SLOT)               \
+    disconnect(VALUE1,SIGNAL(V1_SIGNAL()),VALUE2 ,SLOT(V2_SLOT##Emittor()));
 
 //配列内に要素が存在しているかの確認
 template<class C,class V>
@@ -64,6 +68,18 @@ template<class T,class U = T>
 T Mod(T lhs,const U& rhs){
     return lhs - rhs * static_cast<int>(lhs/rhs);
 }
+
+//型比較
+template<bool,class True_type,class FALSE_TYPE>
+struct TypeIf{};
+template<class True_type,class False_type>
+struct TypeIf<true,True_type,False_type>{
+    typedef True_type type;
+};
+template<class True_type,class False_type>
+struct TypeIf<false,True_type,False_type>{
+    typedef False_type type;
+};
 
 //Changeシグナル対象変数マクロ
 #define OBSERVE_MEMBER(TYPE,CALL,NAME)        \

@@ -133,7 +133,7 @@ bool CadModelCore::ImportFoamFile(QString filename){
     this->Faces.clear();
     this->Blocks.clear();
     this->Selected.clear();
-    this->AddPoints(CPoint::origin);//原点
+    this->AddPoints(this->origin);//原点
 
     //バージョン取得
     int version;
@@ -400,7 +400,7 @@ void CadModelCore::Delete(CObject* obj){
     if(obj->is<CStl  >())this->Delete(dynamic_cast<CStl*  >(obj));
 }
 void CadModelCore::Delete(CPoint* obj){
-    if(obj == CPoint::origin)return ;
+    if(obj == this->origin)return ;
     for(CEdge* parent:this->GetParent(obj))this->Delete(parent);
     this->GetPoints().removeAll(obj);
     UpdatePointsEmittor();

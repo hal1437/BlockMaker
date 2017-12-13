@@ -5,11 +5,18 @@
 void MainWindow::SetModel(CadModelCore* model){
     //モデルと結合
     this->model = model;
+
+    //各UIに伝達
     this->ui->ObjectTree->SetModel(this->model);
     this->ui->SolidEdit ->SetModel(this->model);
+    //ダイアログに伝達
     this->move_diag     ->SetModel(this->model);
     this->prop_diag     ->SetModel(this->model);
-    search.SetModel(model);
+
+    //検索モデルに伝達
+    this->search.SetModel(model);
+
+    //選択オブジェクトが変更時にUIを更新する。
     connect(this->model,SIGNAL(UpdateSelected()),this,SLOT(RefreshUI()));
 }
 
@@ -22,47 +29,51 @@ MainWindow::MainWindow(QWidget *parent) :
 
     //ボタン関係
     connect(this ,SIGNAL(ToggleChanged(MAKE_OBJECT)),ui->SolidEdit ,SLOT(SetState(MAKE_OBJECT)));
-    connect(ui->actionDelete     ,SIGNAL(triggered()) ,this,SLOT(Delete()));
-    connect(ui->actionProperty   ,SIGNAL(triggered()) ,this,SLOT(ShowProperty()));
-    connect(ui->actionMove       ,SIGNAL(triggered()) ,this,SLOT(ShowMoveTransform()));
-    connect(ui->actionGridFilter ,SIGNAL(triggered()) ,this,SLOT(ShowGridFilter()));
-    connect(ui->ToolBlocks       ,SIGNAL(triggered()) ,this,SLOT(MakeBlock()));
-    connect(ui->ToolFace         ,SIGNAL(triggered()) ,this,SLOT(MakeFace()));
-    connect(ui->actionSave       ,SIGNAL(triggered()) ,this,SLOT(Save()));
-    connect(ui->actionOpen       ,SIGNAL(triggered()) ,this,SLOT(Load()));
-    connect(ui->ToolProjection   ,SIGNAL(triggered()) ,this,SLOT(StartProjection()));
+    connect(ui->actionDelete     ,SIGNAL(triggered()) ,this,SLOT(Delete()));           //オブジェクト削除
+    connect(ui->actionProperty   ,SIGNAL(triggered()) ,this,SLOT(ShowProperty()));     //プロパティダイアログ表示
+    connect(ui->actionMove       ,SIGNAL(triggered()) ,this,SLOT(ShowMoveTransform()));//平行移動ダイアログ表示
+    connect(ui->ToolFace         ,SIGNAL(triggered()) ,this,SLOT(MakeFace()));         //面作成ボタン
+    connect(ui->ToolBlock        ,SIGNAL(triggered()) ,this,SLOT(MakeBlock()));        //立体作成ボタン
+    connect(ui->ToolProjection   ,SIGNAL(triggered()) ,this,SLOT(StartProjection()));  //投影ボタン
+    connect(ui->actionSave       ,SIGNAL(triggered()) ,this,SLOT(Save()));             //保存ボタン
+    connect(ui->actionOpen       ,SIGNAL(triggered()) ,this,SLOT(Load()));             //開くボタン
+
+    //ダイアログ生成
+    this->move_diag = new MoveTransformDialog(this);
+    this->prop_diag = new PropertyDefinitionDialog(this);
+    this->ui->SolidEdit->move_diag = this->move_diag; //SolidEditFoamと移動ダイアログを共有
+
+    //イベントフィルター
+    this->installEventFilter(this->ui->SolidEdit);
+    this->installEventFilter(this->move_diag);
 
     //リスト変更系
-    connect(ui->RestraintList ,SIGNAL(itemClicked(QListWidgetItem*)) ,this ,SLOT(MakeRestraint(QListWidgetItem*)));
+    connect(this->ui->RestraintList ,SIGNAL(itemClicked(QListWidgetItem*)) ,this ,SLOT(MakeRestraint(QListWidgetItem*)));
 
-    //SolidEditFoamにイベントフィルター導入
-    this->installEventFilter(ui->SolidEdit);
-    connect(this->ui->SolidEdit,SIGNAL(MousePosChanged(Pos)),this,SLOT(RefreshStatusBar(Pos)));
+    //SolidEditFoam関係
+    connect(this->ui->SolidEdit,SIGNAL(MousePosChanged(Pos)),this,SLOT(RefreshStatusBar(Pos))); // 座標監視
 
     //移動ダイアログ関係
-    this->move_diag = new MoveTransformDialog(this);
-    this->installEventFilter(this->move_diag);
     connect(this->move_diag,SIGNAL(RepaintRequest()),this,SLOT(repaint()));
     connect(this->move_diag,SIGNAL(RepaintRequest()),ui->SolidEdit,SLOT(repaint()));
-    this->ui->SolidEdit->move_diag = this->move_diag;
 
     //プロパティダイアログ関係
-    prop_diag = new PropertyDefinitionDialog(this);
     connect(prop_diag,SIGNAL(RepaintRequest()),this,SLOT(repaint()));
     connect(prop_diag,SIGNAL(RepaintRequest()),ui->SolidEdit,SLOT(repaint()));
 
     //ドック関係
-    connect(this->ui->actionShowObjectList   ,SIGNAL(triggered()),this,SLOT(ShowObjectList()));
-    connect(this->ui->actionShowRestraintList,SIGNAL(triggered()),this,SLOT(ShowRestraintList()));
-    connect(this->ui->actionShowConflictList ,SIGNAL(triggered()),this,SLOT(ShowConflictList()));
-    connect(this->ui->actionExport        ,SIGNAL(triggered()),this,SLOT(Export()));
-    this->ui->ConflictDeck->hide();
+    connect(this->ui->actionShowObjectList   ,SIGNAL(triggered()),this,SLOT(ShowObjectList()));    //オブジェクトリスト表示
+    connect(this->ui->actionShowRestraintList,SIGNAL(triggered()),this,SLOT(ShowRestraintList())); //幾何拘束リスト表示
+    connect(this->ui->actionShowConflictList ,SIGNAL(triggered()),this,SLOT(ShowConflictList()));  //競合リスト表示
+    connect(this->ui->actionExport           ,SIGNAL(triggered()),this,SLOT(Export())); //出力ダイアログ
+    this->ui->ConflictDeck->hide();//競合リストを標準で不可視
 
-
+    //ツールをコネクト
     ConnectSignals();
-    ui->ToolBlocks->setEnabled(false);
-    CObject::drawing_scale = 1.0;
 
+    ui->ToolBlock->setEnabled(false);
+    ui->ToolFace->setEnabled(false);
+    CObject::drawing_scale = 1.0;
 }
 
 MainWindow::~MainWindow()
@@ -150,7 +161,7 @@ void MainWindow::RefreshUI(){
     for(CObject* obj:this->model->GetSelected())if(obj->is<CEdge>())edges.push_back(dynamic_cast<CEdge*>(obj));
     for(CObject* obj:this->model->GetSelected())if(obj->is<CFace>())faces.push_back(dynamic_cast<CFace*>(obj));
     ui->ToolFace      ->setEnabled(search.SearchEdgeMakeFace(edges) .size() > 0);   //面作成ボタン
-    ui->ToolBlocks    ->setEnabled(search.SearchFaceMakeBlock(faces).size() > 0);   //立体作成ボタン
+    ui->ToolBlock     ->setEnabled(search.SearchFaceMakeBlock(faces).size() > 0);   //立体作成ボタン
     ui->ToolProjection->setEnabled(search.Projectable(this->model->GetSelected())); //投影ボタン
 
     this->repaint();
@@ -172,24 +183,18 @@ void MainWindow::Toggled##TYPE (bool checked){  \
 ToggledToolDefinition(Point)
 ToggledToolDefinition(Line)
 ToggledToolDefinition(Arc)
-//ToggledToolDefinition(Rect)
 ToggledToolDefinition(Spline)
 
 void MainWindow::ToggledFileEdge(bool){
     //ファイルパス変更ダイアログ
-    QString filepath = QFileDialog::getOpenFileName(this,
-                                                    "外部ファイルを選択",
-                                                    "",
-                                                    "CSV File(*.csv);;All Files (*)");
+    QString filepath = QFileDialog::getOpenFileName(this,"外部ファイルを選択","","CSV File(*.csv);;All Files (*)");
     if(filepath != ""){
         CFileEdge* edge = CFileEdge::CreateFromFile(filepath);
         if(edge != nullptr){
             this->model->AddEdges(edge);
-            this->model->AddPoints(edge->start);
-            for(int i =0;i<edge->GetChildCount();i++){
-                this->model->AddObject(edge->GetChild(i));
+            for(CPoint* p:edge->GetAllChildren()){
+                this->model->AddObject(p);
             }
-            this->model->AddPoints(edge->end);
         }
     }
 }
@@ -216,10 +221,6 @@ void MainWindow::ToggledSTL(bool){
     this->ui->SolidEdit->repaint();
 }
 
-void MainWindow::ToggleConflict(bool conflict){
-    if(conflict)this->ui->actionCheckConflict->setIcon(QIcon(":/Others/Conflict.png"));
-    else        this->ui->actionCheckConflict->setIcon(QIcon(":/Others/NotConflict.png"));
-}
 void MainWindow::ShowProperty(){
     prop_diag->UpdateLayout();
     prop_diag->show();
@@ -227,13 +228,6 @@ void MainWindow::ShowProperty(){
 
 void MainWindow::ShowMoveTransform(){
     this->move_diag->show();
-}
-void MainWindow::ShowGridFilter(){
-    static GridFilterDialog* diag = new GridFilterDialog(this);
-    //connect(diag,SIGNAL(ChangeGri dStatus(double,double)),ui->CadEdit,SLOT(SetGridFilterStatus(double,double)));
-    diag->setWindowTitle("GridFilter");
-    diag->setWindowFlags(Qt::Dialog | Qt::WindowStaysOnTopHint);
-    diag->show();
 }
 
 void MainWindow::MakeRestraint(QListWidgetItem*){

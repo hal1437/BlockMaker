@@ -46,24 +46,24 @@ signals:
 public slots:
     void SetModel(CadModelCore* model);
 
-    void CtrlZ();             //1手戻る
-    void Delete();            //削除
     void ConnectSignals();    //シグナル接続
     void DisconnectSignals(); //シグナル切断
+
+
+    void CtrlZ();             //1手戻る
+    void Delete();            //削除
     void ClearButton();       //全ボタンリセット
     void RefreshUI();         //UI更新
 
-    void ToggledPoint   (bool checked);//点
-    void ToggledLine    (bool checked);//直線
-    void ToggledArc     (bool checked);//円弧
-    void ToggledSpline  (bool checked);//スプライン
-    void ToggledFileEdge(bool checked);//外部ファイル
-    void ToggledSTL     (bool checked);//STL
-    void ToggleConflict (bool conflict);//競合
+    void ToggledPoint   (bool checked); //点
+    void ToggledLine    (bool checked); //直線
+    void ToggledArc     (bool checked); //円弧
+    void ToggledSpline  (bool checked); //スプライン
+    void ToggledFileEdge(bool checked); //外部ファイル
+    void ToggledSTL     (bool checked); //STL
 
     void ShowProperty();          //プロパティダイアログ表示
     void ShowMoveTransform();     //移動ダイアログ表示
-    void ShowGridFilter();        //グリッドフィルター表示
 
     void MakeRestraint(QListWidgetItem *);   //拘束作成
     void MakeBlock();       //ブロック作成

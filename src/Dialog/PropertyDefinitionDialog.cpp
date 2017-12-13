@@ -213,7 +213,7 @@ void PropertyDefinitionDialog::UpdateLayout(){
         this->name_edit .show();
 
         //変更不可なものが含まれていれば
-        if(exist(selected,CPoint::origin) ||
+        if(exist(selected,this->model->origin) ||
            exist(selected,CFace::base[0]) ||
            exist(selected,CFace::base[1]) ||
            exist(selected,CFace::base[2])){

@@ -92,15 +92,13 @@
    <addaction name="ToolFileEdge"/>
    <addaction name="ToolSTL"/>
    <addaction name="separator"/>
-   <addaction name="ToolBlocks"/>
+   <addaction name="ToolBlock"/>
    <addaction name="ToolFace"/>
-   <addaction name="ToolDimension"/>
+   <addaction name="separator"/>
    <addaction name="actionProperty"/>
    <addaction name="actionMove"/>
    <addaction name="separator"/>
    <addaction name="actionDelete"/>
-   <addaction name="actionCheckConflict"/>
-   <addaction name="actionGridFilter"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <widget class="QDockWidget" name="ObjectDock">
@@ -387,7 +385,7 @@
     <string>Spline</string>
    </property>
   </action>
-  <action name="ToolBlocks">
+  <action name="ToolBlock">
    <property name="enabled">
     <bool>false</bool>
    </property>

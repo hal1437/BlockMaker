@@ -1,6 +1,5 @@
 #include "CPoint.h"
 
-CPoint* CPoint::origin;
 CPoint* CPoint::hanged;
 
 CREATE_RESULT CPoint::Create(CPoint *pos){
