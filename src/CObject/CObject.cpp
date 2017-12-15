@@ -34,8 +34,10 @@ QVector<CPoint *> CObject::GetAllChildren()const{
     QVector<CPoint*> ans;
     for(int i=0;i<this->GetChildCount();i++){
         //追加
-        for(CPoint* v:this->GetChild(i)->GetAllChildren()){
-            ans.push_back(v);
+        if(this->GetChild(i) != nullptr){
+            for(CPoint* v:this->GetChild(i)->GetAllChildren()){
+                ans.push_back(v);
+            }
         }
     }
     return ans;

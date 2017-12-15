@@ -276,32 +276,12 @@ void SolidEditForm::paintGL(){
     CObject* hanged = this->GetHangedFace();
     if(hanged == nullptr)hanged = this->GetHangedObject();
 
-    //幾何拘束描画
-    QVector<std::pair<Pos,QVector<QString>>> rest_maps;
-    for(Restraint* rest : this->model->GetRestraints()){
-        for(Pos pp:rest->GetIconPoint()){
-            bool exist = false;
-            for(std::pair<Pos,QVector<QString>>& p: rest_maps){
-                if(p.first == pp){
-                    p.second.push_back(rest->GetIconPath());
-                    exist = true;
-                    break;
-                }
-            }
-            if(exist != true){
-                rest_maps.push_back(std::make_pair(pp,QVector<QString>{rest->GetIconPath()}));
-            }
-        }
+    //幾何拘束
+    for(Restraint* rest :this->model->GetRestraints()){
+        rest->DrawGL(this->camera,this->center);
     }
-    for(std::pair<Pos,QVector<QString>> ss : rest_maps){
-        for(int i=0;i<ss.second.size();i++){
-            QImage img(ss.second[i]);
-            QImage glimg = QGLWidget::convertToGLFormat(img);
-            Pos cp = ss.first + Pos(30*i,0,0).Dot(quat);
-            glRasterPos3f(cp.x(),cp.y(),cp.z());
-            glDrawPixels(img.width(), img.height(), GL_RGBA, GL_UNSIGNED_BYTE, glimg.bits());
-        }
-    }
+
+
     const int ALL_OBJECT_WIDTH = 3;
     glLineWidth(ALL_OBJECT_WIDTH*2/3);
 
@@ -327,8 +307,6 @@ void SolidEditForm::paintGL(){
     if(this->controller->isSketcheing())         paintObject(this->controller->projection_face,{1,1,0,1},ALL_OBJECT_WIDTH);//選択物体(平面)
     //オブジェクト描画：STL
     for(CStl*   stl   : this->model->GetStls  ())paintObject(stl  ,{0.5,0.5,0.5,1},ALL_OBJECT_WIDTH);//STL
-
-
 
     //座標線の描画
     glLineWidth(3);

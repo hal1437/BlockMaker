@@ -215,14 +215,16 @@ SolidEditController::~SolidEditController()
 }
 
 void SolidEditController::Create3Face(){
+    //三平面を再生成する。
+
     if(exist(CFace::base,nullptr)){
         //新規作成
         CFace::base[0] = this->getFrontFace();
         CFace::base[1] = this->getTopFace();
         CFace::base[2] = this->getSideFace();
-        for(int i =0;i<3;i++){
-            this->model->AddFaces(CFace::base[i]);
-            CFace::base[i]->SetContours(true);
+        for(CFace*& f : CFace::base){
+            this->model->AddFaces(f);
+            f->SetContours(true);
         }
     }else{
         //引き継ぎ

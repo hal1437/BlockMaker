@@ -26,7 +26,7 @@ public slots:                                       \
 #define OBSERVER_IO_COBJECT(TYPE,NAME)                                      \
 inline void Add##NAME(TYPE value){                                          \
     connect(value,SIGNAL(Changed   ()                 ),this,SLOT(Update##NAME##Emittor()));    \
-    connect(value,SIGNAL(Conflicted(CObject*,Conflict)),this,SLOT(ConflictAntObjectEmittor(CObject*,Conflict)));    \
+    connect(value,SIGNAL(Conflicted(CObject*,Conflict)),this,SLOT(ConflictAnyObjectEmittor(CObject*,Conflict)));    \
     if(!exist(NAME,value)){                                                 \
         NAME.push_back(value);                                              \
         emit Update##NAME();                                                \
@@ -34,7 +34,7 @@ inline void Add##NAME(TYPE value){                                          \
 }                                                                           \
 inline void Remove##NAME(TYPE value){                                       \
     disconnect(value,SIGNAL(Changed   ()                 ),this,SLOT(Update##NAME##Emittor()));    \
-    disconnect(value,SIGNAL(Conflicted(CObject*,Conflict)),this,SLOT(ConflictAntObjectEmittor(CObject*,Conflict)));    \
+    disconnect(value,SIGNAL(Conflicted(CObject*,Conflict)),this,SLOT(ConflictAnyObjectEmittor(CObject*,Conflict)));    \
     NAME.removeAll(value);                                                  \
     emit Update##NAME();                                                    \
 }
@@ -72,14 +72,15 @@ class CadModelCore:public QObject
 
 public:
     //オブジェクト定義
-    DEFINE_OBSERVER_COBJECT(CObject*  ,Selected  )//選択
-    DEFINE_OBSERVER_COBJECT(CPoint*   ,Points    )//点
-    DEFINE_OBSERVER_COBJECT(CEdge*    ,Edges     )//線
-    DEFINE_OBSERVER_COBJECT(CFace*    ,Faces     )//面
-    DEFINE_OBSERVER_COBJECT(CBlock*   ,Blocks    )//立体
-    DEFINE_OBSERVER_COBJECT(CStl*     ,Stls      )//STL
+    DEFINE_OBSERVER_COBJECT(CObject*,Selected) //選択
+    DEFINE_OBSERVER_COBJECT(CPoint* ,Points  ) //点
+    DEFINE_OBSERVER_COBJECT(CEdge*  ,Edges   ) //線
+    DEFINE_OBSERVER_COBJECT(CFace*  ,Faces   ) //面
+    DEFINE_OBSERVER_COBJECT(CBlock* ,Blocks  ) //立体
+    DEFINE_OBSERVER_COBJECT(CStl*   ,Stls    ) //STL
 
-    DEFINE_OBSERVER_RESTRAINT(Restraint*      ,Restraints)
+    DEFINE_OBSERVER_RESTRAINT(Restraint* ,SelectedRestraints) //選択拘束
+    DEFINE_OBSERVER_RESTRAINT(Restraint* ,Restraints)         //拘束
 
 public:
     CPoint* origin; //原点
@@ -118,11 +119,12 @@ public slots:
     DEFINE_EMITTOR(UpdateFaces)
     DEFINE_EMITTOR(UpdateBlocks)
     DEFINE_EMITTOR(UpdateStls)
+    DEFINE_EMITTOR(UpdateSelectedRestraints)
     DEFINE_EMITTOR(UpdateRestraints)
     DEFINE_EMITTOR(UpdateDimensions)
     DEFINE_EMITTOR(UpdateAnyObject)
     DEFINE_EMITTOR(UpdateAnyAction)
-    void ConflictAntObjectEmittor(CObject* object,Conflict conf);
+    void ConflictAnyObjectEmittor(CObject* object,Conflict conf);
 
     //削除
     void Delete(CObject*   obj);
@@ -150,6 +152,7 @@ signals:
     void UpdateFaces      ();
     void UpdateBlocks     ();
     void UpdateStls       ();
+    void UpdateSelectedRestraints();
     void UpdateRestraints ();
     void UpdateDimensions ();
     void UpdateAnyObject  ();

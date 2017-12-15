@@ -52,6 +52,7 @@
         <file>LockRestraint.png</file>
         <file>UnlockRestraint.png</file>
         <file>CrossRestraint.png</file>
+        <file>Restraint.png</file>
     </qresource>
     <qresource prefix="/Others">
         <file>Conflict.png</file>

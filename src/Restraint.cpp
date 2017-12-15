@@ -1,18 +1,5 @@
 #include "Restraint.h"
 
-void Restraint::ObserveChild(CObject* obj){
-    //コールバック接続
-    if(obj != nullptr){
-        connect(obj,SIGNAL(Changed(CObject*)),this,SLOT(ChangeObjectCallback(CObject*)));
-    }
-}
-void Restraint::IgnoreChild(CObject* obj){
-    //コールバック接続解除
-    if(obj != nullptr){
-        disconnect(obj,SIGNAL(Changed(CObject*)),this,SLOT(ChangeObjectCallback(CObject*)));
-    }
-}
-
 QVector<Restraint*> Restraint::Restraintable(const QVector<CObject*> nodes){
     //実際にオブジェクトを生成して投げつける
     QVector<Restraint*> ans;
@@ -24,18 +11,53 @@ QVector<Restraint*> Restraint::Restraintable(const QVector<CObject*> nodes){
     if(      MatchRestraint::Restraintable(nodes))ans.push_back(new MatchRestraint     (nodes));
     return ans;
 }
+void Restraint::DrawGL(Pos camera,Pos center)const{
+    //カメラ変換行列
+    Pos cc = camera - center;
+    double theta1 = std::atan2(cc.y(),std::sqrt(cc.x()*cc.x()+cc.z()*cc.z()));
+    double theta2 = std::atan2(-cc.x(),cc.z());
+    Quat quat = Quat::getRotateXMatrix(theta1).Dot(Quat::getRotateYMatrix(theta2));
+
+    QImage img(this->GetIconPath());
+    QImage glimg = QGLWidget::convertToGLFormat(img);
+    for(Pos pp:this->GetIconPoint()){
+        Pos cp = pp + Pos(30*this->stack_level,0,0).Dot(quat);
+        glRasterPos3f(cp.x(),cp.y(),cp.z());
+        glDrawPixels(img.width(), img.height(), GL_RGBA, GL_UNSIGNED_BYTE, glimg.bits());
+    }
+}
 void Restraint::Create(const QVector<CObject*> nodes){
-    this->nodes = nodes;
+    this->children = nodes;
     for(CObject* edge:nodes)ObserveChild(edge);
 }
+CObject* Restraint::GetChild     (int index){
+    return this->children[index];
+}
+void     Restraint::SetChild     (int index,CObject* obj){
+    this->children[index] = obj;
+}
 
-Restraint::Restraint(QVector<CObject*> nodes):
-    nodes(nodes){
+int      Restraint::GetChildCount()const{
+    return this->children.size();
+}
+CObject* Restraint::Clone()const{
+    /*
+    Restraint* c = new Restraint();
+    c->children    = this->children;
+    c->stack_level = this->stack_level;
+    return c;*/
+}
+
+
+
+Restraint::Restraint(QVector<CObject*> children):
+    children(children){
+    stack_level = 0;
 }
 
 QVector<Pos> Restraint::GetIconPoint()const{
     QVector<Pos> ans;
-    for(CObject* obj:this->nodes){
+    for(CObject* obj:this->children){
         Pos p;
         if(obj->is<CPoint>())p = *dynamic_cast<CPoint*>(obj);//点自身
         else if(obj->is<CEdge>() )p = dynamic_cast<CEdge*>(obj)->GetMiddleDivide(0.5);//中点
@@ -58,8 +80,8 @@ void EqualLengthRestraint::Create(const QVector<CObject*> nodes){
 }
 bool EqualLengthRestraint::isComplete(){
     //全てのEdgeの長さが同じ
-    double dd = (*dynamic_cast<CEdge*>(this->nodes[0])->end - *dynamic_cast<CEdge*>(this->nodes[0])->start).Length();
-    return std::all_of(this->nodes.begin()+1,this->nodes.end(),[dd](CObject* obj){
+    double dd = (*dynamic_cast<CEdge*>(this->children[0])->end - *dynamic_cast<CEdge*>(this->children[0])->start).Length();
+    return std::all_of(this->children.begin()+1,this->children.end(),[dd](CObject* obj){
         CEdge* edge = dynamic_cast<CEdge*>(obj);
         return (*edge->end - *edge->start).Length() == dd;
     });
@@ -67,9 +89,9 @@ bool EqualLengthRestraint::isComplete(){
 void EqualLengthRestraint::Calc(){
     //先頭のCEdgeの長さに統一する。
     bool changed = false;
-    double dd = (*dynamic_cast<CEdge*>(this->nodes[0])->end - *dynamic_cast<CEdge*>(this->nodes[0])->start).Length();
-    for(int i=1;i<this->nodes.size();i++){
-        CEdge* edge = dynamic_cast<CEdge*>(this->nodes[i]);
+    double dd = (*dynamic_cast<CEdge*>(this->children[0])->end - *dynamic_cast<CEdge*>(this->children[0])->start).Length();
+    for(int i=1;i<this->children.size();i++){
+        CEdge* edge = dynamic_cast<CEdge*>(this->children[i]);
         //中心へ移動させる
         Pos center = (*edge->end + *edge->start)/2;
         *edge->start = (*edge->start - center).GetNormalize() * dd/2 + center;
@@ -83,8 +105,8 @@ void EqualLengthRestraint::Calc(){
 
 bool ConcurrentRestraint::isComplete(){
     //全てのEdgeの向きが同じ
-    Pos pos = (*dynamic_cast<CEdge*>(this->nodes[0])->end - *dynamic_cast<CEdge*>(this->nodes[0])->start).GetNormalize();
-    return std::all_of(this->nodes.begin()+1,this->nodes.end(),[pos](CObject* obj){
+    Pos pos = (*dynamic_cast<CEdge*>(this->children[0])->end - *dynamic_cast<CEdge*>(this->children[0])->start).GetNormalize();
+    return std::all_of(this->children.begin()+1,this->children.end(),[pos](CObject* obj){
         CEdge* edge = dynamic_cast<CEdge*>(obj);
         return (*edge->end - *edge->start).GetNormalize() == pos;
     });
@@ -92,9 +114,9 @@ bool ConcurrentRestraint::isComplete(){
 void ConcurrentRestraint::Calc(){
     //先頭のCEdgeと同じ向きに変更する。
     bool changed = false;
-    Pos base = (*dynamic_cast<CEdge*>(this->nodes[0])->end - *dynamic_cast<CEdge*>(this->nodes[0])->start).GetNormalize();
-    for(int i=1;i<this->nodes.size();i++){
-        CEdge* edge = dynamic_cast<CEdge*>(this->nodes[i]);
+    Pos base = (*dynamic_cast<CEdge*>(this->children[0])->end - *dynamic_cast<CEdge*>(this->children[0])->start).GetNormalize();
+    for(int i=1;i<this->children.size();i++){
+        CEdge* edge = dynamic_cast<CEdge*>(this->children[i]);
         //endを移動させる
         double l = (*edge->end  - *edge->start).Length();
         if((*edge->end - *edge->start).DotPos(base) < 0) l = -l;//反転
@@ -120,16 +142,16 @@ bool VerticalRestraint::Restraintable(const QVector<CObject *> nodes){
     return true;
 }
 bool VerticalRestraint::isComplete(){
-    CEdge* base_edge = dynamic_cast<CEdge*>(this->nodes[0]);
+    CEdge* base_edge = dynamic_cast<CEdge*>(this->children[0]);
     //すべてのEdgeの端点が初めのEdgeと一致している
-    if(std::any_of(this->nodes.begin()+1,this->nodes.end(),[&](CObject* obj){
+    if(std::any_of(this->children.begin()+1,this->children.end(),[&](CObject* obj){
         CEdge* edge = dynamic_cast<CEdge*>(obj);
         return (!base_edge->isOnEdge(*edge->start))  &&
                (!base_edge->isOnEdge(*edge->end  ));
     }))return false;
 
     //すべてのEdgeの端点が水平方向に成分を持たない
-    if(std::any_of(this->nodes.begin()+1,this->nodes.end(),[&](CObject* obj){
+    if(std::any_of(this->children.begin()+1,this->children.end(),[&](CObject* obj){
         CEdge* edge = dynamic_cast<CEdge*>(obj);
         CPoint *base,*move;//起点,移動点
         if(base_edge->isOnEdge(*edge->start)){
@@ -147,9 +169,9 @@ bool VerticalRestraint::isComplete(){
 }
 void VerticalRestraint::Calc(){
     //先頭のCEdgeと同じ向きに変更する。
-    for(int i = 1;i<this->nodes.size();i++){
-        CEdge* base_edge = dynamic_cast<CEdge*>(this->nodes[0]);
-        CEdge* move_edge = dynamic_cast<CEdge*>(this->nodes[i]);
+    for(int i = 1;i<this->children.size();i++){
+        CEdge* base_edge = dynamic_cast<CEdge*>(this->children[0]);
+        CEdge* move_edge = dynamic_cast<CEdge*>(this->children[i]);
         CPoint *base,*move;//起点,移動点
         if(base_edge->isOnEdge(*move_edge->start)){
             move = move_edge->end;
@@ -168,7 +190,7 @@ void VerticalRestraint::Calc(){
 
 bool LockRestraint::isComplete(){
     bool unlocked = false;
-    for(CObject* child :this->nodes){
+    for(CObject* child :this->children){
         for(CPoint* pp:child->GetAllChildren()){
             //一つでもロックが解除されていれば
             if(!pp->isLock())unlocked = true;
@@ -178,7 +200,7 @@ bool LockRestraint::isComplete(){
     return !unlocked;
 }
 void LockRestraint::Calc(){
-    for(CObject* child :this->nodes){
+    for(CObject* child :this->children){
         for(CPoint* pp:child->GetAllChildren()){
             //全てロック
             pp->SetLock(true);
@@ -188,7 +210,7 @@ void LockRestraint::Calc(){
 void LockRestraint::ChangeObjectCallback(CObject*){
     if(!this->isComplete()){
         //全てのロックの解除
-        for(CObject* child :this->nodes){
+        for(CObject* child :this->children){
             for(CPoint* pp:child->GetAllChildren()){
                 //全てのロックを解除
                 pp->SetLock(false);
@@ -208,7 +230,7 @@ bool LockRestraint::Restraintable(const QVector<CObject *> nodes){
 }
 
 void UnlockRestraint::Calc(){
-    for(CObject* child :this->nodes){
+    for(CObject* child :this->children){
         for(CPoint* pp:child->GetAllChildren()){
             //全てロック解除
             pp->SetLock(false);
@@ -230,33 +252,33 @@ bool UnlockRestraint::Restraintable(const QVector<CObject *> nodes){
 
 QVector<Pos> MatchRestraint::GetIconPoint()const{
     QVector<Pos> ans;
-    for(int i=0;i<this->nodes.size();i++){
-        if(this->nodes[i]->is<CPoint>()){
-            ans.push_back(*dynamic_cast<CPoint*>(this->nodes[i]));
+    for(int i=0;i<this->children.size();i++){
+        if(this->children[i]->is<CPoint>()){
+            ans.push_back(*dynamic_cast<CPoint*>(this->children[i]));
         }
     }
     return ans;
 }
 void MatchRestraint::Calc(){
     //CPointでないCObjectにその他のCPoint一致させる。
-    for(int i=0;i<this->nodes.size();i++){
-        if(!this->nodes[i]->is<CPoint>()){
-            for(int j=0;j<this->nodes.size();j++){
+    for(int i=0;i<this->children.size();i++){
+        if(!this->children[i]->is<CPoint>()){
+            for(int j=0;j<this->children.size();j++){
                 if(i==j)continue;
-                CPoint* pos = dynamic_cast<CPoint*>(this->nodes[j]);
-                pos->MoveAbsolute(this->nodes[i]->GetNearPos(*pos));
+                CPoint* pos = dynamic_cast<CPoint*>(this->children[j]);
+                pos->MoveAbsolute(this->children[i]->GetNearPos(*pos));
 
             }
         }
     }
 }
 bool MatchRestraint::isComplete(){
-    for(int i=0;i<this->nodes.size();i++){
-        if(!this->nodes[i]->is<CPoint>()){
-            for(int j=0;j<this->nodes.size();j++){
+    for(int i=0;i<this->children.size();i++){
+        if(!this->children[i]->is<CPoint>()){
+            for(int j=0;j<this->children.size();j++){
                 if(i==j)continue;
-                CPoint* pos = dynamic_cast<CPoint*>(this->nodes[j]);
-                if((*pos - this->nodes[i]->GetNearPos(*pos)).Length() > 1.0e-10){
+                CPoint* pos = dynamic_cast<CPoint*>(this->children[j]);
+                if((*pos - this->children[i]->GetNearPos(*pos)).Length() > 1.0e-10){
                     return false;
                 }
             }

@@ -138,9 +138,9 @@ Pos CArc::GetNearPos (const Pos& hand)const{
 
 CEdge* CArc::Clone()const{
     CArc* ptr   = new CArc(this->parent());
-    ptr->Create(new CPoint(*this->center ,ptr));
-    ptr->Create(new CPoint(*this->start  ,ptr));
-    ptr->Create(new CPoint(*this->end    ,ptr));
+    if(this->center != nullptr)ptr->Create(new CPoint(*this->center ,ptr));
+    if(this->start  != nullptr)ptr->Create(new CPoint(*this->start  ,ptr));
+    if(this->end    != nullptr)ptr->Create(new CPoint(*this->end    ,ptr));
     ptr->grading = this->grading;
     ptr->divide  = this->divide;
     return ptr;

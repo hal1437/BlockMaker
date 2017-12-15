@@ -101,7 +101,7 @@ signals:
 
 public slots:
     //変更コールバック保存
-    virtual void StackChangeCallback(CObject* children);
+    void StackChangeCallback(CObject* children);
     //子変更コールバック
     virtual void ChangeChildCallback(QVector<CObject*> children);
 
