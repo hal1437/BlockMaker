@@ -12,6 +12,12 @@ QVector<Restraint*> Restraint::Restraintable(const QVector<CObject*> nodes){
     return ans;
 }
 void Restraint::DrawGL(Pos camera,Pos center)const{
+    int old_width;
+    //色と線の太さを保存
+    glGetIntegerv(GL_LINE_WIDTH   ,&old_width);
+    //色と線の太さを設定
+    glLineWidth(2);
+
     //カメラ変換行列
     Pos cc = camera - center;
     double theta1 = std::atan2(cc.y(),std::sqrt(cc.x()*cc.x()+cc.z()*cc.z()));
@@ -21,10 +27,23 @@ void Restraint::DrawGL(Pos camera,Pos center)const{
     QImage img(this->GetIconPath());
     QImage glimg = QGLWidget::convertToGLFormat(img);
     for(Pos pp:this->GetIconPoint()){
-        Pos cp = pp + Pos(30*this->stack_level,0,0).Dot(quat);
+        //描画座標
+        Pos cp   = pp + Pos(30*this->stack_level,0,0).Dot(quat);//画像描画座標
         glRasterPos3f(cp.x(),cp.y(),cp.z());
         glDrawPixels(img.width(), img.height(), GL_RGBA, GL_UNSIGNED_BYTE, glimg.bits());
+
+        //枠線
+        glBegin(GL_LINE_LOOP);
+        const double length = cc.Length()*10*std::sqrt(2);
+        Pos ofs = Pos(1/std::sqrt(2),1/std::sqrt(2),1);
+        for(int i =0;i<4;i++){
+            Pos p = ((Pos(std::sin((i+0.5)*M_PI/2),std::cos((i+0.5)*M_PI/2),0) + ofs)*length).Dot(quat);
+            glVertex3f((cp+p).x(),(cp+p).y(),(cp+p).z());
+        }
+        glEnd();
     }
+    //色と線の太さを復元
+    glLineWidth(old_width);
 }
 void Restraint::Create(const QVector<CObject*> nodes){
     this->children = nodes;

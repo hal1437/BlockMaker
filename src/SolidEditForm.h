@@ -24,7 +24,7 @@ class SolidEditForm : public QOpenGLWidget ,public CadModelCoreInterface
     const int    SENSITIVITY        = 100;      //マウス感度
     const double CAMERA_ANGLE_LIMIT = M_PI/720; //角度限界値
 private:
-    SolidEditController* controller;
+    SolidEditController*  controller;
     MakeObjectController* make_controller;
     CadModelMenu menu;
 
@@ -49,6 +49,7 @@ private:
     void MakeObject(); //オブジェクト生成
     CFace*   GetHangedFace  ();     //直下面を取得
     CObject* GetHangedObject();     //直下オブジェクトを取得
+    void NormComvertColor(Pos); //ベクトルを色に変換
     void ColorSelect(CObject* obj); //オブジェクト色選択
 
 public:
@@ -67,7 +68,6 @@ public:
     void paintObject(CObject* obj, QVector<double> color, int tick); //  選択したオブジェクトを描画する
 
 public slots:
-
     void StartProjection(CFace* face);
     void SetCameraRotate(double theta1,double theta2);
     void SetCameraCenter(Pos point);
