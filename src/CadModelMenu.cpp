@@ -4,42 +4,37 @@
 void CadModelMenu::Show(QPoint pos){
     QVector<CObject*> selected = this->CadModelCoreInterface::model->GetSelected();
     this->menu = new QMenu();
-    if(!selected.isEmpty()){
+
+    //全てのオブジェクト
+    if(selected.size() > 0 ){
         this->delete_action          = this->menu->addAction("削除");
         connect(this->delete_action,SIGNAL(triggered(bool)),this,SLOT(Delete(bool)));
     }
 
+    //いずれかが円弧
     if(std::any_of(selected.begin(),selected.end(),[&](CObject* obj){return obj->is<CArc>();})){
         this->reverse_action         = this->menu->addAction("円弧反転");
         connect(this->reverse_action   ,SIGNAL(triggered(bool)),this,SLOT(ReverseArc(bool)));
     }
-    for(CObject* obj:selected){
-        if(!obj->isVisible()){
-            this->visible_action         = this->menu->addAction("表示");
-            connect(this->visible_action        ,SIGNAL(triggered(bool)),this,SLOT(SetVisible(bool)));
-            break;
-        }
+    //いずれかが「非表示」
+    if(std::any_of(selected.begin(),selected.end(),[&](CObject* obj){return !obj->isVisible();})){
+        this->visible_action         = this->menu->addAction("表示");
+        connect(this->visible_action        ,SIGNAL(triggered(bool)),this,SLOT(SetVisible(bool)));
     }
-    for(CObject* obj:selected){
-        if(obj->isVisible()){
-            this->invisible_action       = this->menu->addAction("非表示");
-            connect(this->invisible_action      ,SIGNAL(triggered(bool)),this,SLOT(SetInvisible(bool)));
-            break;
-        }
+    //いずれかが「表示」
+    if(std::any_of(selected.begin(),selected.end(),[&](CObject* obj){return obj->isVisible();})){
+        this->invisible_action       = this->menu->addAction("非表示");
+        connect(this->invisible_action      ,SIGNAL(triggered(bool)),this,SLOT(SetInvisible(bool)));
     }
-    for(CObject* obj:selected){
-        if(!obj->isVisibleDetail()){
-            this->visible_mesh_action   = this->menu->addAction("詳細表示");
-            connect(this->visible_mesh_action  ,SIGNAL(triggered(bool)),this,SLOT(SetVisibleDetail(bool)));
-            break;
-        }
+    //いずれかが「詳細非表示」
+    if(std::any_of(selected.begin(),selected.end(),[&](CObject* obj){return !obj->isVisibleDetail();})){
+        this->visible_mesh_action   = this->menu->addAction("詳細表示");
+        connect(this->visible_mesh_action  ,SIGNAL(triggered(bool)),this,SLOT(SetVisibleDetail(bool)));
     }
-    for(CObject* obj:selected){
-        if(obj->isVisibleDetail()){
-            this->invisible_mesh_action = this->menu->addAction("詳細非表示");
-            connect(this->invisible_mesh_action,SIGNAL(triggered(bool)),this,SLOT(SetInVisibleDetail(bool)));
-            break;
-        }
+    //いずれかが「詳細表示」
+    if(std::any_of(selected.begin(),selected.end(),[&](CObject* obj){return obj->isVisibleDetail();})){
+        this->invisible_mesh_action = this->menu->addAction("詳細非表示");
+        connect(this->invisible_mesh_action,SIGNAL(triggered(bool)),this,SLOT(SetInVisibleDetail(bool)));
     }
     this->menu->exec(pos);
 }

@@ -79,7 +79,6 @@ public:
     DEFINE_OBSERVER_COBJECT(CBlock* ,Blocks  ) //立体
     DEFINE_OBSERVER_COBJECT(CStl*   ,Stls    ) //STL
 
-    DEFINE_OBSERVER_RESTRAINT(Restraint* ,SelectedRestraints) //選択拘束
     DEFINE_OBSERVER_RESTRAINT(Restraint* ,Restraints)         //拘束
 
 public:
@@ -119,7 +118,6 @@ public slots:
     DEFINE_EMITTOR(UpdateFaces)
     DEFINE_EMITTOR(UpdateBlocks)
     DEFINE_EMITTOR(UpdateStls)
-    DEFINE_EMITTOR(UpdateSelectedRestraints)
     DEFINE_EMITTOR(UpdateRestraints)
     DEFINE_EMITTOR(UpdateDimensions)
     DEFINE_EMITTOR(UpdateAnyObject)
@@ -152,7 +150,6 @@ signals:
     void UpdateFaces      ();
     void UpdateBlocks     ();
     void UpdateStls       ();
-    void UpdateSelectedRestraints();
     void UpdateRestraints ();
     void UpdateDimensions ();
     void UpdateAnyObject  ();

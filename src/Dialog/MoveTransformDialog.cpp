@@ -31,7 +31,8 @@ void MoveTransformDialog::RefreshTranslated(){
     translated.clear();
     //複製
     for(CObject* obj:this->model->GetSelected()){
-        translated.push_back(obj->Clone());
+        CObject* ptr = obj->Clone();
+        if(ptr != nullptr)translated.push_back(ptr);
     }
 
     Pos value = Pos(this->ui->XSpinBox->value(),

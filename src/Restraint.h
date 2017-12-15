@@ -87,8 +87,8 @@ public:
     virtual QString GetRestraintName ()const = 0; //拘束名
     virtual QVector<Pos> GetIconPoint()const;     //アイコン表示点を取得
 
-    virtual Pos GetNearPos (const Pos& hand)const{return Pos();}
-    virtual Pos GetNearLine(const Pos& pos1,const Pos& pos2)const{return Pos();}
+    virtual Pos GetNearPos (const Pos&)const{return Pos();}
+    virtual Pos GetNearLine(const Pos&,const Pos&)const{return Pos();}
 
     Restraint(QVector<CObject*> nodes = QVector<CObject*>());
 

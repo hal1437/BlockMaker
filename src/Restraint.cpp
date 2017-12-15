@@ -65,6 +65,7 @@ CObject* Restraint::Clone()const{
     c->children    = this->children;
     c->stack_level = this->stack_level;
     return c;*/
+    return nullptr;
 }
 
 
