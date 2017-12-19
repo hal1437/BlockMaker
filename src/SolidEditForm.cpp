@@ -242,7 +242,7 @@ void SolidEditForm::initializeGL(){
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
-void SolidEditForm::resizeGL(int w, int h){
+void SolidEditForm::resizeGL(int,int){
 }
 
 void SolidEditForm::paintGL(){

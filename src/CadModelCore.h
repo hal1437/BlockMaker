@@ -27,6 +27,7 @@ public slots:                                       \
 inline void Add##NAME(TYPE value){                                          \
     connect(value,SIGNAL(Changed   ()                 ),this,SLOT(Update##NAME##Emittor()));    \
     connect(value,SIGNAL(Conflicted(CObject*,Conflict)),this,SLOT(ConflictAnyObjectEmittor(CObject*,Conflict)));    \
+    connect(value,SIGNAL(Solved    (CObject*         )),this,SLOT(SolvedAnyObjectEmittor  (CObject*)));             \
     if(!exist(NAME,value)){                                                 \
         NAME.push_back(value);                                              \
         emit Update##NAME();                                                \
@@ -35,6 +36,7 @@ inline void Add##NAME(TYPE value){                                          \
 inline void Remove##NAME(TYPE value){                                       \
     disconnect(value,SIGNAL(Changed   ()                 ),this,SLOT(Update##NAME##Emittor()));    \
     disconnect(value,SIGNAL(Conflicted(CObject*,Conflict)),this,SLOT(ConflictAnyObjectEmittor(CObject*,Conflict)));    \
+    disconnect(value,SIGNAL(Solved    (CObject*         )),this,SLOT(SolvedAnyObjectEmittor  (CObject*)));             \
     NAME.removeAll(value);                                                  \
     emit Update##NAME();                                                    \
 }
@@ -44,6 +46,8 @@ inline void Remove##NAME(TYPE value){                                       \
 inline void Add##NAME(TYPE value){                                          \
     connect(value,SIGNAL(Changed())    ,this,SLOT(Update##NAME##Emittor()));\
     connect(value,SIGNAL(Destroy(TYPE)),this,SLOT(Delete(TYPE)));           \
+    connect(value,SIGNAL(Conflicted(CObject*,Conflict)),this,SLOT(ConflictAnyObjectEmittor(CObject*,Conflict)));    \
+    connect(value,SIGNAL(Solved    (CObject*         )),this,SLOT(SolvedAnyObjectEmittor  (CObject*)));             \
     if(!exist(NAME,value)){                                                 \
         NAME.push_back(value);                                              \
         emit Update##NAME();                                                \
@@ -52,6 +56,8 @@ inline void Add##NAME(TYPE value){                                          \
 inline void Remove##NAME(TYPE value){                                       \
     disconnect(value,SIGNAL(Changed()),this,SLOT(Update##NAME##Emittor())); \
     disconnect(value,SIGNAL(Destroy(TYPE)),this,SLOT(Delete(TYPE)));        \
+    disconnect(value,SIGNAL(Conflicted(CObject*,Conflict)),this,SLOT(ConflictAnyObjectEmittor(CObject*,Conflict)));    \
+    disconnect(value,SIGNAL(Solved    (CObject*         )),this,SLOT(SolvedAnyObjectEmittor  (CObject*)));             \
     NAME.removeAll(value);                                                  \
     emit Update##NAME();                                                    \
 }
@@ -122,7 +128,9 @@ public slots:
     DEFINE_EMITTOR(UpdateDimensions)
     DEFINE_EMITTOR(UpdateAnyObject)
     DEFINE_EMITTOR(UpdateAnyAction)
+
     void ConflictAnyObjectEmittor(CObject* object,Conflict conf);
+    void SolvedAnyObjectEmittor  (CObject* object);
 
     //削除
     void Delete(CObject*   obj);
@@ -161,6 +169,7 @@ signals:
     void ChangedFaces    (QVector<CFace* >);
     void ChangedBlocks   (QVector<CBlock*>);
     void ConflictAnyObject(CObject* object,Conflict conf);
+    void SolvedAnyObject  (CObject* object);
 };
 
 class CadModelCoreInterface{

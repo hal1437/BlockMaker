@@ -8,6 +8,7 @@
 #include <random>
 #include "CadModelCore.h"
 #include "CadModelSearch.h"
+#include "ConflictList.h"
 #include "SolidEditForm.h"
 
 #include "Dialog/SmartDimensionDialog.h"
@@ -31,9 +32,10 @@ public:
 private:
     Ui::MainWindow *ui;
     CadModelSearch search;
-    bool shift_press =false;
+    bool shift_press = false;
     MoveTransformDialog*      move_diag;
     PropertyDefinitionDialog* prop_diag;
+    ConflictList* conf_list;
     QVector<Restraint*> creatable; //作成可能な拘束
 
 protected:

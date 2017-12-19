@@ -3,16 +3,32 @@
 
 #include <QString>
 #include <QVector>
+#include <QPushButton>
 #include <functional>
 
 //競合
-struct ConflictSolver{
-    QString explain; //解決手段
-    std::function<void()> solver; //解決関数
+class ConflictSolver : public QObject
+{
+    Q_OBJECT
+public:
+    typedef std::function<void()> ConflictFunc;
+    QString explain;
+    ConflictFunc solver;
+
+    ConflictSolver(QObject* parent=nullptr);
+    ConflictSolver(QString exprain,ConflictFunc solver , QObject* parent=nullptr);
+    virtual ~ConflictSolver(){}
+public slots:
+    void Run();
 };
+
 struct Conflict{
     QString error; //原因
-    QVector<ConflictSolver> solvers; //解決関数
+    QVector<ConflictSolver*> solvers; //解決関数
+
+    bool operator<(const Conflict& rhs)const{
+        return this->error < rhs.error;
+    }
 };
 
 

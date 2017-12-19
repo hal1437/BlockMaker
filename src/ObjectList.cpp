@@ -40,6 +40,7 @@ QString ObjectList::getName(CObject *obj){
     if(obj->is<Restraint>()){
         return dynamic_cast<Restraint*>(obj)->GetRestraintName();
     }
+    return "";
 }
 
 void ObjectList::mouseReleaseEvent(QMouseEvent* event){

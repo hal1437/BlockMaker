@@ -14,8 +14,8 @@ void NAME##Emittor(){               \
     emit NAME();                    \
 }
 #define DEFINE_EMITTOR_ARG(NAME,ARG) \
-void NAME##Emittor(){                \
-    emit NAME(ARG);                  \
+void NAME##Emittor(){           \
+    emit NAME(ARG);             \
 }
 
 //シンクロナイズ : シグナル発生時に別のシグナルを発生させる(要エミッター)

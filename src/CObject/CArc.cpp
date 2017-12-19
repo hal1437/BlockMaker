@@ -174,6 +174,22 @@ void CArc::ChangeChildCallback(QVector<CObject*> child){
     }
     if(*this->start != *this->center)round_s = (*this->start - *this->center).Length();
     if(*this->end   != *this->center)round_e = (*this->end   - *this->center).Length();
+
+    //競合
+    if(std::abs(this->round_s - this->round_e) > SAME_ANGLE_EPS){
+        Conflict conf;
+        conf.error = "半径が一致しません";
+        conf.solvers.push_back(new ConflictSolver("始点を移動",[&](){
+            this->start->MoveAbsolute((*this->start - *this->center).GetNormalize() * round_e + *this->center);
+        }));
+        conf.solvers.push_back(new ConflictSolver("終点を移動",[&](){
+            this->end->MoveAbsolute((*this->end - *this->center).GetNormalize() * round_s + *this->center);
+        }));
+        emit Conflicted(this,conf);
+    }else{
+        emit Solved(this);
+    }
+
     emit Changed(this);
 }
 

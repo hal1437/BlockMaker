@@ -16,6 +16,9 @@ void MainWindow::SetModel(CadModelCore* model){
     //検索モデルに伝達
     this->search.SetModel(model);
 
+    //競合リストに伝達
+    this->conf_list->SetModel(model);
+
     //選択オブジェクトが変更時にUIを更新する。
     connect(this->model,SIGNAL(UpdateSelected()),this,SLOT(RefreshUI()));
 }
@@ -70,6 +73,10 @@ MainWindow::MainWindow(QWidget *parent) :
 
     //ツールをコネクト
     ConnectSignals();
+    //競合リストを作成
+    this->conf_list = new ConflictList();
+    this->conf_list->SetWidget(this->ui->ConflictList);
+    connect(this->conf_list,SIGNAL(Changed()),ui->SolidEdit,SLOT(repaint()));
 
     ui->ToolBlock->setEnabled(false);
     ui->ToolFace->setEnabled(false);

@@ -435,6 +435,11 @@ void CadModelCore::ConflictAnyObjectEmittor(CObject* object,Conflict conf){
         emit ConflictAnyObject(object,conf);
     }
 }
+void CadModelCore::SolvedAnyObjectEmittor(CObject* object){
+    if(this->isPause() == false){
+        emit SolvedAnyObject(object);
+    }
+}
 
 void CadModelCore::UpdatePause(){
 }

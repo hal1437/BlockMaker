@@ -96,15 +96,15 @@ signals:
     void Changed();
     void Changed(CObject* child);
 
-    //競合シグナル
+    //競合/解決シグナル
     void Conflicted(CObject* object,Conflict conf);
+    void Solved    (CObject* object);
 
 public slots:
     //変更コールバック保存
     void StackChangeCallback(CObject* children);
     //子変更コールバック
     virtual void ChangeChildCallback(QVector<CObject*> children);
-
 };
 
 

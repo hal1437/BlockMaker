@@ -207,7 +207,7 @@
    <widget class="QWidget" name="dockWidgetContents">
     <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>
-      <widget class="QTreeWidget" name="treeWidget">
+      <widget class="QTreeWidget" name="ConflictList">
        <column>
         <property name="text">
          <string>オブジェクト</string>
