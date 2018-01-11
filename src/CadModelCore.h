@@ -5,6 +5,7 @@
 #include <QStringList>
 #include <iostream>
 #include <fstream>
+#include <SeqenceFileIO.h>
 #include "CObject/CObject.h"
 #include "CObject/CPoint.h"
 #include "CObject/CEdge.h"
@@ -104,7 +105,7 @@ public:
     void AutoMerge(CObject* obj);        //引数のオブジェクトの同一座標を自動的に結合
 
     //ファイル入出力
-    bool ExportFoamFile(QString filename)const;
+    bool ExportFoamFile(QString filename);
     bool ImportFoamFile(QString filename);
 
     //親取得

@@ -1,303 +1,230 @@
 #include "CadModelCore.h"
 
 
-bool CadModelCore::ExportFoamFile(QString filename)const{
-    QFile file(filename.toStdString().c_str());
-    QTextStream out(&file);
-    if (!file.open(QIODevice::WriteOnly)){
-        QMessageBox::information(nullptr, "ファイルが開けません",file.errorString());
-        return false;
-    }
+bool CadModelCore::ExportFoamFile(QString filename){
 
-    //バージョン出力
-    out << 4 << endl;
+    SeqenceFileIO seq(filename);
 
-    //頂点リスト出力
-    out << this->Points.size() << endl;
-    for(CPoint* pos: this->Points){
+    //CObject型出力
+    std::function<void(const CObject*)> object_out = [&](const CObject* obj){
+        seq.Output(obj->getName());
+        seq.Output(obj->isVisible());
+        seq.Output(obj->isVisibleDetail());
+    };
+    //CPoint型出力
+    std::function<void(const CPoint*)> pos_out = [&](const CPoint* pos){
+        seq.Output(pos->x());
+        seq.Output(pos->y());
+        seq.Output(pos->z());
+        object_out(pos);
+    };
+    //CEdge型出力
+    std::function<void(const CEdge*)> edge_out = [&](const CEdge* edge){
+        if(edge->is<CLine  >())seq.OutputQString(CLine  ::DefaultClassName());
+        if(edge->is<CArc   >())seq.OutputQString(CArc   ::DefaultClassName());
+        if(edge->is<CSpline>())seq.OutputQString(CSpline::DefaultClassName());
 
-        //座標
-        out << pos->getName() << ",";
-        out << QString::number(pos->x(),'g',15) << "," ;
-        out << QString::number(pos->y(),'g',15) << "," ;
-        out << QString::number(pos->z(),'g',15) << endl;
-    }
+        //分割情報を出力
+        seq.Output(edge->getDivide());
+        seq.OutputForeach(edge->getGrading().elements,[&](CEdge::Grading::GradingElement g){
+            seq << g.cell;
+            seq << g.dir;
+            seq << g.grading;
+        });
 
-    //エッジリスト出力
-    out << this->Edges.size() << endl;
-    for(CEdge* edge: this->Edges){
-
-        //エッジタイプ
-        QString name;
-        if(edge->is<CLine>  ())name = "CLine";
-        if(edge->is<CArc>   ())name = "CArc";
-        if(edge->is<CSpline>())name = "CSpline";
-        out << name;
-
-        //オブジェクト名
-        out << "," << edge->getName().toStdString().c_str();
-
-
-        //構成点インデックス
-        for(int i=0;i<edge->GetChildCount();i++){
-            out << "," << IndexOf(this->Points,edge->GetPoint(i));
+        //子の番号を出力
+        seq.Output(edge->GetChildCount());
+        for(CPoint* pp :edge->GetAllChildren()){
+            seq << IndexOf(this->GetPoints(),pp);
         }
-        //分割数
-        out << "," << edge->getDivide();
-        //エッジ寄せ係数
-        //out << "," << edge->getGrading();
-        //詳細表示
-        out << "," << edge->isVisibleDetail();
-        //改行
-        out << endl;
-    }
+        object_out(edge);
+    };
+    //CFace型出力
+    std::function<void(const CFace*)> face_out = [&](const CFace* face){
 
-    //面リスト出力
-    QVector<CFace*> faces_out = this->Faces;
-    faces_out.erase(std::remove_if(faces_out.begin(),faces_out.end(),[](CFace* face){
-        return exist(CFace::base,face);
-    }),faces_out.end());
-
-    out << faces_out.size() << endl;
-    for(CFace* face: faces_out){
-        //面タイプ
-        out << "CFace";
-        //オブジェクト名
-        out << "," << face->getName().toStdString().c_str();
-
-        //構成線インデックス
-        for(int i=0;i< face->edges.size();i++){
-            out << "," << IndexOf(this->Edges,face->edges[i]);
-        }
-        //境界名
-        out << "," << face->getName();
         //境界タイプ
-        out << "," << Boundary::BoundaryTypeToString(face->getBoundary().type);
-        //詳細表示
-        out << "," << face->isVisibleDetail();
-        //改行
-        out << endl;
-    }
-    //立体リスト出力
-    out << this->Blocks.size() << endl;
-    for(CBlock* block: this->Blocks){
-        //立体タイプ
-        out << "CBlock";
-        //オブジェクト名
-        out << "," << block->getName().toStdString().c_str();
+        seq.OutputQString(face->getBoundary().name);
+        seq.Output(static_cast<int>(face->getBoundary().type));
 
-        //平面インデックス
-        for(int i=0;i< 6;i++)out << "," << IndexOf(faces_out,block->faces[i]);
-        //分割数
-        //for(int i=0;i< 3;i++)out << "," << block->div[i];
-        //詳細表示
-        out << "," << block->isVisibleDetail();
+        //子の番号を出力
+        seq.OutputForeach(face->edges,[&](CEdge* ee){seq << IndexOf(this->GetEdges(),ee);});
 
-        out << endl;
-    }
-    //STL出力
-    out << this->Stls.size() << endl;
-    for(CStl* stl:this->Stls){
-         out << "STL," << stl->filepath.toStdString().c_str() << endl;
-         //点の出力
-         out << "STL_Points";
-         for(CPoint* pos:stl->points){
-             out << "," << IndexOf(this->Points,pos);
-         }
-         out << endl;
-         out << "STL_Edges";
-         for(CEdge* edge:stl->edges){
-             out << "," << IndexOf(this->Points,edge->start)
-                 << "," << IndexOf(this->Points,edge->end);
-         }
-         out << endl;
-         out << "STL_Faces";
-         for(CFace* face:stl->faces){
-             out << "," << IndexOf(stl->edges,face->edges[0])
-                 << "," << IndexOf(stl->edges,face->edges[1])
-                 << "," << IndexOf(stl->edges,face->edges[2]);
-         }
-         out << endl;
-    }
+        //追加情報
+        object_out(face);
+    };
+    //CBlock型出力
+    std::function<void(const CBlock*)> block_out = [&](const CBlock* block){
+        //子の番号を出力
+        seq.OutputForeach(block->faces,[&](CFace* ff){seq << IndexOf(this->GetFaces(),ff);});
+        //追加情報
+        object_out(block);
+    };
+
+    //三平面を削除
+    for(int i=0;i<3;i++)this->RemoveFaces(CFace::base[i]);
+
+    //オブジェクト出力
+    seq.OutputForeach(this->GetPoints(),pos_out);
+    seq.OutputForeach(this->GetEdges (),edge_out);
+    seq.OutputForeach(this->GetFaces (),face_out);
+    seq.OutputForeach(this->GetBlocks(),block_out);
+
+    //三平面を復元
+    for(int i=0;i<3;i++)this->AddFaces(CFace::base[i]);
 
     return true;
 }
 bool CadModelCore::ImportFoamFile(QString filename){
 
-    std::ifstream in(filename.toStdString().c_str());
-    if(!in)return false;
+    SeqenceFileIO seq(filename);
 
-    //オブジェクトを全て削除
+    //全て削除
     this->Points.clear();
     this->Edges.clear();
     this->Faces.clear();
     this->Blocks.clear();
-    this->Selected.clear();
-    this->AddPoints(this->origin);//原点
 
-    //バージョン取得
-    int version;
-    in >> version;
+    //CObject型入力
+    std::function<CObject* (CObject* obj)> object_in = [&](CObject* obj){
+        QString name;
+        bool visible,visible_detail;
+        seq.Input(name);
+        seq.Input(visible);
+        seq.Input(visible_detail);
+        obj->setName(name);
+        obj->SetVisible(visible);
+        obj->SetVisibleDetail(visible_detail);
+        return obj;
+    };
+    //CPoint型入力
+    std::function<CPoint* (SeqenceFileIO&)> pos_in = [&](SeqenceFileIO& seq){
+        CPoint* pos = new CPoint();
+        double x,y,z;
+        seq.Input(x);
+        seq.Input(y);
+        seq.Input(z);
 
-    //頂点リスト取得
-    int vertex_num;
-    in >> vertex_num;
-    for(int i=0;i<vertex_num;i++){
-        std::string str;
-        in >> str;
-        QStringList sl = QString(str.c_str()).split(',');
-        if(sl[0] == "原点")continue;
-        CPoint* p = new CPoint();
-        //名前
-        p->setName(sl[0]);
-        //座標
-        p->x() = sl[1].toDouble();
-        p->y() = sl[2].toDouble();
-        p->z() = sl[3].toDouble();
-        //モデルに追加
-        this->Points.push_back(p);
-    }
+        pos->x() = x;
+        pos->y() = y;
+        pos->z() = z;
+        object_in(pos);
+        return pos;
+    };
+    //CEdge型入力
+    std::function<CEdge* (SeqenceFileIO&)> edge_in = [&](SeqenceFileIO& seq){
+        CEdge* edge;
+        QString class_name;
+        int divide;
+        CEdge::Grading gradings;
+        int index_s,index_e,index_m;
+        int child_size;
+        seq.InputQString(class_name);
 
-    //エッジリスト取得
-    int edge_num;
-    in >> edge_num;
-    for(int i=0;i<edge_num;i++){
-        std::string str;
-        //エッジタイプ
-        CEdge* make = nullptr;
-        in >> str;
-        QStringList sl = QString(str.c_str()).split(',');
-        if(sl[0] == "CLine"  )make = new CLine();
-        if(sl[0] == "CArc"   )make = new CArc();
-        if(sl[0] == "CSpline")make = new CSpline();
+        //クラス名に応じた生成
+        if(class_name == CLine  ::DefaultClassName())edge = new CLine  ();
+        if(class_name == CArc   ::DefaultClassName())edge = new CArc   ();
+        if(class_name == CSpline::DefaultClassName())edge = new CSpline();
 
-        //名前
-        make->setName(sl[1]);
+        //分割情報を取得
+        seq.Input(divide);
+        seq.InputForeach(gradings.elements,[&](SeqenceFileIO& seq){
+            CEdge::Grading::GradingElement g;
+            seq >> g.cell;
+            seq >> g.dir;
+            seq >> g.grading;
+            return g;
+        });
 
-        //オブジェクト生成
-        if(make != nullptr){
+        //子数の取得
+        seq.Input(child_size);
+        //始点
+        seq.Input(index_s);
 
-            if(make->is<CArc>()){
-                //例外
-                make->Create(this->Points[sl[3].toInt()]);
-                make->Create(this->Points[sl[2].toInt()]);
-                make->Create(this->Points[sl[4].toInt()]);
-            }else{
-
-                CREATE_RESULT res = make->Create(this->Points[sl[2].toInt()]);
-                if(res == CREATE_RESULT::ENDLESS){
-                    //spline
-                    for(int j=3;j<sl.size()-3;j++){
-                        make->Create(this->Points[sl[j].toInt()]);
-                    }
-                    //make->Create(this->Points[sl[3].toInt()]);
-                }else{
-                    //line
-                    for(int j=3;j<sl.size()-3;j++){
-                        make->Create(this->Points[sl[j].toInt()]);
-                    }
-                }
+        //中央点：円弧
+        if(class_name == CArc::DefaultClassName()){
+            seq.Input(index_m);
+            dynamic_cast<CArc*>(edge)->SetCenterPos(this->GetPoints()[index_m]);
+        }
+        //補助点：スプライン
+        if(class_name == CSpline::DefaultClassName()){
+            for(int i =0;i<child_size-2;i++){
+                seq.Input(index_m);
+                dynamic_cast<CArc*>(edge)->SetCenterPos(this->GetPoints()[index_m]);
             }
-            //分割数取得
-            make->setDivide(sl[sl.size()-3].toInt());
-            //分割数取得
-            //make->setGrading(sl[sl.size()-2].toDouble());
-            //詳細表示取得
-            make->SetVisibleDetail(sl[sl.size()-1]=="1");
-            //モデルに追加
-            Edges.push_back(make);
         }
-    }
-    //面取得
-    int face_num;
-    in >> face_num;
-    for(int i=0;i<face_num;i++){
-        //面タイプ
-        std::string str;
-        in >> str;
 
-        //エッジ取得
-        CFace* make = new CFace();
-        QStringList sl = QString(str.c_str()).split(',');
+        //終点
+        seq.Input(index_e);
 
-        //名前
-        make->setName(sl[1]);
+        //値の代入
+        edge->SetStartPos(this->GetPoints()[index_s]);
+        edge->SetEndPos  (this->GetPoints()[index_e]);
+        edge->setDivide  (divide);
+        edge->setGrading (gradings);
 
-        QVector<CEdge*> ee;
-        for(int j = 2;j<sl.size()-3;j++){
-            ee.push_back(this->Edges[sl[j].toInt()]);
+        object_in(edge);
+        return edge;
+    };
+    //CFace型入力
+    std::function<CFace* (SeqenceFileIO&)> face_in = [&](SeqenceFileIO& seq){
+        CFace* face = new CFace();
+
+        Boundary bound;
+        QVector<int> indexies;
+        int type;
+        //境界タイプ
+        seq.InputQString(bound.name);
+        seq.Input(type);
+        bound.type = static_cast<Boundary::Type>(type);
+
+        //子の番号入力
+        seq.InputForeach(indexies,[](SeqenceFileIO& seq){
+            int index;
+            seq >> index;
+            return index;
+        });
+
+        //値の代入
+        for(int i:indexies){
+            face->edges.push_back(this->GetEdges()[i]);
         }
-        make->Create(ee);//作成
 
-        //境界名
-        make->setName(sl[sl.size()-3]);
-        //境界名
-        //make->setBoundary(Boundary::StringToBoundaryType(sl[sl.size()-2]));
-        //詳細表示取得
-        make->SetVisibleDetail(sl[sl.size()-1]=="1");
+        face->setBoundary(bound);
 
-        //モデルに追加
-        this->Faces.push_back(make);
-    }
-    //立体取得
-    int block_num;
-    in >> block_num;
-    for(int i=0;i<block_num;i++){
-        std::string str;
-        in >> str;
+        //追加情報
+        object_in(face);
+        //メッシュ再生成
+        face->RecalcMesh();
+        return face;
+    };
+    //CBlock型入力
+    std::function<CBlock*(SeqenceFileIO&)> block_in = [&](SeqenceFileIO& seq){
+        CBlock* block = new CBlock();
+        QVector<int> indexies;
+        //子の番号入力
+        seq.InputForeach(indexies,[](SeqenceFileIO& seq){
+            int index;
+            seq >> index;
+            return index;
+        });
 
-        //平面判定
-        CBlock* make = new CBlock();
-        QStringList sl = QString(str.c_str()).split(',');
-        //名前
-        make->setName(sl[1]);
+        //値の代入
+        for(int i:indexies){
+            block->faces.push_back(this->GetFaces()[i]);
+        }
+        //追加情報
+        object_in(block);
+        return block;
+    };
 
-        int j=2;
-        QVector<CFace*> faces;
-        for(int i=0;i<6;i++,j++){
-            faces.push_back(this->Faces[sl[j].toInt()]);
-        }
-        //詳細表示取得
-        make->SetVisibleDetail(sl[sl.size()-1]=="1");
-        make->Create(faces);
-        //モデルに追加
-        this->Blocks.push_back(make);
-    }
-    //STL取得
-    int stl_num;
-    in >> stl_num;
-    for(int i=0;i<stl_num;i++){
-        std::string str;
-        in >> str;
-        QStringList sl = QString(str.c_str()).split(',');
-        CStl* stl = new CStl();
-        //点の構成
-        in >> str;
-        sl = QString(str.c_str()).split(',');
-        for(int j=1;j < sl.size();j++){
-            stl->points.push_back(this->Points[sl[j].toInt()]);
-        }
-        //線の構成
-        in >> str;
-        sl = QString(str.c_str()).split(',');
-        for(int j=1;j < sl.size();j+=2){
-            CLine* edge = new CLine();
-            edge->start = this->Points[sl[j].toInt()];
-            edge->end   = this->Points[sl[j+1].toInt()];
-            stl->edges.push_back(edge);
-        }
-        //面の構成
-        in >> str;
-        sl = QString(str.c_str()).split(',');
-        for(int j=1;j < sl.size();j+=3){
-            CFace* face = new CFace();
-            face->Create({stl->edges[sl[j].toInt()],
-                          stl->edges[sl[j+1].toInt()],
-                          stl->edges[sl[j+2].toInt()]});
-            stl->faces.push_back(face);
-        }
-        this->Stls.push_back(stl);
-    }
+    //オブジェクト出力
+    seq.InputForeach(this->GetPoints(),pos_in);
+    seq.InputForeach(this->GetEdges (),edge_in);
+    seq.InputForeach(this->GetFaces (),face_in);
+    seq.InputForeach(this->GetBlocks(),block_in);
+
+    //三平面を復元
+    for(int i=0;i<3;i++)this->AddFaces(CFace::base[i]);
 
     //更新
     emit UpdatePoints();
@@ -306,10 +233,6 @@ bool CadModelCore::ImportFoamFile(QString filename){
     emit UpdateBlocks();
     emit UpdateSelected();
 
-    //三平面復元
-    for(int i=0;i<3;i++){
-        this->AddFaces(CFace::base[i]);//原点
-    }
     return true;
 }
 

@@ -19,7 +19,7 @@ void ConflictList::Repaint(){
             item_s->setText(0,solver->explain);
 
             //解決ボタン
-            QPushButton* button = new QPushButton("Solved!");
+            QPushButton* button = new QPushButton("解決");
             connect(button,SIGNAL(pressed()),solver,SLOT(Run()));
             this->table->setItemWidget(item_s,1,button);
         }

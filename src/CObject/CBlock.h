@@ -28,6 +28,7 @@ private:
     double GetLength_impl(Quat convert);
 
 public:
+    static QString DefaultClassName(){return "CBlock";}
     //立体が作成可能か
     static bool Creatable(QVector<CObject* > values);
     virtual void Create(QVector<CFace*> faces);     //作成

@@ -47,7 +47,8 @@ SOURCES += src/main.cpp\
     src/Dialog/BoundaryDefinitionDialog.cpp \
     src/Algorithm.cpp \
     src/ConflictList.cpp \
-    src/Conflict.cpp
+    src/Conflict.cpp \
+    src/SeqenceFileIO.cpp
 
 HEADERS  += src/MainWindow.h \
     src/Point.h \
@@ -83,7 +84,8 @@ HEADERS  += src/MainWindow.h \
     src/Dialog/BoundaryDefinitionDialog.h \
     src/Algorithm.h \
     src/ConflictList.h \
-    src/Conflict.h
+    src/Conflict.h \
+    src/SeqenceFileIO.h
 
 FORMS    += src/MainWindow.ui \
     src/Dialog/SmartDimensionDialog.ui \

@@ -242,7 +242,6 @@ public:
         return n * (n.DotPos(r)) + (r - n*(n.DotPos(r)))*std::cos(theta) - (r.Cross(n)*std::sin(theta));
     }
 
-
     //直線以上
     static bool MoreThan(cr_current pos1,cr_current pos2,cr_current hand){
         //y=ax+b

@@ -36,6 +36,8 @@ public:
     static double GetDivisionRate(int divide,Grading grading, int count);
 
 public:
+    static QString DefaultClassName(){return "CEdge";}
+
     virtual CREATE_RESULT Create(CPoint* pos) = 0;   //作成関数
     virtual void DrawArrow(double start,double end)const; //三次元描画関数
     virtual void DrawGL(Pos camera,Pos center)const; //三次元描画関数

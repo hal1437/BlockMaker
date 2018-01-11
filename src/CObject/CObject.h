@@ -49,6 +49,7 @@ public:
     DEFINE_FLAG(Lock   ,false)       //固定
     DEFINE_FLAG(Visible,true)        //表示
     DEFINE_FLAG(VisibleDetail,false)  //分割フレーム表示
+
     DEFINE_EMITTOR_ARG(Changed,this) // 変更エミッター
 
 protected:
@@ -62,6 +63,8 @@ public:
     bool is()const {
         return (dynamic_cast<const T*>(this) != nullptr);
     }
+
+    static QString DefaultClassName(){return "CObject";}
 
     virtual void DrawGL(Pos camera,Pos center)const = 0; //三次元描画関数
     virtual bool isSelectable(Pos pos)const;     //posの位置で選択可能か
