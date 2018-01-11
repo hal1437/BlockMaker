@@ -185,10 +185,11 @@ bool CadModelCore::ImportFoamFile(QString filename){
         });
 
         //値の代入
+        QVector<CEdge*>edges;
         for(int i:indexies){
-            face->edges.push_back(this->GetEdges()[i]);
+            edges.push_back(this->GetEdges()[i]);
         }
-
+        face->Create(edges);
         face->setBoundary(bound);
 
         //追加情報
@@ -209,11 +210,16 @@ bool CadModelCore::ImportFoamFile(QString filename){
         });
 
         //値の代入
+        QVector<CFace*>faces;
         for(int i:indexies){
-            block->faces.push_back(this->GetFaces()[i]);
+            faces.push_back(this->GetFaces()[i]);
         }
         //追加情報
         object_in(block);
+
+        //再構築
+        block->Create(faces);
+        block->Refresh();
         return block;
     };
 
