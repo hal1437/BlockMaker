@@ -46,7 +46,7 @@ public:
     QVector<int> reorder; //エッジ反転係数
     QVector<QVector<Pos>> mesh_memory; //メッシュ分割位置記録二次元配列
 public:
-    static QString DefaultClassName(){return "CFace";}
+    virtual QString DefaultClassName(){return "CFace";}
 
     //面が作成可能か
     static  bool Creatable(QVector<CObject*> lines);

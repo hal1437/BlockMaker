@@ -17,7 +17,7 @@ public:
     DEFINE_FLAG(Moving      ,false) //移動中
 
 public:
-    static QString DefaultClassName(){return "CPoint";}
+    virtual QString DefaultClassName(){return "CPoint";}
 
     virtual CREATE_RESULT Create(CPoint* pos);       //作成関数
     virtual void DrawGL(Pos camera,Pos center)const; //描画関数

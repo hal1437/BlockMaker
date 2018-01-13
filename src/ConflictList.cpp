@@ -7,7 +7,12 @@ void ConflictList::Repaint(){
     for(std::pair<CObject*,Conflict> conf:this->conflicts){
         QTreeWidgetItem* item = new QTreeWidgetItem();
         //ポインタ
-        item->setText(0,QString("0x%1").arg((quintptr)conf.first,QT_POINTER_SIZE * 2, 16, QChar('0')));
+        if(conf.first->getName() == ""){
+            QString ptr_str = QString("0x%1").arg((quintptr)conf.first,QT_POINTER_SIZE * 2, 16, QChar('0'));
+            item->setText(0,conf.first->DefaultClassName() + "(" + ptr_str + ")");
+        }else{
+            item->setText(0,conf.first->getName());
+        }
         //エラー原因
         item->setText(1,conf.second.error);
 

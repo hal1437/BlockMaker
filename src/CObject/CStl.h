@@ -22,7 +22,7 @@ public:
     static CStl* CreateFromFile(QString filepath);
 
 public:
-    static QString DefaultClassName(){return "CStl";}
+    virtual QString DefaultClassName(){return "CStl";}
 
     virtual void DrawGL(Pos camera,Pos center)const; //三次元描画関数
 

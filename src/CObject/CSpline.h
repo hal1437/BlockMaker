@@ -29,7 +29,7 @@ protected:
     Spline zs;
 
 public:
-    static QString DefaultClassName(){return "CSpline";}
+    virtual QString DefaultClassName(){return "CSpline";}
 
     //作成関数(完了時:true , 継続時:false)
     virtual CREATE_RESULT Create(CPoint* pos);

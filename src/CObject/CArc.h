@@ -18,7 +18,7 @@ public:
     //半径操作関数
     //double GetRound()const;
 
-    static QString DefaultClassName(){return "CArc";}
+    virtual QString DefaultClassName(){return "CArc";}
 
     //作成関数(完了時:true , 継続時:false)
     virtual CREATE_RESULT Create(CPoint* pos);

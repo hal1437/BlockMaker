@@ -7,7 +7,7 @@ class CLine : public CEdge
 {
     Q_OBJECT
 public:
-    static QString DefaultClassName(){return "CLine";}
+    virtual QString DefaultClassName(){return "CLine";}
 
     //作成関数(完了時:true , 継続時:false)
     virtual CREATE_RESULT Create(CPoint* pos);

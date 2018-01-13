@@ -42,8 +42,8 @@ void PropertyDefinitionDialog::ConstructEdge(){
     //テーブル設定
     this->edge_multi_grading_table.clear();
     this->edge_multi_grading_table.setColumnCount(3);
-    this->edge_multi_grading_table.setHorizontalHeaderItem(0,new QTableWidgetItem("方向割合"));
-    this->edge_multi_grading_table.setHorizontalHeaderItem(1,new QTableWidgetItem("分割割合"));
+    this->edge_multi_grading_table.setHorizontalHeaderItem(0,new QTableWidgetItem("長さ割合"));
+    this->edge_multi_grading_table.setHorizontalHeaderItem(1,new QTableWidgetItem("分割数割合"));
     this->edge_multi_grading_table.setHorizontalHeaderItem(2,new QTableWidgetItem("エッジ寄せ係数"));
     this->edge_multi_grading_table.setColumnWidth(0,80);
     this->edge_multi_grading_table.setColumnWidth(1,80);

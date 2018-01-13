@@ -20,9 +20,9 @@ bool CadModelCore::ExportFoamFile(QString filename){
     };
     //CEdge型出力
     std::function<void(const CEdge*)> edge_out = [&](const CEdge* edge){
-        if(edge->is<CLine  >())seq.OutputQString(CLine  ::DefaultClassName());
-        if(edge->is<CArc   >())seq.OutputQString(CArc   ::DefaultClassName());
-        if(edge->is<CSpline>())seq.OutputQString(CSpline::DefaultClassName());
+        if(edge->is<CLine  >())seq.OutputQString(CLine  ().DefaultClassName());
+        if(edge->is<CArc   >())seq.OutputQString(CArc   ().DefaultClassName());
+        if(edge->is<CSpline>())seq.OutputQString(CSpline().DefaultClassName());
 
         //分割情報を出力
         seq.Output(edge->getDivide());
@@ -121,9 +121,9 @@ bool CadModelCore::ImportFoamFile(QString filename){
         seq.InputQString(class_name);
 
         //クラス名に応じた生成
-        if(class_name == CLine  ::DefaultClassName())edge = new CLine  ();
-        if(class_name == CArc   ::DefaultClassName())edge = new CArc   ();
-        if(class_name == CSpline::DefaultClassName())edge = new CSpline();
+        if(class_name == CLine  ().DefaultClassName())edge = new CLine  ();
+        if(class_name == CArc   ().DefaultClassName())edge = new CArc   ();
+        if(class_name == CSpline().DefaultClassName())edge = new CSpline();
 
         //分割情報を取得
         seq.Input(divide);
@@ -141,12 +141,12 @@ bool CadModelCore::ImportFoamFile(QString filename){
         seq.Input(index_s);
 
         //中央点：円弧
-        if(class_name == CArc::DefaultClassName()){
+        if(class_name == CArc().DefaultClassName()){
             seq.Input(index_m);
             dynamic_cast<CArc*>(edge)->SetCenterPos(this->GetPoints()[index_m]);
         }
         //補助点：スプライン
-        if(class_name == CSpline::DefaultClassName()){
+        if(class_name == CSpline().DefaultClassName()){
             for(int i =0;i<child_size-2;i++){
                 seq.Input(index_m);
                 dynamic_cast<CArc*>(edge)->SetCenterPos(this->GetPoints()[index_m]);

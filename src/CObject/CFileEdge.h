@@ -14,7 +14,7 @@ private:
 public:
     static CFileEdge* CreateFromFile(QString filepath);
 public:
-    static QString DefaultClassName(){return "CFileEdge";}
+    virtual QString DefaultClassName(){return "CFileEdge";}
 
 
     virtual void DrawGL(Pos camera,Pos center)const;

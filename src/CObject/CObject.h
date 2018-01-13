@@ -64,7 +64,7 @@ public:
         return (dynamic_cast<const T*>(this) != nullptr);
     }
 
-    static QString DefaultClassName(){return "CObject";}
+    virtual QString DefaultClassName(){return "CObject";}
 
     virtual void DrawGL(Pos camera,Pos center)const = 0; //三次元描画関数
     virtual bool isSelectable(Pos pos)const;     //posの位置で選択可能か

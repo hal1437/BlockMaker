@@ -108,23 +108,20 @@ Pos CFace::GetNorm(double u,double v)const{
 
 Pos CFace::GetPosFromUV(double u,double v)const{
     //全ての曲線の差分値の合計
-    Pos delta[4];
-    //曲線の反対側の座標を計算原点をセット
-    delta[0] = this->GetPosFromUVSquare(  u,1.0);
-    delta[1] = this->GetPosFromUVSquare(  0,  v);
-    delta[2] = this->GetPosFromUVSquare(  u,  0);
-    delta[3] = this->GetPosFromUVSquare(1.0,  v);
-    //曲面に対して垂直方向の座標値を加算
-    delta[0] += (this->GetEdgeMiddle(0,u) - delta[0]) * (1.0-v);
-    delta[1] += (this->GetEdgeMiddle(1,v) - delta[1]) * u;
-    delta[2] += (this->GetEdgeMiddle(2,1.0-u) - delta[2]) * v;
-    delta[3] += (this->GetEdgeMiddle(3,1.0-v) - delta[3]) * (1.0-u);
-    //GetPosFromUVSquareとの差分を取得
-    for(int i=0;i<4;i++){
-        delta[i] -= this->GetPosFromUVSquare(u,v);
-    }
+    Pos pp[4],lp[4];
+    //曲線の反対側の座標を計算原点をセット(直線として扱う)
+    lp[0] = this->GetPosFromUVSquare(  u,1.0);
+    lp[1] = this->GetPosFromUVSquare(  0,  v);
+    lp[2] = this->GetPosFromUVSquare(  u,  0);
+    lp[3] = this->GetPosFromUVSquare(1.0,  v);
 
-    return this->GetPosFromUVSquare(u,v) + (delta[0]+delta[1]+delta[2]+delta[3]);
+    //曲面に対して垂直方向の座標値を加算
+    pp[0] = (this->GetEdgeMiddle(0,    u) - lp[0]) * (1.0-v) + lp[0];
+    pp[1] = (this->GetEdgeMiddle(1,    v) - lp[1]) *      u  + lp[1];
+    pp[2] = (this->GetEdgeMiddle(2,1.0-u) - lp[2]) *      v  + lp[2];
+    pp[3] = (this->GetEdgeMiddle(3,1.0-v) - lp[3]) * (1.0-u) + lp[3];
+    //GetPosFromUVSquareとの差分を取得
+    return (pp[0]+pp[1]+pp[2]+pp[3]) - this->GetPosFromUVSquare(u,v) * 3;
 }
 Pos CFace::GetPosFromUVSquare(double u,double v)const{
     //双1次曲面の式
