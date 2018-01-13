@@ -32,6 +32,10 @@ void Restraint::DrawGL(Pos camera,Pos center)const{
         glRasterPos3f(cp.x(),cp.y(),cp.z());
         glDrawPixels(img.width(), img.height(), GL_RGBA, GL_UNSIGNED_BYTE, glimg.bits());
 
+        //無効なら色を変える
+        if(this->isNotEffect()){
+            glColor3f(1,0,0);
+        }
         //枠線
         glBegin(GL_LINE_LOOP);
         const double length = cc.Length()*10*std::sqrt(2);
@@ -41,6 +45,19 @@ void Restraint::DrawGL(Pos camera,Pos center)const{
             glVertex3f((cp+p).x(),(cp+p).y(),(cp+p).z());
         }
         glEnd();
+        //無効なら／を入れる
+        if(this->isNotEffect()){
+            glBegin(GL_LINES);
+            for(int i =0;i<2;i++){
+                Pos p1 = ((Pos(std::sin((i+0.25)*M_PI),std::cos((i+0.25)*M_PI),0) + ofs)*length).Dot(quat);
+                glVertex3f((cp+p1).x(),(cp+p1).y(),(cp+p1).z());
+            }
+            for(int i =0;i<2;i++){
+                Pos p1 = ((Pos(std::sin((i+0.75)*M_PI),std::cos((i+0.75)*M_PI),0) + ofs)*length).Dot(quat);
+                glVertex3f((cp+p1).x(),(cp+p1).y(),(cp+p1).z());
+            }
+            glEnd();
+        }
     }
     //色と線の太さを復元
     glLineWidth(old_width);
@@ -101,10 +118,31 @@ void EqualLengthRestraint::Create(const QVector<CObject*> nodes){
 bool EqualLengthRestraint::isComplete(){
     //全てのEdgeの長さが同じ
     double dd = (*dynamic_cast<CEdge*>(this->children[0])->end - *dynamic_cast<CEdge*>(this->children[0])->start).Length();
-    return std::all_of(this->children.begin()+1,this->children.end(),[dd](CObject* obj){
+    bool equal = std::all_of(this->children.begin()+1,this->children.end(),[dd](CObject* obj){
         CEdge* edge = dynamic_cast<CEdge*>(obj);
         return (*edge->end - *edge->start).Length() == dd;
     });
+
+    if(!equal){
+        //競合発生
+        Conflict conf;
+        conf.error = "長さが等しくありません";
+        double dd = (*dynamic_cast<CEdge*>(this->children[0])->end - *dynamic_cast<CEdge*>(this->children[0])->start).Length();
+        for(int i =1;i<this->children.size();i++){
+            conf.solvers.push_back(new ConflictSolver(QString("線%1を線1の長さに変更").arg(i+1),[&](){
+                CEdge* edge = dynamic_cast<CEdge*>(this->children[i]);
+                //中心へ移動させる
+                Pos center = (*edge->end + *edge->start)/2;
+                *edge->start = (*edge->start - center).GetNormalize() * dd/2 + center;
+                *edge->end   = (*edge->end   - center).GetNormalize() * dd/2 + center;
+            }));
+        }
+        emit Conflicted(this,conf);
+    }else{
+        emit Solved(this);
+    }
+    this->SetNotEffect(!equal);
+    return equal;
 }
 void EqualLengthRestraint::Calc(){
     //先頭のCEdgeの長さに統一する。
@@ -122,6 +160,8 @@ void EqualLengthRestraint::Calc(){
         //emit Changed();
     }
 }
+
+
 
 bool ConcurrentRestraint::isComplete(){
     //全てのEdgeの向きが同じ

@@ -36,7 +36,8 @@ struct Restraint :public CObject{
 protected:
     QVector<CObject*> children; //拘束対象
     RestraintType type;         //タイプ
-    OBSERVE_MEMBER(int    ,StackLevel,stack_level) //同一の座標に表示時に右に避ける
+    DEFINE_FLAG(NotEffect,false)
+    OBSERVE_MEMBER(int  ,StackLevel,stack_level) //同一の座標に表示時に右に避ける
 
 protected:
     //拘束生成条件マクロ:全て同じ型
@@ -66,6 +67,8 @@ protected:
     }
 
 public:
+    virtual QString DefaultClassName(){return this->GetRestraintName();}
+
     virtual void DrawGL(Pos camera,Pos center)const;
 
     //作成可能タイプを検索
@@ -96,8 +99,10 @@ public slots:
 
     //子変更コールバック
     virtual void ChangeChildCallback(QVector<CObject*>){
-        //監視コールバック:不成立時に自身を削除
-        DestroyCallback();
+        if(!this->isComplete()){
+            //監視コールバック:不成立時に自身を削除
+            //DestroyCallback();
+        }
     }
 
 signals:
