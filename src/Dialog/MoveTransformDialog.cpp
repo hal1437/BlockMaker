@@ -55,8 +55,7 @@ QVector<CPoint*> MoveTransformDialog::ConvertChildPoint(QVector<CObject *> objec
 }
 MoveTransformDialog::TRANSFORM_METHOD MoveTransformDialog::GetTransformMethod()const{
     if(this->ui->RelativeRadio->isChecked())return RELATIVE;
-    if(this->ui->AbsoluteRadio->isChecked())return ABSOLUTE;
-    // ????
+    else return ABSOLUTE;
 }
 
 void MoveTransformDialog::keyPressEvent(QKeyEvent *event){
@@ -138,10 +137,7 @@ void MoveTransformDialog::Accept(){
                     this->ui->ZSpinBox->value());
     if(this->GetTransformMethod() == ABSOLUTE) this->AbsoluteMove(this->model->GetSelected(),value);
     else                                       this->RelativeMove(this->model->GetSelected(),value);
-    /*
-    for(CBlock* block:this->model->GetBlocks()){
-        //block->RefreshDividePoint();
-    }*/
+
     this->model->UpdateAnyObjectEmittor();
     RefreshTranslated();
 }

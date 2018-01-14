@@ -62,10 +62,15 @@ void CFace::Create(QVector<CEdge*> edges){
         }
     }
     if(edges.size()==4){
+        //エッジ並び替え
         this->ReorderEdges();
-        this->RecalcMesh();
 
-        //子を監視
+        //枠のみならばメッシュ生成しない
+        if(!this->isContours()){
+            this->RecalcMesh();
+        }
+
+        //子を監視対象に追加
         for(CEdge* e :this->edges){
             this->ObserveChild(e);
         }
@@ -245,7 +250,7 @@ CEdge*  CFace::GetEdgeSequence(int index)const{
 void CFace::DrawGL(Pos,Pos)const{
     if(!this->isVisible())return;
 
-    //色を保存
+    //色を保存する
     float currentColor[4];
     glGetFloatv(GL_CURRENT_COLOR,currentColor);
 
@@ -262,6 +267,7 @@ void CFace::DrawGL(Pos,Pos)const{
                       1.0);
         }
 
+        //四角形でない
         if(this->edges.size() != 4){
             //多角形描画
             glBegin(GL_POLYGON);
@@ -323,26 +329,28 @@ void CFace::DrawFillGL()const{
 
 }
 void CFace::DrawMeshGL()const{
-    //u方向
-    for(double i=0;i<this->mesh_memory.size()-1;i++){//u方向ループ
-        for(double j=1;j<this->mesh_memory.first().size()-1;j++){//v方向ループ
-            //描画
-            glBegin(GL_LINE_STRIP);
-            glVertex3f(this->mesh_memory[i][j].x(),this->mesh_memory[i][j].y(),this->mesh_memory[i][j].z());
-            glVertex3f(this->mesh_memory[i+1][j].x(),this->mesh_memory[i+1][j].y(),this->mesh_memory[i+1][j].z());
-            glEnd();
+    if(!this->isContours()){
+        //u方向
+        for(double i=0;i<this->mesh_memory.size()-1;i++){//u方向ループ
+            for(double j=1;j<this->mesh_memory.first().size()-1;j++){//v方向ループ
+                //描画
+                glBegin(GL_LINE_STRIP);
+                glVertex3f(this->mesh_memory[i][j].x(),this->mesh_memory[i][j].y(),this->mesh_memory[i][j].z());
+                glVertex3f(this->mesh_memory[i+1][j].x(),this->mesh_memory[i+1][j].y(),this->mesh_memory[i+1][j].z());
+                glEnd();
 
+            }
         }
-    }
-    //v方向
-    for(double i=1;i<this->mesh_memory.size()-1;i++){//u方向ループ
-        for(double j=0;j<this->mesh_memory.first().size()-1;j++){//v方向ループ
-            //描画
-            glBegin(GL_LINE_STRIP);
-            glVertex3f(this->mesh_memory[i][j].x(),this->mesh_memory[i][j].y(),this->mesh_memory[i][j].z());
-            glVertex3f(this->mesh_memory[i][j+1].x(),this->mesh_memory[i][j+1].y(),this->mesh_memory[i][j+1].z());
-            glEnd();
+        //v方向
+        for(double i=1;i<this->mesh_memory.size()-1;i++){//u方向ループ
+            for(double j=0;j<this->mesh_memory.first().size()-1;j++){//v方向ループ
+                //描画
+                glBegin(GL_LINE_STRIP);
+                glVertex3f(this->mesh_memory[i][j].x(),this->mesh_memory[i][j].y(),this->mesh_memory[i][j].z());
+                glVertex3f(this->mesh_memory[i][j+1].x(),this->mesh_memory[i][j+1].y(),this->mesh_memory[i][j+1].z());
+                glEnd();
 
+            }
         }
     }
 }
@@ -435,6 +443,7 @@ Pos CFace::GetNearLine(const Pos& ,const Pos& )const{
 
 CObject* CFace::Clone()const{
     CFace* new_obj = new CFace();
+    //edgeを複製
     QVector<CEdge*> edges;
     for(CEdge* edge:this->edges){
         edges.push_back(dynamic_cast<CEdge*>(edge->Clone()));
@@ -448,9 +457,10 @@ CObject* CFace::Clone()const{
             if(*e1->end   == *e2->end  )e2->end   = e1->end;
         }
     }
-    new_obj->Create(edges);
     new_obj->name = this->name;
     new_obj->boundary = this->boundary;
+    new_obj->Contours = this->Contours;
+    new_obj->Create(edges);
     return new_obj;
 }
 

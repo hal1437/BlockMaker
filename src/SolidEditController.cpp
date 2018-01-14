@@ -190,7 +190,7 @@ CFace* SolidEditController::getHangedFace(Pos center,Pos camera_pos,double zoom_
         //三平面を削除
         for(int i=0;i<rank.size();i++){
             if(exist(CFace::base,rank[i].second)){
-                rank.removeAll(rank[i]);
+                rank.erase(rank.begin());
                 i--;
             }
         }
