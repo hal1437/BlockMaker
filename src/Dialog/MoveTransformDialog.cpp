@@ -145,23 +145,24 @@ void MoveTransformDialog::Accept(){
     RefreshTranslated();
 }
 void MoveTransformDialog::Duplicate(){
+
     //値
     Pos value = Pos(this->ui->XSpinBox->value(),
                     this->ui->YSpinBox->value(),
                     this->ui->ZSpinBox->value());
 
     QList<CObject*> pp;
-    this->model->ObservePause();
+    this->model->ObservePause();//監視停止
+
     for(CObject* s : this->model->GetSelected()){
         CObject* dup = s->Clone();   //複製
-        this->model->AddObject(dup); //モデルに追加
-        for(CPoint* pos:dup->GetAllChildren()){
-            pp.push_back(pos);
+        if(dup != nullptr){
+            pp.push_back(dup);
         }
     }
-    this->model->ObserveRestart();
-    //重複削除
-    unique(pp);
+    this->model->ObserveRestart();//監視再開
+
+    for(CObject* s:pp)this->model->AddObject(s); //モデルに追加
 
     //移動
     if(this->GetTransformMethod() == ABSOLUTE)this->AbsoluteMove(pp.begin(),pp.end(),value);

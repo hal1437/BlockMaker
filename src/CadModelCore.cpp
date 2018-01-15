@@ -360,14 +360,12 @@ void CadModelCore::Delete(Restraint* obj){
 }
 
 void CadModelCore::ConflictAnyObjectEmittor(CObject* object,Conflict conf){
-    if(this->isPause() == false){
-        emit ConflictAnyObject(object,conf);
-    }
+    emit ConflictAnyObject(object,conf);
 }
 void CadModelCore::SolvedAnyObjectEmittor(CObject* object){
-    if(this->isPause() == false){
+    //if(this->isPause() == false){
         emit SolvedAnyObject(object);
-    }
+    //}
 }
 
 void CadModelCore::ObservePause(){
@@ -380,10 +378,10 @@ void CadModelCore::ObservePause(){
 
 void CadModelCore::ObserveRestart(){
     this->pause = false;
-    for(CBlock* obj:this->Blocks)obj->ObserveRestart();
-    for(CFace*  obj:this->Faces )obj->ObserveRestart();
-    for(CEdge*  obj:this->Edges )obj->ObserveRestart();
     for(CPoint* obj:this->Points)obj->ObserveRestart();
+    for(CEdge*  obj:this->Edges )obj->ObserveRestart();
+    for(CFace*  obj:this->Faces )obj->ObserveRestart();
+    for(CBlock* obj:this->Blocks)obj->ObserveRestart();
 }
 
 void CadModelCore::SelectedClear(){
@@ -411,4 +409,3 @@ CadModelCore::~CadModelCore()
 {
 
 }
-

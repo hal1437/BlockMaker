@@ -85,8 +85,12 @@ void ObjectList::AddObjectToTree(CObject* obj,QTreeWidgetItem* parent,int index)
 }
 
 void ObjectList::PushSelectedObject(CObject* obj,QTreeWidgetItem* current){
-    if(current->isSelected())this->CadModelCoreInterface::model->AddSelected(obj);
-    else                     this->CadModelCoreInterface::model->RemoveSelected(obj);
+    if(current->isSelected() && !exist(this->CadModelCoreInterface::model->GetSelected(),obj)){
+        this->CadModelCoreInterface::model->AddSelected(obj);
+    }
+    if(!current->isSelected() && exist(this->CadModelCoreInterface::model->GetSelected(),obj)){
+        this->CadModelCoreInterface::model->RemoveSelected(obj);
+    }
     //子に伝達
     for(int i=0;i<current->childCount();i++){
         PushSelectedObject(obj->GetChild(i),current->child(i));

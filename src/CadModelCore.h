@@ -177,6 +177,7 @@ signals:
     void ChangedBlocks   (QList<CBlock*>);
     void ConflictAnyObject(CObject* object,Conflict conf);
     void SolvedAnyObject  (CObject* object);
+
 };
 
 class CadModelCoreInterface{

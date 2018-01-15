@@ -52,7 +52,7 @@ void CObject::ObservePause  (){
 void CObject::ObserveRestart(){
     this->observe_pause = false;
     if(this->observe_queue.size() > 0){
-        //更新
+        //止めていた分をまとめて更新
         this->ChangeChildCallback(this->observe_queue);
         this->observe_queue.clear();
     }
