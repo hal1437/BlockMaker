@@ -162,6 +162,12 @@ double CEdge::GetMiddleParamFromPos(Pos pos)const{
         return (this->GetMiddleDivide(t) - pos).Length();
     });
 }
+//結合
+CEdge*          CEdge::MergeEdge (CEdge* merge){
+}
+QVector<CEdge*> CEdge::DivideEdge(CPoint* division){
+    return     QVector<CEdge*>();
+}
 
 CEdge::CEdge(QObject* parent):
     CObject(parent)

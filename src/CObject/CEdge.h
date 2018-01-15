@@ -64,6 +64,10 @@ public:
     Pos    GetDifferentialVec   (Pos pos)const; //posの位置で微分した基底ベクトル取得
     double GetMiddleParamFromPos(Pos pos)const; //tを求める
 
+    //結合
+    virtual CEdge*          MergeEdge (CEdge* merge_point); //失敗ならnullptr
+    virtual QVector<CEdge*> DivideEdge(CPoint* division);   //失敗ならQVector<CEdge*>()
+
     CEdge(QObject* parent=nullptr);
     CEdge(CPoint* start,CPoint* end,QObject* parent=nullptr);
     ~CEdge();

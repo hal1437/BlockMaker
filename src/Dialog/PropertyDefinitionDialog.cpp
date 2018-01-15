@@ -145,7 +145,7 @@ PropertyDefinitionDialog::PropertyDefinitionDialog(QWidget *parent) :
     //初期値設定
     this->name_label             .setText("オブジェクト名");
     this->face_boundary_label    .setText("境界タイプ");
-    this->face_boundary_button   .setText("...");
+    this->face_boundary_button   .setText("登録済み境界条件リスト");
     this->edge_all_divide_label  .setText("分割数");
     this->edge_add_grading_button.setText("+");
     this->edge_remove_grading_button.setText("-");
@@ -161,7 +161,7 @@ PropertyDefinitionDialog::PropertyDefinitionDialog(QWidget *parent) :
     this->ui->Grid->addWidget(&this->name_edit                  ,0,1);
     this->ui->Grid->addWidget(&this->face_boundary_label        ,1,0);
     this->ui->Grid->addWidget(&this->face_boundary_combo        ,1,1);
-    this->ui->Grid->addWidget(&this->face_boundary_button       ,1,2);
+    this->ui->Grid->addWidget(&this->face_boundary_button       ,2,1,1,2);
     this->ui->Grid->addWidget(&this->edge_all_divide_label      ,2,0);
     this->ui->Grid->addWidget(&this->edge_all_divide_spin       ,2,1);
     this->ui->Grid->addWidget(&this->edge_multi_grading_table   ,3,0,1,2);

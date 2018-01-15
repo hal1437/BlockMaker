@@ -28,6 +28,10 @@ public:
     //複製
     virtual CEdge* Clone()const;
 
+    //結合
+    virtual CEdge*          MergeEdge (CEdge* merge); //失敗ならnullptr
+    virtual QVector<CEdge*> DivideEdge(CPoint* division);   //失敗ならQVector<CEdge*>()
+
     CLine(QObject* parent=nullptr);
     CLine(CPoint* start,CPoint* end,QObject* parent=nullptr);
     ~CLine();

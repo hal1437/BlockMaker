@@ -88,6 +88,40 @@ CEdge* CLine::Clone()const{
     return ptr;
 }
 
+//結合
+CEdge*          CLine::MergeEdge (CEdge* merge){
+    //型が同じでない
+    if(!merge->is<CLine>()){
+        QMessageBox::critical(nullptr, tr("結合エラー"), tr("型が違います。同一タイプの線を選択してください。"));
+        return nullptr;
+    }
+    //一致しない
+    CPoint* merge_point;
+    if(this->start == merge->start)merge_point = this->start;
+    if(this->start == merge->end  )merge_point = this->start;
+    if(this->end   == merge->start)merge_point = this->end;
+    if(this->end   == merge->end  )merge_point = this->end;
+    if(merge_point == nullptr){
+        QMessageBox::critical(nullptr, tr("結合エラー"), tr("二つの線の始点または終点が一致している必要があります。"));
+        return nullptr;
+    }
+
+    //方向が違う
+    if(std::abs(((*this->end) - (*this->start)).DotPos((*merge->end) - (*merge->start))) < 1.0){
+        QMessageBox::critical(nullptr, tr("結合エラー"), tr("二つの線の方向が一致している必要があります。"));
+        return nullptr;
+    }
+
+    //作成
+    CLine* new_line = new CLine();
+    new_line->Create(this ->start == merge_point ? this ->end : this ->start);
+    new_line->Create(merge->start == merge_point ? merge->end : merge->start);
+    return new_line;
+}
+QVector<CEdge*> CLine::DivideEdge(CPoint* division){
+    return     QVector<CEdge*>();
+}
+
 
 CLine::CLine(QObject *parent):
     CEdge(parent)
