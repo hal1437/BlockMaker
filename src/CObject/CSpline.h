@@ -58,7 +58,7 @@ public:
 
 public slots:
     //点移動コールバックオーバーライド
-    virtual void ChangeChildCallback(QVector<CObject*>);
+    virtual void ChangeChildCallback(QList<CObject*>);
 
 };
 

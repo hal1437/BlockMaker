@@ -32,13 +32,13 @@ QString Boundary::BoundaryTypeToString(Boundary::Type type){
     return "none";
 }
 
-bool CFace::Creatable(QVector<CObject*> lines){
+bool CFace::Creatable(QList<CObject*> lines){
     if(std::any_of(lines.begin(),lines.end(),[](CObject* p){return !p->is<CEdge>();}))return false;
     if(lines.size() < 3)return false;
 
     //閉じた図形テスト
     std::map<CPoint*,int> point_maps;
-    QVector<CPoint*> points;
+    QList<CPoint*> points;
     for(CObject* line: lines){
         point_maps[dynamic_cast<CEdge*>(line)->start]++;
         points.push_back(dynamic_cast<CEdge*>(line)->start);
@@ -54,7 +54,7 @@ bool CFace::Creatable(QVector<CObject*> lines){
 
     return true;
 }
-void CFace::Create(QVector<CEdge*> edges){
+void CFace::Create(QList<CEdge*> edges){
     this->edges = edges;
     for(int i=0;i<edges.size();i++){
         if(std::count(edges.begin(),edges.end(),edges[i]) > 1){
@@ -141,7 +141,7 @@ Pos CFace::GetPosFromUVSquare(double u,double v)const{
             p[2] *     u * v);
 }
 CPoint* CFace::GetBasePoint()const{
-    QVector<CPoint*> pp;
+    QList<CPoint*> pp;
     for(CEdge* edge:this->edges){
         pp.push_back(edge->start);
         pp.push_back(edge->end);
@@ -152,7 +152,7 @@ CPoint* CFace::GetBasePoint()const{
     CPoint* corner = nullptr;//左下
     double LIMIT_LENGTH = 0;
     for(CPoint* pos:pp){
-        QVector<double> vs = {pos->x(),pos->y(),pos->z(),LIMIT_LENGTH};
+        QList<double> vs = {pos->x(),pos->y(),pos->z(),LIMIT_LENGTH};
         LIMIT_LENGTH = *std::max_element(vs.begin(),vs.end());
     }
     //角の算出
@@ -166,7 +166,7 @@ CEdge*  CFace::GetBaseEdge()const{
     CPoint* base = this->GetBasePoint();
 
     //基準点を含むエッジ
-    QVector<CEdge*> ee;
+    QList<CEdge*> ee;
     for(CEdge* e :this->edges){
         if(e->start == base || e->end == base){
             ee.push_back(e);
@@ -184,7 +184,7 @@ CPoint* CFace::GetPointSequence(int index)const{
     CPoint* corner = this->GetBasePoint();
     CPoint* ans = corner;
     CPoint* old = corner; //反復連鎖防止
-    QVector<CPoint*> candidate;//連鎖候補
+    QList<CPoint*> candidate;//連鎖候補
     for(int i=0;i<index%this->edges.size();i++){
         //ansを含むlineを探す
         for(CEdge* line:this->edges){
@@ -232,7 +232,7 @@ CPoint* CFace::GetPointSequence(int index)const{
 }
 CEdge*  CFace::GetEdgeSequence(int index)const{
     //index番目の点とindex+1番目の点を含む点を持つエッジを探す
-    QVector<CEdge*>::const_iterator it = std::find_if(this->edges.begin(),this->edges.end(),[&](CEdge* edge){
+    QList<CEdge*>::const_iterator it = std::find_if(this->edges.begin(),this->edges.end(),[&](CEdge* edge){
         CPoint*  p1 = this->GetPointSequence(index);
         CPoint*  p2 = this->GetPointSequence((index+1)%this->edges.size());
         return (edge->start == p1 && edge->end == p2) ||
@@ -356,7 +356,7 @@ void CFace::DrawMeshGL()const{
 }
 
 void CFace::ReorderEdges(){
-    QVector<CEdge*> ans;
+    QList<CEdge*> ans;
     //整合確認
     for(int i=0;i<this->edges.size();i++){
         ans.push_back(this->GetEdgeSequence(i));
@@ -414,9 +414,6 @@ CObject* CFace::GetChild     (int index){
     return this->GetEdge(index);
 }
 void CFace::SetChild(int index,CObject* obj){
-    if(this->GetChildCount() <= index){
-        this->edges.resize(index);
-    }
     this->edges[index] = dynamic_cast<CEdge*>(obj);
 }
 
@@ -444,7 +441,7 @@ Pos CFace::GetNearLine(const Pos& ,const Pos& )const{
 CObject* CFace::Clone()const{
     CFace* new_obj = new CFace();
     //edgeを複製
-    QVector<CEdge*> edges;
+    QList<CEdge*> edges;
     for(CEdge* edge:this->edges){
         edges.push_back(dynamic_cast<CEdge*>(edge->Clone()));
     }
@@ -474,7 +471,7 @@ CFace::CFace(QObject* parent):
 
 CFace::~CFace(){}
 
-void CFace::ChangeChildCallback(QVector<CObject*> edges){
+void CFace::ChangeChildCallback(QList<CObject*> edges){
     for(CEdge* edge:this->edges){
         if(exist(edges,edge)){
             //対角エッジの分割数同期

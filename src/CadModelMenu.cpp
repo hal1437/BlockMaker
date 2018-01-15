@@ -2,7 +2,7 @@
 
 
 void CadModelMenu::Show(QPoint pos){
-    QVector<CObject*> selected = this->CadModelCoreInterface::model->GetSelected();
+    QList<CObject*> selected = this->CadModelCoreInterface::model->GetSelected();
     this->menu = new QMenu();
 
     //全てのオブジェクト

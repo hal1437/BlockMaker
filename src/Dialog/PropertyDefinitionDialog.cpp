@@ -14,7 +14,7 @@ void PropertyDefinitionDialog::ConstructFace(){
     this->face_boundary_label .show();
     this->face_boundary_combo .show();
     this->face_boundary_button.show();
-    QVector<CObject*> selected = this->model->GetSelected();
+    QList<CObject*> selected = this->model->GetSelected();
 
     //コンボ更新
     this->face_boundary_combo.clear();
@@ -53,7 +53,7 @@ void PropertyDefinitionDialog::ConstructEdge(){
     this->edge_grading_spins.clear();
 
     //全て分割数が同じであれば
-    QVector<CObject*> selected = this->model->GetSelected();
+    QList<CObject*> selected = this->model->GetSelected();
     if(SELECTED_SAME_VALUE(selected,CEdge*,Divide)){
         this->edge_all_divide_spin.setValue(dynamic_cast<CEdge*>(selected.first())->getDivide());
     }
@@ -119,7 +119,7 @@ void PropertyDefinitionDialog::SetupDoubleSpin(QDoubleSpinBox* dir,QDoubleSpinBo
 }
 
 bool PropertyDefinitionDialog::CheckAvailable()const{
-    QVector<CObject*> selected = this->model->GetSelected();
+    QList<CObject*> selected = this->model->GetSelected();
     if(selected.size() > 0 && std::all_of(selected.begin(),selected.end(),[](CObject* obj){return obj->is<CEdge>();}))return true;
     if(selected.size() > 0 && std::all_of(selected.begin(),selected.end(),[](CObject* obj){return obj->is<CFace>();}))return true;
     return false;
@@ -194,7 +194,7 @@ void PropertyDefinitionDialog::UpdateLayout(){
     this->edge_multi_grading_table.hide();
 
     //表示タイプ選定
-    QVector<CObject*> selected = this->model->GetSelected();
+    QList<CObject*> selected = this->model->GetSelected();
     if     (selected.size() > 0 && std::all_of(selected.begin(),selected.end(),[](CObject* obj){return obj->is<CEdge>();}))this->ConstructEdge();
     else if(selected.size() > 0 && std::all_of(selected.begin(),selected.end(),[](CObject* obj){return obj->is<CFace>();}))this->ConstructFace();
     else{
@@ -254,10 +254,10 @@ void PropertyDefinitionDialog::ShowBoundayDefinitionDialog(){
 
 void PropertyDefinitionDialog::Accept(){
     //適用処理
-    QVector<CObject*> selected = this->model->GetSelected();
+    QList<CObject*> selected = this->model->GetSelected();
 
     //更新停止対象選定
-    QVector<CObject*> paused;
+    QList<CObject*> paused;
     if(this->constructed == CONSTRUCTED::FACE){
         for(CBlock* block: this->model->GetBlocks()){
             for(CObject* obj: selected){

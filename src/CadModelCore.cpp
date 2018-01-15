@@ -170,7 +170,7 @@ bool CadModelCore::ImportFoamFile(QString filename){
         CFace* face = new CFace();
 
         Boundary bound;
-        QVector<int> indexies;
+        QList<int> indexies;
         int type;
         //境界タイプ
         seq.InputQString(bound.name);
@@ -185,7 +185,7 @@ bool CadModelCore::ImportFoamFile(QString filename){
         });
 
         //値の代入
-        QVector<CEdge*>edges;
+        QList<CEdge*>edges;
         for(int i:indexies){
             edges.push_back(this->GetEdges()[i]);
         }
@@ -201,7 +201,7 @@ bool CadModelCore::ImportFoamFile(QString filename){
     //CBlock型入力
     std::function<CBlock*(SeqenceFileIO&)> block_in = [&](SeqenceFileIO& seq){
         CBlock* block = new CBlock();
-        QVector<int> indexies;
+        QList<int> indexies;
         //子の番号入力
         seq.InputForeach(indexies,[](SeqenceFileIO& seq){
             int index;
@@ -210,7 +210,7 @@ bool CadModelCore::ImportFoamFile(QString filename){
         });
 
         //値の代入
-        QVector<CFace*>faces;
+        QList<CFace*>faces;
         for(int i:indexies){
             faces.push_back(this->GetFaces()[i]);
         }
@@ -251,7 +251,7 @@ void CadModelCore::AddObject(CObject* obj){
         this->AddObject(obj->GetChild(i));
     }
 }
-void CadModelCore::Merge(QVector<CPoint*> points){
+void CadModelCore::Merge(QList<CPoint*> points){
     if(points.isEmpty())return ;
     CPoint* first = points.first();
     //全て先頭に結合
@@ -267,9 +267,9 @@ void CadModelCore::Merge(QVector<CPoint*> points){
         }
     }
 }
-void CadModelCore::AutoMerge_impl(QVector<CPoint*> points){
+void CadModelCore::AutoMerge_impl(QList<CPoint*> points){
     for(int i=0;i<points.size();i++){
-        QVector<CPoint*> same;
+        QList<CPoint*> same;
         same.push_back(points[i]);
         for(int j=i;j<points.size();j++){
             if(points[i] != points[j] && *points[i] == *points[j]){
@@ -292,8 +292,8 @@ void CadModelCore::AutoMerge(CObject* obj){
     this->AutoMerge_impl(obj->GetAllChildren());
 }
 
-QVector<CBlock*> CadModelCore::GetParent(CFace*  child)const{
-    QVector<CBlock*>ans;
+QList<CBlock*> CadModelCore::GetParent(CFace*  child)const{
+    QList<CBlock*>ans;
     for(CBlock* block:this->GetBlocks()){
         for(CFace* face : block->faces){
             if(face == child){
@@ -304,8 +304,8 @@ QVector<CBlock*> CadModelCore::GetParent(CFace*  child)const{
     }
     return ans;
 }
-QVector<CFace*>  CadModelCore::GetParent(CEdge*  child)const{
-    QVector<CFace*>ans;
+QList<CFace*>  CadModelCore::GetParent(CEdge*  child)const{
+    QList<CFace*>ans;
     for(CFace* face:this->GetFaces()){
         for(CEdge* edge : face->edges){
             if(edge == child)ans.push_back(face);
@@ -314,8 +314,8 @@ QVector<CFace*>  CadModelCore::GetParent(CEdge*  child)const{
     }
     return ans;
 }
-QVector<CEdge*>  CadModelCore::GetParent(CPoint* child)const{
-    QVector<CEdge*>ans;
+QList<CEdge*>  CadModelCore::GetParent(CPoint* child)const{
+    QList<CEdge*>ans;
     for(CEdge* edge:this->GetEdges()){
         if(edge->start == child || edge->end == child)ans.push_back(edge);
     }
@@ -370,10 +370,20 @@ void CadModelCore::SolvedAnyObjectEmittor(CObject* object){
     }
 }
 
-void CadModelCore::UpdatePause(){
+void CadModelCore::ObservePause(){
+    this->pause = true;
+    for(CBlock* obj:this->Blocks)obj->ObservePause();
+    for(CFace*  obj:this->Faces )obj->ObservePause();
+    for(CEdge*  obj:this->Edges )obj->ObservePause();
+    for(CPoint* obj:this->Points)obj->ObservePause();
 }
 
-void CadModelCore::UpdateRestart(){
+void CadModelCore::ObserveRestart(){
+    this->pause = false;
+    for(CBlock* obj:this->Blocks)obj->ObserveRestart();
+    for(CFace*  obj:this->Faces )obj->ObserveRestart();
+    for(CEdge*  obj:this->Edges )obj->ObserveRestart();
+    for(CPoint* obj:this->Points)obj->ObserveRestart();
 }
 
 void CadModelCore::SelectedClear(){

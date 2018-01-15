@@ -19,22 +19,22 @@ bool CadModelSearch::HavePoint(CEdge* e1,CPoint* pos){
 
 
 //面生成補完関数
-QVector<CEdge*> CadModelSearch::SearchEdgeMakeFace (QVector<CEdge*> select)const{
-    QVector<QVector<CEdge*>> ans;
+QList<CEdge*> CadModelSearch::SearchEdgeMakeFace (QList<CEdge*> select)const{
+    QList<QList<CEdge*>> ans;
 
     //作成対象外
-    if(select.size() <= 1)return QVector<CEdge*>();
+    if(select.size() <= 1)return QList<CEdge*>();
     if(select.size() >= 4){
         // CFace::Creatable関数で作成可能であれば作成
-        QVector<CObject*> objects;
+        QList<CObject*> objects;
         //CObjectに変換
         for(CEdge* edge:select)objects.push_back(edge);
         if(CFace::Creatable(objects))return select;
-        else return QVector<CEdge*>();
+        else return QList<CEdge*>();
     }
 
     //選択されたオブジェクトを除外したedgesを作成
-    QVector<CEdge*> edges = this->model->GetEdges();
+    QList<CEdge*> edges = this->model->GetEdges();
     for(CEdge* edge:select){
         edges.removeAll(edge);
     }
@@ -99,12 +99,12 @@ QVector<CEdge*> CadModelSearch::SearchEdgeMakeFace (QVector<CEdge*> select)const
                         e3 = select[j];
                     }else{
                         //二回目以降は失敗
-                        return QVector<CEdge*>();
+                        return QList<CEdge*>();
                     }
                 }
             }
         }
-        if(e1 == nullptr)return QVector<CEdge*>();
+        if(e1 == nullptr)return QList<CEdge*>();
 
         //のこり1辺を探す
         for(int i=0;i<edges.size();i++){
@@ -116,17 +116,17 @@ QVector<CEdge*> CadModelSearch::SearchEdgeMakeFace (QVector<CEdge*> select)const
         }
     }
     if(ans.size() == 1)return ans.first();
-    else return QVector<CEdge*>();
+    else return QList<CEdge*>();
 }
-QVector<CEdge*> CadModelSearch::SearchEdgeMakeBlock(QVector<CEdge*> select)const{
+QList<CEdge*> CadModelSearch::SearchEdgeMakeBlock(QList<CEdge*> select)const{
 /*
-    QVector<QVector<CEdge*>> ans;
+    QList<QList<CEdge*>> ans;
 
     //無理
-    if(select.size() != 3)return QVector<CEdge*>();
+    if(select.size() != 3)return QList<CEdge*>();
     if(!isContinuity(select[0],select[1]) ||
        !isContinuity(select[1],select[2]) ||
-       !isContinuity(select[2],select[0]))return QVector<CEdge*>();
+       !isContinuity(select[2],select[0]))return QList<CEdge*>();
 
     //端点を3つ割り出す
     CPoint* center = GetUnionPoint(select[0],select[1]); //共通点
@@ -136,10 +136,10 @@ QVector<CEdge*> CadModelSearch::SearchEdgeMakeBlock(QVector<CEdge*> select)const
     }
 
     //端点は全て違う点である
-    if(out[0] == out[1] || out[1] == out[2] || out[2] == out[0])return QVector<CEdge*>();
+    if(out[0] == out[1] || out[1] == out[2] || out[2] == out[0])return QList<CEdge*>();
 
     //選択されたオブジェクトを除外したedgesを作成
-    QVector<CEdge*> edges = this->model->GetEdges();
+    QList<CEdge*> edges = this->model->GetEdges();
     for(CEdge* edge:select){
         edges.removeAll(edge);
     }
@@ -164,7 +164,7 @@ QVector<CEdge*> CadModelSearch::SearchEdgeMakeBlock(QVector<CEdge*> select)const
                 }
 
                 //端点は全て違う点である
-                if(out_p[0] == out_p[1] || out_p[1] == out_p[2] || out_p[2] == out_p[0])return QVector<CEdge*>();
+                if(out_p[0] == out_p[1] || out_p[1] == out_p[2] || out_p[2] == out_p[0])return QList<CEdge*>();
 
                 //比較
                 if(!exist(out,out_p[0]) && !exist(out,out_p[2]) && !exist(out,out_p[2])){
@@ -179,24 +179,24 @@ QVector<CEdge*> CadModelSearch::SearchEdgeMakeBlock(QVector<CEdge*> select)const
 
 
 */
-    return QVector<CEdge*>();
+    return QList<CEdge*>();
     /*
-    if(ans.size() > 1)return QVector<CEdge*>();
+    if(ans.size() > 1)return QList<CEdge*>();
     else
     return ans.first();*/
 }
-QVector<CFace*> CadModelSearch::SearchFaceMakeBlock(QVector<CFace*> select)const{
-    QVector<QVector<CFace*>> ans;
+QList<CFace*> CadModelSearch::SearchFaceMakeBlock(QList<CFace*> select)const{
+    QList<QList<CFace*>> ans;
 
     //作成対象外
-    if(select.size() <= 1)return QVector<CFace*>();
+    if(select.size() <= 1)return QList<CFace*>();
     if(select.size() == 6){
         // CBlock::Creatable関数で作成可能であれば作成
-        QVector<CObject*> objects;
+        QList<CObject*> objects;
         //CObjectに変換
         for(CFace* face:select)objects.push_back(face);
         if(CBlock::Creatable(objects))return select;
-        else return QVector<CFace*>();
+        else return QList<CFace*>();
     }
 
     //対面のみ
@@ -204,16 +204,16 @@ QVector<CFace*> CadModelSearch::SearchFaceMakeBlock(QVector<CFace*> select)const
         if(std::any_of(select[0]->edges.begin(),select[0]->edges.end(),[&](CEdge* edge){
             return exist(select[1]->edges,edge);
         })){
-            return QVector<CFace*>();
+            return QList<CFace*>();
         }
         for(int j=0;j<4;j++){//シフト
-            QVector<CEdge*> connection;//接続数
+            QList<CEdge*> connection;//接続数
             for(int k=0;k<4;k++){//ループ
                 CPoint* p1 = select[0]->GetPointSequence(k);
                 CPoint* p2 = select[1]->GetPointSequence((j + k)%4);
 
                 //2つの点を持つ点を探す
-                QVector<CEdge*>::iterator it = std::find_if(this->model->GetEdges().begin(),this->model->GetEdges().end(),[&](CEdge* edge){
+                QList<CEdge*>::iterator it = std::find_if(this->model->GetEdges().begin(),this->model->GetEdges().end(),[&](CEdge* edge){
                     return HavePoint(edge,p1) && HavePoint(edge,p2);
                 });
                 if(it != this->model->GetEdges().end()){
@@ -222,20 +222,20 @@ QVector<CFace*> CadModelSearch::SearchFaceMakeBlock(QVector<CFace*> select)const
             }
             if(connection.size() == 4){
                 //構築
-                QVector<CFace*>faces;
+                QList<CFace*>faces;
                 faces.push_back(select[0]);
                 faces.push_back(select[1]);
                 //面を作成する
                 for(int k = 0;k<4;k++){
                     CFace* face = new CFace();
-                    QVector<CEdge*> edges;
-                    QVector<CEdge*>::iterator it1 = std::find_if(select[0]->edges.begin(),
+                    QList<CEdge*> edges;
+                    QList<CEdge*>::iterator it1 = std::find_if(select[0]->edges.begin(),
                                                                  select[0]->edges.end(),
                                                                  [&](CEdge* edge){
                         return HavePoint(edge,select[0]->GetPointSequence(k)) &&
                                HavePoint(edge,select[0]->GetPointSequence((k+1)%4));
                     });
-                    QVector<CEdge*>::iterator it2 = std::find_if(select[1]->edges.begin(),
+                    QList<CEdge*>::iterator it2 = std::find_if(select[1]->edges.begin(),
                                                                  select[1]->edges.end(),
                                                                  [&](CEdge* edge){
                         return HavePoint(edge,select[1]->GetPointSequence((j+k)%4)) &&
@@ -271,10 +271,10 @@ QVector<CFace*> CadModelSearch::SearchFaceMakeBlock(QVector<CFace*> select)const
         }
         return ans.first();
     }
-    else return QVector<CFace*>();
+    else return QList<CFace*>();
 }
 
-bool   CadModelSearch::Projectable(QVector<CObject*>objects){
+bool   CadModelSearch::Projectable(QList<CObject*>objects){
     //全て点
     if(std::all_of(objects.begin(),objects.end(),[](CObject* obj){return obj->is<CPoint>();}) && objects.size() >= 3){
         Pos center = *dynamic_cast<CPoint*>(objects[0]);
@@ -297,11 +297,11 @@ bool   CadModelSearch::Projectable(QVector<CObject*>objects){
 
     return false;
 }
-CFace* CadModelSearch::CreateProjectionFace(QVector<CObject*> objects){
+CFace* CadModelSearch::CreateProjectionFace(QList<CObject*> objects){
     //全て点
     if(std::all_of(objects.begin(),objects.end(),[](CObject* obj){return obj->is<CPoint>();}) && objects.size() >= 3){
         CFace* answer = new CFace();
-        QVector<CEdge*> egdes;
+        QList<CEdge*> egdes;
         for(int i =0;i<objects.size();i++){
             egdes.push_back(new CLine(dynamic_cast<CPoint*>(objects[i]),dynamic_cast<CPoint*>(objects[(i+1)%objects.size()])));
         }

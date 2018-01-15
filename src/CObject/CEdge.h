@@ -19,7 +19,7 @@ public:
             double grading; //寄せ係数
             bool operator==(GradingElement rhs)const{return std::tie(this->dir,this->cell,this->grading) == std::tie(rhs.dir,rhs.cell,rhs.grading); }
         };
-        QVector<GradingElement> elements;
+        QList<GradingElement> elements;
         Grading GetReverse()const;//反転したものを取得
         bool operator==(Grading rhs)const{return this->elements == rhs.elements; }
         GradingElement& operator[](int index){return this->elements[index]; }
@@ -66,7 +66,7 @@ public:
 
     //結合
     virtual CEdge*          MergeEdge (CEdge* merge_point); //失敗ならnullptr
-    virtual QVector<CEdge*> DivideEdge(CPoint* division);   //失敗ならQVector<CEdge*>()
+    virtual QList<CEdge*> DivideEdge(CPoint* division);   //失敗ならQList<CEdge*>()
 
     CEdge(QObject* parent=nullptr);
     CEdge(CPoint* start,CPoint* end,QObject* parent=nullptr);
@@ -74,7 +74,7 @@ public:
 
 public slots:
     //点移動コールバック
-    virtual void ChangeChildCallback(QVector<CObject*> child);
+    virtual void ChangeChildCallback(QList<CObject*> child);
 
 };
 

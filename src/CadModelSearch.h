@@ -17,13 +17,13 @@ private:
 
 public:
     //オブジェクト生成補完関数
-    QVector<CEdge*> SearchEdgeMakeFace (QVector<CEdge*> select)const;
-    QVector<CEdge*> SearchEdgeMakeBlock(QVector<CEdge*> select)const;
-    QVector<CFace*> SearchFaceMakeBlock(QVector<CFace*> select)const;
+    QList<CEdge*> SearchEdgeMakeFace (QList<CEdge*> select)const;
+    QList<CEdge*> SearchEdgeMakeBlock(QList<CEdge*> select)const;
+    QList<CFace*> SearchFaceMakeBlock(QList<CFace*> select)const;
 
     //投影チェック、投影面生成
-    static bool   Projectable(QVector<CObject*>objects);
-    static CFace* CreateProjectionFace(QVector<CObject*>objects);
+    static bool   Projectable(QList<CObject*>objects);
+    static CFace* CreateProjectionFace(QList<CObject*>objects);
 
 public:
     //モデルを必要とするためインタンスが必要

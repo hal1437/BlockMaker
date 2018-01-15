@@ -13,9 +13,9 @@ class CStl :public CObject
 public:
     QString filepath;        //ファイルパス
     QString name;            //STL名
-    QVector<CPoint*> points; //点群
-    QVector<CEdge* > edges;  //線群
-    QVector<CFace* > faces;  //面群
+    QList<CPoint*> points; //点群
+    QList<CEdge* > edges;  //線群
+    QList<CFace* > faces;  //面群
 private:
     static CStl* AddTriangle(CStl* stl,Pos pos[3]);
 public:
@@ -27,7 +27,7 @@ public:
     virtual void DrawGL(Pos camera,Pos center)const; //三次元描画関数
 
     //中間点操作
-    virtual QVector<CPoint*> GetAllChildren()const;
+    virtual QList<CPoint*> GetAllChildren()const;
     virtual CObject* GetChild(int index);
     virtual void     SetChild(int index,CObject* obj);
     virtual int      GetChildCount()const;

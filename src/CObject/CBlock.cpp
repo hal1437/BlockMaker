@@ -1,6 +1,6 @@
 #include "CBlock.h"
 
-bool CBlock::Creatable(QVector<CObject*> values){
+bool CBlock::Creatable(QList<CObject*> values){
     if(values.size()==1 && values[0]->is<CBlock>())return true;
 
     //全てがCFaceである
@@ -21,7 +21,7 @@ bool CBlock::Creatable(QVector<CObject*> values){
 
     return true;
 }
-void CBlock::Create(QVector<CFace*> faces){
+void CBlock::Create(QList<CFace*> faces){
     this->faces = faces;
     for(CFace* f :this->faces){
         f->SetFaceBlend(false); //面を非透過に
@@ -31,9 +31,9 @@ void CBlock::Create(QVector<CFace*> faces){
 
 CPoint* CBlock::GetBasePoint()const{
     double LIMIT_LENGTH = 0;
-    QVector<CPoint*> vertex = this->GetAllPoints();
+    QList<CPoint*> vertex = this->GetAllPoints();
     for(CPoint* pos:vertex){
-        QVector<double> vs = {std::abs(pos->x()),std::abs(pos->y()),std::abs(pos->z()),LIMIT_LENGTH};
+        QList<double> vs = {std::abs(pos->x()),std::abs(pos->y()),std::abs(pos->z()),LIMIT_LENGTH};
         LIMIT_LENGTH = *std::max_element(vs.begin(),vs.end());
     }
     //角の算出
@@ -46,7 +46,7 @@ CEdge*  CBlock::GetBaseEdge ()const{
     CPoint* base = this->GetBasePoint();
 
     //基準点を含むエッジ
-    QVector<CEdge*> ee;
+    QList<CEdge*> ee;
     for(CEdge* e :this->GetAllEdges()){
         if(e->start == base || e->end == base){
             ee.push_back(e);
@@ -59,8 +59,8 @@ CEdge*  CBlock::GetBaseEdge ()const{
                (*rhs->end - *rhs->start).DotPos(n);
     });
 }
-QVector<CPoint*> CBlock::GetAllPoints()const{
-    QVector<CPoint*>pp;
+QList<CPoint*> CBlock::GetAllPoints()const{
+    QList<CPoint*>pp;
     for(CFace* face:faces){
         for(CEdge* edge:face->edges){
             pp.push_back(edge->start);
@@ -72,8 +72,8 @@ QVector<CPoint*> CBlock::GetAllPoints()const{
     pp.erase(std::unique(pp.begin(),pp.end()),pp.end());
     return pp;
 }
-QVector<CEdge*> CBlock::GetAllEdges()const{
-    QVector<CEdge*>ee;
+QList<CEdge*> CBlock::GetAllEdges()const{
+    QList<CEdge*>ee;
     for(CFace* face:faces){
         for(CEdge* edge:face->edges){
             ee.push_back(edge);
@@ -84,12 +84,12 @@ QVector<CEdge*> CBlock::GetAllEdges()const{
     ee.erase(std::unique(ee.begin(),ee.end()),ee.end());
     return ee;
 }
-QVector<CFace*> CBlock::GetAllFaces()const{
+QList<CFace*> CBlock::GetAllFaces()const{
     return this->faces;
 }
 
 double CBlock::GetLength_impl(Quat convert){
-    QVector<CPoint*> pp;
+    QList<CPoint*> pp;
     pp = this->GetAllPoints();
     std::for_each(pp.begin(),pp.end(),[&](CPoint* pos){*pos = pos->Dot(convert);});
     double begin = (*std::min_element(pp.begin(),pp.end(),[](CPoint* lhs,CPoint* rhs){return lhs->mat[0] < rhs->mat[0];}))->mat[0];
@@ -132,10 +132,10 @@ CPoint* CBlock::GetPointSequence(int index)const{
 
     //方向エッジ算出
     CEdge* base_edges[3]={nullptr,nullptr,nullptr};
-    QVector<CEdge*> edges = this->GetAllEdges();
+    QList<CEdge*> edges = this->GetAllEdges();
 
     //edgesをクローンに入れ替え
-    QVector<CEdge*> swap_tmp;
+    QList<CEdge*> swap_tmp;
     for(CEdge* edge:edges){
         CEdge* clone = dynamic_cast<CEdge*>(edge->Clone());
         clone->start = edge->start;
@@ -205,7 +205,7 @@ CPoint* CBlock::GetPointSequence(int index)const{
 
     //ここに到達できるのは6のみ
     //それ以外の点
-    QVector<CPoint*> pos = this->GetAllPoints();
+    QList<CPoint*> pos = this->GetAllPoints();
     for(int i=0;i<8;i++){
         if(i!=6)pos.removeAll(ans[i]);
     }
@@ -215,7 +215,7 @@ CPoint* CBlock::GetPointSequence(int index)const{
 }
 CEdge* CBlock::GetEdgeSequence(int index) const{
     //始点と終点を持つ点を探す
-    QVector<CEdge*> edges = this->GetAllEdges();
+    QList<CEdge*> edges = this->GetAllEdges();
     CPoint* p1 = this->GetPointSequence(edge_comb[index][0]);
     CPoint* p2 = this->GetPointSequence(edge_comb[index][1]);
     CEdge* edge = *std::find_if(edges.begin(),edges.end(),[&](CEdge* e){
@@ -226,7 +226,7 @@ CEdge* CBlock::GetEdgeSequence(int index) const{
 
 bool CBlock::isEdgeReverse(int index){
     //始点と終点を持つ点を探す
-    QVector<CEdge*> edges = this->GetAllEdges();
+    QList<CEdge*> edges = this->GetAllEdges();
     CPoint* p1 = this->GetPointSequence(edge_comb[index][0]);
     CPoint* p2 = this->GetPointSequence(edge_comb[index][1]);
     CEdge* edge = *std::find_if(edges.begin(),edges.end(),[&](CEdge* e){
@@ -245,9 +245,6 @@ CObject* CBlock::GetChild(int index){
     return this->GetFace(index);
 }
 void CBlock::SetChild(int index,CObject* obj){
-    if(this->GetChildCount() <= index){
-        this->faces.resize(index);
-    }
     this->faces[index] = dynamic_cast<CFace*>(obj);
 }
 

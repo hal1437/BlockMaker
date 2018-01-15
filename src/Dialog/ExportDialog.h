@@ -40,7 +40,7 @@ private:
     int GetPosIndex(CPoint *p)const;
 
     //方向から面を取得し適切な順番に点を並び替えて返す
-    QVector<CPoint*> GetBoundaryPos(CBlock* block,BoundaryDir dir)const;
+    QList<CPoint*> GetBoundaryPos(CBlock* block,BoundaryDir dir)const;
 
 public:
     explicit ExportDialog(QWidget *parent = 0);

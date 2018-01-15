@@ -4,7 +4,7 @@
 
 int ExportDialog::GetPosIndex(CPoint* p) const{
     int ans;
-    QVector<CPoint*> pp = this->model->GetPoints();
+    QList<CPoint*> pp = this->model->GetPoints();
     //検索
     ans = std::distance(pp.begin(),std::find(pp.begin(),pp.end(),p));
     if(ans == pp.size()){
@@ -14,9 +14,9 @@ int ExportDialog::GetPosIndex(CPoint* p) const{
     }
 }
 
-QVector<CPoint*> ExportDialog::GetBoundaryPos(CBlock* block,BoundaryDir dir)const{
-    QVector<CPoint*> vertices;
-    QVector<CPoint*> ans;
+QList<CPoint*> ExportDialog::GetBoundaryPos(CBlock* block,BoundaryDir dir)const{
+    QList<CPoint*> vertices;
+    QList<CPoint*> ans;
     for(int i=0;i<8;i++){
         vertices.push_back(block->GetPointSequence(i));
     }
@@ -55,8 +55,8 @@ void ExportDialog::ChangeDirctory(){
 void ExportDialog::Export(QString filename)const{
 
     //全ての辺を抽出
-    QVector<CPoint*> all_points = this->model->GetPoints();
-    QVector<CEdge*> all_edges  = this->model->GetEdges();
+    QList<CPoint*> all_points = this->model->GetPoints();
+    QList<CEdge*> all_edges  = this->model->GetEdges();
 
     //BlockMeshDict出力
     FoamFile file(filename+"/blockMeshDict");
@@ -110,10 +110,10 @@ void ExportDialog::Export(QString filename)const{
             if(block->isEdgeReverse(i)) gr = grading.GetReverse();
             else                        gr = grading;
             for(CEdge::Grading::GradingElement elm: gr.elements){
-                QVector<double> args;
-                args.push_back(elm.dir);
-                args.push_back(elm.cell);
-                args.push_back(elm.grading);
+                QVector<double> args(3);
+                args[0] = elm.dir;
+                args[1] = elm.cell;
+                args[2] = elm.grading;
                 file.OutVector(args);
             }
             file.EndScope();
@@ -159,12 +159,12 @@ void ExportDialog::Export(QString filename)const{
     // 境界定義
     file.StartListDifinition("boundary");
     //境界追加
-    QMap<QString,std::pair<Boundary::Type,QVector<int>>> boundary_list; //(name ,[[index]])
+    QMap<QString,std::pair<Boundary::Type,QList<int>>> boundary_list; //(name ,[[index]])
     for(CBlock* block:this->model->GetBlocks()){
         for(int i=0;i<6;i++){
             CFace* face = block->GetFace(static_cast<BoundaryDir>(i));
             //頂点番号リスト出力
-            QVector<CPoint*> vp = this->GetBoundaryPos(block,static_cast<BoundaryDir>(i));
+            QList<CPoint*> vp = this->GetBoundaryPos(block,static_cast<BoundaryDir>(i));
             for(CPoint* v:vp){
                 if(face->getBoundary().type == Boundary::Type::undefined)continue;//連続は登録しない
                 boundary_list[face->getName()].first = face->getBoundary().type;
@@ -172,7 +172,7 @@ void ExportDialog::Export(QString filename)const{
             }
         }
     }
-    QMap<QString,std::pair<Boundary::Type,QVector<int>>>::const_iterator it = boundary_list.constBegin();
+    QMap<QString,std::pair<Boundary::Type,QList<int>>>::const_iterator it = boundary_list.constBegin();
     while (it != boundary_list.constEnd()) {
 
         //境界名

@@ -13,12 +13,12 @@ class ObjectList : public QTreeWidget, public CadModelCoreInterface
     Q_OBJECT
 
 private:
-    QVector<CPoint*   > points;
-    QVector<CEdge*    > edges ;
-    QVector<CFace*    > faces ;
-    QVector<CBlock*   > blocks;
-    QVector<CStl*     > stls;
-    QVector<Restraint*> restraints;
+    QList<CPoint*   > points;
+    QList<CEdge*    > edges ;
+    QList<CFace*    > faces ;
+    QList<CBlock*   > blocks;
+    QList<CStl*     > stls;
+    QList<Restraint*> restraints;
     CadModelMenu menu;
     QTreeWidgetItem* rest_root;
 

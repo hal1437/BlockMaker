@@ -10,7 +10,7 @@
 class CBlock : public CObject{
     Q_OBJECT
 public:
-    QVector<CFace*> faces;
+    QList<CFace*> faces;
 
 private:
     DEFINE_FLAG(VisibleDetail,true)//分割フレーム表示
@@ -30,17 +30,17 @@ private:
 public:
     virtual QString DefaultClassName(){return "CBlock";}
     //立体が作成可能か
-    static bool Creatable(QVector<CObject* > values);
-    virtual void Create(QVector<CFace*> faces);     //作成
+    static bool Creatable(QList<CObject* > values);
+    virtual void Create(QList<CFace*> faces);     //作成
 
     void DrawGL(Pos camera,Pos center)const; //三次元描画関数
 
     //インデックス取得
     virtual CPoint* GetBasePoint()const;  //基準点取得
     virtual CEdge*  GetBaseEdge()const;   //基準線取得
-    virtual QVector<CPoint*> GetAllPoints()const; //構成点取得
-    virtual QVector<CEdge* > GetAllEdges()const;  //構成線取得
-    virtual QVector<CFace* > GetAllFaces()const;  //構成面取得
+    virtual QList<CPoint*> GetAllPoints()const; //構成点取得
+    virtual QList<CEdge* > GetAllEdges()const;  //構成線取得
+    virtual QList<CFace* > GetAllFaces()const;  //構成面取得
     virtual CPoint* GetPointSequence(int index) const;//番号順点取得
     virtual CEdge*  GetEdgeSequence (int index) const;//番号順線取得
     virtual bool isEdgeReverse(int index);//番号のエッジが反転しているか

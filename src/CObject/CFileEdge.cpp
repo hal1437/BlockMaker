@@ -66,7 +66,7 @@ CFileEdge::CFileEdge()
 
 }
 
-void CFileEdge::ChangeChildCallback(QVector<CObject *> children){
+void CFileEdge::ChangeChildCallback(QList<CObject *> children){
     if(exist(children,this->start)){
         Pos delta = *dynamic_cast<CPoint*>(*std::find(children.begin(),children.end(),this->start)) - this->start_base;
         for(CPoint* child : this->GetAllChildren()){

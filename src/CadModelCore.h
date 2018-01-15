@@ -16,12 +16,12 @@
 #include "Restraint.h"
 
 //監視変数追加
-#define OBSERVER_BASE(TYPE,NAME)                    \
-private:                                            \
-    QVector<TYPE> NAME;                             \
-public slots:                                       \
-    QVector<TYPE>& Get##NAME()     {return NAME;}   \
-    QVector<TYPE>  Get##NAME()const{return NAME;}
+#define OBSERVER_BASE(TYPE,NAME)                  \
+private:                                          \
+    QList<TYPE> NAME;                             \
+public slots:                                     \
+    QList<TYPE>& Get##NAME()     {return NAME;}   \
+    QList<TYPE>  Get##NAME()const{return NAME;}
 
 //通常追加マクロ
 #define OBSERVER_IO_COBJECT(TYPE,NAME)                                      \
@@ -71,6 +71,11 @@ inline void Remove##NAME(TYPE value){                                       \
     OBSERVER_BASE(TYPE,NAME)                        \
     OBSERVER_IO_RESTRAINT(TYPE,NAME)
 
+#define DEFINE_EMITTOR_CHECK_PAUSE(NAME) \
+void NAME##Emittor(){                    \
+    if(!this->isPause())emit NAME();     \
+}
+
 
 //クラス定義
 class CadModelCore:public QObject
@@ -90,17 +95,18 @@ public:
 
 public:
     CPoint* origin; //原点
-    DEFINE_FLAG(Pause,false)             //更新停止フラグ
+    bool pause = false;             //更新停止フラグ
+    bool isPause()const{return this->pause;}
 
     //自動点結合
-    void AutoMerge_impl(QVector<CPoint*> points);
+    void AutoMerge_impl(QList<CPoint*> points);
 public:
 
     //選定して追加
     void AddObject(CObject* obj);
 
     //結合
-    void Merge(QVector<CPoint*> points); //先頭のものに結合
+    void Merge(QList<CPoint*> points); //先頭のものに結合
     void AutoMerge();                    //全てのオブジェクトの同一座標を自動的に結合
     void AutoMerge(CObject* obj);        //引数のオブジェクトの同一座標を自動的に結合
 
@@ -109,9 +115,9 @@ public:
     bool ImportFoamFile(QString filename);
 
     //親取得
-    QVector<CBlock*> GetParent(CFace*  child)const;
-    QVector<CFace*>  GetParent(CEdge*  child)const;
-    QVector<CEdge*>  GetParent(CPoint* child)const;
+    QList<CBlock*> GetParent(CFace*  child)const;
+    QList<CFace*>  GetParent(CEdge*  child)const;
+    QList<CEdge*>  GetParent(CPoint* child)const;
 
     //選択解除
     void SelectedClear();
@@ -119,16 +125,16 @@ public:
 public slots:
 
     //エミッター
-    DEFINE_EMITTOR(UpdateSelected)
-    DEFINE_EMITTOR(UpdatePoints)
-    DEFINE_EMITTOR(UpdateEdges)
-    DEFINE_EMITTOR(UpdateFaces)
-    DEFINE_EMITTOR(UpdateBlocks)
-    DEFINE_EMITTOR(UpdateStls)
-    DEFINE_EMITTOR(UpdateRestraints)
-    DEFINE_EMITTOR(UpdateDimensions)
-    DEFINE_EMITTOR(UpdateAnyObject)
-    DEFINE_EMITTOR(UpdateAnyAction)
+    DEFINE_EMITTOR_CHECK_PAUSE(UpdateSelected)
+    DEFINE_EMITTOR_CHECK_PAUSE(UpdatePoints)
+    DEFINE_EMITTOR_CHECK_PAUSE(UpdateEdges)
+    DEFINE_EMITTOR_CHECK_PAUSE(UpdateFaces)
+    DEFINE_EMITTOR_CHECK_PAUSE(UpdateBlocks)
+    DEFINE_EMITTOR_CHECK_PAUSE(UpdateStls)
+    DEFINE_EMITTOR_CHECK_PAUSE(UpdateRestraints)
+    DEFINE_EMITTOR_CHECK_PAUSE(UpdateDimensions)
+    DEFINE_EMITTOR_CHECK_PAUSE(UpdateAnyObject)
+    DEFINE_EMITTOR_CHECK_PAUSE(UpdateAnyAction)
 
     void ConflictAnyObjectEmittor(CObject* object,Conflict conf);
     void SolvedAnyObjectEmittor  (CObject* object);
@@ -143,8 +149,8 @@ public slots:
     void Delete(Restraint* obj);
 
     //更新操作関数
-    void UpdatePause();   //停止
-    void UpdateRestart(); //再始動
+    void ObservePause();   //全ての子の監視を停止
+    void ObserveRestart(); //全ての子の監視を再開
 
 public:
     explicit CadModelCore(QWidget *parent = 0);
@@ -165,10 +171,10 @@ signals:
     void UpdateAnyAction  ();
 
     //変更シグナル
-    void ChangedPoints   (QVector<CPoint*>);
-    void ChangedEdges    (QVector<CEdge* >);
-    void ChangedFaces    (QVector<CFace* >);
-    void ChangedBlocks   (QVector<CBlock*>);
+    void ChangedPoints   (QList<CPoint*>);
+    void ChangedEdges    (QList<CEdge* >);
+    void ChangedFaces    (QList<CFace* >);
+    void ChangedBlocks   (QList<CBlock*>);
     void ConflictAnyObject(CObject* object,Conflict conf);
     void SolvedAnyObject  (CObject* object);
 };

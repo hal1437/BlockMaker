@@ -22,8 +22,9 @@ private:
         ABSOLUTE  //絶対
     };
 private:
-    QVector<CPoint*> ConvertChildPoint(QVector<CObject*> objects)const; //引数の点を取得する
-    TRANSFORM_METHOD GetTransformMethod()const;                        //移動タイプ取得
+    template <class Iterator>
+    QList<CPoint*> ConvertChildPoint(Iterator begin,Iterator end)const; //引数の点を取得する
+    TRANSFORM_METHOD GetTransformMethod()const;                         //移動タイプ取得
 
 public:
     QVector<CObject*> translated;//予測オブジェクト
@@ -36,21 +37,24 @@ public:
     void keyPressEvent(QKeyEvent *event);
     void keyReleaseEvent(QKeyEvent *event);
 
-    void AbsoluteMove(QVector<CObject*> objects, Pos pos);
-    void RelativeMove(QVector<CObject*> objects, Pos diff);
+    //移動する関数:Iterator<CObject*>
+    template <class Iterator> void AbsoluteMove(Iterator begin,Iterator end, Pos pos);
+    template <class Iterator> void RelativeMove(Iterator begin,Iterator end, Pos diff);
+
+    //子の監視
+    template <class Iterator> void Pause  (Iterator begin,Iterator end); //更新停止
+    template <class Iterator> void Restart(Iterator begin,Iterator end); //更新再開
 
     explicit MoveTransformDialog(QWidget *parent = 0);
     ~MoveTransformDialog();
 
 public slots:
-    void PauseChanged(QVector<CObject *> objects);  //更新停止
-    void RestartChanged(QVector<CObject *> objects);//更新再開
 
-    //変更後の予測位置を表示
+    //変更後の予測位置を更新
     void RefreshTranslated();
 
-    void RadioChangedEmitter(bool);   //ラジオボタン変更時
-    void ValueChangedEmitter(double); //値変更時
+    void RadioChangedEmitter(bool);   //ラジオボタン変更時スロット
+    void ValueChangedEmitter(double); //値変更時スロット
 
     void Accept();    //適用時
     void Duplicate(); //複製時

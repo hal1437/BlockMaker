@@ -30,8 +30,8 @@ void CObject::InsertChild  (int index,CObject* obj){
     }
     this->SetChild(index,obj);
 }
-QVector<CPoint *> CObject::GetAllChildren()const{
-    QVector<CPoint*> ans;
+QList<CPoint *> CObject::GetAllChildren()const{
+    QList<CPoint*> ans;
     for(int i=0;i<this->GetChildCount();i++){
         //追加
         if(this->GetChild(i) != nullptr){
@@ -74,5 +74,5 @@ void CObject::StackChangeCallback(CObject* child){
         this->ChangeChildCallback({child});
     }
 }
-void CObject::ChangeChildCallback(QVector<CObject*>){
+void CObject::ChangeChildCallback(QList<CObject*>){
 }

@@ -165,8 +165,8 @@ double CEdge::GetMiddleParamFromPos(Pos pos)const{
 //結合
 CEdge*          CEdge::MergeEdge (CEdge* merge){
 }
-QVector<CEdge*> CEdge::DivideEdge(CPoint* division){
-    return     QVector<CEdge*>();
+QList<CEdge*> CEdge::DivideEdge(CPoint* division){
+    return     QList<CEdge*>();
 }
 
 CEdge::CEdge(QObject* parent):
@@ -186,7 +186,7 @@ CEdge::CEdge(CPoint* start,CPoint* end,QObject* parent):
 
 CEdge::~CEdge(){}
 
-void CEdge::ChangeChildCallback(QVector<CObject*>){
+void CEdge::ChangeChildCallback(QList<CObject*>){
     emit Changed(this);
 }
 

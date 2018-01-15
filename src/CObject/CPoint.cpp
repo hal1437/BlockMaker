@@ -69,8 +69,8 @@ void CPoint::SetChild(int,CObject*){
 int CPoint::GetChildCount()const{
     return 0;
 }
-QVector<CPoint*> CPoint::GetAllChildren() const{
-    QVector<CPoint*>ans;
+QList<CPoint*> CPoint::GetAllChildren() const{
+    QList<CPoint*>ans;
     ans.push_back(const_cast<CPoint*>(this));
     return ans;
 }

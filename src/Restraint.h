@@ -34,7 +34,7 @@ enum RestraintType{
 struct Restraint :public CObject{
     Q_OBJECT
 protected:
-    QVector<CObject*> children; //拘束対象
+    QList<CObject*> children; //拘束対象
     RestraintType type;         //タイプ
     DEFINE_FLAG(NotEffect,false)
     OBSERVE_MEMBER(int  ,StackLevel,stack_level) //同一の座標に表示時に右に避ける
@@ -42,13 +42,13 @@ protected:
 protected:
     //拘束生成条件マクロ:全て同じ型
     template<class Type,int MIN_COUNT>
-    static bool AllSameTypeRestraint(const QVector<CObject *> nodes){
+    static bool AllSameTypeRestraint(const QList<CObject *> nodes){
         return (nodes.size() >= MIN_COUNT &&
                 std::all_of(nodes.begin(),nodes.end(),[](CObject* obj){return obj->is<Type>();}));
     }
     //拘束生成条件マクロ:1対n
     template<class Type1,class Type2,int MIN_TYPE2_COUNT>
-    static bool OnceAndAnyTypeRestraintable(const QVector<CObject *> nodes){
+    static bool OnceAndAnyTypeRestraintable(const QList<CObject *> nodes){
         return (std::any_of  (nodes.begin(),nodes.end(),[](CObject* obj){return (obj->is<Type1>() && !obj->is<Type2>());}) &&
                 std::count_if(nodes.begin(),nodes.end(),[](CObject* obj){return (obj->is<Type2>());}) >= MIN_TYPE2_COUNT);
     }
@@ -72,7 +72,7 @@ public:
     virtual void DrawGL(Pos camera,Pos center)const;
 
     //作成可能タイプを検索
-    static QVector<Restraint*> Restraintable(const QVector<CObject*> children);
+    static QList<Restraint*> Restraintable(const QList<CObject*> children);
 
     //子の操作
     virtual CObject* GetChild     (int index);
@@ -81,24 +81,24 @@ public:
     virtual CObject* Clone()const;
 
     //作成
-    void Create(const QVector<CObject*> nodes);
+    void Create(const QList<CObject*> nodes);
 
     virtual void Calc(){} //拘束再計算
     virtual bool isComplete(){return true;}//解決済みか判定
 
     virtual QString GetIconPath      ()const = 0; //アイコンパス
     virtual QString GetRestraintName ()const = 0; //拘束名
-    virtual QVector<Pos> GetIconPoint()const;     //アイコン表示点を取得
+    virtual QList<Pos> GetIconPoint()const;     //アイコン表示点を取得
 
     virtual Pos GetNearPos (const Pos&)const{return Pos();}
     virtual Pos GetNearLine(const Pos&,const Pos&)const{return Pos();}
 
-    Restraint(QVector<CObject*> nodes = QVector<CObject*>());
+    Restraint(QList<CObject*> nodes = QList<CObject*>());
 
 public slots:
 
     //子変更コールバック
-    virtual void ChangeChildCallback(QVector<CObject*>){
+    virtual void ChangeChildCallback(QList<CObject*>){
         if(!this->isComplete()){
             //監視コールバック:不成立時に自身を削除
             //DestroyCallback();
@@ -116,14 +116,14 @@ private:
     double length = 0;//長さ
 public:
     //CEdge限定
-    static  bool Restraintable(const QVector<CObject*> vs){return AllSameTypeRestraint<CEdge,2>(vs);}
+    static  bool Restraintable(const QList<CObject*> vs){return AllSameTypeRestraint<CEdge,2>(vs);}
     virtual QString GetIconPath()     const{ return QString(":/Restraint/EqualRestraint.png");}
     virtual QString GetRestraintName()const{ return QString("等値");}
 
-    virtual void Create(const QVector<CObject*> nodes);
+    virtual void Create(const QList<CObject*> nodes);
     virtual void Calc();
     virtual bool isComplete();
-    EqualLengthRestraint(QVector<CObject*> nodes = QVector<CObject*>()):Restraint(nodes){}
+    EqualLengthRestraint(QList<CObject*> nodes = QList<CObject*>()):Restraint(nodes){}
 
 };
 
@@ -132,26 +132,26 @@ class ConcurrentRestraint: public Restraint{
     Q_OBJECT
 public:
     //CLine限定
-    static  bool Restraintable(const QVector<CObject*> vs){return AllSameTypeRestraint<CLine,2>(vs);}
+    static  bool Restraintable(const QList<CObject*> vs){return AllSameTypeRestraint<CLine,2>(vs);}
     virtual QString GetIconPath()     const{ return QString(":/Restraint/ConcurrentRestraint.png");}
     virtual QString GetRestraintName()const{ return QString("平行");}
 
     virtual void Calc();
     virtual bool isComplete();
-    ConcurrentRestraint(QVector<CObject*> nodes = QVector<CObject*>()):Restraint(nodes){}
+    ConcurrentRestraint(QList<CObject*> nodes = QList<CObject*>()):Restraint(nodes){}
 };
 //垂直
 class VerticalRestraint: public Restraint{
     Q_OBJECT
 public:
     //CEdgeを2つ以上含む、かつ他のCEdgeの端点が1つめのCEdgeに一致している
-    static bool Restraintable(const QVector<CObject*> vs);
+    static bool Restraintable(const QList<CObject*> vs);
     virtual QString GetIconPath()     const{ return QString(":/Restraint/CrossRestraint.png");}
     virtual QString GetRestraintName()const{ return QString("垂直");}
 
     virtual void Calc();
     virtual bool isComplete();
-    VerticalRestraint(QVector<CObject*> nodes = QVector<CObject*>()):Restraint(nodes){}
+    VerticalRestraint(QList<CObject*> nodes = QList<CObject*>()):Restraint(nodes){}
 };
 
 
@@ -161,12 +161,12 @@ class LockRestraint: public Restraint{
 public:
     //ロックされていないオブジェクト以上であれば全て可
 
-    static bool Restraintable(const QVector<CObject *> nodes);
+    static bool Restraintable(const QList<CObject *> nodes);
     virtual QString GetIconPath()     const{ return QString(":/Restraint/LockRestraint.png");}
     virtual QString GetRestraintName()const{ return QString("固定");}
     virtual void Calc();
     virtual bool isComplete();
-    LockRestraint(QVector<CObject*> nodes = QVector<CObject*>()):Restraint(nodes){}
+    LockRestraint(QList<CObject*> nodes = QList<CObject*>()):Restraint(nodes){}
 public slots:
     //自壊コールバックのオーバーライド
     virtual void ChangeObjectCallback(CObject*);
@@ -176,12 +176,12 @@ class UnlockRestraint: public Restraint{
     Q_OBJECT
 public:
     //ロックされているオブジェクト以上であれば全て可
-    static bool Restraintable(const QVector<CObject *> nodes);
+    static bool Restraintable(const QList<CObject *> nodes);
     virtual QString GetIconPath()     const{ return QString(":/Restraint/UnlockRestraint.png");}
     virtual QString GetRestraintName()const{ return QString("固定解除");}
 
     virtual void Calc();
-    UnlockRestraint(QVector<CObject*> nodes = QVector<CObject*>()):Restraint(nodes){}
+    UnlockRestraint(QList<CObject*> nodes = QList<CObject*>()):Restraint(nodes){}
 };
 
 //一致
@@ -189,14 +189,14 @@ class MatchRestraint: public Restraint{
     Q_OBJECT
 public:
     //全てのオブジェクトに対してCPointは一致可能
-    static bool Restraintable(const QVector<CObject *> nodes){return OnceAndAnyTypeRestraintable<CObject,CPoint,1>(nodes);}
+    static bool Restraintable(const QList<CObject *> nodes){return OnceAndAnyTypeRestraintable<CObject,CPoint,1>(nodes);}
     virtual QString GetIconPath()     const{ return QString(":/Restraint/MatchRestraint.png");}
     virtual QString GetRestraintName()const{ return QString("一致");}
-    virtual QVector<Pos> GetIconPoint()const; //特別定義
+    virtual QList<Pos> GetIconPoint()const; //特別定義
 
     virtual void Calc();
     virtual bool isComplete();
-    MatchRestraint(QVector<CObject*> nodes = QVector<CObject*>()):Restraint(nodes){}
+    MatchRestraint(QList<CObject*> nodes = QList<CObject*>()):Restraint(nodes){}
 };
 
 

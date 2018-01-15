@@ -153,7 +153,7 @@ Pos CSpline::GetMiddleDivide(double t)const{
 
 Pos CSpline::GetNearPos(const Pos& pos)const{
     //制御点ごとの区間を三分探索
-    QVector<double> dd;
+    QList<double> dd;
     auto L = [&](double t){
         return (this->GetMiddleDivide(t) - pos).Length();
     };
@@ -174,7 +174,7 @@ Pos CSpline::GetNearPos(const Pos& pos)const{
 
 Pos CSpline::GetNearLine(const Pos& pos1,const Pos& pos2)const{
     //制御点ごとの区間を三分探索
-    QVector<double> dd;
+    QList<double> dd;
     Pos dir = (pos1 - pos2).GetNormalize();   //投影方向
 
     //距離関数
@@ -235,8 +235,8 @@ CEdge* CSpline::Clone()const{
     ptr->end     = new CPoint(*this->end   ,ptr);
     ptr->ObserveChild(ptr->start);
     ptr->ObserveChild(ptr->end);
-    for(int i=0;i<this->pos.size();i++){
-        CPoint* pp = new CPoint(*this->pos[i],ptr);
+    for(CPoint* p_b:this->pos){
+        CPoint* pp = new CPoint(*p_b,ptr);
         ptr->ObserveChild(pp);
         ptr->pos.push_back(pp);
     }
@@ -251,7 +251,7 @@ CSpline::~CSpline()
 
 }
 //点移動コールバックオーバーライド
-void CSpline::ChangeChildCallback(QVector<CObject *> ){
+void CSpline::ChangeChildCallback(QList<CObject *> ){
     Refresh();
 }
 

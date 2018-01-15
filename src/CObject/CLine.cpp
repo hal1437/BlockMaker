@@ -118,8 +118,8 @@ CEdge*          CLine::MergeEdge (CEdge* merge){
     new_line->Create(merge->start == merge_point ? merge->end : merge->start);
     return new_line;
 }
-QVector<CEdge*> CLine::DivideEdge(CPoint* division){
-    return     QVector<CEdge*>();
+QList<CEdge*> CLine::DivideEdge(CPoint* division){
+    return     QList<CEdge*>();
 }
 
 

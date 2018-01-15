@@ -36,7 +36,7 @@ private:
     MoveTransformDialog*      move_diag;
     PropertyDefinitionDialog* prop_diag;
     ConflictList* conf_list;
-    QVector<Restraint*> creatable; //作成可能な拘束
+    QList<Restraint*> creatable; //作成可能な拘束
 
 protected:
     void keyPressEvent  (QKeyEvent* event);

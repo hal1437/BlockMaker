@@ -162,7 +162,7 @@ CArc::~CArc()
 {
 }
 
-void CArc::ChangeChildCallback(QVector<CObject*> child){
+void CArc::ChangeChildCallback(QList<CObject*> child){
     if(this->start==nullptr || this->end==nullptr)return;
 
     //保持点ならば同一半形状の動きのみ行う

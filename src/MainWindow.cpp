@@ -106,7 +106,7 @@ void MainWindow::CtrlZ(){
 }
 void MainWindow::Delete(){
     if(this->shift_press){
-        QVector<CPoint*> pp;
+        QList<CPoint*> pp;
         for(CObject* obj : this->model->GetSelected()){
             for(CPoint* p:obj->GetAllChildren()){
                 pp.push_back(p);
@@ -163,8 +163,8 @@ void MainWindow::RefreshUI(){
     }
 
     //ボタン有効化/無効化
-    QVector<CEdge*> edges;
-    QVector<CFace*> faces;
+    QList<CEdge*> edges;
+    QList<CFace*> faces;
     for(CObject* obj:this->model->GetSelected())if(obj->is<CEdge>())edges.push_back(dynamic_cast<CEdge*>(obj));
     for(CObject* obj:this->model->GetSelected())if(obj->is<CFace>())faces.push_back(dynamic_cast<CFace*>(obj));
     ui->ToolFace      ->setEnabled(search.SearchEdgeMakeFace(edges) .size() > 0);   //面作成ボタン
@@ -215,14 +215,14 @@ void MainWindow::ToggledSTL(bool){
         CStl* stl = CStl::CreateFromFile(filepath);
         if(stl != nullptr){
             this->model->AddStls(stl);
-            this->model->SetPause(true);
+            this->model->ObservePause();
             for(int i =0;i<stl->points.size();i++){
                 this->model->AddPoints(stl->points[i]);
             }/*
             for(int i =0;i<stl->edges.size();i++){
                 this->model->AddEdges (stl->edges[i]);
             }*/
-            this->model->SetPause(false);
+            this->model->ObserveRestart();
         }
     }
     this->ui->SolidEdit->repaint();
@@ -263,7 +263,7 @@ void MainWindow::MakeRestraint(QListWidgetItem*){
 
 void MainWindow::MakeBlock(){
     CBlock* block = new CBlock(this);
-    QVector<CFace*> faces;
+    QList<CFace*> faces;
     for(CObject* obj:this->model->GetSelected()){
         faces.push_back(dynamic_cast<CFace*>(obj));
     }
@@ -280,7 +280,7 @@ void MainWindow::MakeBlock(){
 }
 void MainWindow::MakeFace(){
     CFace* face = new CFace(this);
-    QVector<CEdge*> edges;
+    QList<CEdge*> edges;
     for(CObject* obj:this->model->GetSelected())if(obj->is<CEdge>())edges.push_back(dynamic_cast<CEdge*>(obj));
     face->Create(this->search.SearchEdgeMakeFace(edges));
     this->model->AddFaces(face);

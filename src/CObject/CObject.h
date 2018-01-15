@@ -45,7 +45,7 @@ public:
 
     //フラグ定義
     bool              observe_pause; //子の変更による更新を停止
-    QVector<CObject*> observe_queue; //子変更キュー
+    QList<CObject*> observe_queue; //子変更キュー
 
     DEFINE_FLAG(Lock   ,false)       //固定
     DEFINE_FLAG(Visible,true)        //表示
@@ -76,7 +76,7 @@ public:
     virtual void     SetChild     (int index,CObject* obj)=0;
     virtual void     InsertChild  (int index,CObject* obj);
     virtual int      GetChildCount()const = 0;
-    virtual QVector<CPoint*> GetAllChildren()const;
+    virtual QList<CPoint*> GetAllChildren()const;
 
     //最近傍点の取得
     virtual Pos GetNearPos (const Pos& hand)const=0;
@@ -108,7 +108,7 @@ public slots:
     //変更コールバック保存
     void StackChangeCallback(CObject* children);
     //子変更コールバック
-    virtual void ChangeChildCallback(QVector<CObject*> children);
+    virtual void ChangeChildCallback(QList<CObject*> children);
 };
 
 

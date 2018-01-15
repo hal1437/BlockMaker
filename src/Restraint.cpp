@@ -1,8 +1,8 @@
 #include "Restraint.h"
 
-QVector<Restraint*> Restraint::Restraintable(const QVector<CObject*> nodes){
+QList<Restraint*> Restraint::Restraintable(const QList<CObject*> nodes){
     //実際にオブジェクトを生成して投げつける
-    QVector<Restraint*> ans;
+    QList<Restraint*> ans;
     if(EqualLengthRestraint::Restraintable(nodes))ans.push_back(new EqualLengthRestraint(nodes));
     if( ConcurrentRestraint::Restraintable(nodes))ans.push_back(new ConcurrentRestraint (nodes));
     if(   VerticalRestraint::Restraintable(nodes))ans.push_back(new VerticalRestraint   (nodes));
@@ -62,7 +62,7 @@ void Restraint::DrawGL(Pos camera,Pos center)const{
     //色と線の太さを復元
     glLineWidth(old_width);
 }
-void Restraint::Create(const QVector<CObject*> nodes){
+void Restraint::Create(const QList<CObject*> nodes){
     this->children = nodes;
     for(CObject* edge:nodes)ObserveChild(edge);
 }
@@ -87,19 +87,19 @@ CObject* Restraint::Clone()const{
 
 
 
-Restraint::Restraint(QVector<CObject*> children):
+Restraint::Restraint(QList<CObject*> children):
     children(children){
     stack_level = 0;
 }
 
-QVector<Pos> Restraint::GetIconPoint()const{
-    QVector<Pos> ans;
+QList<Pos> Restraint::GetIconPoint()const{
+    QList<Pos> ans;
     for(CObject* obj:this->children){
         Pos p;
         if(obj->is<CPoint>())p = *dynamic_cast<CPoint*>(obj);//点自身
         else if(obj->is<CEdge>() )p = dynamic_cast<CEdge*>(obj)->GetMiddleDivide(0.5);//中点
         else {
-            QVector<CPoint*> children = obj->GetAllChildren();
+            QList<CPoint*> children = obj->GetAllChildren();
             for(CPoint* pos:children){
                 p += *pos;
             }
@@ -110,7 +110,7 @@ QVector<Pos> Restraint::GetIconPoint()const{
     return ans;
 }
 
-void EqualLengthRestraint::Create(const QVector<CObject*> nodes){
+void EqualLengthRestraint::Create(const QList<CObject*> nodes){
     CEdge* ee = dynamic_cast<CEdge*>(nodes.first());
     this->length = (*ee->end - *ee->start).Length();
     Restraint::Create(nodes);
@@ -188,7 +188,7 @@ void ConcurrentRestraint::Calc(){
     }
 }
 
-bool VerticalRestraint::Restraintable(const QVector<CObject *> nodes){
+bool VerticalRestraint::Restraintable(const QList<CObject *> nodes){
     if(nodes.size() < 2)return false;
     if(std::any_of(nodes.begin(),nodes.end(),[](CObject* obj){return !obj->is<CEdge>();}))return false;
 
@@ -280,7 +280,7 @@ void LockRestraint::ChangeObjectCallback(CObject*){
         emit Destroy(this);
     }
 }
-bool LockRestraint::Restraintable(const QVector<CObject *> nodes){
+bool LockRestraint::Restraintable(const QList<CObject *> nodes){
     for(CObject* child :nodes){
         for(CPoint* pp:child->GetAllChildren()){
             if(!pp->isLock())return true;
@@ -300,7 +300,7 @@ void UnlockRestraint::Calc(){
     //自壊
     emit Destroy(this);
 }
-bool UnlockRestraint::Restraintable(const QVector<CObject *> nodes){
+bool UnlockRestraint::Restraintable(const QList<CObject *> nodes){
     for(CObject* child :nodes){
         for(CPoint* pp:child->GetAllChildren()){
             if(pp->isLock())return true;
@@ -310,8 +310,8 @@ bool UnlockRestraint::Restraintable(const QVector<CObject *> nodes){
 }
 
 
-QVector<Pos> MatchRestraint::GetIconPoint()const{
-    QVector<Pos> ans;
+QList<Pos> MatchRestraint::GetIconPoint()const{
+    QList<Pos> ans;
     for(int i=0;i<this->children.size();i++){
         if(this->children[i]->is<CPoint>()){
             ans.push_back(*dynamic_cast<CPoint*>(this->children[i]));

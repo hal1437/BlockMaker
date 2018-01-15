@@ -18,10 +18,10 @@ CStl* CStl::AddTriangle(CStl* stl,Pos pos[3]){
         }
     }
     //存在しなければ追加
-    QVector<CEdge*> ee;
+    QList<CEdge*> ee;
     for(int j=0;j<3;j++){
         //検索
-        QVector<CEdge*>::iterator it = std::find_if(stl->edges.begin(),stl->edges.end(),[&](CEdge* e){
+        QList<CEdge*>::iterator it = std::find_if(stl->edges.begin(),stl->edges.end(),[&](CEdge* e){
             return ((e->start == stl->points[index[   j   ]] && e->end == stl->points[index[(j+1)%3]]  ) ||
                     (e->start == stl->points[index[(j+1)%3]] && e->end == stl->points[index[   j   ]]) );
         });
@@ -153,7 +153,7 @@ void CStl::DrawGL(Pos camera,Pos center)const{
     }
 }
 
-QVector<CPoint *> CStl::GetAllChildren() const{
+QList<CPoint *> CStl::GetAllChildren() const{
     return this->points;
 }
 
