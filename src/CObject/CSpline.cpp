@@ -97,7 +97,16 @@ CPoint*  CSpline::GetPoint(int index){
     else if(index >= this->pos.size()+1)return this->end;
     return nullptr;
 }
+CPoint*  CSpline::GetPoint(int index)const{
+    if     (index <= 0                 )return this->start;
+    else if(index <= this->pos.size()  )return this->pos[index-1];
+    else if(index >= this->pos.size()+1)return this->end;
+    return nullptr;
+}
 CObject* CSpline::GetChild(int index){
+    return GetPoint(index);
+}
+CObject* CSpline::GetChild(int index)const{
     return GetPoint(index);
 }
 void     CSpline::SetChild(int index,CObject* obj){
@@ -231,14 +240,8 @@ CSpline::CSpline(CPoint* start,CPoint* end,QObject* parent):
 
 CEdge* CSpline::Clone()const{
     CSpline* ptr = new CSpline(this->parent());
-    ptr->start   = new CPoint(*this->start ,ptr);
-    ptr->end     = new CPoint(*this->end   ,ptr);
-    ptr->ObserveChild(ptr->start);
-    ptr->ObserveChild(ptr->end);
-    for(CPoint* p_b:this->pos){
-        CPoint* pp = new CPoint(*p_b,ptr);
-        ptr->ObserveChild(pp);
-        ptr->pos.push_back(pp);
+for(int i= 0;i<this->GetChildCount();i++){
+        ptr->SetChild(i,this->GetChild(i));
     }
     ptr->grading = this->grading;
     ptr->divide  = this->divide;

@@ -28,19 +28,65 @@ void MoveTransformDialog::SetModel(CadModelCore *m){
     connect(this->model,SIGNAL(UpdateSelected()),this,SLOT(RefreshTranslated()));
 }
 void MoveTransformDialog::RefreshTranslated(){
-    translated.clear();
     //複製
+    QVector<CPoint*> points;
+    QVector<CEdge* > edges;
     for(CObject* obj:this->model->GetSelected()){
-        CObject* ptr = obj->Clone();
-        if(ptr != nullptr)translated.push_back(ptr);
+        if(obj->is<CPoint>())points.append(dynamic_cast<CPoint*>(obj));
+        if(obj->is<CEdge >())edges .append(dynamic_cast<CEdge*>(obj->Clone()));
+        if(obj->is<CFace >()){//展開
+            for(int i =0;i<obj->GetChildCount();i++){
+                edges.append(dynamic_cast<CEdge*>(obj->GetChild(i)->Clone()));
+            }
+        }
+        if(obj->is<CBlock >()){//展開
+            for(int i =0;i<obj->GetChildCount();i++){
+                for(int j =0;j<obj->GetChild(i)->GetChildCount();j++){
+                    edges.append(dynamic_cast<CEdge*>(obj->GetChild(i)->GetChild(j)->Clone()));
+                }
+            }
+        }
     }
+    //線が含む点を吐き出す
+    for(CEdge* edge:edges){
+        for(int i =0;i<edge->GetChildCount();i++){
+            points.append(dynamic_cast<CPoint*>(edge->GetChild(i)));
+        }
+    }
+    //重複を削除
+    unique(points);
+    unique(edges);
+
+    //マッピング
+    QMap<QObject*,CPoint*> point_map;
+    QVector<CPoint*> points_cloned;
+
+    //点をクローン
+    for(CPoint* pp:points){
+        CPoint* cloned = dynamic_cast<CPoint*>(pp->Clone());
+        points_cloned.append(cloned);
+        point_map.insert(pp,cloned);
+    }
+    //線の子をマッピングしたものに変更
+    for(CEdge* ee:edges){
+        for(int i =0;i<ee->GetChildCount();i++){
+            ee->SetChild(i,point_map[ee->GetChild(i)]);
+        }
+    }
+
+    this->translated_pos  = points_cloned;
+    this->translated_edges = edges;
 
     Pos value = Pos(this->ui->XSpinBox->value(),
                     this->ui->YSpinBox->value(),
                     this->ui->ZSpinBox->value());
 
-    if(this->GetTransformMethod() == ABSOLUTE) this->AbsoluteMove(translated.begin(),translated.end(),value);
-    else                                       this->RelativeMove(translated.begin(),translated.end(),value);
+    if(this->GetTransformMethod() == ABSOLUTE){
+        this->AbsoluteMove(points_cloned.begin(),points_cloned.end(),value);
+    }
+    else{
+        this->RelativeMove(points_cloned.begin(),points_cloned.end(),value);
+    }
     emit RepaintRequest();
 }
 
@@ -123,9 +169,8 @@ void MoveTransformDialog::DrawTranslated(Pos camera,Pos center){
     glGetFloatv  (GL_CURRENT_COLOR,old_color);
 
     glColor3f(1,1,0);
-    for(CObject* obj:this->translated){
-        obj->DrawGL(camera,center);
-    }
+    for(CObject* obj:this->translated_pos  )obj->DrawGL(camera,center);
+    for(CObject* obj:this->translated_edges)obj->DrawGL(camera,center);
     //色を復元
     glColor4f(old_color[0],old_color[1],old_color[2], old_color[3]);
 }
@@ -227,7 +272,7 @@ void MoveTransformDialog::Duplicate(){
             cloned->SetChild(i,faces_map[bb->GetChild(i)]);
         }
         //リストに登録
-        blocks_clone.append(bb);
+        blocks_clone.append(cloned);
     }
 
     //移動
@@ -245,7 +290,7 @@ void MoveTransformDialog::Duplicate(){
 
 void MoveTransformDialog::Closed(){
     //予測表示を停止
-    this->translated.clear();
+    //this->translated.clear();
     emit RepaintRequest();
 }
 

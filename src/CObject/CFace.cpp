@@ -442,23 +442,11 @@ Pos CFace::GetNearLine(const Pos& ,const Pos& )const{
 
 CObject* CFace::Clone()const{
     CFace* new_obj = new CFace();
-    //edgeを複製
-    QList<CEdge*> edges;
-    for(CEdge* edge:this->edges){
-        edges.push_back(dynamic_cast<CEdge*>(edge->Clone()));
-    }
-    //構成点マージ
-    for(CEdge* e1: edges){
-        for(CEdge* e2: edges){
-            if(*e1->start == *e2->start)e2->start = e1->start;
-            if(*e1->start == *e2->end  )e2->end   = e1->start;
-            if(*e1->end   == *e2->start)e2->start = e1->end;
-            if(*e1->end   == *e2->end  )e2->end   = e1->end;
-        }
-    }
     new_obj->name = this->name;
+    new_obj->edges = this->edges;
     new_obj->boundary = this->boundary;
     new_obj->Contours = this->Contours;
+    new_obj->FaceBlend =  this->FaceBlend;
     new_obj->Create(edges);
     return new_obj;
 }

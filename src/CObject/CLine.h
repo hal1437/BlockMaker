@@ -16,7 +16,9 @@ public:
 
     //中間点操作
     virtual CPoint*  GetPoint(int index);
+    virtual CPoint*  GetPoint(int index)const;
     virtual CObject* GetChild(int index);
+    virtual CObject* GetChild(int index)const;
     virtual void     SetChild(int index,CObject* obj);
     virtual int      GetChildCount()const;
     virtual Pos      GetMiddleDivide(double t)const;

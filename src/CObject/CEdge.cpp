@@ -11,6 +11,7 @@ CEdge::Grading CEdge::Grading::GetReverse()const{
 }
 
 
+
 double CEdge::GetDivisionRate(int divide,Grading grading,int count){
     if(divide == 1){
         if(count == 0)return 0;

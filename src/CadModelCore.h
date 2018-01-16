@@ -128,8 +128,9 @@ public:
 
     //結合
     void Merge(QList<CPoint*> points); //先頭のものに結合
-    void AutoMerge();                    //全てのオブジェクトの同一座標を自動的に結合
-    void AutoMerge(CObject* obj);        //引数のオブジェクトの同一座標を自動的に結合
+    void AutoMerge();                  //全てのオブジェクトの同一座標を自動的に結合
+    void AutoMerge(CObject* obj);      //引数のオブジェクトの同一座標を自動的に結合
+    void AllMerge();                  //全てのオブジェクトの同一座標を自動的に結合
 
     //ファイル入出力
     bool ExportFoamFile(QString filename);

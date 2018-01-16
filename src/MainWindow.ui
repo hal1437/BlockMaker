@@ -53,6 +53,7 @@
     <addaction name="actionCopy"/>
     <addaction name="actionPaste"/>
     <addaction name="separator"/>
+    <addaction name="actionAllMarge"/>
    </widget>
    <widget class="QMenu" name="menuWindow">
     <property name="title">
@@ -540,6 +541,11 @@
   <action name="actionShowConflictList">
    <property name="text">
     <string>ShowConflictList</string>
+   </property>
+  </action>
+  <action name="actionAllMarge">
+   <property name="text">
+    <string>AllMarge</string>
    </property>
   </action>
  </widget>

@@ -93,8 +93,16 @@ CPoint*  CArc::GetPoint(int index){
     if(index == 2)return this->end;
     return nullptr;
 }
-
+CPoint*  CArc::GetPoint(int index)const{
+    if(index == 0)return this->start;
+    if(index == 1)return this->center;
+    if(index == 2)return this->end;
+    return nullptr;
+}
 CObject* CArc::GetChild     (int index){
+    return this->GetPoint(index);
+}
+CObject* CArc::GetChild     (int index)const{
     return this->GetPoint(index);
 }
 void     CArc::SetChild(int index,CObject* obj){
@@ -138,9 +146,9 @@ Pos CArc::GetNearPos (const Pos& hand)const{
 
 CEdge* CArc::Clone()const{
     CArc* ptr   = new CArc(this->parent());
-    if(this->center != nullptr)ptr->Create(new CPoint(*this->center ,ptr));
-    if(this->start  != nullptr)ptr->Create(new CPoint(*this->start  ,ptr));
-    if(this->end    != nullptr)ptr->Create(new CPoint(*this->end    ,ptr));
+    for(int i= 0;i<this->GetChildCount();i++){
+        ptr->SetChild(i,this->GetChild(i));
+    }
     ptr->grading = this->grading;
     ptr->divide  = this->divide;
     return ptr;

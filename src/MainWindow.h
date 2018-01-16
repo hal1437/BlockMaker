@@ -66,6 +66,7 @@ public slots:
 
     void ShowProperty();          //プロパティダイアログ表示
     void ShowMoveTransform();     //移動ダイアログ表示
+    void AllMarge();              //結合
 
     void MakeRestraint(QListWidgetItem *);   //拘束作成
     void MakeBlock();       //ブロック作成

@@ -68,6 +68,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(this->ui->actionShowObjectList   ,SIGNAL(triggered()),this,SLOT(ShowObjectList()));    //オブジェクトリスト表示
     connect(this->ui->actionShowRestraintList,SIGNAL(triggered()),this,SLOT(ShowRestraintList())); //幾何拘束リスト表示
     connect(this->ui->actionShowConflictList ,SIGNAL(triggered()),this,SLOT(ShowConflictList()));  //競合リスト表示
+    connect(this->ui->actionAllMarge         ,SIGNAL(triggered()),this,SLOT(AllMarge()));  //競合リスト表示
     connect(this->ui->actionExport           ,SIGNAL(triggered()),this,SLOT(Export())); //出力ダイアログ
     this->ui->ConflictDeck->hide();//競合リストを標準で不可視
 
@@ -308,8 +309,11 @@ void MainWindow::ShowRestraintList(){
 }
 void MainWindow::ShowConflictList(){
     this->ui->ConflictDeck->show();
-
 }
+void MainWindow::AllMarge(){
+    this->model->AllMerge();
+}
+
 void MainWindow::Save(){
     QString filepath = QFileDialog::getSaveFileName(this,
                                                     "Save file",

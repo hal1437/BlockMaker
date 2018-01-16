@@ -328,6 +328,84 @@ void CadModelCore::AutoMerge(){
 void CadModelCore::AutoMerge(CObject* obj){
     this->AutoMerge_impl(obj->GetAllChildren());
 }
+void CadModelCore::AllMerge(){
+    //点
+    qDebug() << "点結合中...";
+    QList<CPoint*>::iterator it1_p,it2_p;
+    for(it1_p = this->Points.begin();it1_p != this->Points.end();it1_p++){
+        for(it2_p = it1_p+1;it2_p != this->Points.end();it2_p++){
+            if(**it1_p == **it2_p){
+                qDebug() << *it1_p << " <= " << *it2_p;
+
+                //it2を含むエッジを探してit1に置き換える
+                for(CEdge* edge:this->Edges){
+                    for(int i =0;i<edge->GetChildCount();i++){
+                        if(edge->GetChild(i) == *it2_p){
+                            edge->SetChild(i,*it1_p);
+                        }
+                    }
+                }
+                it2_p--;
+                this->Points.erase(it2_p+1);
+            }
+        }
+    }
+    qDebug() << "線結合中...";
+    QList<CEdge*>::iterator it1_l,it2_l;
+    std::function<bool(CEdge*,CEdge*)> edge_comp = [](CEdge* lhs,CEdge* rhs){
+        if(lhs->GetChildCount() != rhs->GetChildCount())return false;
+        for(int i =0;i< lhs->GetChildCount();i++){
+            if(lhs->GetChild(i) != rhs->GetChild(i))return false;
+        }
+        return true;
+    };
+    for(it1_l = this->Edges.begin();it1_l != this->Edges.end();it1_l++){
+        for(it2_l = it1_l+1;it2_l != this->Edges.end();it2_l++){
+            if(edge_comp(*it1_l , *it2_l)){
+                qDebug() << *it1_l << " <= " << *it2_l;
+
+                //it2を含むエッジを探してit1に置き換える
+                for(CFace* face:this->Faces){
+                    for(int i =0;i<face->GetChildCount();i++){
+                        if(face->GetChild(i) == *it2_l){
+                            face->SetChild(i,*it1_l);
+                        }
+                    }
+                }
+                it2_l--;
+                this->Edges.erase(it2_l+1);
+            }
+        }
+    }
+    qDebug() << "面結合中...";
+    QList<CFace*>::iterator it1_f,it2_f;
+    std::function<bool(CFace*,CFace*)> face_comp = [&](CFace* lhs,CFace* rhs){
+        if(lhs->GetChildCount() != rhs->GetChildCount())return false;
+        for(int i =0;i< lhs->GetChildCount();i++){
+            if(lhs->GetChild(i) != rhs->GetChild(i))return false;
+        }
+        return true;
+    };
+    for(it1_f = this->Faces.begin();it1_f != this->Faces.end();it1_f++){
+        for(it2_f = it1_f+1;it2_f != this->Faces.end();it2_f++){
+            if(face_comp(*it1_f , *it2_f)){
+                qDebug() << *it1_f << " <= " << *it2_f;
+
+                //it2を含むエッジを探してit1に置き換える
+                for(CBlock* face:this->Blocks){
+                    for(int i =0;i<face->GetChildCount();i++){
+                        if(face->GetChild(i) == *it2_f){
+                            face->SetChild(i,*it1_f);
+                        }
+                    }
+                }
+                it2_f--;
+                this->Faces.erase(it2_f+1);
+            }
+        }
+    }
+    qDebug() << "結合完了";
+}
 
 QList<CBlock*> CadModelCore::GetParent(CFace*  child)const{
     QList<CBlock*>ans;

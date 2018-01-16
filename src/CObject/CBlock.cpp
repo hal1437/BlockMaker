@@ -254,9 +254,7 @@ int CBlock::GetChildCount()const{
 
 CObject* CBlock::Clone()const{
     CBlock* new_obj = new CBlock();
-    for(CFace* face:this->faces){
-        new_obj->faces.push_back(dynamic_cast<CFace*>(face->Clone()));
-    }
+    new_obj->faces = this->faces;
     return new_obj;
 }
 

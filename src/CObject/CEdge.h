@@ -44,7 +44,9 @@ public:
 
     //中間点操作
     virtual CPoint*  GetPoint(int index) = 0;
+    virtual CPoint*  GetPoint(int index)const = 0;
     virtual CObject* GetChild(int index) = 0;
+    virtual CObject* GetChild(int index) const = 0;
     virtual void     SetChild(int index,CObject* obj) = 0;
     virtual int      GetChildCount()const = 0;
     virtual Pos      GetMiddleDivide(double t)const = 0;//補間点取得

@@ -27,7 +27,8 @@ private:
     TRANSFORM_METHOD GetTransformMethod()const;                         //移動タイプ取得
 
 public:
-    QVector<CObject*> translated;//予測オブジェクト
+    QVector<CEdge*> translated_edges;//予測オブジェクト
+    QVector<CPoint*> translated_pos ;//予測オブジェクト
 
     void SetModel(CadModelCore *m);
 

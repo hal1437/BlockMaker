@@ -38,8 +38,15 @@ CPoint*  CLine::GetPoint(int index){
     if(index == 1)return this->end;
     return nullptr;
 }
-
 CObject* CLine::GetChild(int index){
+    return this->GetPoint(index);
+}
+CPoint*  CLine::GetPoint(int index)const{
+    if(index == 0)return this->start;
+    if(index == 1)return this->end;
+    return nullptr;
+}
+CObject* CLine::GetChild(int index)const{
     return this->GetPoint(index);
 }
 void     CLine::SetChild(int index,CObject* obj){
@@ -79,10 +86,9 @@ Pos CLine::GetNearLine(const Pos& pos1,const Pos& pos2)const{
 
 CEdge* CLine::Clone()const{
     CLine* ptr = new CLine(this->parent());
-    ptr->SetStartPos(new CPoint(*this->start,ptr));
-    ptr->SetEndPos  (new CPoint(*this->end  ,ptr));
-    ptr->ObserveChild(ptr->start);
-    ptr->ObserveChild(ptr->end);
+    for(int i= 0;i<this->GetChildCount();i++){
+        ptr->SetChild(i,this->GetChild(i));
+    }
     ptr->grading = this->grading;
     ptr->divide  = this->divide;
     return ptr;

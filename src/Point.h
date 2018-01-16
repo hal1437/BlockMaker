@@ -141,7 +141,7 @@ public:
     template<class V> current& operator/=(V rhs)      {*this = *this / rhs;return (*this);}
 
     //比較演算子
-    bool operator==(cr_current rhs)const{
+    virtual bool operator==(cr_current rhs)const{
         return std::equal(this->begin(),this->end(),rhs.begin());
     }
     bool operator!=(cr_current rhs)const{return !(*this == rhs);}
@@ -300,7 +300,9 @@ public:
         this->y() = p.y();
         return (*this);
     }
-
+    virtual bool operator==(cr_current rhs)const{
+        return (this->mat[0]==rhs.mat[0]) && (this->mat[1]==rhs.mat[1]) && (this->mat[2]==rhs.mat[2]);
+    }
     operator QString(){
         return QString("(") + QString::number(this->x()) + ","
                             + QString::number(this->y()) + ","
