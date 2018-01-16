@@ -87,31 +87,34 @@ template <class Iterator> void MoveTransformDialog::AbsoluteMove(Iterator begin,
     delta /= points.size();
 
     //移動
-    Pause(begin,end);//更新停止
+    for(Iterator it = begin;it != end;it++)Pause(*it);//更新停止
     for(CPoint* p :points){
         p->MoveAbsolute(*p - delta + pos);
     }
-    Restart(begin,end);//更新再開
+    for(Iterator it = begin;it != end;it++)Restart(*it);//更新再開
 }
 template <class Iterator> void MoveTransformDialog::RelativeMove(Iterator begin,Iterator end, Pos diff){
     //選択された点を相対移動
-    Pause(begin,end);//更新停止
-    for(CPoint* p :this->ConvertChildPoint(begin,end)){
+    QList<CPoint*> points = this->ConvertChildPoint(begin,end);
+
+    for(Iterator it=begin;it != end;it++)Pause(*it);//更新停止
+
+    for(CPoint* p:points){
         p->MoveRelative(diff);
     }
-    Restart(begin,end);//更新再開
+    for(Iterator it=begin;it != end;it++)Restart(*it);//更新再開
 }
 
-template <class Iterator>
-void MoveTransformDialog::Pause(Iterator begin,Iterator end){
-    for(;begin != end;begin++){
-        (*begin)->ObservePause();
+void MoveTransformDialog::Pause(CObject* obj){
+    obj->ObservePause();
+    for(int i = 0;i<obj->GetChildCount();i++){
+        Pause(obj->GetChild(i));
     }
 }
-template <class Iterator>
-void MoveTransformDialog::Restart(Iterator begin,Iterator end){
-    for(;begin != end;begin++){
-        (*begin)->ObserveRestart();
+void MoveTransformDialog::Restart(CObject* obj){
+    obj->ObserveRestart();
+    for(int i = 0;i<obj->GetChildCount();i++){
+        Restart(obj->GetChild(i));
     }
 }
 void MoveTransformDialog::DrawTranslated(Pos camera,Pos center){
@@ -151,24 +154,22 @@ void MoveTransformDialog::Duplicate(){
                     this->ui->YSpinBox->value(),
                     this->ui->ZSpinBox->value());
 
-    QList<CObject*> pp;
-    this->model->ObservePause();//監視停止
-
+    QList<CObject*> obj;
+    //this->model->ObservePause();//監視停止
     for(CObject* s : this->model->GetSelected()){
         CObject* dup = s->Clone();   //複製
         if(dup != nullptr){
-            pp.push_back(dup);
+            obj.push_back(dup);
         }
     }
-    this->model->ObserveRestart();//監視再開
-
-    for(CObject* s:pp)this->model->AddObject(s); //モデルに追加
+    //this->model->ObserveRestart();//監視再開
 
     //移動
-    if(this->GetTransformMethod() == ABSOLUTE)this->AbsoluteMove(pp.begin(),pp.end(),value);
-    else                                      this->RelativeMove(pp.begin(),pp.end(),value);
+    if(this->GetTransformMethod() == ABSOLUTE)this->AbsoluteMove(obj.begin(),obj.end(),value);
+    else                                      this->RelativeMove(obj.begin(),obj.end(),value);
 
-    //this->model->AutoMerge();
+    this->model->AddObjectArray(obj); //モデルに追加
+    this->model->AutoMerge();
     this->model->UpdateAnyObjectEmittor();
 }
 

@@ -42,8 +42,8 @@ public:
     template <class Iterator> void RelativeMove(Iterator begin,Iterator end, Pos diff);
 
     //子の監視
-    template <class Iterator> void Pause  (Iterator begin,Iterator end); //更新停止
-    template <class Iterator> void Restart(Iterator begin,Iterator end); //更新再開
+    void Pause  (CObject* obj); //更新停止
+    void Restart(CObject* obj); //更新再開
 
     explicit MoveTransformDialog(QWidget *parent = 0);
     ~MoveTransformDialog();

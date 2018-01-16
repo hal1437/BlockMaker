@@ -63,6 +63,16 @@ void erase(C array,const V& value){
         it = std::find(std::begin(array),std::end(array),value);
     }
 }
+//配列の型を変換
+template<class In,class Out>
+QList<Out> ConvertArrayType(QList<In> array){
+    QList<Out> ans;
+    for(In& tt:array){
+        ans.push_back(dynamic_cast<Out>(tt));
+    }
+    return ans;
+}
+
 //剰余
 template<class T,class U = T>
 T Mod(T lhs,const U& rhs){

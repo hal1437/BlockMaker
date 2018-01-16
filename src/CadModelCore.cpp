@@ -241,48 +241,85 @@ bool CadModelCore::ImportFoamFile(QString filename){
 
     return true;
 }
-
 void CadModelCore::AddObject(CObject* obj){
     if(obj->is<CPoint>())this->AddPoints(dynamic_cast<CPoint*>(obj));
     if(obj->is<CEdge >())this->AddEdges (dynamic_cast<CEdge* >(obj));
     if(obj->is<CFace >())this->AddFaces (dynamic_cast<CFace* >(obj));
     if(obj->is<CBlock>())this->AddBlocks(dynamic_cast<CBlock*>(obj));
+
+    //子の追加
+    QList<CObject*> obj_children;
     for(int i=0;i<obj->GetChildCount();i++){
-        this->AddObject(obj->GetChild(i));
+        obj_children.append(obj->GetChild(i));
     }
+    this->AddObjectArray(obj_children);
 }
+void CadModelCore::AddObjectArray(QList<CObject*> obj){
+    if(obj.first()->is<CPoint>())this->AddPoints(ConvertArrayType<CObject*,CPoint*>(obj));
+    if(obj.first()->is<CEdge >())this->AddEdges (ConvertArrayType<CObject*,CEdge* >(obj));
+    if(obj.first()->is<CFace >())this->AddFaces (ConvertArrayType<CObject*,CFace* >(obj));
+    if(obj.first()->is<CBlock>())this->AddBlocks(ConvertArrayType<CObject*,CBlock*>(obj));
+
+    QList<CObject*> obj_children;
+    for(CObject* v:obj){
+        for(int i=0;i<v->GetChildCount();i++){
+            obj_children.append(v->GetChild(i));
+        }
+    }
+    if(!obj_children.empty())this->AddObjectArray(obj_children);
+}
+
 void CadModelCore::Merge(QList<CPoint*> points){
     if(points.isEmpty())return ;
     CPoint* first = points.first();
+
     //全て先頭に結合
-    for(int i=1;i<points.size();i++){
+    for(CPoint* pos:points){
         for(CEdge* edge:this->GetEdges()){
-            for(int j=0;j<edge->GetChildCount();j++){
-                if(edge->GetPoint(j) == points[i]){
-                    CPoint* old = edge->GetPoint(j);
-                    edge->SetChild(j,first);
-                    this->RemovePoints(old);
+            //posを含むエッジを探す
+            for(int i=0;i<edge->GetChildCount();i++){
+                //使っていれば
+                if(edge->GetPoint(i) == pos){
+                    edge->SetChild(i,first);//firstに上書き
                 }
             }
         }
     }
+
+    //先頭以外は消す
+    points.pop_front();
+    this->RemovePoints(points);
 }
 void CadModelCore::AutoMerge_impl(QList<CPoint*> points){
-    for(int i=0;i<points.size();i++){
+
+    QList<CPoint*>::iterator begin = points.begin();
+    while(begin != points.end()){
+        //検索
+        QList<CPoint*>::iterator it_f = begin;
+
         QList<CPoint*> same;
-        same.push_back(points[i]);
-        for(int j=i;j<points.size();j++){
-            if(points[i] != points[j] && *points[i] == *points[j]){
-                same.push_back(points[j]);
-                points.removeAll(points[j]);
-                j--;
+        //同一の座標を探す
+        while(it_f != points.end()){
+            //探索
+            it_f = std::find_if(it_f+1,points.end(),[&](CPoint* p){
+                return (*p == **begin);
+            });
+            //同一の座標が存在するならば追加
+            if(it_f != points.end()){
+                same.push_back(*it_f);
+
+                it_f--;//一度引き戻す
+                points.erase(it_f+1);//さっきのを削除
+                it_f++;//次へ
             }
-        }
+        };
+
         //マージ
         if(same.size() > 1){
             this->Merge(same);
-            i = 0;
         }
+        //次の候補へ
+        begin++;
     }
 }
 void CadModelCore::AutoMerge(){

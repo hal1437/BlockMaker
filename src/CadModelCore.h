@@ -24,22 +24,42 @@ public slots:                                     \
     QList<TYPE>  Get##NAME()const{return NAME;}
 
 //通常追加マクロ
-#define OBSERVER_IO_COBJECT(TYPE,NAME)                                      \
-inline void Add##NAME(TYPE value){                                          \
+#define OBSERVER_IO_COBJECT(TYPE,NAME)                                          \
+inline void Add##NAME(TYPE value){                                              \
     connect(value,SIGNAL(Changed   ()                 ),this,SLOT(Update##NAME##Emittor()));    \
     connect(value,SIGNAL(Conflicted(CObject*,Conflict)),this,SLOT(ConflictAnyObjectEmittor(CObject*,Conflict)));    \
     connect(value,SIGNAL(Solved    (CObject*         )),this,SLOT(SolvedAnyObjectEmittor  (CObject*)));             \
-    if(!exist(NAME,value)){                                                 \
-        NAME.push_back(value);                                              \
-        emit Update##NAME();                                                \
-    }                                                                       \
-}                                                                           \
-inline void Remove##NAME(TYPE value){                                       \
+    if(!exist(NAME,value)){                                                     \
+        NAME.push_back(value);                                                  \
+        emit Update##NAME();                                                    \
+    }                                                                           \
+}                                                                               \
+inline void Add##NAME(QList<TYPE> values){                                      \
+    for(TYPE& v:values){                                                        \
+        connect(v,SIGNAL(Changed   ()                 ),this,SLOT(Update##NAME##Emittor()));    \
+        connect(v,SIGNAL(Conflicted(CObject*,Conflict)),this,SLOT(ConflictAnyObjectEmittor(CObject*,Conflict)));    \
+        connect(v,SIGNAL(Solved    (CObject*         )),this,SLOT(SolvedAnyObjectEmittor  (CObject*)));             \
+        if(!exist(NAME,v)){                                                     \
+            NAME.push_back(v);                                                  \
+        }                                                                       \
+    }                                                                           \
+    emit Update##NAME();                                                        \
+}                                                                               \
+inline void Remove##NAME(TYPE value){                                           \
     disconnect(value,SIGNAL(Changed   ()                 ),this,SLOT(Update##NAME##Emittor()));    \
     disconnect(value,SIGNAL(Conflicted(CObject*,Conflict)),this,SLOT(ConflictAnyObjectEmittor(CObject*,Conflict)));    \
     disconnect(value,SIGNAL(Solved    (CObject*         )),this,SLOT(SolvedAnyObjectEmittor  (CObject*)));             \
-    NAME.removeAll(value);                                                  \
-    emit Update##NAME();                                                    \
+    NAME.removeAll(value);                                                      \
+    emit Update##NAME();                                                        \
+}                                                                               \
+inline void Remove##NAME(QList<TYPE> values){                                   \
+    for(TYPE& v:values){                                                        \
+        disconnect(v,SIGNAL(Changed   ()                 ),this,SLOT(Update##NAME##Emittor()));    \
+        disconnect(v,SIGNAL(Conflicted(CObject*,Conflict)),this,SLOT(ConflictAnyObjectEmittor(CObject*,Conflict)));    \
+        disconnect(v,SIGNAL(Solved    (CObject*         )),this,SLOT(SolvedAnyObjectEmittor  (CObject*)));             \
+        NAME.removeAll(v);                                                      \
+    }                                                                           \
+    emit Update##NAME();                                                        \
 }
 
 //自壊追加マクロ
@@ -104,6 +124,7 @@ public:
 
     //選定して追加
     void AddObject(CObject* obj);
+    void AddObjectArray(QList<CObject*> obj);
 
     //結合
     void Merge(QList<CPoint*> points); //先頭のものに結合

@@ -44,7 +44,7 @@ public:
     OBSERVE_MEMBER(QString,Name,name)
 
     //フラグ定義
-    bool              observe_pause; //子の変更による更新を停止
+    bool            observe_pause; //子の変更による更新を停止
     QList<CObject*> observe_queue; //子変更キュー
 
     DEFINE_FLAG(Lock   ,false)       //固定
