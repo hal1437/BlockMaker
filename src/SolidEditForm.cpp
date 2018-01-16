@@ -259,7 +259,7 @@ void SolidEditForm::paintGL(){
     glOrtho(-this->width() *(round),
              this->width() *(round),
             -this->height()*(round),
-             this->height()*(round),-1.0e5,1.0e5);
+             this->height()*(round),-1.0e3,1.0e3);
     glMatrixMode(GL_MODELVIEW); //行列モードを戻す
     glLoadIdentity();
     gluLookAt(camera.x(), camera.y(), camera.z(),
@@ -283,22 +283,23 @@ void SolidEditForm::paintGL(){
     glDepthFunc(GL_LEQUAL);
 
     //非透過描画ステップ
-    for(Restraint* rest :this->model->GetRestraints())paintObject(rest,{0,0,1,1},ALL_OBJECT_WIDTH);// 幾何拘束
-    for(CPoint* pos     : this->model->GetPoints())paintObject(pos   ,{0,0,1,1},ALL_OBJECT_WIDTH); //通常の点
-    if(hanged->is<CPoint>())                     paintObject(hanged,{1,1,1,1},ALL_OBJECT_WIDTH); //直下物体(点)
-    for(CEdge*  edge    : this->model->GetEdges ())paintObject(edge  ,{0,0,1,1},ALL_OBJECT_WIDTH); //通常の線
-    if(hanged->is<CEdge>())                      paintObject(hanged,{1,1,1,1},ALL_OBJECT_WIDTH); //直下物体(線)
-    for(CFace*  face    : this->model->GetFaces ())face->DrawMeshGL(); //格子線
     for(CFace*  face    : this->model->GetFaces ())
         if(!face->isFaceBlend() && !exist(CFace::base,face))paintObject(face  ,{0,0,1,1},ALL_OBJECT_WIDTH); //非透過の面
+    if (hanged->is<CFace>() && !dynamic_cast<CFace*>(hanged)->isFaceBlend())paintObject(hanged,{1,1,1,1},ALL_OBJECT_WIDTH); //直下物体(平面)
+    for(Restraint* rest : this->model->GetRestraints())paintObject(rest,{0,0,1,1},ALL_OBJECT_WIDTH);// 幾何拘束
+    for(CPoint* pos     : this->model->GetPoints()    )paintObject(pos   ,{0,0,1,1},ALL_OBJECT_WIDTH); //通常の点
+    if(hanged->is<CPoint>())                           paintObject(hanged,{1,1,1,1},ALL_OBJECT_WIDTH); //直下物体(点)
+    for(CEdge*  edge    : this->model->GetEdges()     )paintObject(edge  ,{0,0,1,1},ALL_OBJECT_WIDTH); //通常の線
+    if(hanged->is<CEdge>())                            paintObject(hanged,{1,1,1,1},ALL_OBJECT_WIDTH); //直下物体(線)
+    for(CFace*  face    : this->model->GetFaces ()    )face->DrawMeshGL(); //格子線
     if(this->move_diag != nullptr && this->move_diag->isVisible())this->move_diag->DrawTranslated(camera,center);//移動予測オブジェクト
 
     //透過描画ステップ
     for(CFace*  base  : CFace::base             )paintObject(base  ,{std::abs(base->GetNorm().x()),std::abs(base->GetNorm().y()),std::abs(base->GetNorm().z()),1},ALL_OBJECT_WIDTH); //三平面
     for(CFace*  face  : this->model->GetFaces ())
         if( face->isFaceBlend() && !exist(CFace::base,face))paintObject(face          ,{0,0,1,1},ALL_OBJECT_WIDTH); //透過の面
-    if (hanged->is<CFace>())             paintObject(hanged                           ,{1,1,1,1},ALL_OBJECT_WIDTH); //直下物体(平面)
-    if (this->controller->isSketcheing())paintObject(this->controller->projection_face,{1,1,0,1},ALL_OBJECT_WIDTH); //選択物体(平面)
+    if (hanged->is<CFace>() && dynamic_cast<CFace*>(hanged)->isFaceBlend())paintObject(hanged                           ,{1,1,1,1},ALL_OBJECT_WIDTH); //直下物体(平面)
+    if (this->controller->isSketcheing()                                  )paintObject(this->controller->projection_face,{1,1,0,1},ALL_OBJECT_WIDTH); //選択物体(平面)
     for(CStl*   stl   : this->model->GetStls  ())paintObject(stl  ,{0.5,0.5,0.5,1},ALL_OBJECT_WIDTH);//STL
 
     //座標線の描画

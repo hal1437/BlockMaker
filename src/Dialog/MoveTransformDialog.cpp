@@ -149,26 +149,96 @@ void MoveTransformDialog::Accept(){
 }
 void MoveTransformDialog::Duplicate(){
 
-    //値
+    //移動値
     Pos value = Pos(this->ui->XSpinBox->value(),
                     this->ui->YSpinBox->value(),
                     this->ui->ZSpinBox->value());
 
-    QList<CObject*> obj;
-    //this->model->ObservePause();//監視停止
+    QList<CPoint*> points,points_clone;//点
+    QList<CEdge*>  edges ,edges_clone; //線
+    QList<CFace*>  faces ,faces_clone; //面
+    QList<CBlock*> blocks,blocks_clone;//立体
+
+    //マッピング
+    QMap<CObject*,CPoint*> points_map;
+    QMap<CObject*,CEdge* > edges_map;
+    QMap<CObject*,CFace* > faces_map;
+
     for(CObject* s : this->model->GetSelected()){
-        CObject* dup = s->Clone();   //複製
-        if(dup != nullptr){
-            obj.push_back(dup);
-        }
+        //分類
+        if(s->is<CPoint>())points.push_back(dynamic_cast<CPoint*>(s));
+        if(s->is<CEdge> ())edges .push_back(dynamic_cast<CEdge*> (s));
+        if(s->is<CFace> ())faces .push_back(dynamic_cast<CFace*> (s));
+        if(s->is<CBlock>())blocks.push_back(dynamic_cast<CBlock*>(s));
     }
-    //this->model->ObserveRestart();//監視再開
+    //展開
+    for(CBlock* bb:blocks)for(int i=0;i<bb->GetChildCount();i++)faces .append(dynamic_cast<CFace*>(bb->GetChild(i)));
+    unique(faces);
+    for(CFace*  ff:faces )for(int i=0;i<ff->GetChildCount();i++)edges .append(dynamic_cast<CEdge*>(ff->GetChild(i)));
+    unique(edges);
+    for(CEdge*  ee:edges )for(int i=0;i<ee->GetChildCount();i++)points.append(dynamic_cast<CPoint*>(ee->GetChild(i)));
+    unique(points);
+
+    //点の複製
+    for(CPoint* pp:points){
+        //複製
+        CPoint* cloned = dynamic_cast<CPoint*>(pp->Clone());
+        //マップに登録
+        points_map.insert(pp,cloned);
+        //リストに登録
+        points_clone.append(cloned);
+    }
+    //線の複製
+    for(CEdge* ee:edges){
+        //複製
+        CEdge* cloned = dynamic_cast<CEdge*>(ee->Clone());
+
+        //マップを参照し点をすり替え
+        for(int i =0;i<ee->GetChildCount();i++){
+            cloned->SetChild(i,points_map[ee->GetChild(i)]);
+        }
+        //マップに登録
+        edges_map.insert(ee,cloned);
+        //リストに登録
+        edges_clone.append(cloned);
+    }
+    //面の複製
+    for(CFace* ff:faces){
+        //複製
+        CFace* cloned = dynamic_cast<CFace*>(ff->Clone());
+
+        //マップを参照し点をすり替え
+        for(int i =0;i<ff->GetChildCount();i++){
+            cloned->SetChild(i,edges_map[ff->GetChild(i)]);
+        }
+        //マップに登録
+        faces_map.insert(ff,cloned);
+        //リストに登録
+        faces_clone.append(cloned);
+    }
+
+    //面の複製
+    for(CBlock* bb:blocks){
+        //複製
+        CBlock* cloned = dynamic_cast<CBlock*>(bb->Clone());
+
+        //マップを参照し点をすり替え
+        for(int i =0;i<bb->GetChildCount();i++){
+            cloned->SetChild(i,faces_map[bb->GetChild(i)]);
+        }
+        //リストに登録
+        blocks_clone.append(bb);
+    }
 
     //移動
-    if(this->GetTransformMethod() == ABSOLUTE)this->AbsoluteMove(obj.begin(),obj.end(),value);
-    else                                      this->RelativeMove(obj.begin(),obj.end(),value);
+    if(this->GetTransformMethod() == ABSOLUTE)this->AbsoluteMove(points_clone.begin(),points_clone.end(),value);
+    else                                      this->RelativeMove(points_clone.begin(),points_clone.end(),value);
 
-    this->model->AddObjectArray(obj); //モデルに追加
+    this->model->AddPoints(points_clone); //モデルに追加
+    this->model->AddEdges (edges_clone);  //モデルに追加
+    this->model->AddFaces (faces_clone);  //モデルに追加
+    this->model->AddBlocks(blocks_clone); //モデルに追加
+
     this->model->AutoMerge();
     this->model->UpdateAnyObjectEmittor();
 }

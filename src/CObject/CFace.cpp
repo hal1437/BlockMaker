@@ -414,7 +414,9 @@ CObject* CFace::GetChild     (int index){
     return this->GetEdge(index);
 }
 void CFace::SetChild(int index,CObject* obj){
+    IgnoreChild(this->GetChild(index));
     this->edges[index] = dynamic_cast<CEdge*>(obj);
+    ObserveChild(this->GetChild(index));
 }
 
 int      CFace::GetChildCount()const{
