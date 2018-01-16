@@ -259,7 +259,7 @@ void SolidEditForm::paintGL(){
     glOrtho(-this->width() *(round),
              this->width() *(round),
             -this->height()*(round),
-             this->height()*(round),-1.0e3,1.0e3);
+             this->height()*(round),-1.0e4,1.0e4);
     glMatrixMode(GL_MODELVIEW); //行列モードを戻す
     glLoadIdentity();
     gluLookAt(camera.x(), camera.y(), camera.z(),

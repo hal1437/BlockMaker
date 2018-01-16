@@ -178,10 +178,13 @@ CFace* SolidEditController::getHangedFace(Pos center,Pos camera_pos,double zoom_
             rank.push_back(std::make_pair(f->GetLengthFaceToLine(camera_pos,center-camera_pos),f));
         }
     }
+
+
     //非接触面は削除
     rank.erase(std::remove_if(rank.begin(),rank.end(),[](std::pair<double,CFace*> v){
         return v.first==-1;
     }),rank.end());
+
 
     //三平面以外が含まれていれば
     if(std::any_of(rank.begin(),rank.end(),[](std::pair<double,CFace*> rank_v){
@@ -190,11 +193,12 @@ CFace* SolidEditController::getHangedFace(Pos center,Pos camera_pos,double zoom_
         //三平面を削除
         for(int i=0;i<rank.size();i++){
             if(exist(CFace::base,rank[i].second)){
-                rank.erase(rank.begin());
+                rank.removeAll(rank[i]);
                 i--;
             }
         }
     }
+
     //存在しなければぬるぽ
     if(rank.size()==0) return nullptr;
 
@@ -202,6 +206,7 @@ CFace* SolidEditController::getHangedFace(Pos center,Pos camera_pos,double zoom_
     std::pair<double,CFace*> a = *std::min_element(rank.begin(),rank.end(),[](std::pair<double,CFace*> lhs,std::pair<double,CFace*> rhs){
         return lhs.first < rhs.first;
     });
+
     return a.second;
 }
 
