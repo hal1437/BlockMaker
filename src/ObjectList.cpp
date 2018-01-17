@@ -91,15 +91,19 @@ void ObjectList::PushSelectedObject(CObject* obj,QTreeWidgetItem* current){
         this->CadModelCoreInterface::model->RemoveSelected(obj);
     }
     //子に伝達
-    for(int i=0;i<current->childCount();i++){
-        PushSelectedObject(obj->GetChild(i),current->child(i));
+    if(current->isExpanded()){
+        for(int i=0;i<current->childCount();i++){
+            PushSelectedObject(obj->GetChild(i),current->child(i));
+        }
     }
 }
 void ObjectList::PullSelectedObject(CObject* obj,QTreeWidgetItem* current){
     current->setIcon(0,this->getIcon(obj));
     current->setSelected(exist(this->CadModelCoreInterface::model->GetSelected(),obj));
-    for(int i=0;i<current->childCount();i++){
-        PullSelectedObject(obj->GetChild(i),current->child(i));
+    if(current->isExpanded()){
+        for(int i=0;i<current->childCount();i++){
+            PullSelectedObject(obj->GetChild(i),current->child(i));
+        }
     }
 }
 
@@ -149,10 +153,10 @@ void ObjectList::PullSelected(){
     //this <- model
     disconnect(this->CadModelCoreInterface::model,SIGNAL(UpdateSelected()),this,SLOT(PullSelected()));//一時的にコネクト解除
     disconnect(this,SIGNAL(itemSelectionChanged()),this,SLOT(PushSelected()));
-    for(int i=0;i<this->blocks_root->childCount();i++)PullSelectedObject(this->CadModelCoreInterface::model->GetBlocks()[i],this->blocks_root->child(i));
-    for(int i=0;i<this->faces_root ->childCount();i++)PullSelectedObject(this->CadModelCoreInterface::model->GetFaces() [i],this->faces_root ->child(i));
-    for(int i=0;i<this->edges_root ->childCount();i++)PullSelectedObject(this->CadModelCoreInterface::model->GetEdges() [i],this->edges_root ->child(i));
-    for(int i=0;i<this->points_root->childCount();i++)PullSelectedObject(this->CadModelCoreInterface::model->GetPoints()[i],this->points_root->child(i));
+    if(blocks_root->isExpanded())for(int i=0;i<this->blocks_root->childCount();i++)PullSelectedObject(this->CadModelCoreInterface::model->GetBlocks()[i],this->blocks_root->child(i));
+    if(faces_root ->isExpanded())for(int i=0;i<this->faces_root ->childCount();i++)PullSelectedObject(this->CadModelCoreInterface::model->GetFaces() [i],this->faces_root ->child(i));
+    if(edges_root ->isExpanded())for(int i=0;i<this->edges_root ->childCount();i++)PullSelectedObject(this->CadModelCoreInterface::model->GetEdges() [i],this->edges_root ->child(i));
+    if(points_root->isExpanded())for(int i=0;i<this->points_root->childCount();i++)PullSelectedObject(this->CadModelCoreInterface::model->GetPoints()[i],this->points_root->child(i));
 //    for(int i=0;i<this->CadModelCoreInterface::model->GetStls()  .size();i++,count++)PullSelectedObject(this->CadModelCoreInterface::model->GetStls()  [i],this->topLevelItem(count));
     for(int i =0;i<restraints_root->childCount();i++){
         PullSelectedObject(this->CadModelCoreInterface::model->GetRestraints()[i],restraints_root->child(i));
@@ -167,10 +171,10 @@ void ObjectList::PushSelected(){
     disconnect(this->CadModelCoreInterface::model,SIGNAL(UpdateSelected()),this,SLOT(PullSelected()));//一時的にコネクト解除
     disconnect(this,SIGNAL(itemSelectionChanged()),this,SLOT(PushSelected()));
     this->CadModelCoreInterface::model->SelectedClear();
-    for(int i=0;i<this->blocks_root->childCount();i++)PushSelectedObject(this->CadModelCoreInterface::model->GetBlocks()[i],this->blocks_root->child(i));
-    for(int i=0;i<this->faces_root ->childCount();i++)PushSelectedObject(this->CadModelCoreInterface::model->GetFaces() [i],this->faces_root ->child(i));
-    for(int i=0;i<this->edges_root ->childCount();i++)PushSelectedObject(this->CadModelCoreInterface::model->GetEdges() [i],this->edges_root ->child(i));
-    for(int i=0;i<this->points_root->childCount();i++)PushSelectedObject(this->CadModelCoreInterface::model->GetPoints()[i],this->points_root->child(i));
+    if(blocks_root->isExpanded())for(int i=0;i<this->blocks_root->childCount();i++)PushSelectedObject(this->CadModelCoreInterface::model->GetBlocks()[i],this->blocks_root->child(i));
+    if(faces_root-> isExpanded())for(int i=0;i<this->faces_root ->childCount();i++)PushSelectedObject(this->CadModelCoreInterface::model->GetFaces() [i],this->faces_root ->child(i));
+    if(edges_root-> isExpanded())for(int i=0;i<this->edges_root ->childCount();i++)PushSelectedObject(this->CadModelCoreInterface::model->GetEdges() [i],this->edges_root ->child(i));
+    if(points_root->isExpanded())for(int i=0;i<this->points_root->childCount();i++)PushSelectedObject(this->CadModelCoreInterface::model->GetPoints()[i],this->points_root->child(i));
 //    for(int i=0;i<this->CadModelCoreInterface::model->GetStls()  .size();i++)PushSelectedObject(this->CadModelCoreInterface::model->GetStls()  [i],this->stl_root  ->child(i));
     for(int i =0;i<restraints_root->childCount();i++)PushSelectedObject(this->CadModelCoreInterface::model->GetRestraints()[i],restraints_root->child(i));
 

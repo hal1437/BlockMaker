@@ -319,7 +319,7 @@ void MainWindow::Save(){
                                                     "Save file",
                                                     "",
                                                     "FoamCAD File(*.foamcad);;All Files (*)");
-    this->model->ExportFoamFile(filepath);
+    if(filepath != "")this->model->ExportFoamFile(filepath);
 }
 
 void MainWindow::Load(){
@@ -327,8 +327,7 @@ void MainWindow::Load(){
                                                     "Load file",
                                                     "",
                                                     "FoamCAD File(*.foamcad);;All Files (*)");
-    this->model->ImportFoamFile(filepath);
-
+    if(filepath != "")this->model->ImportFoamFile(filepath);
 }
 
 void MainWindow::Export(){
