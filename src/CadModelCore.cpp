@@ -404,7 +404,27 @@ void CadModelCore::AllMerge(){
             }
         }
     }
+
+    qDebug() << "立体結合中...";
+    QList<CBlock*>::iterator it1_b,it2_b;
+    std::function<bool(CBlock*,CBlock*)> block_comp = [&](CBlock* lhs,CBlock* rhs){
+        if(lhs->GetChildCount() != rhs->GetChildCount())return false;
+        for(int i =0;i< lhs->GetChildCount();i++){
+            if(lhs->GetChild(i) != rhs->GetChild(i))return false;
+        }
+        return true;
+    };
+    for(it1_b = this->Blocks.begin();it1_b != this->Blocks.end();it1_b++){
+        for(it2_b = it1_b+1;it2_b != this->Blocks.end();it2_b++){
+            if(block_comp(*it1_b , *it2_b)){
+                qDebug() << *it1_b << " <= " << *it2_b;
+                it2_b--;
+                this->Blocks.erase(it2_b+1);
+            }
+        }
+    }
     qDebug() << "結合完了";
+    emit UpdateAnyObjectEmittor();
 }
 
 QList<CBlock*> CadModelCore::GetParent(CFace*  child)const{

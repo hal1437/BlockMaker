@@ -122,7 +122,7 @@ void MainWindow::Delete(){
         }
     }
 
-    this->ui->ObjectTree->UpdateObject();
+    this->ui->ObjectTree->UpdateAllObject();
     this->ui->SolidEdit->repaint();
     this->model->SelectedClear();
     repaint();

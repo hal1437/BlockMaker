@@ -13,14 +13,12 @@ class ObjectList : public QTreeWidget, public CadModelCoreInterface
     Q_OBJECT
 
 private:
-    QList<CPoint*   > points;
-    QList<CEdge*    > edges ;
-    QList<CFace*    > faces ;
-    QList<CBlock*   > blocks;
-    QList<CStl*     > stls;
-    QList<Restraint*> restraints;
+    QTreeWidgetItem* points_root;
+    QTreeWidgetItem* edges_root;
+    QTreeWidgetItem* faces_root;
+    QTreeWidgetItem* blocks_root;
+    QTreeWidgetItem* restraints_root;
     CadModelMenu menu;
-    QTreeWidgetItem* rest_root;
 
 protected:
     QIcon   getIcon(CObject* obj);
@@ -36,7 +34,7 @@ public:
     void SetModel(CadModelCore* m);
 
 public slots:
-    void UpdateObject();    //オブジェクト更新
+    void UpdateAllObject(); //オブジェクト更新
     void PullSelected();    //選択情報取得
     void PushSelected();    //選択情報同期
 
