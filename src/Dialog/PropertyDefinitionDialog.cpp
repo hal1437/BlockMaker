@@ -281,7 +281,7 @@ void PropertyDefinitionDialog::Accept(){
         }
     }
     //更新停止
-    for(CObject* obj:paused) obj->ObservePause();
+    for(CObject* obj:paused) obj->ObserveStack();
 
     //値を代入
     for(CObject* obj: selected){
@@ -324,7 +324,7 @@ void PropertyDefinitionDialog::Accept(){
     }
 
     //更新再開
-    for(CObject* obj:paused) obj->ObserveRestart();
+    for(CObject* obj:paused) obj->ObservePop();
 
     emit RepaintRequest();
     this->ui->ApplyButton->setText("Apply");

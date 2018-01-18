@@ -46,32 +46,39 @@ QList<CPoint *> CObject::GetAllChildren()const{
 void CObject::Refresh(){
 }
 
-void CObject::ObservePause  (){
-    this->observe_pause = true;
+void CObject::ObserveIgnore    (){
+    this->observe_status = OBSERVE_STATUS::IGNORE;
 }
-void CObject::ObserveRestart(){
-    this->observe_pause = false;
-    if(this->observe_queue.size() > 0){
+void CObject::ObserveRestart   (){
+    this->observe_status = OBSERVE_STATUS::OBSERVE;
+}
+void CObject::ObserveStack(){
+    this->observe_status = OBSERVE_STATUS::STACK;
+}
+void CObject::ObservePop(){
+    if(this->observe_stack.size() > 0){
         //止めていた分をまとめて更新
-        this->ChangeChildCallback(this->observe_queue);
-        this->observe_queue.clear();
+        this->ChangeChildCallback(this->observe_stack);
+        this->observe_stack.clear();
     }
+    this->observe_status = OBSERVE_STATUS::OBSERVE;
 }
 
 
 CObject::CObject(QObject* parent):QObject(parent)
 {
-    observe_pause = false;
+    this->observe_status = OBSERVE_STATUS::OBSERVE;
 }
 
 CObject::~CObject(){}
 
 
 void CObject::StackChangeCallback(CObject* child){
-    if(this->observe_pause == true){
-         this->observe_queue.push_back(child);
-    }else{
+    if(this->observe_status == OBSERVE_STATUS::OBSERVE){
         this->ChangeChildCallback({child});
+    }
+    if(this->observe_status == OBSERVE_STATUS::STACK){
+        this->observe_stack.push_back(child);
     }
 }
 void CObject::ChangeChildCallback(QList<CObject*>){

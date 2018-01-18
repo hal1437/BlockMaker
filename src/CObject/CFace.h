@@ -40,7 +40,7 @@ public:
     OBSERVE_MEMBER(Boundary,Boundary,boundary) // 境界タイプ
     DEFINE_FLAG(VisibleDetail,true)         // 分割フレーム表示
     //DEFINE_FLAG(BaseFace ,true)               // ポリゴン判定
-    DEFINE_FLAG(FaceBlend,true)             // 面透過判定
+    DEFINE_FLAG(FaceBlend,true)              // 面透過判定
     DEFINE_FLAG(Contours ,false)             // 面を塗らずに輪郭だけ塗る
 
     QVector<int> reorder; //エッジ反転係数

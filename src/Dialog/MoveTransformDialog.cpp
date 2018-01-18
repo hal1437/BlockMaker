@@ -133,37 +133,48 @@ template <class Iterator> void MoveTransformDialog::AbsoluteMove(Iterator begin,
     delta /= points.size();
 
     //移動
-    for(Iterator it = begin;it != end;it++)Pause(*it);//更新停止
+    for(Iterator it = begin;it != end;it++)ObserveStack(*it);//更新停止
     for(CPoint* p :points){
         p->MoveAbsolute(*p - delta + pos);
     }
-    for(Iterator it = begin;it != end;it++)Restart(*it);//更新再開
+    for(Iterator it = begin;it != end;it++)ObservePop(*it);//更新再開
 }
 template <class Iterator> void MoveTransformDialog::RelativeMove(Iterator begin,Iterator end, Pos diff){
     //選択された点を相対移動
     QList<CPoint*> points = this->ConvertChildPoint(begin,end);
 
-    for(Iterator it=begin;it != end;it++)Pause(*it);//更新停止
+    for(Iterator it=begin;it != end;it++)ObserveStack(*it);//更新停止
 
     for(CPoint* p:points){
         p->MoveRelative(diff);
     }
-    for(Iterator it=begin;it != end;it++)Restart(*it);//更新再開
+    for(Iterator it=begin;it != end;it++)ObservePop(*it);//更新再開
 }
 
-void MoveTransformDialog::Pause(CObject* obj){
-    obj->ObservePause();
+void MoveTransformDialog::ObserveIgnore(CObject* obj){
+    obj->ObserveIgnore();
     for(int i = 0;i<obj->GetChildCount();i++){
-        Pause(obj->GetChild(i));
+        this->ObserveIgnore(obj->GetChild(i));
     }
 }
-void MoveTransformDialog::Restart(CObject* obj){
+void MoveTransformDialog::ObserveRestart(CObject* obj){
     obj->ObserveRestart();
     for(int i = 0;i<obj->GetChildCount();i++){
-        Restart(obj->GetChild(i));
+        this->ObserveRestart(obj->GetChild(i));
     }
 }
-void MoveTransformDialog::DrawTranslated(Pos camera,Pos center){
+void MoveTransformDialog::ObserveStack(CObject* obj){
+    obj->ObserveStack();
+    for(int i = 0;i<obj->GetChildCount();i++){
+        this->ObserveStack(obj->GetChild(i));
+    }
+}
+void MoveTransformDialog::ObservePop(CObject* obj){
+    obj->ObservePop();
+    for(int i = 0;i<obj->GetChildCount();i++){
+        this->ObservePop(obj->GetChild(i));
+    }
+}void MoveTransformDialog::DrawTranslated(Pos camera,Pos center){
     //色を保存
     float old_color[4];
     glGetFloatv  (GL_CURRENT_COLOR,old_color);

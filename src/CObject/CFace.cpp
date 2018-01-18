@@ -462,6 +462,7 @@ CFace::CFace(QObject* parent):
 CFace::~CFace(){}
 
 void CFace::ChangeChildCallback(QList<CObject*> edges){
+    this->ObserveIgnore();
     for(CEdge* edge:this->edges){
         if(exist(edges,edge)){
             //対角エッジの分割数同期
@@ -479,6 +480,7 @@ void CFace::ChangeChildCallback(QList<CObject*> edges){
             }
         }
     }
+    this->ObserveRestart();
     //メッシュ再計算
     this->RecalcMesh();
 }

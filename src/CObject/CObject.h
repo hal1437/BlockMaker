@@ -44,8 +44,13 @@ public:
     OBSERVE_MEMBER(QString,Name,name)
 
     //フラグ定義
-    bool            observe_pause; //子の変更による更新を停止
-    QList<CObject*> observe_queue; //子変更キュー
+    enum OBSERVE_STATUS{
+        OBSERVE,//監視中
+        IGNORE ,//無視
+        STACK  ,//スタック保存
+    };
+    OBSERVE_STATUS  observe_status; //監視状態
+    QList<CObject*> observe_stack; //監視スタック
 
     DEFINE_FLAG(Lock   ,false)       //固定
     DEFINE_FLAG(Visible,true)        //表示
@@ -88,8 +93,10 @@ public:
     virtual  void Refresh();
 
     //子監視関連
-    void ObservePause  ();//監視を一時停止
-    void ObserveRestart();//監視を再開
+    void ObserveIgnore (); //監視を再開
+    void ObserveRestart(); //監視を再開
+    void ObserveStack  (); //監視スタックに保存する
+    void ObservePop    (); //監視スタックを全て解放する
 
     //コンストラクタ
     explicit CObject(QObject* parent=nullptr);

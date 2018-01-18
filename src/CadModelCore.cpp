@@ -501,10 +501,10 @@ void CadModelCore::SolvedAnyObjectEmittor(CObject* object){
 
 void CadModelCore::ObservePause(){
     this->pause = true;
-    for(CBlock* obj:this->Blocks)obj->ObservePause();
-    for(CFace*  obj:this->Faces )obj->ObservePause();
-    for(CEdge*  obj:this->Edges )obj->ObservePause();
-    for(CPoint* obj:this->Points)obj->ObservePause();
+    for(CBlock* obj:this->Blocks)obj->ObserveStack();
+    for(CFace*  obj:this->Faces )obj->ObserveStack();
+    for(CEdge*  obj:this->Edges )obj->ObserveStack();
+    for(CPoint* obj:this->Points)obj->ObserveStack();
 }
 
 void CadModelCore::ObserveRestart(){
