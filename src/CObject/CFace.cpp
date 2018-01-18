@@ -469,10 +469,11 @@ void CFace::ChangeChildCallback(QList<CObject*> edges){
             for(int i=0;i<this->edges.size();i++){
                 if(this->edges[i] == edge){
                     //エッジ寄せ係数
-                    Pos e1 = *this->edges[(i+2)%this->edges.size()]->end - *this->edges[(i+2)%this->edges.size()]->start;
-                    Pos e2 = *edge->end - *edge->start;
-                    if(e1.DotPos(e2) > 0)this->edges[(i+2)%this->edges.size()]->setGrading(edge->getGrading());
-                    else                 this->edges[(i+2)%this->edges.size()]->setGrading(edge->getGrading().GetReverse());
+                    if(this->reorder[i] != this->reorder[(i+2)]%this->edges.size()){
+                        this->edges[(i+2)%this->edges.size()]->setGrading(edge->getGrading());
+                    }else{
+                        this->edges[(i+2)%this->edges.size()]->setGrading(edge->getGrading().GetReverse());
+                    }
 
                     //分割数
                     this->edges[(i+2)%this->edges.size()]->setDivide(edge->getDivide());

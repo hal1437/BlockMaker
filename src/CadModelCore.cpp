@@ -230,7 +230,9 @@ bool CadModelCore::ImportFoamFile(QString filename){
     seq.InputForeach(this->GetBlocks(),block_in);
 
     //三平面を復元
+    this->ObservePause();
     for(int i=0;i<3;i++)this->AddFaces(CFace::base[i]);
+    this->ObserveRestart();
 
     //更新
     emit UpdateAnyObjectEmittor();
