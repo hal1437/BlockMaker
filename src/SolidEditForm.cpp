@@ -37,11 +37,15 @@ void SolidEditForm::ColorSelect(CObject* obj){
 void SolidEditForm::keyPressEvent    (QKeyEvent *event){
     //キーイベント
     if(!this->controller->isSketcheing()){
-        if(event->key() == Qt::Key_Up    )this->SetCameraRotate(M_PI/2,0);  //平面
-        if(event->key() == Qt::Key_Left  )this->SetCameraRotate(0,0);       //正面
-        if(event->key() == Qt::Key_Right )this->SetCameraRotate(0,-M_PI/2); //右側面
+        if(event->key() == Qt::Key_Up    && !(event->modifiers() & Qt::ShiftModifier))this->SetCameraRotate( M_PI/2,0);  //平面
+        if(event->key() == Qt::Key_Up    &&  (event->modifiers() & Qt::ShiftModifier))this->SetCameraRotate(-M_PI/2,0);  //平面
+        if(event->key() == Qt::Key_Left  && !(event->modifiers() & Qt::ShiftModifier))this->SetCameraRotate(0 ,0);    //正面
+        if(event->key() == Qt::Key_Left  &&  (event->modifiers() & Qt::ShiftModifier))this->SetCameraRotate(0 ,M_PI);    //正面
+        if(event->key() == Qt::Key_Right && !(event->modifiers() & Qt::ShiftModifier))this->SetCameraRotate(0,M_PI/2);   //正面
+        if(event->key() == Qt::Key_Right &&  (event->modifiers() & Qt::ShiftModifier))this->SetCameraRotate(0,-M_PI/2);  //正面
         if(event->key() == Qt::Key_Down  ){        //視点リセット
-            this->SetCameraRotate(M_PI/4,-M_PI/4);
+            if((event->modifiers() & Qt::ShiftModifier))this->SetCameraRotate(-M_PI/4,M_PI/4);
+            else                                        this->SetCameraRotate(M_PI/4,-M_PI/4);
             this->SetCameraCenter(Pos(0,0,0));
             this->SetZoomRate(1.0);
         }
