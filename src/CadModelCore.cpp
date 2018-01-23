@@ -250,7 +250,7 @@ void CadModelCore::AddObject(CObject* obj){
     for(int i=0;i<obj->GetChildCount();i++){
         obj_children.append(obj->GetChild(i));
     }
-    this->AddObjectArray(obj_children);
+    if(!obj_children.empty())this->AddObjectArray(obj_children);
 }
 void CadModelCore::AddObjectArray(QList<CObject*> obj){
     if(obj.first()->is<CPoint>())this->AddPoints(ConvertArrayType<CObject*,CPoint*>(obj));
@@ -332,7 +332,7 @@ void CadModelCore::AllMerge(){
     QList<CPoint*>::iterator it1_p,it2_p;
     for(it1_p = this->Points.begin();it1_p != this->Points.end();it1_p++){
         for(it2_p = it1_p+1;it2_p != this->Points.end();it2_p++){
-            if(**it1_p == **it2_p){
+            if(**it1_p == **it2_p && *it1_p != *it2_p){
                 qDebug() << *it1_p << " <= " << *it2_p;
 
                 //it2を含むエッジを探してit1に置き換える

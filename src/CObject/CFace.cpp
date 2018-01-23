@@ -126,6 +126,7 @@ Pos CFace::GetPosFromUV(double u,double v)const{
     pp[2] = (this->GetEdgeMiddle(2,1.0-u) - lp[2]) *      v  + lp[2];
     pp[3] = (this->GetEdgeMiddle(3,1.0-v) - lp[3]) * (1.0-u) + lp[3];
     //GetPosFromUVSquareとの差分を取得
+//    return this->GetPosFromUVSquare(u,v);
     return (pp[0]+pp[1]+pp[2]+pp[3]) - this->GetPosFromUVSquare(u,v) * 3;
 }
 Pos CFace::GetPosFromUVSquare(double u,double v)const{
@@ -469,7 +470,7 @@ void CFace::ChangeChildCallback(QList<CObject*> edges){
             for(int i=0;i<this->edges.size();i++){
                 if(this->edges[i] == edge){
                     //エッジ寄せ係数
-                    if(this->reorder[i] != this->reorder[(i+2)]%this->edges.size()){
+                    if(this->reorder[i] != this->reorder[(i+2)%this->edges.size()]){
                         this->edges[(i+2)%this->edges.size()]->setGrading(edge->getGrading());
                     }else{
                         this->edges[(i+2)%this->edges.size()]->setGrading(edge->getGrading().GetReverse());

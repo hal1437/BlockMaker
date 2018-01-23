@@ -35,7 +35,6 @@ CFileEdge* CFileEdge::CreateFromFile(QString filepath){
     return edge;
 }
 
-
 void CFileEdge::DrawGL(Pos camera,Pos center)const{
     //詳細表示に構成点の表示を含める
     for(int i =0;i<this->pos.size();i++){
@@ -66,8 +65,24 @@ CFileEdge::CFileEdge()
 
 }
 
+CEdge* CFileEdge::Clone()const{
+    CFileEdge* ptr = new CFileEdge();
+    ptr->Create(this->start);
+    for(CPoint* pp : this->pos){
+        ptr->Create(dynamic_cast<CPoint*>(pp->Clone()));
+    }
+    ptr->Create(this->end);
+    ptr->name    = this->name;
+    ptr->grading = this->grading;
+    ptr->divide  = this->divide;
+    ptr->start_base = this->start_base;
+    ptr->Refresh();
+    return ptr;
+}
+
 void CFileEdge::ChangeChildCallback(QList<CObject *> children){
     if(exist(children,this->start)){
+        this->ObserveIgnore();
         Pos delta = *dynamic_cast<CPoint*>(*std::find(children.begin(),children.end(),this->start)) - this->start_base;
         for(CPoint* child : this->GetAllChildren()){
             if(child == this->start)continue;
@@ -75,8 +90,10 @@ void CFileEdge::ChangeChildCallback(QList<CObject *> children){
             child->MoveRelative(delta);
             child->SetLock(true);
         }
+
         this->start_base = *this->start;
-        Refresh();
+        this->ObserveRestart();
     }
+    Refresh();
 }
 

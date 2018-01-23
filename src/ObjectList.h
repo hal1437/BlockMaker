@@ -17,6 +17,7 @@ private:
     QTreeWidgetItem* edges_root;
     QTreeWidgetItem* faces_root;
     QTreeWidgetItem* blocks_root;
+    QTreeWidgetItem* stl_root;
     QTreeWidgetItem* restraints_root;
     CadModelMenu menu;
 
@@ -34,6 +35,10 @@ public:
     void SetModel(CadModelCore* m);
 
 public slots:
+    //開閉時
+    void ItemExpanded (QTreeWidgetItem * item);
+    void ItemCollapsed(QTreeWidgetItem * item);
+
     void UpdateAllObject(); //オブジェクト更新
     void PullSelected();    //選択情報取得
     void PushSelected();    //選択情報同期

@@ -19,6 +19,9 @@ public:
 
     virtual void DrawGL(Pos camera,Pos center)const;
 
+
+    CEdge* Clone()const;
+
     virtual CREATE_RESULT Create(CPoint *pos);
 
     CFileEdge();

@@ -200,9 +200,11 @@ void MainWindow::ToggledFileEdge(bool){
         CFileEdge* edge = CFileEdge::CreateFromFile(filepath);
         if(edge != nullptr){
             this->model->AddEdges(edge);
+            QList<CObject*> obj;
             for(CPoint* p:edge->GetAllChildren()){
-                this->model->AddObject(p);
+                obj.append(p);
             }
+            this->model->AddObjectArray(obj);
         }
     }
 }

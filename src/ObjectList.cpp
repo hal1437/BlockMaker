@@ -114,6 +114,46 @@ void ObjectList::SetModel(CadModelCore* m){
     connect(this->CadModelCoreInterface::model,SIGNAL(UpdateRestraints()),this,SLOT(UpdateAllObject()));
     connect(this->CadModelCoreInterface::model,SIGNAL(UpdateSelected()  ),this,SLOT(PullSelected()));
 }
+void ObjectList::ItemExpanded (QTreeWidgetItem * item){
+    //展開時にモデルから読み込みを行う。
+    if(item == this->points_root){
+        while(this->points_root->childCount() > 0)this->points_root->removeChild(this->points_root->child(0));
+        for(int i=0;i<this->CadModelCoreInterface::model->GetPoints()    .size();i++)AddObjectToTree(this->CadModelCoreInterface::model->GetPoints()    [i],points_root    ,i+1);
+    }
+    if(item == this->edges_root){
+        while(this->edges_root ->childCount() > 0)this->edges_root ->removeChild(this->edges_root ->child(0));
+        for(int i=0;i<this->CadModelCoreInterface::model->GetEdges()     .size();i++)AddObjectToTree(this->CadModelCoreInterface::model->GetEdges()     [i],edges_root     ,i+1);
+    }
+    if(item == this->faces_root){
+        while(this->faces_root ->childCount() > 0)this->faces_root ->removeChild(this->faces_root ->child(0));
+        for(int i=0;i<this->CadModelCoreInterface::model->GetFaces()     .size();i++)AddObjectToTree(this->CadModelCoreInterface::model->GetFaces()     [i],faces_root     ,i+1);
+    }
+    if(item == this->blocks_root){
+        while(this->blocks_root->childCount() > 0)this->blocks_root->removeChild(this->blocks_root->child(0));
+        for(int i=0;i<this->CadModelCoreInterface::model->GetBlocks()    .size();i++)AddObjectToTree(this->CadModelCoreInterface::model->GetBlocks()    [i],blocks_root    ,i+1);
+    }
+    if(item == this->stl_root){
+        while(this->stl_root   ->childCount() > 0)this->stl_root   ->removeChild(this->stl_root   ->child(0));
+        for(int i=0;i<this->CadModelCoreInterface::model->GetStls()      .size();i++)AddObjectToTree(this->CadModelCoreInterface::model->GetStls()      [i],stl_root       ,i+1);
+    }
+    if(item == this->restraints_root){
+        while(this->restraints_root->childCount() > 0)this->restraints_root->removeChild(this->restraints_root->child(0));
+        for(int i=0;i<this->CadModelCoreInterface::model->GetRestraints().size();i++)AddObjectToTree(this->CadModelCoreInterface::model->GetRestraints()[i],restraints_root,i+1);
+    }
+}
+void ObjectList::ItemCollapsed(QTreeWidgetItem * item){
+    //展開時にモデルから読み込みを行う。
+    if(item == this->points_root    )while(this->points_root    ->childCount() > 0)this->points_root->removeChild(this->points_root->child(0));
+    if(item == this->edges_root     )while(this->edges_root     ->childCount() > 0)this->edges_root ->removeChild(this->edges_root ->child(0));
+    if(item == this->faces_root     )while(this->faces_root     ->childCount() > 0)this->faces_root ->removeChild(this->faces_root ->child(0));
+    if(item == this->blocks_root    )while(this->blocks_root    ->childCount() > 0)this->blocks_root->removeChild(this->blocks_root->child(0));
+    if(item == this->stl_root       )while(this->stl_root       ->childCount() > 0)this->stl_root   ->removeChild(this->stl_root   ->child(0));
+    if(item == this->restraints_root)while(this->restraints_root->childCount() > 0)this->blocks_root->removeChild(this->blocks_root->child(0));
+    QTreeWidgetItem* obj = new QTreeWidgetItem();
+    obj->setText(0,"?");
+    item->addChild(obj);
+}
+
 
 void ObjectList::UpdateAllObject  (){
 
@@ -122,6 +162,7 @@ void ObjectList::UpdateAllObject  (){
     this->edges_root ->setText(0,QString("線　 <") + QString::number(this->CadModelCoreInterface::model->GetEdges() .size()) + ">");
     this->faces_root ->setText(0,QString("面　 <") + QString::number(this->CadModelCoreInterface::model->GetFaces() .size()) + ">");
     this->blocks_root->setText(0,QString("立体 <") + QString::number(this->CadModelCoreInterface::model->GetBlocks().size()) + ">");
+    this->stl_root   ->setText(0,QString("STL <") + QString::number(this->CadModelCoreInterface::model->GetStls()  .size()) + ">");
     this->restraints_root->setText(0,QString("幾何拘束 <") + QString::number(this->CadModelCoreInterface::model->GetRestraints().size()) + ">");
 
     //一時的にコネクト解除
@@ -129,19 +170,30 @@ void ObjectList::UpdateAllObject  (){
     disconnect(this,SIGNAL(itemSelectionChanged()),this,SLOT(PushSelected()));
 
     //オブジェクトのリセット
-    while(this->points_root->childCount() > 0)this->points_root->removeChild(this->points_root->child(0));
-    while(this->edges_root ->childCount() > 0)this->edges_root ->removeChild(this->edges_root ->child(0));
-    while(this->faces_root ->childCount() > 0)this->faces_root ->removeChild(this->faces_root ->child(0));
-    while(this->blocks_root->childCount() > 0)this->blocks_root->removeChild(this->blocks_root->child(0));
-    while(this->restraints_root->childCount() > 0)this->blocks_root->removeChild(this->blocks_root->child(0));
-
-    //オブジェクトのセット
-    for(int i=0;i<this->CadModelCoreInterface::model->GetPoints()    .size();i++)AddObjectToTree(this->CadModelCoreInterface::model->GetPoints()    [i],points_root    ,i+1);
-    for(int i=0;i<this->CadModelCoreInterface::model->GetEdges()     .size();i++)AddObjectToTree(this->CadModelCoreInterface::model->GetEdges()     [i],edges_root     ,i+1);
-    for(int i=0;i<this->CadModelCoreInterface::model->GetFaces()     .size();i++)AddObjectToTree(this->CadModelCoreInterface::model->GetFaces()     [i],faces_root     ,i+1);
-    for(int i=0;i<this->CadModelCoreInterface::model->GetBlocks()    .size();i++)AddObjectToTree(this->CadModelCoreInterface::model->GetBlocks()    [i],blocks_root    ,i+1);
-    for(int i=0;i<this->CadModelCoreInterface::model->GetStls()      .size();i++)AddObjectToTree(this->CadModelCoreInterface::model->GetStls()      [i],nullptr        ,i+1);
-    for(int i=0;i<this->CadModelCoreInterface::model->GetRestraints().size();i++)AddObjectToTree(this->CadModelCoreInterface::model->GetRestraints()[i],restraints_root,i+1);
+    if(this->points_root->isExpanded()){
+        while(this->points_root->childCount() > 0)this->points_root->removeChild(this->points_root->child(0));
+        for(int i=0;i<this->CadModelCoreInterface::model->GetPoints()    .size();i++)AddObjectToTree(this->CadModelCoreInterface::model->GetPoints()    [i],points_root    ,i+1);
+    }
+    if(this->edges_root->isExpanded()){
+        while(this->edges_root ->childCount() > 0)this->edges_root ->removeChild(this->edges_root ->child(0));
+        for(int i=0;i<this->CadModelCoreInterface::model->GetEdges()     .size();i++)AddObjectToTree(this->CadModelCoreInterface::model->GetEdges()     [i],edges_root     ,i+1);
+    }
+    if(this->faces_root->isExpanded()){
+        while(this->faces_root ->childCount() > 0)this->faces_root ->removeChild(this->faces_root ->child(0));
+        for(int i=0;i<this->CadModelCoreInterface::model->GetFaces()     .size();i++)AddObjectToTree(this->CadModelCoreInterface::model->GetFaces()     [i],faces_root     ,i+1);
+    }
+    if(this->blocks_root->isExpanded()){
+        while(this->blocks_root->childCount() > 0)this->blocks_root->removeChild(this->blocks_root->child(0));
+        for(int i=0;i<this->CadModelCoreInterface::model->GetBlocks()    .size();i++)AddObjectToTree(this->CadModelCoreInterface::model->GetBlocks()    [i],blocks_root    ,i+1);
+    }
+    if(this->stl_root->isExpanded()){
+        while(this->stl_root   ->childCount() > 0)this->stl_root   ->removeChild(this->stl_root   ->child(0));
+        for(int i=0;i<this->CadModelCoreInterface::model->GetStls()      .size();i++)AddObjectToTree(this->CadModelCoreInterface::model->GetStls()      [i],stl_root       ,i+1);
+    }
+    if(this->restraints_root->isExpanded()){
+        while(this->restraints_root->childCount() > 0)this->blocks_root->removeChild(this->blocks_root->child(0));
+        for(int i=0;i<this->CadModelCoreInterface::model->GetRestraints().size();i++)AddObjectToTree(this->CadModelCoreInterface::model->GetRestraints()[i],restraints_root,i+1);
+    }
 
     //再コネクト
     connect(this->CadModelCoreInterface::model,SIGNAL(UpdateSelected()),this,SLOT(PullSelected()));
@@ -153,11 +205,11 @@ void ObjectList::PullSelected(){
     //this <- model
     disconnect(this->CadModelCoreInterface::model,SIGNAL(UpdateSelected()),this,SLOT(PullSelected()));//一時的にコネクト解除
     disconnect(this,SIGNAL(itemSelectionChanged()),this,SLOT(PushSelected()));
+    if(stl_root   ->isExpanded())for(int i=0;i<this->stl_root   ->childCount();i++)PullSelectedObject(this->CadModelCoreInterface::model->GetStls()  [i],this->stl_root   ->child(i));
     if(blocks_root->isExpanded())for(int i=0;i<this->blocks_root->childCount();i++)PullSelectedObject(this->CadModelCoreInterface::model->GetBlocks()[i],this->blocks_root->child(i));
     if(faces_root ->isExpanded())for(int i=0;i<this->faces_root ->childCount();i++)PullSelectedObject(this->CadModelCoreInterface::model->GetFaces() [i],this->faces_root ->child(i));
     if(edges_root ->isExpanded())for(int i=0;i<this->edges_root ->childCount();i++)PullSelectedObject(this->CadModelCoreInterface::model->GetEdges() [i],this->edges_root ->child(i));
     if(points_root->isExpanded())for(int i=0;i<this->points_root->childCount();i++)PullSelectedObject(this->CadModelCoreInterface::model->GetPoints()[i],this->points_root->child(i));
-//    for(int i=0;i<this->CadModelCoreInterface::model->GetStls()  .size();i++,count++)PullSelectedObject(this->CadModelCoreInterface::model->GetStls()  [i],this->topLevelItem(count));
     for(int i =0;i<restraints_root->childCount();i++){
         PullSelectedObject(this->CadModelCoreInterface::model->GetRestraints()[i],restraints_root->child(i));
     }
@@ -175,7 +227,7 @@ void ObjectList::PushSelected(){
     if(faces_root-> isExpanded())for(int i=0;i<this->faces_root ->childCount();i++)PushSelectedObject(this->CadModelCoreInterface::model->GetFaces() [i],this->faces_root ->child(i));
     if(edges_root-> isExpanded())for(int i=0;i<this->edges_root ->childCount();i++)PushSelectedObject(this->CadModelCoreInterface::model->GetEdges() [i],this->edges_root ->child(i));
     if(points_root->isExpanded())for(int i=0;i<this->points_root->childCount();i++)PushSelectedObject(this->CadModelCoreInterface::model->GetPoints()[i],this->points_root->child(i));
-//    for(int i=0;i<this->CadModelCoreInterface::model->GetStls()  .size();i++)PushSelectedObject(this->CadModelCoreInterface::model->GetStls()  [i],this->stl_root  ->child(i));
+    if(stl_root   ->isExpanded())for(int i=0;i<this->stl_root   ->childCount();i++)PushSelectedObject(this->CadModelCoreInterface::model->GetStls()  [i],this->stl_root   ->child(i));
     for(int i =0;i<restraints_root->childCount();i++)PushSelectedObject(this->CadModelCoreInterface::model->GetRestraints()[i],restraints_root->child(i));
 
     connect(this->CadModelCoreInterface::model,SIGNAL(UpdateSelected()),this,SLOT(PullSelected()));//再コネクト
@@ -186,20 +238,29 @@ ObjectList::ObjectList(QWidget *parent) :
     QTreeWidget(parent)
 {
     connect(this,SIGNAL(itemSelectionChanged()),this,SLOT(PushSelected()));
+    connect(this,SIGNAL(itemCollapsed(QTreeWidgetItem*)),this,SLOT(ItemCollapsed(QTreeWidgetItem*)));
+    connect(this,SIGNAL(itemExpanded (QTreeWidgetItem*)),this,SLOT(ItemExpanded (QTreeWidgetItem*)));
 
     //ルート作成
     points_root     = new QTreeWidgetItem(this);
     edges_root      = new QTreeWidgetItem(this);
     faces_root      = new QTreeWidgetItem(this);
     blocks_root     = new QTreeWidgetItem(this);
+    stl_root        = new QTreeWidgetItem(this);
     restraints_root = new QTreeWidgetItem(this);
     points_root    ->setIcon(0,QIcon(":/ToolImages/Dot.png"));
     edges_root     ->setIcon(0,QIcon(":/ToolImages/Line.png"));
     faces_root     ->setIcon(0,QIcon(":/ToolImages/Face.png"));
     blocks_root    ->setIcon(0,QIcon(":/ToolImages/Blocks.png"));
+    stl_root       ->setIcon(0,QIcon(":/ToolImages/Stl.png"));
     restraints_root->setIcon(0,QIcon(":/Restraint/Restraint.png"));
+    this->ItemCollapsed(points_root);
+    this->ItemCollapsed(edges_root);
+    this->ItemCollapsed(faces_root);
+    this->ItemCollapsed(blocks_root);
+    this->ItemCollapsed(stl_root);
+    this->ItemCollapsed(restraints_root);
     this->addTopLevelItems({points_root,edges_root,faces_root,blocks_root});
-
 }
 
 ObjectList::~ObjectList()

@@ -240,8 +240,8 @@ CSpline::CSpline(CPoint* start,CPoint* end,QObject* parent):
 
 CEdge* CSpline::Clone()const{
     CSpline* ptr = new CSpline(this->parent());
-for(int i= 0;i<this->GetChildCount();i++){
-        ptr->SetChild(i,this->GetChild(i));
+    for(int i= 0;i<this->GetChildCount();i++){
+        ptr->Create(dynamic_cast<CPoint*>(this->GetChild(i)->Clone()));
     }
     ptr->grading = this->grading;
     ptr->divide  = this->divide;
