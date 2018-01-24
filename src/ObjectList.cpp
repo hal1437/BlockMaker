@@ -230,7 +230,7 @@ void ObjectList::PushSelected(){
     if(edges_root-> isExpanded())for(int i=0;i<this->edges_root ->childCount();i++)PushSelectedObject(this->CadModelCoreInterface::model->GetEdges() [i],this->edges_root ->child(i));
     if(points_root->isExpanded())for(int i=0;i<this->points_root->childCount();i++)PushSelectedObject(this->CadModelCoreInterface::model->GetPoints()[i],this->points_root->child(i));
     if(stl_root   ->isExpanded())for(int i=0;i<this->stl_root   ->childCount();i++)PushSelectedObject(this->CadModelCoreInterface::model->GetStls()  [i],this->stl_root   ->child(i));
-    if(restraints_root   ->isExpanded())for(int i =0;i<restraints_root->childCount();i++)PushSelectedObject(this->CadModelCoreInterface::model->GetRestraints()[i],restraints_root->child(i));
+    if(restraints_root->isExpanded())for(int i =0;i<restraints_root->childCount();i++)PushSelectedObject(this->CadModelCoreInterface::model->GetRestraints()[i],restraints_root->child(i));
 
     connect(this->CadModelCoreInterface::model,SIGNAL(UpdateSelected()),this,SLOT(PullSelected()));//再コネクト
     connect(this,SIGNAL(itemSelectionChanged()),this,SLOT(PushSelected()));

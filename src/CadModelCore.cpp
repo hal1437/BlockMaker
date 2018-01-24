@@ -441,8 +441,10 @@ QList<CFace*>  CadModelCore::GetParent(CEdge*  child)const{
     QList<CFace*>ans;
     for(CFace* face:this->GetFaces()){
         for(CEdge* edge : face->edges){
-            if(edge == child)ans.push_back(face);
-            break;
+            if(edge == child){
+                ans.push_back(face);
+                break;
+            }
         }
     }
     return ans;
