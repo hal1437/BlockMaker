@@ -67,7 +67,7 @@ public:
     double GetMiddleParamFromPos(Pos pos)const; //tを求める
 
     //結合
-    virtual CEdge*          MergeEdge (CEdge* merge_point); //失敗ならnullptr
+    virtual CEdge*        MergeEdge (CEdge* merge_point); //失敗ならnullptr
     virtual QList<CEdge*> DivideEdge(CPoint* division);   //失敗ならQList<CEdge*>()
 
     CEdge(QObject* parent=nullptr);

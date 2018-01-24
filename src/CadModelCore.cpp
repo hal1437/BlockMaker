@@ -253,6 +253,7 @@ void CadModelCore::AddObject(CObject* obj){
     if(!obj_children.empty())this->AddObjectArray(obj_children);
 }
 void CadModelCore::AddObjectArray(QList<CObject*> obj){
+    if(obj.isEmpty())return;
     if(obj.first()->is<CPoint>())this->AddPoints(ConvertArrayType<CObject*,CPoint*>(obj));
     if(obj.first()->is<CEdge >())this->AddEdges (ConvertArrayType<CObject*,CEdge* >(obj));
     if(obj.first()->is<CFace >())this->AddFaces (ConvertArrayType<CObject*,CFace* >(obj));

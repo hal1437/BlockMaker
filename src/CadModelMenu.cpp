@@ -36,6 +36,29 @@ void CadModelMenu::Show(QPoint pos){
         this->invisible_mesh_action = this->menu->addAction("詳細非表示");
         connect(this->invisible_mesh_action,SIGNAL(triggered(bool)),this,SLOT(SetInVisibleDetail(bool)));
     }
+    //いずれかが「詳細表示」
+    if(std::any_of(selected.begin(),selected.end(),[&](CObject* obj){return obj->isVisibleDetail();})){
+        this->invisible_mesh_action = this->menu->addAction("詳細非表示");
+        connect(this->invisible_mesh_action,SIGNAL(triggered(bool)),this,SLOT(SetInVisibleDetail(bool)));
+    }
+    //選択されたオブジェクトが線のみかつ2個以上
+    if(std::all_of  (selected.begin(),selected.end(),[&](CObject* obj){return obj->is<CEdge>();}) &&
+       selected.size()  >= 2){
+        this->invisible_mesh_action = this->menu->addAction("線を結合");
+        connect(this->invisible_mesh_action,SIGNAL(triggered(bool)),this,SLOT(MergeEdge(bool)));
+    }
+    //選択されたオブジェクトが点である、かつ一つの線上に存在する。
+    if(selected.size() ==1 && std::count_if(selected.begin(),selected.end(),[&](CObject* obj){return obj->is<CPoint>();}) == 1){
+        CPoint* pos = dynamic_cast<CPoint*>(selected.first());
+        if(std::count_if(this->model->GetEdges().begin(),this->model->GetEdges().end(),[&](CEdge* edge){
+            return edge->isOnEdge(*pos);
+        }) == 1){
+            this->invisible_mesh_action = this->menu->addAction("線を分割");
+            connect(this->invisible_mesh_action,SIGNAL(triggered(bool)),this,SLOT(DivideEdge(bool)));
+        }
+    }
+
+
     this->menu->exec(pos);
 }
 
@@ -70,6 +93,42 @@ void CadModelMenu::SetInVisibleDetail(bool){
         obj->SetVisibleDetail(false);
     }
 }
+void CadModelMenu::DivideEdge(bool){
+    CPoint* pos = dynamic_cast<CPoint*>(this->model->GetSelected().first());
+    CEdge* edge = *std::find_if(this->model->GetEdges().begin(),this->model->GetEdges().end(),[&](CEdge* edge){
+        return edge->isOnEdge(*pos);
+    });
+
+    //線を分割しモデルに追加
+    QList<CObject*> objects = ConvertArrayType<CEdge*,CObject*>(edge->DivideEdge(pos));
+    if(!objects.empty()){
+        this->model->AddObjectArray(objects);
+        this->model->RemoveEdges(edge);
+    }
+}
+void CadModelMenu::MergeEdge(bool){
+    QList<CEdge*> edges = ConvertArrayType<CObject*,CEdge*>(this->model->GetSelected());
+    QList<CEdge*> merges;
+
+    //線を分割しモデルに追加
+    for(int i =0;i<edges.size()-1;){
+         CEdge* merged = edges[i]->MergeEdge(edges[i+1]);
+         if(merged != nullptr){
+             //成功
+             merges.append(merged);
+             merges.removeAll(edges[i]);
+             this->model->RemoveEdges(edges[i]);
+             this->model->RemoveEdges(edges[i+1]);
+             edges[i] = merged;
+             edges.removeAt(i+1);
+         }else{
+             //失敗
+             i++;
+         }
+    }
+    this->model->AddEdges(merges);
+}
+
 
 CadModelMenu::CadModelMenu(QObject *parent):
     QObject(parent)

@@ -113,10 +113,12 @@ CEdge*          CLine::MergeEdge (CEdge* merge){
     }
 
     //方向が違う
-    if(std::abs(((*this->end) - (*this->start)).DotPos((*merge->end) - (*merge->start))) < 1.0){
+    /*
+    if(std::abs((((*this ->end) - (*this ->start)).GetNormalize()).DotPos
+                (((*merge->end) - (*merge->start)).GetNormalize())) !=  1){
         QMessageBox::critical(nullptr, tr("結合エラー"), tr("二つの線の方向が一致している必要があります。"));
         return nullptr;
-    }
+    }*/
 
     //作成
     CLine* new_line = new CLine();
@@ -125,7 +127,13 @@ CEdge*          CLine::MergeEdge (CEdge* merge){
     return new_line;
 }
 QList<CEdge*> CLine::DivideEdge(CPoint* division){
-    return     QList<CEdge*>();
+    CEdge* edge_s = new CLine();
+    CEdge* edge_e = new CLine();
+    edge_s->start = this->start;
+    edge_s->end   = division;
+    edge_e->start = division;
+    edge_e->end   = this->end;
+    return {edge_s,edge_e};
 }
 
 

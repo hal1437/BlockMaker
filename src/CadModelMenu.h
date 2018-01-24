@@ -16,6 +16,8 @@ private:
     QAction* invisible_action;
     QAction* visible_mesh_action;
     QAction* invisible_mesh_action;
+    QAction* divide_edge_action;
+    QAction* merge_edge_action;
 
 public:
     //メニュー表示
@@ -31,6 +33,8 @@ public slots:
     void SetInvisible(bool);//不可視設定
     void SetVisibleDetail(bool);//可視フレーム設定
     void SetInVisibleDetail(bool);//不可視フレーム設定
+    void DivideEdge(bool);
+    void MergeEdge(bool);
 };
 
 #endif // CADMODELMENU_H

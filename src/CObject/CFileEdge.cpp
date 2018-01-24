@@ -81,6 +81,7 @@ CEdge* CFileEdge::Clone()const{
 }
 
 void CFileEdge::ChangeChildCallback(QList<CObject *> children){
+    /*
     if(exist(children,this->start)){
         this->ObserveIgnore();
         Pos delta = *dynamic_cast<CPoint*>(*std::find(children.begin(),children.end(),this->start)) - this->start_base;
@@ -93,7 +94,7 @@ void CFileEdge::ChangeChildCallback(QList<CObject *> children){
 
         this->start_base = *this->start;
         this->ObserveRestart();
-    }
+    }*/
     Refresh();
 }
 

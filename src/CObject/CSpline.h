@@ -54,6 +54,10 @@ public:
     //更新
     virtual void Refresh();
 
+    //結合
+    virtual CEdge*        MergeEdge (CEdge* merge); //失敗ならnullptr
+    virtual QList<CEdge*> DivideEdge(CPoint* division);   //失敗ならQVector<CEdge*>()
+
     CSpline(QObject* parent = nullptr);
     CSpline(CPoint* start,CPoint* end,QObject* parent = nullptr);
     ~CSpline();

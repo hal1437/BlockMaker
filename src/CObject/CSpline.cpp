@@ -228,6 +228,64 @@ void CSpline::Refresh(){
     zs.init(z);
 }
 
+//結合
+CEdge*          CSpline::MergeEdge (CEdge* merge){
+    //型が同じでない
+    if(!merge->is<CSpline>()){
+        QMessageBox::critical(nullptr, tr("結合エラー"), tr("型が違います。同一タイプの線を選択してください。"));
+        return nullptr;
+    }
+    //一致しない
+    CPoint* merge_point;
+    if(this->start == merge->start)merge_point = this->start;
+    if(this->start == merge->end  )merge_point = this->start;
+    if(this->end   == merge->start)merge_point = this->end;
+    if(this->end   == merge->end  )merge_point = this->end;
+    if(merge_point == nullptr){
+        QMessageBox::critical(nullptr, tr("結合エラー"), tr("二つの線の始点または終点が一致している必要があります。"));
+        return nullptr;
+    }
+
+    //作成
+    CSpline* new_line = new CSpline();
+    if(this->end == merge_point){
+        for(int i=0;i<this->GetChildCount()-1;i++){
+            new_line->Create(dynamic_cast<CPoint*>(this->GetChild(i)));
+        }
+    }else{
+        for(int i=this->GetChildCount()-1;i>=1;i--){
+            new_line->Create(dynamic_cast<CPoint*>(this->GetChild(i)));
+        }
+    }
+    if(merge->end == merge_point){
+        for(int i=merge->GetChildCount()-1;i>=0;i--){
+            new_line->Create(dynamic_cast<CPoint*>(merge->GetChild(i)));
+        }
+    }else{
+        for(int i=0;i<merge->GetChildCount();i++){
+            new_line->Create(dynamic_cast<CPoint*>(merge->GetChild(i)));
+        }
+    }
+    return new_line;
+}
+QList<CEdge*> CSpline::DivideEdge(CPoint* division){
+    //補間値を取得
+    double middle_param = this->GetMiddleParamFromPos(*division);
+
+    CEdge* edge_s = new CSpline();
+    CEdge* edge_e = new CSpline();
+    for(int i =0;i<middle_param * (this->GetChildCount()-1);i++){
+        edge_s->Create(dynamic_cast<CPoint*>(this->GetChild(i)));
+    }
+    edge_s->Create(division);
+    edge_e->Create(division);
+    for(int i = middle_param * (this->GetChildCount()-1) + 1;i<this->GetChildCount();i++){
+        edge_e->Create(dynamic_cast<CPoint*>(this->GetChild(i)));
+    }
+    return {edge_s,edge_e};
+}
+
+
 CSpline::CSpline(QObject *parent):
     CEdge(parent)
 {
