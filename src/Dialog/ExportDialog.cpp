@@ -61,7 +61,10 @@ void ExportDialog::Export(QString filename)const{
     //BlockMeshDict出力
     FoamFile file(filename+"/blockMeshDict");
 
+
     //ヘッダー出力
+    file.OutOpenFOAMHeader();
+    file.OutBlockMakerHeader();
     file.OutHeader();
 
     //単位変換設定

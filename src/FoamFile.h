@@ -4,6 +4,7 @@
 #include <QDebug>
 #include <QMap>
 #include <QFile>
+#include <QTextCodec>
 #include <QTextStream>
 #include <QMessageBox>
 #include <type_traits>
@@ -49,9 +50,10 @@ public:
     void OutValue(QString name,QString value); //値出力
     void OutString(QString str);               //文字列出力
     void EndScope();                           //閉じかっこ出力
+    void OutOpenFOAMHeader();                  //ヘッダー出力
+    void OutBlockMakerHeader();                //ヘッダー出力
     void OutHeader();                          //ヘッダー出力
     void OutNewline();                         //改行出力
-
 
     //改行&タブなし出力
     template<class T>
@@ -59,8 +61,6 @@ public:
     void OutVectorInline(Pos pos);                   //座標出力
     void OutValueInline(QString name,QString value); //値出力
     void OutStringInline(QString str);               //文字列出力
-
-
 
     FoamFile(QString str);
     ~FoamFile();

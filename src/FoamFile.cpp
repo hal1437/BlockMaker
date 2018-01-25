@@ -60,13 +60,36 @@ void FoamFile::EndScope(){
     defs.pop_back();
     if(defs.size()==0)ofs << NEWLINE;
 }
+
+void FoamFile::OutOpenFOAMHeader(){
+    ofs << R"(
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  4.1                                   |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+)";
+}
+void FoamFile::OutBlockMakerHeader(){
+    ofs <<R"(
+/*---------------------------------------------------------------------------*\
+|     ____  __           __      __  ___      __             |                |
+|    / __ )/ /___  _____/ /__   /  |/  /___ _/ /_____  _____ | Block Maker    |
+|   / __  / / __ \/ ___/ //_/  / /|_/ / __ `/ //_/ _ \/ ___/ | BlockMesh GUI  |
+|  / /_/ / / /_/ / /__/ ,<    / /  / / /_/ / ,< /  __/ /     | Version: zero  |
+| /_____/_/\____/\___/_/|_|  /_/  /_/\__,_/_/|_|\___/_/      |                |
+\*---------------------------------------------------------------------------*/
+)";
+
+}
 void FoamFile::OutHeader(){
     this->StartDictionaryDifinition("FoamFile");
     this->OutValue("version" ,"2.0");
     this->OutValue("format " ,"ascii");
     this->OutValue("class  " ,"dictionary");
     this->OutValue("object " ,obj_name);
-
     this->EndScope();
 }
 void FoamFile::OutNewline(){
@@ -80,6 +103,8 @@ FoamFile::FoamFile(QString str):
         QMessageBox::information(nullptr, "ファイルが開けません",file.errorString());
         return;
     }
+    this->ofs.setAutoDetectUnicode(true);
+    //this->ofs.setCodec(QTextCodec::codecForName("UTF-8"));
     obj_name = str.split('/').back();
 }
 FoamFile::~FoamFile()
