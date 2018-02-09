@@ -139,26 +139,27 @@ bool CadModelCore::ImportFoamFile(QString filename){
         seq.Input(child_size);
         //始点
         seq.Input(index_s);
+        edge->Create(this->GetPoints()[index_s]);
 
         //中央点：円弧
         if(class_name == CArc().DefaultClassName()){
-            seq.Input(index_m);
-            dynamic_cast<CArc*>(edge)->SetCenterPos(this->GetPoints()[index_m]);
+            seq.Input(index_m);//始点
+            dynamic_cast<CArc*>(edge)->Create(this->GetPoints()[index_m]);
+            std::swap(dynamic_cast<CArc*>(edge)->start,dynamic_cast<CArc*>(edge)->center);
         }
         //補助点：スプライン
         if(class_name == CSpline().DefaultClassName()){
             for(int i =0;i<child_size-2;i++){
                 seq.Input(index_m);
-                dynamic_cast<CArc*>(edge)->SetCenterPos(this->GetPoints()[index_m]);
+                dynamic_cast<CSpline*>(edge)->Create(this->GetPoints()[index_m]);
             }
         }
 
         //終点
         seq.Input(index_e);
+        edge->Create(this->GetPoints()[index_e]);
 
         //値の代入
-        edge->SetStartPos(this->GetPoints()[index_s]);
-        edge->SetEndPos  (this->GetPoints()[index_e]);
         edge->setDivide  (divide);
         edge->setGrading (gradings);
 
