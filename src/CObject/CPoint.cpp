@@ -83,7 +83,12 @@ Pos CPoint::GetNearLine(const Pos&,const Pos&)const{
 }
 
 CObject* CPoint::Clone()const{
-    return new CPoint(static_cast<Pos>(*this));
+    CPoint* new_obj = new CPoint(static_cast<Pos>(*this));
+    new_obj->ControlPoint  = this->ControlPoint;
+    new_obj->Visible       = this->Visible;
+    new_obj->VisibleDetail = this->VisibleDetail;
+    new_obj->Lock          = this->Lock;
+    return new_obj;
 }
 
 

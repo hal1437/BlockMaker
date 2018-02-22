@@ -16,20 +16,7 @@ public:
 public:
     virtual QString DefaultClassName(){return "CFileEdge";}
 
-
-    virtual void DrawGL(Pos camera,Pos center)const;
-
-
-    CEdge* Clone()const;
-
-    virtual CREATE_RESULT Create(CPoint *pos);
-
     CFileEdge();
-
-public slots:
-    //点移動コールバックオーバーライド
-    virtual void ChangeChildCallback(QList<CObject*>);
-
 };
 
 #endif // CFILEEDGE_H

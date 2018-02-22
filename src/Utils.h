@@ -106,7 +106,7 @@ public:                                       \
 
 //フラグ定義
 #define DEFINE_FLAG(NAME,DEFAULT)                    \
-private:                                             \
+protected:                                             \
     bool NAME = DEFAULT;                             \
 public:                                              \
     virtual void Set##NAME(bool flag){NAME = flag;}  \
